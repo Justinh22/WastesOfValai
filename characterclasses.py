@@ -43,13 +43,13 @@ class Character():
         self.manaregen = 0
         self.buffs = [0,0,0,0,0,0,0]
     def getAttack(self):
-        return self.eqpWpn.attack + self.attack
+        return self.eqpWpn.attack + self.attack + self.getBuff("ATK")
     def getDefense(self):
-        return self.eqpAmr.defense + self.defense
+        return self.eqpAmr.defense + self.defense + self.getBuff("DEF")
     def getCritRate(self):
-        return self.eqpWpn.critrate + self.critrate
+        return self.eqpWpn.critrate + self.critrate + self.getBuff("CRT")
     def getDodge(self):
-        return self.eqpAmr.dodge + self.dodge
+        return self.eqpAmr.dodge + self.dodge + self.getBuff("DDG")
     def getSpeed(self):
         return self.speed
     def takeDamage(self,val):
@@ -77,6 +77,9 @@ class Character():
     def addBuffs(self,buff):
         for i in range(len(self.buffs)):
             self.buffs[i] += buff[i]
+        self.hp += self.buffs[6]
+        if self.hp > self.hpMax:
+            self.hp = self.hpMax
     def getBuff(self,type):
         if type == "ATK":
             return self.buffs[0]
@@ -164,7 +167,7 @@ class Buff():
         self.duration -= 1
         self.checkExpiry()
     def checkExpiry(self):
-        if duration <= 0:
+        if self.duration <= 0:
             return True
     def getBuff(self,type):
         if type == "ATK":

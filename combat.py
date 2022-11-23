@@ -2,6 +2,7 @@ import pygame
 import random
 import time
 from characters import Action
+from characters import Buff
 
 class Combat():
     def __init__(self,game):
@@ -44,6 +45,9 @@ class Combat():
         members = self.party + self.encounter
         members.sort(key=lambda x: x.speed)
         members.reverse()
+        for i in range(len(members)-1,-1,-1):
+            if members[i].hp <= 0:
+                members.pop(i)
         seenPty = [0] * len(self.party)
         seenEnc = [0] * len(self.encounter)
         for entry in members:
@@ -173,8 +177,9 @@ class Combat():
                 else:
                     self.cursorPos -= 2
         if self.game.DOWN:
-            if self.state == "targetSelect" and self.cursorPos < len(self.encounter)-1:
-                self.cursorPos += 1
+            if self.state == "targetSelect":
+                if (self.actionVal < 400 and self.cursorPos < len(self.encounter)-1) or (self.actionVal >= 400 and self.cursorPos < len(self.party)-1):
+                    self.cursorPos += 1
             elif self.state == "spellList":
                 if self.cursorPos == 2 or self.cursorPos == 3:
                     if self.menuTop+5 < len(self.party[self.combatOrder[self.currentTurn][1]].spells):
@@ -216,9 +221,14 @@ class Combat():
             self.write(20,500,400,"CANCEL")
         if self.state == "targetSelect":
             self.write(20, self.left+15, 325, "Select a target")
-            self.write(20, 450, 30+(self.cursorPos*30), "<")
-            self.write(20,30,400,"A) SELECT")
-            self.write(20,180,400,"B) BACK")
+            if self.actionVal < 400:
+                self.write(20, 450, 30+(self.cursorPos*30), "<")
+                self.write(20,30,400,"A) SELECT")
+                self.write(20,180,400,"B) BACK")
+            else:
+                self.write(20, 260, 173+(self.cursorPos*30), ">")
+                self.write(20,30,400,"A) SELECT")
+                self.write(20,180,400,"B) BACK")
         if self.state == "spellList":
             if self.lowMana:
                 self.write(20, self.left+15, 325, "You don't have enough mana to cast that.")
@@ -264,6 +274,17 @@ class Combat():
                         combatStr = self.party[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + " at " + self.encounter[self.actions[self.exTurn-1].target].name + " for " + str(self.dmg) + " damage!"
                     else:
                         combatStr = self.party[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + " for " + str(self.dmg) + " damage!"
+            elif self.actions[self.exTurn-1].action >= 400 and self.actions[self.exTurn-1].action < 500:
+                if self.game.directory.getSptSpell(self.actions[self.exTurn-1].action).type == "Buff":
+                    if self.game.directory.getSptSpell(self.actions[self.exTurn-1].action).target == "Single":
+                        combatStr = self.party[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + " on " + self.party[self.actions[self.exTurn-1].target].name + "!"
+                    else:
+                        combatStr = self.party[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + "!"
+                elif self.game.directory.getSptSpell(self.actions[self.exTurn-1].action).type == "Heal":
+                    if self.game.directory.getSptSpell(self.actions[self.exTurn-1].action).target == "Single":
+                        combatStr = self.party[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + " on " + self.party[self.actions[self.exTurn-1].target].name + ", restoring " + str(self.game.directory.getSptSpell(self.actions[self.exTurn-1].action).getHeal()) + " HP!"
+                    else:
+                        combatStr = self.party[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + ", restoring " + str(self.game.directory.getSptSpell(self.actions[self.exTurn-1].action).getHeal()) + " HP!"
             self.write(20, self.left+15, 325, combatStr)
 
         if self.state == "win":
@@ -394,6 +415,26 @@ class Combat():
                         member.takeDamage(self.dmg)
                     self.dmg = spell.attack
                     self.party[source[1]].mp -= spell.manacost
+        elif spellID < 500:
+            spell = self.game.directory.getSptSpell(spellID)
+            if spell.target == "Single":
+                if spell.type == "Heal":
+                    self.party[target].hp += spell.getHeal()
+                    if self.party[target].hp > self.party[target].hpMax:
+                        self.party[target].hp = self.party[target].hpMax
+                elif spell.type == "Buff":
+                    self.applyBuff(spell,target)
+                self.party[source[1]].mp -= spell.manacost
+            elif spell.target == "All":
+                if spell.type == "Heal":
+                    for member in self.party:
+                        member.hp += spell.getHeal()
+                        if member.hp > member.hpMax:
+                            member.hp = member.hpMax
+                elif spell.type == "Buff":
+                    self.applyBuff(spell,target)
+                self.party[source[1]].mp -= spell.manacost
+
 
     def validManaCost(self,user,spell):
         return user.mp > self.game.directory.getManaCost(spell)
@@ -413,6 +454,8 @@ class Combat():
                 if self.actions[self.exTurn].action == 0:
                     self.attack(self.actions[self.exTurn].source,self.actions[self.exTurn].target)
                 elif self.actions[self.exTurn].action >= 300 and self.actions[self.exTurn].action < 400:
+                    self.cast(self.actions[self.exTurn].source,self.actions[self.exTurn].target,self.actions[self.exTurn].action)
+                elif self.actions[self.exTurn].action >= 400 and self.actions[self.exTurn].action < 500:
                     self.cast(self.actions[self.exTurn].source,self.actions[self.exTurn].target,self.actions[self.exTurn].action)
                 self.exTurn += 1
                 self.timeStart = pygame.time.get_ticks()
@@ -485,13 +528,15 @@ class Combat():
             self.state = "win"
             self.timeStart = pygame.time.get_ticks()
 
-    def applyBuff(self,buff):
-        self.buffs.append(buff):
-        if bf.target == -1:
+    def applyBuff(self,buff,target):
+        newBuff = Buff(buff.name,buff.potency,4,target)
+        self.buffs.append(newBuff)
+        if newBuff.target == -1:
             for member in self.party:
-                member.addBuffs(buff)
+                member.addBuffs(newBuff.buff)
         else:
-            self.party[i].addBuffs(buff)
+            for member in self.party:
+                self.party[newBuff.target].addBuffs(newBuff.buff)
 
     def processBuffs(self):
         for member in self.party:
@@ -501,8 +546,12 @@ class Combat():
                 for member in self.party:
                     member.addBuffs(bf.buff)
             else:
-                self.party[i].addBuffs(bf.buff)
+                self.party[bf.target].addBuffs(bf.buff)
+            print(f'{bf.name}, {bf.duration}')
             bf.tick()
         for i in range(len(self.buffs)-1,-1,-1):
             if self.buffs[i].checkExpiry():
+                print(f'{bf.name} expired.')
                 self.buffs.pop(i)
+        for member in self.party:
+            print(member.buffs)

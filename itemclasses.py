@@ -48,3 +48,5 @@ class SupportMagic(Item):
         self.manacost = mpc
         self.type = tp
         self.target = tgt
+    def getHeal(self):
+        return self.potency[6]
