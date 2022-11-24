@@ -20,7 +20,7 @@ class Armor(Item):
         Item.__init__(self,nm,desc,rar,i)
         self.defense = df
         self.dodge = ddg
-        self.mpregen = mpr
+        self.manaregen = mpr
 
 class Potion(Item):
     def __init__(self,nm,desc,rar,i,hpg,mpg):

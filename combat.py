@@ -3,6 +3,7 @@ import random
 import time
 from characters import Action
 from characters import Buff
+from dialogue import *
 
 class Combat():
     def __init__(self,game):
@@ -32,11 +33,12 @@ class Combat():
         self.menuTop = -1
         self.lowMana = False
         self.buffs = []
+        self.combatDialogue = ""
 
     def initialize(self,party,encounter):
         self.party = party
         for i in range(0,len(self.party)):
-            print(f'{self.party[i].name}, {self.party[i].type.name}, {self.party[i].level} (ID {self.party[i].id}) - HP: {self.party[i].hpMax}, MP: {self.party[i].mpMax}, ATK: {self.party[i].attack}, CRT: {self.party[i].critrate}, DEF: {self.party[i].defense}, DDG: {self.party[i].dodge}, LCK: {self.party[i].luck}, SPD: {self.party[i].speed}, SPELLS: {self.party[i].spells}')
+            print(f'{self.party[i].name}, {self.party[i].type.name}, {self.party[i].level} (ID {self.party[i].id}) - HP: {self.party[i].hpMax}, MP: {self.party[i].mpMax}, ATK: {self.party[i].attack}, CRT: {self.party[i].critrate}, DEF: {self.party[i].defense}, DDG: {self.party[i].dodge}, LCK: {self.party[i].luck}, SPD: {self.party[i].speed}, PRS: {self.party[i].personality}, SPELLS: {self.party[i].spells}')
         self.encounter = encounter
         for i in range(0,len(self.encounter)):
             print(f'{self.encounter[i].name}, {self.encounter[i].level} - SPD: {self.encounter[i].speed}')
@@ -71,6 +73,8 @@ class Combat():
         if self.combatOrder[self.currentTurn][0] == "Encounter":
             self.enemyAction(self.combatOrder[self.currentTurn])
             self.next()
+        if self.combatOrder[self.currentTurn][0] == "Party":
+            self.combatDialogue = getCombatDialogue(self.party[self.combatOrder[self.currentTurn][1]])
         self.inCombat = True
         self.state = "mainWindow"
         self.delay = 5
@@ -207,11 +211,13 @@ class Combat():
         self.combatInfo()
         if self.state == "mainWindow":
             self.write(20, self.left+15, 325, self.party[self.combatOrder[self.currentTurn][1]].name+"'s turn!")
-            self.write(20,30,400,"A) ATTACK")
-            self.write(20,180,400,"B) USE") #SPELL, ITEM, COMBAT ART
-            self.write(20,330,400,"X) CANCEL")
-            self.write(20,480,400,"Y) RUN")
+            self.write(20,45,375,"A) ATTACK")
+            self.write(20,210,375,"B) USE") #SPELL, ITEM, COMBAT ART
+            self.write(20,45,420,"X) CANCEL")
+            self.write(20,210,420,"Y) RUN")
+            self.statBlock()
         if self.state == "useMenu":
+            pygame.draw.line(self.game.screen,self.game.white,(self.left,350),(self.right+9,350),2)
             self.write(20, self.left+15, 325, "Use what?")
             self.write(20, 20+(self.cursorPos*150), 398, ">")
             self.write(20,50,400,"SPELL")
@@ -220,6 +226,7 @@ class Combat():
             self.write(20,350,400,"ART")
             self.write(20,500,400,"CANCEL")
         if self.state == "targetSelect":
+            pygame.draw.line(self.game.screen,self.game.white,(self.left,350),(self.right+9,350),2)
             self.write(20, self.left+15, 325, "Select a target")
             if self.actionVal < 400:
                 self.write(20, 450, 30+(self.cursorPos*30), "<")
@@ -230,6 +237,7 @@ class Combat():
                 self.write(20,30,400,"A) SELECT")
                 self.write(20,180,400,"B) BACK")
         if self.state == "spellList":
+            pygame.draw.line(self.game.screen,self.game.white,(self.left,350),(self.right+9,350),2)
             if self.lowMana:
                 self.write(20, self.left+15, 325, "You don't have enough mana to cast that.")
             else:
@@ -257,6 +265,7 @@ class Combat():
         #if self.state == "combatArtList":
 
         if self.state == "execute":
+            pygame.draw.line(self.game.screen,self.game.white,(self.left,350),(self.right+9,350),2)
             combatStr = ""
             if self.actions[self.exTurn-1].action == 0:
                 if self.actions[self.exTurn-1].source[0] == "Encounter":
@@ -288,11 +297,13 @@ class Combat():
             self.write(20, self.left+15, 325, combatStr)
 
         if self.state == "win":
+            pygame.draw.line(self.game.screen,self.game.white,(self.left,350),(self.right+9,350),2)
             self.write(20, self.left+15, 325, "You win!")
             if pygame.time.get_ticks() - self.timeStart >= 3000:
                 self.inCombat = False
 
         if self.state == "lose":
+            pygame.draw.line(self.game.screen,self.game.white,(self.left,350),(self.right+9,350),2)
             self.write(20, self.left+15, 325, "You have fallen...")
             if pygame.time.get_ticks() - self.timeStart >= 3000:
                 self.inCombat = False
@@ -303,6 +314,17 @@ class Combat():
         text_surface = font.render(text, True, self.game.white)
         text_rect = text_surface.get_rect()
         text_rect.topleft = (x,y)
+        self.game.screen.blit(text_surface,text_rect)
+        return font.size(text)
+
+    def writeOrientation(self,size,x,y,text,orn):
+        font = pygame.font.Font('freesansbold.ttf',size)
+        text_surface = font.render(text, True, self.game.white)
+        text_rect = text_surface.get_rect()
+        if orn == "L":
+            text_rect.topleft = (x,y)
+        elif orn == "R":
+            text_rect.topright = (x,y)
         self.game.screen.blit(text_surface,text_rect)
         return font.size(text)
 
@@ -343,7 +365,23 @@ class Combat():
             self.write(20, self.right-maxPtyWidth-220, 170+offset, str(self.party[i].hp)+"/"+str(self.party[i].hpMax))
         #Setting border
         pygame.draw.line(self.game.screen,self.game.white,(self.left,320),(self.right+9,320),2)
-        pygame.draw.line(self.game.screen,self.game.white,(self.left,350),(self.right+9,350),2)
+
+    def statBlock(self):
+        pygame.draw.line(self.game.screen,self.game.white,(self.left,350),(350,350),2)
+        pygame.draw.line(self.game.screen,self.game.white,(350,320),(350,self.bottom+7),2)
+        self.write(11, 360, 330, "HP "+str(self.party[self.combatOrder[self.currentTurn][1]].hp)+"/"+str(self.party[self.combatOrder[self.currentTurn][1]].hpMax))
+        self.write(11, 415, 330, "MP "+str(self.party[self.combatOrder[self.currentTurn][1]].mp)+"/"+str(self.party[self.combatOrder[self.currentTurn][1]].mpMax))
+        self.write(11, 360, 345, "ATK "+str(self.party[self.combatOrder[self.currentTurn][1]].getAttack()))
+        self.write(11, 415, 345, "DEF "+str(self.party[self.combatOrder[self.currentTurn][1]].getDefense()))
+        self.write(11, 360, 360, "ACC "+str(self.party[self.combatOrder[self.currentTurn][1]].getAccuracy()))
+        self.write(11, 415, 360, "DDG "+str(self.party[self.combatOrder[self.currentTurn][1]].getDodge()))
+        self.write(11, 360, 375, "CRT "+str(self.party[self.combatOrder[self.currentTurn][1]].getCritRate()))
+        self.write(11, 415, 375, "LCK "+str(self.party[self.combatOrder[self.currentTurn][1]].getLuck()))
+        self.write(11, 360, 390, "AMP "+str(self.party[self.combatOrder[self.currentTurn][1]].getAmplifier()))
+        self.write(11, 415, 390, "MPG "+str(self.party[self.combatOrder[self.currentTurn][1]].getManaRegen()))
+        self.write(16, 360, 425, self.combatDialogue)
+        for i in range(len(self.party[self.combatOrder[self.currentTurn][1]].activeBuffs)):
+            self.writeOrientation(11, self.right, 330+(i*15), self.party[self.combatOrder[self.currentTurn][1]].activeBuffs[i][0]+" ("+str(self.party[self.combatOrder[self.currentTurn][1]].activeBuffs[i][1])+"}","R")
 
     def next(self):
         self.currentTurn += 1
@@ -357,6 +395,8 @@ class Combat():
             if self.currentTurn >= len(self.combatOrder):
                 self.startExecute()
             #print(self.party[self.combatOrder[self.currentTurn][1]].name)
+        if self.combatOrder[self.currentTurn][0] == "Party":
+            self.combatDialogue = getCombatDialogue(self.party[self.combatOrder[self.currentTurn][1]])
 
     def enemyAction(self,source):
         if not self.isAlive(source):
@@ -432,7 +472,7 @@ class Combat():
                         if member.hp > member.hpMax:
                             member.hp = member.hpMax
                 elif spell.type == "Buff":
-                    self.applyBuff(spell,target)
+                    self.applyBuff(spell,-1)
                 self.party[source[1]].mp -= spell.manacost
 
 
@@ -529,14 +569,14 @@ class Combat():
             self.timeStart = pygame.time.get_ticks()
 
     def applyBuff(self,buff,target):
-        newBuff = Buff(buff.name,buff.potency,4,target)
+        newBuff = Buff(buff.name,buff.potency,5,target)
+        print(newBuff.target)
         self.buffs.append(newBuff)
         if newBuff.target == -1:
             for member in self.party:
-                member.addBuffs(newBuff.buff)
+                member.addBuffs(newBuff)
         else:
-            for member in self.party:
-                self.party[newBuff.target].addBuffs(newBuff.buff)
+            self.party[newBuff.target].addBuffs(newBuff)
 
     def processBuffs(self):
         for member in self.party:
@@ -544,9 +584,9 @@ class Combat():
         for bf in self.buffs:
             if bf.target == -1:
                 for member in self.party:
-                    member.addBuffs(bf.buff)
+                    member.addBuffs(bf)
             else:
-                self.party[bf.target].addBuffs(bf.buff)
+                self.party[bf.target].addBuffs(bf)
             print(f'{bf.name}, {bf.duration}')
             bf.tick()
         for i in range(len(self.buffs)-1,-1,-1):

@@ -460,7 +460,7 @@ def initSptSpellDirectory():
     sptSpellDirectory.append(Minor_Regenerate_Aura);
     Major_Heal = SupportMagic("Major Heal","Heals for a large amount of health.",2,444,[0,0,0,0,0,0,60],30,"Heal","Single");
     sptSpellDirectory.append(Major_Heal);
-    Raise = SupportMagic("Raise","Raises a party member from the dead with 30 HP.",2,445,[0,0,0,0,0,0,30],40,"Heal","Single");
+    Raise = SupportMagic("Raise","Raises a party member from the dead with 30 HP.",2,445,[0,0,0,0,0,0,30],30,"Heal","Single");
     sptSpellDirectory.append(Raise);
     #5
     Rage_Aura_II =  SupportMagic("Rage Aura II","Increases your party's Atk by a great amount.",1,446,[10,0,0,0,0,0,0],32,"Buff","All");

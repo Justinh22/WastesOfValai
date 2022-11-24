@@ -15,7 +15,7 @@ class Overworld():
         self.lvlTot = 0
         for i in range(0,random.randint(3,4)):
             lvl = random.randint(1,8)
-            self.party.append(Character(getCharacterName(),lvl,self.game.directory.classDirectory[random.randint(0,11)])) #random.randint(0,11)
+            self.party.append(Character(getCharacterName(),lvl,self.game.directory.classDirectory[8],random.randint(0,5))) #random.randint(0,11)
             self.lvlTot += lvl
 
     def blitScreen(self):

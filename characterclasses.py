@@ -4,7 +4,7 @@ from items import *
 
 class Character():
     charNum = 100
-    def __init__(self,nm,lv,tp):
+    def __init__(self,nm,lv,tp,p):
         self.name = nm
         self.level = lv
         Character.charNum += 1
@@ -42,14 +42,38 @@ class Character():
         self.amplifier = 0
         self.manaregen = 0
         self.buffs = [0,0,0,0,0,0,0]
+        self.activeBuffs = []
+        if p == 0:
+            self.personality = "Brave"
+        elif p == 1:
+            self.personality = "Angry"
+        elif p == 2:
+            self.personality = "Friendly"
+        elif p == 3:
+            self.personality = "Cowardly"
+        elif p == 4:
+            self.personality = "Headstrong"
+        elif p == 5:
+            self.personality = "Lazy"
     def getAttack(self):
         return self.eqpWpn.attack + self.attack + self.getBuff("ATK")
     def getDefense(self):
         return self.eqpAmr.defense + self.defense + self.getBuff("DEF")
     def getCritRate(self):
         return self.eqpWpn.critrate + self.critrate + self.getBuff("CRT")
+    def getAccuracy(self):
+        if self.eqpWpn.accuracy > 0:
+            return self.eqpWpn.accuracy + self.getBuff("ACC")
+        else:
+            return self.accuracy + self.getBuff("ACC")
     def getDodge(self):
         return self.eqpAmr.dodge + self.dodge + self.getBuff("DDG")
+    def getLuck(self):
+        return self.luck + self.getBuff("LCK")
+    def getAmplifier(self):
+        return self.amplifier + self.eqpWpn.amplifier
+    def getManaRegen(self):
+        return self.manaregen + self.eqpAmr.manaregen
     def getSpeed(self):
         return self.speed
     def takeDamage(self,val):
@@ -59,24 +83,10 @@ class Character():
         else:
             self.hp -= val
         return val
-    def buffUp(self,type,val):
-        if type == "ATK":
-            self.buffs[0] += val
-        elif type == "ACC":
-            self.buffs[1] += val
-        elif type == "CRT":
-            self.buffs[2] += val
-        elif type == "DEF":
-            self.buffs[3] += val
-        elif type == "DDG":
-            self.buffs[4] += val
-        elif type == "LCK":
-            self.buffs[5] += val
-        elif type == "HP":
-            self.buffs[6] += val
     def addBuffs(self,buff):
+        self.activeBuffs.append((buff.name,buff.duration))
         for i in range(len(self.buffs)):
-            self.buffs[i] += buff[i]
+            self.buffs[i] += buff.buff[i]
         self.hp += self.buffs[6]
         if self.hp > self.hpMax:
             self.hp = self.hpMax
@@ -97,6 +107,7 @@ class Character():
             return self.buffs[6]
     def resetBuffs(self):
         self.buffs = [0,0,0,0,0,0,0]
+        self.activeBuffs.clear()
 
 
 class ClassType():
