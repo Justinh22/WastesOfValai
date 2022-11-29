@@ -30,7 +30,7 @@ def initWeaponDirectory():
     weaponDirectory.append(Gnarled_Rod)
 
     #3
-    Iron_Axe = Weapon("Iron Axe","A sturdy iron axe.",3,10,10,70,5,0)
+    Iron_Axe = Weapon("Iron Axe","A sturdy iron axe.",3,10,9,70,5,0)
     weaponDirectory.append(Iron_Axe)
     Iron_Sword = Weapon("Iron Sword","A sturdy iron sword.",3,11,8,80,0,0)
     weaponDirectory.append(Iron_Sword)
@@ -42,11 +42,11 @@ def initWeaponDirectory():
     weaponDirectory.append(Iron_Sceptre)
 
     #4
-    Steel_Axe = Weapon("Steel Axe","A sharp, shining steel axe.",4,15,13,75,5,0)
+    Steel_Axe = Weapon("Steel Axe","A sharp, shining steel axe.",4,15,11,75,5,0)
     weaponDirectory.append(Steel_Axe)
-    Steel_Sword = Weapon("Steel Sword","A sharp, shining steel sword.",4,16,12,80,0,0)
+    Steel_Sword = Weapon("Steel Sword","A sharp, shining steel sword.",4,16,10,80,0,0)
     weaponDirectory.append(Steel_Sword)
-    Steel_Spear = Weapon("Steel Spear","A sharp, shining steel spear.",4,17,10,85,5,0)
+    Steel_Spear = Weapon("Steel Spear","A sharp, shining steel spear.",4,17,9,85,5,0)
     weaponDirectory.append(Steel_Spear)
     Steel_Dagger = Weapon("Steel Dagger","A sharp, shining steel dagger.",4,18,8,90,15,0)
     weaponDirectory.append(Steel_Dagger)
@@ -54,75 +54,75 @@ def initWeaponDirectory():
     weaponDirectory.append(Steel_Wand)
 
     #5
-    Ebonite_Axe = Weapon("Ebonite Axe","An axe made of a dark, menacing steel, emanating an evil aura.",5,20,16,70,15,0)
+    Ebonite_Axe = Weapon("Ebonite Axe","An axe made of a dark, menacing steel, emanating an evil aura.",5,20,13,70,15,0)
     weaponDirectory.append(Ebonite_Axe)
-    Ebonite_Sword = Weapon("Ebonite Sword","A sword made of a dark, menacing steel, emanating an evil aura.",5,21,14,75,10,0)
+    Ebonite_Sword = Weapon("Ebonite Sword","A sword made of a dark, menacing steel, emanating an evil aura.",5,21,12,75,10,0)
     weaponDirectory.append(Ebonite_Sword)
-    Ebonite_Spear = Weapon("Ebonite Spear","A spear made of a dark, menacing steel, emanating an evil aura.",5,22,12,80,15,0)
+    Ebonite_Spear = Weapon("Ebonite Spear","A spear made of a dark, menacing steel, emanating an evil aura.",5,22,11,80,15,0)
     weaponDirectory.append(Ebonite_Spear)
     Ebonite_Dagger = Weapon("Ebonite Dagger","A dagger made of a dark, menacing steel, emanating an evil aura.",5,23,10,85,25,0)
     weaponDirectory.append(Ebonite_Dagger)
-    Ebonite_Sceptre = Weapon("Ebonite Sceptre","A long, menacing sceptre made of a dark black metal.",5,24,7,80,10,25)
+    Ebonite_Sceptre = Weapon("Ebonite Sceptre","A long, menacing sceptre made of a dark black metal.",5,24,8,80,10,25)
     weaponDirectory.append(Ebonite_Sceptre)
 
     #6
-    Golden_Axe = Weapon("Golden Axe","An axe made of shimmering gold.",6,25,20,80,10,0)
+    Golden_Axe = Weapon("Golden Axe","An axe made of shimmering gold.",6,25,15,80,10,0)
     weaponDirectory.append(Golden_Axe)
-    Golden_Sword = Weapon("Golden Sword","A sword made of shimmering gold.",6,26,17,85,5,0)
+    Golden_Sword = Weapon("Golden Sword","A sword made of shimmering gold.",6,26,14,85,5,0)
     weaponDirectory.append(Golden_Sword)
-    Golden_Spear = Weapon("Golden Spear","A spear made of shimmering gold.",6,27,15,90,10,0)
+    Golden_Spear = Weapon("Golden Spear","A spear made of shimmering gold.",6,27,12,90,10,0)
     weaponDirectory.append(Golden_Spear)
-    Golden_Dagger = Weapon("Golden Dagger","A dagger made of shimmering gold.",6,28,13,95,20,0)
+    Golden_Dagger = Weapon("Golden Dagger","A dagger made of shimmering gold.",6,28,11,95,20,0)
     weaponDirectory.append(Golden_Dagger)
     Golden_Staff = Weapon("Golden Staff","A shining, golden staff, radiating magical energy.",6,29,10,85,0,30)
     weaponDirectory.append(Golden_Staff)
 
     #7
-    Runic_Axe = Weapon("Runic Axe","An axe made of shining steel, with shimmering runes etched into it.",7,30,23,85,5,10)
+    Runic_Axe = Weapon("Runic Axe","An axe made of shining steel, with shimmering runes etched into it.",7,30,17,85,5,10)
     weaponDirectory.append(Runic_Axe)
-    Runic_Sword = Weapon("Runic Sword","A sword made of shining steel, with shimmering runes etched into it.",7,31,21,90,0,10)
+    Runic_Sword = Weapon("Runic Sword","A sword made of shining steel, with shimmering runes etched into it.",7,31,15,90,0,10)
     weaponDirectory.append(Runic_Sword)
-    Runic_Spear = Weapon("Runic Spear","A spear made of shining steel, with shimmering runes etched into it.",7,32,18,95,5,10)
+    Runic_Spear = Weapon("Runic Spear","A spear made of shining steel, with shimmering runes etched into it.",7,32,14,95,5,10)
     weaponDirectory.append(Runic_Spear)
-    Runic_Dagger = Weapon("Runic Dagger","A dagger made of shining steel, with shimmering runes etched into it.",7,33,15,100,15,10)
+    Runic_Dagger = Weapon("Runic Dagger","A dagger made of shining steel, with shimmering runes etched into it.",7,33,12,100,15,10)
     weaponDirectory.append(Runic_Dagger)
-    Runic_Wand = Weapon("Runic Wand","A powerful steel wand, with shimmering runes etched into it.",7,34,5,70,0,45)
+    Runic_Wand = Weapon("Runic Wand","A powerful steel wand, with shimmering runes etched into it.",7,34,11,90,0,45)
     weaponDirectory.append(Runic_Wand)
 
     #8
-    Valentium_Axe = Weapon("Valentium Axe","An axe made of a magical, indestructable metal.",8,35,28,85,15,5)
+    Valentium_Axe = Weapon("Valentium Axe","An axe made of a magical, indestructable metal.",8,35,20,85,15,5)
     weaponDirectory.append(Valentium_Axe)
-    Valentium_Sword = Weapon("Valentium Sword","A sword made of a magical, indestructable metal.",8,36,24,90,10,5)
+    Valentium_Sword = Weapon("Valentium Sword","A sword made of a magical, indestructable metal.",8,36,18,90,10,5)
     weaponDirectory.append(Valentium_Sword)
-    Valentium_Spear = Weapon("Valentium Spear","A spear made of a magical, indestructable metal.",8,37,21,95,15,5)
+    Valentium_Spear = Weapon("Valentium Spear","A spear made of a magical, indestructable metal.",8,37,16,95,15,5)
     weaponDirectory.append(Valentium_Spear)
-    Valentium_Dagger = Weapon("Valentium Dagger","An dagger made of a magical, indestructable metal.",8,38,18,100,25,5)
+    Valentium_Dagger = Weapon("Valentium Dagger","An dagger made of a magical, indestructable metal.",8,38,14,100,25,5)
     weaponDirectory.append(Valentium_Dagger)
     Valentium_Sceptre = Weapon("Valentium Sceptre","A sceptre made of a magical, indestructable metal.",8,39,14,90,10,40)
     weaponDirectory.append(Valentium_Sceptre)
 
     #9
-    Mechanical_Axe = Weapon("Mechanical Axe","An axe covered in whirring gears, arcing with electricity.",9,40,30,85,35,0)
+    Mechanical_Axe = Weapon("Mechanical Axe","An axe covered in whirring gears, arcing with electricity.",9,40,23,85,35,0)
     weaponDirectory.append(Mechanical_Axe)
-    Mechanical_Sword = Weapon("Mechanical Sword","A sword covered in whirring gears, arcing with electricity.",9,41,26,90,30,0)
+    Mechanical_Sword = Weapon("Mechanical Sword","A sword covered in whirring gears, arcing with electricity.",9,41,21,90,30,0)
     weaponDirectory.append(Mechanical_Sword)
-    Mechanical_Spear = Weapon("Mechanical Spear","A spear covered in whirring gears, arcing with electricity.",9,42,23,95,35,0)
+    Mechanical_Spear = Weapon("Mechanical Spear","A spear covered in whirring gears, arcing with electricity.",9,42,18,95,35,0)
     weaponDirectory.append(Mechanical_Spear)
-    Mechanical_Dagger = Weapon("Mechanical Dagger","A dagger covered in whirring gears, arcing with electricity.",9,43,20,100,45,0)
+    Mechanical_Dagger = Weapon("Mechanical Dagger","A dagger covered in whirring gears, arcing with electricity.",9,43,16,100,45,0)
     weaponDirectory.append(Mechanical_Dagger)
-    Rod_of_Order = Weapon("Rod of Order","A magic staff, covered in spinning gears.",9,44,18,90,20,45)
+    Rod_of_Order = Weapon("Rod of Order","A magic staff, covered in spinning gears.",9,44,15,90,20,45)
     weaponDirectory.append(Rod_of_Order)
 
     #10
-    Teratra = Weapon("Teratra","A mythical axe of legend, raised from the earth.",10,45,42,80,20,5)
+    Teratra = Weapon("Teratra","A mythical axe of legend, raised from the earth.",10,45,27,80,20,5)
     weaponDirectory.append(Teratra)
-    Pyrithia = Weapon("Pyrithia","A mythical sword of legend, born from flame.",10,46,36,90,10,10)
+    Pyrithia = Weapon("Pyrithia","A mythical sword of legend, born from flame.",10,46,25,90,10,10)
     weaponDirectory.append(Pyrithia)
-    Hyliat = Weapon("Hyliat","A mythical spear of legend, created in the depths of the ocean.",10,47,34,95,20,10)
+    Hyliat = Weapon("Hyliat","A mythical spear of legend, created in the depths of the ocean.",10,47,22,95,20,10)
     weaponDirectory.append(Hyliat)
-    Aerolinde = Weapon("Aerolinde","A mythical dagger of legend, formed from the raging winds.",10,48,32,100,35,10)
+    Aerolinde = Weapon("Aerolinde","A mythical dagger of legend, formed from the raging winds.",10,48,19,100,35,10)
     weaponDirectory.append(Aerolinde)
-    Ordointh = Weapon("Ordointh","A magical staff of legend, formed from the forces of balance and order.",10,49,20,90,10,50)
+    Ordointh = Weapon("Ordointh","A magical staff of legend, formed from the forces of balance and order.",10,49,18,90,10,50)
     weaponDirectory.append(Ordointh)
 
     return weaponDirectory
@@ -282,79 +282,79 @@ def initAtkSpellDirectory():
     attackSpellDirectory = []
 
     #1
-    Jolt = AttackMagic("Jolt","Fires a small jolt of lightning at a target.",1,300,4,10,"Lightning","Single");
+    Jolt = AttackMagic("Jolt","Fires a small jolt of lightning at a target.",1,300,4,10,"Attack","Lightning","Single");
     attackSpellDirectory.append(Jolt);
-    Ember = AttackMagic("Ember","Fires a small burst of flame at a target.",1,301,3,8,"Fire","Single");
+    Ember = AttackMagic("Ember","Fires a small burst of flame at a target.",1,301,3,8,"Attack","Fire","Single");
     attackSpellDirectory.append(Ember);
-    Frostbite = AttackMagic("Frostbite","Fires a small burst of cold at a target.",1,302,2,6,"Ice","Single");
+    Frostbite = AttackMagic("Frostbite","Fires a small burst of cold at a target.",1,302,2,6,"Attack","Ice","Single");
     attackSpellDirectory.append(Frostbite);
     #2
-    Thunderbolt = AttackMagic("Thunderbolt","Fires a bolt of lightning at a target.",2,303,8,16,"Lightning","Single");
+    Thunderbolt = AttackMagic("Thunderbolt","Fires a bolt of lightning at a target.",2,303,8,16,"Attack","Lightning","Single");
     attackSpellDirectory.append(Thunderbolt);
-    Firebolt = AttackMagic("Firebolt","Fires a bolt of fire at a target.",2,304,7,14,"Fire","Single");
+    Firebolt = AttackMagic("Firebolt","Fires a bolt of fire at a target.",2,304,7,14,"Attack","Fire","Single");
     attackSpellDirectory.append(Firebolt);
-    Frostbolt = AttackMagic("Frostbolt","Fires a bolt of freezing energy at a target.",2,305,6,12,"Ice","Single");
+    Frostbolt = AttackMagic("Frostbolt","Fires a bolt of freezing energy at a target.",2,305,6,12,"Attack","Ice","Single");
     attackSpellDirectory.append(Frostbolt);
-    Thunder_Wave = AttackMagic("Thunder Wave","Summons a wave of electricity toward all foes.",2,306,10,10,"Lightning","All");
+    Thunder_Wave = AttackMagic("Thunder Wave","Summons a wave of electricity toward all foes.",2,306,10,10,"Attack","Lightning","All");
     attackSpellDirectory.append(Thunder_Wave);
-    Fire_Wave = AttackMagic("Fire Wave","Summons a wave of flame toward all foes.",2,307,9,8,"Fire","All");
+    Fire_Wave = AttackMagic("Fire Wave","Summons a wave of flame toward all foes.",2,307,9,8,"Attack","Fire","All");
     attackSpellDirectory.append(Fire_Wave);
-    Frost_Wave = AttackMagic("Frost Wave","Summons a wave of ice toward all foes.",2,308,8,6,"Ice","All");
+    Frost_Wave = AttackMagic("Frost Wave","Summons a wave of ice toward all foes.",2,308,8,6,"Attack","Ice","All");
     attackSpellDirectory.append(Frost_Wave);
     #3
-    Lightning_Strike = AttackMagic("Lightning Strike","Strikes down a bolt of lightning at a target.",3,309,12,22,"Lightning","Single");
+    Lightning_Strike = AttackMagic("Lightning Strike","Strikes down a bolt of lightning at a target.",3,309,12,22,"Attack","Lightning","Single");
     attackSpellDirectory.append(Lightning_Strike);
-    Fireball = AttackMagic("Fireball","Hurls a fireball at a target.",3,310,11,20,"Fire","Single");
+    Fireball = AttackMagic("Fireball","Hurls a fireball at a target.",3,310,11,20,"Attack","Fire","Single");
     attackSpellDirectory.append(Fireball);
-    Hail = AttackMagic("Hail","Launches a blast of freezing magic at a target.",3,311,10,18,"Ice","Single");
+    Hail = AttackMagic("Hail","Launches a blast of freezing magic at a target.",3,311,10,18,"Attack","Ice","Single");
     attackSpellDirectory.append(Hail);
-    Thunder_Wave_II = AttackMagic("Thunder Wave II","Hurls a large wave of electricity toward all foes.",2,312,14,16,"Lightning","All");
+    Thunder_Wave_II = AttackMagic("Thunder Wave II","Hurls a large wave of electricity toward all foes.",2,312,14,16,"Attack","Lightning","All");
     attackSpellDirectory.append(Thunder_Wave_II);
-    Fire_Wave_II = AttackMagic("Fire Wave II","Hurls a large wave of flame toward all foes.",2,313,13,14,"Fire","All");
+    Fire_Wave_II = AttackMagic("Fire Wave II","Hurls a large wave of flame toward all foes.",2,313,13,14,"Attack","Fire","All");
     attackSpellDirectory.append(Fire_Wave_II);
-    Frost_Wave_II = AttackMagic("Frost Wave II","Hurls a large wave of ice toward all foes.",2,314,12,12,"Ice","All");
+    Frost_Wave_II = AttackMagic("Frost Wave II","Hurls a large wave of ice toward all foes.",2,314,12,12,"Attack","Ice","All");
     attackSpellDirectory.append(Frost_Wave_II);
     #4
-    Electrocute = AttackMagic("Electrocute","Unleashes a massive jolt of electricity at a target.",4,315,16,28,"Lightning","Single");
+    Electrocute = AttackMagic("Electrocute","Unleashes a massive jolt of electricity at a target.",4,315,16,28,"Attack","Lightning","Single");
     attackSpellDirectory.append(Electrocute);
-    Fire_Blast = AttackMagic("Fire Blast","Unleashes a blast of flame at a target.",4,316,15,26,"Fire","Single");
+    Fire_Blast = AttackMagic("Fire Blast","Unleashes a blast of flame at a target.",4,316,15,26,"Attack","Fire","Single");
     attackSpellDirectory.append(Fire_Blast);
-    Cryo_Beam = AttackMagic("Cryo Beam","Fires a beam of pure freezing magic at a target.",4,317,14,24,"Ice","Single");
+    Cryo_Beam = AttackMagic("Cryo Beam","Fires a beam of pure freezing magic at a target.",4,317,14,24,"Attack","Ice","Single");
     attackSpellDirectory.append(Cryo_Beam);
-    Thunder_Wave_III = AttackMagic("Thunder Wave III","Launches a massive wave of electricity toward all foes.",2,318,18,22,"Lightning","All");
+    Thunder_Wave_III = AttackMagic("Thunder Wave III","Launches a massive wave of electricity toward all foes.",2,318,18,22,"Attack","Lightning","All");
     attackSpellDirectory.append(Thunder_Wave_III);
-    Fire_Wave_III = AttackMagic("Fire Wave III","Launches a massive wave of flame toward all foes.",2,319,17,20,"Fire","All");
+    Fire_Wave_III = AttackMagic("Fire Wave III","Launches a massive wave of flame toward all foes.",2,319,17,20,"Attack","Fire","All");
     attackSpellDirectory.append(Fire_Wave_III);
-    Frost_Wave_III = AttackMagic("Frost Wave III","Launches a massive wave of ice toward all foes.",2,320,16,18,"Ice","All");
+    Frost_Wave_III = AttackMagic("Frost Wave III","Launches a massive wave of ice toward all foes.",2,320,16,18,"Attack","Ice","All");
     attackSpellDirectory.append(Frost_Wave_III);
     #5
-    Thunderstorm = AttackMagic("Thunderstorm","Calls down a raging storm to electrify a target.",5,321,20,28,"Lightning","All");
+    Thunderstorm = AttackMagic("Thunderstorm","Calls down a raging storm to electrify a target.",5,321,20,28,"Attack","Lightning","All");
     attackSpellDirectory.append(Thunderstorm);
-    Inferno = AttackMagic("Inferno","Calls a raging inferno to incinerate a target.",5,322,19,26,"Fire","All");
+    Inferno = AttackMagic("Inferno","Calls a raging inferno to incinerate a target.",5,322,19,26,"Attack","Fire","All");
     attackSpellDirectory.append(Inferno);
-    Blizzard = AttackMagic("Blizzard","Calls a raging blizzard to freeze a target.",5,323,18,24,"Ice","All");
+    Blizzard = AttackMagic("Blizzard","Calls a raging blizzard to freeze a target.",5,323,18,24,"Attack","Ice","All");
     attackSpellDirectory.append(Blizzard);
 
     #DEBUFFS
-    Paralyze = AttackMagic("Paralyze","Has a chance to inflict Paralysis on a target.",2,324,10,0,"Lightning","Single");
+    Paralyze = AttackMagic("Paralyze","Has a chance to inflict Paralysis on a target.",2,324,10,0,"Debuff","Lightning","Single");
     attackSpellDirectory.append(Paralyze);
-    Burn = AttackMagic("Burn","Has a chance to inflict Burned on a target.",2,325,10,0,"Fire","Single");
+    Burn = AttackMagic("Burn","Has a chance to inflict Burned on a target.",2,325,10,0,"Debuff","Fire","Single");
     attackSpellDirectory.append(Firebolt);
-    Freeze = AttackMagic("Freeze","Has a chance to inflict Frozen on a target.",2,326,10,0,"Ice","Single");
+    Freeze = AttackMagic("Freeze","Has a chance to inflict Freezing on a target.",2,326,10,0,"Debuff","Ice","Single");
     attackSpellDirectory.append(Freeze);
 
-    Paralyze_II = AttackMagic("Paralyze II","Inflicts Paralysis on a target.",3,327,16,0,"Lightning","Single");
+    Paralyze_II = AttackMagic("Paralyze II","Inflicts Paralysis on a target.",3,327,16,0,"Debuff","Lightning","Single");
     attackSpellDirectory.append(Paralyze_II);
-    Burn_II = AttackMagic("Burn II","Inflicts Burned on a target.",3,328,16,0,"Fire","Single");
+    Burn_II = AttackMagic("Burn II","Inflicts Burned on a target.",3,328,16,0,"Debuff","Fire","Single");
     attackSpellDirectory.append(Burn_II);
-    Freeze_II = AttackMagic("Freeze II","Inflicts Frozen on a target.",3,329,16,0,"Ice","Single");
+    Freeze_II = AttackMagic("Freeze II","Inflicts Freezing on a target.",3,329,16,0,"Debuff","Ice","Single");
     attackSpellDirectory.append(Freeze_II);
 
-    Paralyze_Wave = AttackMagic("Paralyze Wave","Has a chance to inflict Paralysis on all targets.",4,330,30,0,"Lightning","All");
+    Paralyze_Wave = AttackMagic("Paralyze Wave","Has a chance to inflict Paralysis on all targets.",4,330,30,0,"Debuff","Lightning","All");
     attackSpellDirectory.append(Paralyze_Wave);
-    Burn_Wave = AttackMagic("Burn Wave","Has a chance to inflict Burned on all targets.",4,331,30,0,"Fire","All");
+    Burn_Wave = AttackMagic("Burn Wave","Has a chance to inflict Burned on all targets.",4,331,30,0,"Debuff","Fire","All");
     attackSpellDirectory.append(Burn_Wave);
-    Freeze_Wave = AttackMagic("Freeze Wave","Has a chance to inflict Frozen on all targets.",4,332,30,0,"Ice","All");
+    Freeze_Wave = AttackMagic("Freeze Wave","Has a chance to inflict Freezing on all targets.",4,332,30,0,"Debuff","Ice","All");
     attackSpellDirectory.append(Freeze_Wave);
 
     return attackSpellDirectory

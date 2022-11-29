@@ -16,8 +16,8 @@ class Character():
         for i in range(self.level):
             if self.type.knownSpells[i] >= 0:
                 self.spells.append(self.type.knownSpells[i])
-        self.eqpWpn = Weapon();
-        self.eqpAmr = Armor();
+        self.eqpWpn = Weapon()
+        self.eqpAmr = Armor()
         self.hpMax = 20
         self.mpMax = 20
         self.attack = 0
@@ -43,6 +43,7 @@ class Character():
         self.manaregen = 0
         self.buffs = [0,0,0,0,0,0,0]
         self.activeBuffs = []
+        self.status = ("None",0)
         if p == 0:
             self.personality = "Brave"
         elif p == 1:
@@ -108,6 +109,11 @@ class Character():
     def resetBuffs(self):
         self.buffs = [0,0,0,0,0,0,0]
         self.activeBuffs.clear()
+    def tickStatus(self):
+        if self.status[1] > 0:
+            self.status[1] -= 1
+            if self.status[1] == 0:
+                self.status[0] = "None"
 
 
 class ClassType():
@@ -150,6 +156,7 @@ class Creature():
         self.biomeType = type
         self.knownSpells = spells
         self.spellCooldown = 0
+        self.status = ("None",0)
     def takeDamage(self,val):
         print(f'{self.name} took {val} damage!')
         if val > self.hp:
@@ -157,6 +164,11 @@ class Creature():
         else:
             self.hp -= val
         return val
+    def tickStatus(self):
+        if self.status[1] > 0:
+            self.status[1] -= 1
+            if self.status[1] == 0:
+                self.status[0] = "None"
 
 class Encounter():
     def __init__(self):

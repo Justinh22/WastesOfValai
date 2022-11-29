@@ -42,7 +42,7 @@ def getCombatDialogue(character):
             elif choice == 1:
                 dialogue = "You'll fall like the rest of them."
             else:
-                dialogue = "I'll paint the earth with your blood!"
+                dialogue = "I'll paint the earth with blood!"
         elif hpPercentage >= 50:
             if choice == 0:
                 dialogue = "This? Nothing."
@@ -136,17 +136,17 @@ def getCombatDialogue(character):
             elif choice == 1:
                 dialogue = "You're a joke!"
             else:
-                dialogue = "Huh, I thought this would be tough..."
+                dialogue = "I thought this would be tough..."
         elif hpPercentage >= 25:
             if choice == 0:
                 dialogue = "It's nothing! Take this!"
             elif choice == 1:
-                dialogue = "...we're fine! Let's take them down!"
+                dialogue = "Let's take them down!"
             else:
                 dialogue = "You're dead! Get over here!"
         else:
             if choice == 0:
-                dialogue = "There's no way I'm going down here!"
+                dialogue = "I'm not going down here!"
             elif choice == 1:
                 dialogue = "I could use a hand here!"
             else:
@@ -161,7 +161,7 @@ def getCombatDialogue(character):
                 dialogue = "Ugh, fine."
         elif hpPercentage >= 50:
             if choice == 0:
-                dialogue = "Alright, you all take this one..."
+                dialogue = "Alright, you take this one..."
             elif choice == 1:
                 dialogue = "I'm good, thanks..."
             else:

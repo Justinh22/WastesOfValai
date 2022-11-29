@@ -157,7 +157,7 @@ class Directory():
                         options.append(item.id)
         else:
             return -1
-        return options[random.randint(0,len(options))]
+        return options[random.randint(0,len(options)-1)]
 
     def buildEncounter(self,level,biome):
         biomeCreatures = []

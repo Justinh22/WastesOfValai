@@ -34,11 +34,12 @@ class Accessory(Item):
         self.activationRate = ar
 
 class AttackMagic(Item):
-    def __init__(self,nm,desc,rar,i,mpc,atk,tp,tgt):
+    def __init__(self,nm,desc,rar,i,mpc,atk,tp,el,tgt):
         Item.__init__(self,nm,desc,rar,i)
         self.attack = atk
         self.manacost = mpc
         self.type = tp
+        self.element = el
         self.target = tgt
 
 class SupportMagic(Item):
