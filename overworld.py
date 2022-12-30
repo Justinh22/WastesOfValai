@@ -15,7 +15,7 @@ class Overworld():
         self.lvlTot = 0
         for i in range(0,random.randint(3,4)):
             lvl = random.randint(1,8)
-            self.party.append(Character(getCharacterName(),lvl,self.game.directory.classDirectory[random.randint(0,11)],random.randint(0,5))) #random.randint(0,11)
+            self.party.append(Character(getCharacterName(),10,self.game.directory.classDirectory[random.randint(0,11)],random.randint(0,5))) #random.randint(0,11)
             self.party[i].eqpWpn = game.directory.getWeapon(game.directory.getItemByRarities("Weapon",lvl-1,lvl))
             self.party[i].eqpAmr = game.directory.getArmor(game.directory.getItemByRarities("Armor",lvl-1,lvl))
             self.lvlTot += lvl
