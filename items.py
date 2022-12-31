@@ -339,7 +339,7 @@ def initAtkSpellDirectory():
     Paralyze = AttackMagic("Paralyze","Has a chance to inflict Paralysis on a target.",2,324,10,0,"Debuff","Lightning","Single");
     attackSpellDirectory.append(Paralyze);
     Burn = AttackMagic("Burn","Has a chance to inflict Burned on a target.",2,325,10,0,"Debuff","Fire","Single");
-    attackSpellDirectory.append(Firebolt);
+    attackSpellDirectory.append(Burn);
     Freeze = AttackMagic("Freeze","Has a chance to inflict Freezing on a target.",2,326,10,0,"Debuff","Ice","Single");
     attackSpellDirectory.append(Freeze);
 

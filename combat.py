@@ -249,11 +249,11 @@ class Combat():
             pygame.draw.line(self.game.screen,self.game.white,(self.left,350),(self.right+9,350),2)
             self.write(20, self.left+15, 325, "Select a target")
             if self.actionVal < 400:
-                self.write(20, 450, 30+(self.cursorPos*30), "<")
+                self.write(20, 480, 30+(self.cursorPos*30), "<")
                 self.write(20,30,400,"A) SELECT")
                 self.write(20,180,400,"B) BACK")
             else:
-                self.write(20, 260, 173+(self.cursorPos*30), ">")
+                self.write(20, 230, 172+(self.cursorPos*30), ">")
                 self.write(20,30,400,"A) SELECT")
                 self.write(20,180,400,"B) BACK")
         if self.state == "spellList":
@@ -341,6 +341,11 @@ class Combat():
                         combatStr = self.party[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + " on " + self.party[self.actions[self.exTurn-1].target].name + ", bringing them back to life!"
                     else:
                         combatStr = self.party[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + ", raising all fallen party members!"
+                elif self.game.directory.getSptSpell(self.actions[self.exTurn-1].action).type == "Cleanse":
+                    if self.game.directory.getSptSpell(self.actions[self.exTurn-1].action).target == "Single":
+                        combatStr = self.party[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + " on " + self.party[self.actions[self.exTurn-1].target].name + ", removing status effects!"
+                    else:
+                        combatStr = self.party[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + ", removing all status effects!"
             self.write(20, self.left+15, 325, combatStr)
 
         if self.state == "win":
@@ -466,7 +471,6 @@ class Combat():
 
     def enemyAction(self,source):
         if not self.isAlive(source):
-            print(f'{source} couldnt act!')
             self.actions.append(Action(source,0,-1))
             return
         elif self.encounter[self.combatOrder[self.currentTurn][1]].status == "Paralyzed":
@@ -600,6 +604,9 @@ class Combat():
                         self.party[target].hp += spell.getHeal()
                     if self.party[target].hp > self.party[target].hpMax:
                         self.party[target].hp = self.party[target].hpMax
+                elif spell.type == "Cleanse":
+                    if self.party[target].hp > 0:
+                        self.party[target].resetStatus()
                 self.party[source[1]].mp -= spell.manacost
             elif spell.target == "All":
                 if spell.type == "Heal":
@@ -616,8 +623,11 @@ class Combat():
                             member.hp += spell.getHeal()
                         if member.hp > member.hpMax:
                             member.hp = member.hpMax
+                elif spell.type == "Cleanse":
+                    for member in self.party:
+                        if member.hp > 0:
+                            member.resetStatus()
                 self.party[source[1]].mp -= spell.manacost
-
 
     def validManaCost(self,user,spell):
         return user.mp > self.game.directory.getManaCost(spell)
