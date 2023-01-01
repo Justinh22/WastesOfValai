@@ -143,6 +143,15 @@ class ClassType():
 class Party():
     def __init__(self):
         self.members = []
+        self.inventory = []
+        self.power = 0
+    def initializeMembers(self,dir):
+        for i in range(0,random.randint(3,4)):
+            lvl = 10
+            self.members.append(Character(dir.getCharacterName(self.members),lvl,dir.classDirectory[random.randint(0,11)],random.randint(0,5))) #random.randint(0,11)
+            self.members[i].eqpWpn = dir.getWeapon(dir.getItemByRarities("Weapon",lvl-1,lvl))
+            self.members[i].eqpAmr = dir.getArmor(dir.getItemByRarities("Armor",lvl-1,lvl))
+            self.power += lvl
 
 class Creature():
     def __init__(self,nm,lv,idIN,hpIN,at,ac,df,dg,sd,res,type,spells):

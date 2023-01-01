@@ -119,11 +119,11 @@ def initCreatureDirectory():
 
     return creatureDirectory
 
-def getCharacterName():
+def initNameDirectory():
     names = ["Abrielle", "Adara", "Alissa", "Amara", "Amelia", "Anya", "Aurelia", "Brielle", "Balthus",
              "Cara", "Cassius", "Cirius", "Corvo", "Darius", "Dagen", "Eira", "Elysia", "Finean", "Gareth",
              "Guinevere", "Hesperos", "Ignacio", "Isolde", "Jace", "Kara", "Kyra", "Kyrielle", "Leila",
              "Lilina", "Lucien", "Lucius", "Matthew", "Mathilda", "Natania", "Orion", "Orin", "Perseus", "Pyralia",
              "Quincy", "Rialda", "Sebastian", "Sirian", "Terra", "Thalia", "Torin", "Ulysses", "Vanora",
              "Xanthus", "Zeke", "Zorian"]
-    return names[random.randint(0,len(names)-1)]
+    return names

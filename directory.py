@@ -12,6 +12,7 @@ class Directory():
         self.sptSpellDirectory = initSptSpellDirectory()
         self.classDirectory = initClassDirectory()
         self.creatureDirectory = initCreatureDirectory()
+        self.nameDirectory = initNameDirectory()
 
     def getItemName(self,id):
         name = "NULL"
@@ -158,6 +159,16 @@ class Directory():
         else:
             return -1
         return options[random.randint(0,len(options)-1)]
+
+    def getCharacterName(self,members):
+        good = False
+        while good == False:
+            good = True
+            candidate = self.nameDirectory[random.randint(0,len(self.nameDirectory)-1)]
+            for member in members:
+                if candidate == member.name:
+                    good = False
+        return candidate
 
     def buildEncounter(self,level,biome):
         biomeCreatures = []

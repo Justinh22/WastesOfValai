@@ -16,7 +16,7 @@ class Combat():
         self.menu_top = 350
         self.menu_height = self.bottom-340
         self.font = pygame.font.Font('freesansbold.ttf',20)
-        self.party = []
+        self.party = None
         self.encounter = []
         self.combatOrder = []
         self.currentTurn = 0
@@ -38,24 +38,24 @@ class Combat():
 
     def initialize(self,party,encounter):
         self.party = party
-        for i in range(0,len(self.party)):
-            print(f'{self.party[i].name}, {self.party[i].type.name}, {self.party[i].level} (ID {self.party[i].id}) - WPN: {self.party[i].eqpWpn.name}, AMR: {self.party[i].eqpAmr.name}, HP: {self.party[i].hpMax}, MP: {self.party[i].mpMax}, ATK: {self.party[i].attack}, CRT: {self.party[i].critrate}, DEF: {self.party[i].defense}, DDG: {self.party[i].dodge}, LCK: {self.party[i].luck}, SPD: {self.party[i].speed}, PRS: {self.party[i].personality}, SPELLS: {self.party[i].spells}')
+        for i in range(0,len(self.party.members)):
+            print(f'{self.party.members[i].name}, {self.party.members[i].type.name}, {self.party.members[i].level} (ID {self.party.members[i].id}) - WPN: {self.party.members[i].eqpWpn.name}, AMR: {self.party.members[i].eqpAmr.name}, HP: {self.party.members[i].hpMax}, MP: {self.party.members[i].mpMax}, ATK: {self.party.members[i].attack}, CRT: {self.party.members[i].critrate}, DEF: {self.party.members[i].defense}, DDG: {self.party.members[i].dodge}, LCK: {self.party.members[i].luck}, SPD: {self.party.members[i].speed}, PRS: {self.party.members[i].personality}, SPELLS: {self.party.members[i].spells}')
         self.encounter = encounter
         for i in range(0,len(self.encounter)):
             print(f'{self.encounter[i].name}, {self.encounter[i].level} - SPD: {self.encounter[i].speed}')
 
         self.combatOrder = []
-        members = self.party + self.encounter
+        members = self.party.members + self.encounter
         members.sort(key=lambda x: x.speed)
         members.reverse()
         for i in range(len(members)-1,-1,-1):
             if members[i].hp <= 0:
                 members.pop(i)
-        seenPty = [0] * len(self.party)
+        seenPty = [0] * len(self.party.members)
         seenEnc = [0] * len(self.encounter)
         for entry in members:
-            for i in range(len(self.party)):
-                if entry.id == self.party[i].id:
+            for i in range(len(self.party.members)):
+                if entry.id == self.party.members[i].id:
                     if seenPty[i] == 1:
                         continue
                     self.combatOrder.append(("Party",i))
@@ -75,7 +75,7 @@ class Combat():
             self.enemyAction(self.combatOrder[self.currentTurn])
             self.next()
         if self.combatOrder[self.currentTurn][0] == "Party":
-            self.combatDialogue = getCombatDialogue(self.party[self.combatOrder[self.currentTurn][1]])
+            self.combatDialogue = getCombatDialogue(self.party.members[self.combatOrder[self.currentTurn][1]])
         self.inCombat = True
         self.state = "mainWindow"
         self.delay = 5
@@ -128,29 +128,29 @@ class Combat():
                     print("CANCEL")
             elif self.state == "targetSelect":
                 self.state = "mainWindow"
-                if self.party[self.combatOrder[self.currentTurn][1]].status == "Paralyzed":
+                if self.party.members[self.combatOrder[self.currentTurn][1]].status == "Paralyzed":
                     self.actionVal = -2
-                if self.party[self.combatOrder[self.currentTurn][1]].status == "Freezing" and random.randint(0,2)==0:
+                if self.party.members[self.combatOrder[self.currentTurn][1]].status == "Freezing" and random.randint(0,2)==0:
                     self.actionVal = -3
                 self.actions.append(Action(self.combatOrder[self.currentTurn],self.cursorPos,self.actionVal))
                 self.next()
                 self.cursorPos = -1
                 print("TARGET")
             elif self.state == "spellList":
-                if self.cursorPos+self.menuTop < len(self.party[self.combatOrder[self.currentTurn][1]].spells):
+                if self.cursorPos+self.menuTop < len(self.party.members[self.combatOrder[self.currentTurn][1]].spells):
                     self.spellID = self.menuTop + self.cursorPos
                     self.state = "spellSummary"
                     print("SPELLSUMMARY")
             elif self.state =="spellSummary":
-                if self.validManaCost(self.party[self.combatOrder[self.currentTurn][1]],self.party[self.combatOrder[self.currentTurn][1]].spells[self.spellID]):
+                if self.validManaCost(self.party.members[self.combatOrder[self.currentTurn][1]],self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID]):
                     self.lowMana = False
-                    self.actionVal = self.party[self.combatOrder[self.currentTurn][1]].spells[self.spellID]
+                    self.actionVal = self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID]
                     if self.game.directory.getSpellTarget(self.actionVal) == "Single":
                         self.state = "targetSelect"
                         self.cursorPos = 0
                     else:
                         self.state = "mainWindow"
-                        if self.party[self.combatOrder[self.currentTurn][1]].status == "Paralyzed" or (self.party[self.combatOrder[self.currentTurn][1]].status == "Freezing" and random.randint(0,2)==0):
+                        if self.party.members[self.combatOrder[self.currentTurn][1]].status == "Paralyzed" or (self.party.members[self.combatOrder[self.currentTurn][1]].status == "Freezing" and random.randint(0,2)==0):
                             self.actionVal = -1
                         self.actions.append(Action(self.combatOrder[self.currentTurn],0,self.actionVal))
                         self.next()
@@ -199,14 +199,14 @@ class Combat():
                     self.cursorPos -= 2
         if self.game.DOWN:
             if self.state == "targetSelect":
-                if (self.actionVal < 400 and self.cursorPos < len(self.encounter)-1) or (self.actionVal >= 400 and self.cursorPos < len(self.party)-1):
+                if (self.actionVal < 400 and self.cursorPos < len(self.encounter)-1) or (self.actionVal >= 400 and self.cursorPos < len(self.party.members)-1):
                     self.cursorPos += 1
             elif self.state == "useMenu":
                 if self.cursorPos == 0 or self.cursorPos == 1:
                     self.cursorPos += 2
             elif self.state == "spellList":
                 if self.cursorPos == 2 or self.cursorPos == 3:
-                    if self.menuTop+4 < len(self.party[self.combatOrder[self.currentTurn][1]].spells):
+                    if self.menuTop+4 < len(self.party.members[self.combatOrder[self.currentTurn][1]].spells):
                         self.menuTop += 2
                 else:
                     self.cursorPos += 2
@@ -230,7 +230,7 @@ class Combat():
         pygame.draw.rect(self.game.screen,self.game.white,screenOutline,2)
         self.combatInfo()
         if self.state == "mainWindow":
-            self.write(20, self.left+15, 325, self.party[self.combatOrder[self.currentTurn][1]].name+"'s turn!")
+            self.write(20, self.left+15, 325, self.party.members[self.combatOrder[self.currentTurn][1]].name+"'s turn!")
             self.write(20,45,375,"A) ATTACK")
             self.write(20,210,375,"B) USE") #SPELL, ITEM, COMBAT ART
             self.write(20,45,420,"X) CANCEL")
@@ -240,7 +240,7 @@ class Combat():
             self.write(20, self.left+15, 325, "Use what?")
             self.write(20, 28+(int(self.cursorPos%2)*165), 373+(int(self.cursorPos/2)*45), ">")
             self.write(20,45,375,"SPELL")
-            self.write(13,45,395,str(self.party[self.combatOrder[self.currentTurn][1]].mp)+"/"+str(self.party[self.combatOrder[self.currentTurn][1]].mpMax))
+            self.write(13,45,395,str(self.party.members[self.combatOrder[self.currentTurn][1]].mp)+"/"+str(self.party.members[self.combatOrder[self.currentTurn][1]].mpMax))
             self.write(20,210,375,"ITEM")
             self.write(20,45,420,"ART")
             self.write(20,210,420,"CANCEL")
@@ -263,38 +263,38 @@ class Combat():
             else:
                 self.write(20, self.left+15, 325, "Select a spell: (B to cancel)")
             self.write(20, 40+((self.cursorPos%2)*300), 380+((int(self.cursorPos/2))*40), ">")
-            if self.menuTop < len(self.party[self.combatOrder[self.currentTurn][1]].spells):
-                self.write(20,60,380,str(self.menuTop+1)+") "+self.game.directory.getItemName(self.party[self.combatOrder[self.currentTurn][1]].spells[self.menuTop]))
+            if self.menuTop < len(self.party.members[self.combatOrder[self.currentTurn][1]].spells):
+                self.write(20,60,380,str(self.menuTop+1)+") "+self.game.directory.getItemName(self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.menuTop]))
             else:
                 self.write(20,60,380,str(self.menuTop+1)+")")
-            if self.menuTop+1 < len(self.party[self.combatOrder[self.currentTurn][1]].spells):
-                self.write(20,360,380,str(self.menuTop+2)+") "+self.game.directory.getItemName(self.party[self.combatOrder[self.currentTurn][1]].spells[self.menuTop+1]))
+            if self.menuTop+1 < len(self.party.members[self.combatOrder[self.currentTurn][1]].spells):
+                self.write(20,360,380,str(self.menuTop+2)+") "+self.game.directory.getItemName(self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.menuTop+1]))
             else:
                 self.write(20,360,380,str(self.menuTop+2)+")")
-            if self.menuTop+2 < len(self.party[self.combatOrder[self.currentTurn][1]].spells):
-                self.write(20,60,420,str(self.menuTop+3)+") "+self.game.directory.getItemName(self.party[self.combatOrder[self.currentTurn][1]].spells[self.menuTop+2]))
+            if self.menuTop+2 < len(self.party.members[self.combatOrder[self.currentTurn][1]].spells):
+                self.write(20,60,420,str(self.menuTop+3)+") "+self.game.directory.getItemName(self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.menuTop+2]))
             else:
                 self.write(20,60,420,str(self.menuTop+3)+")")
-            if self.menuTop+3 < len(self.party[self.combatOrder[self.currentTurn][1]].spells):
-                self.write(20,360,420,str(self.menuTop+4)+") "+self.game.directory.getItemName(self.party[self.combatOrder[self.currentTurn][1]].spells[self.menuTop+3]))
+            if self.menuTop+3 < len(self.party.members[self.combatOrder[self.currentTurn][1]].spells):
+                self.write(20,360,420,str(self.menuTop+4)+") "+self.game.directory.getItemName(self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.menuTop+3]))
             else:
                 self.write(20,360,420,str(self.menuTop+4)+")")
         if self.state == "spellSummary":
             pygame.draw.line(self.game.screen,self.game.white,(self.left,350),(self.right+9,350),2)
             self.write(20, self.left+15, 325, "Do you want to cast this spell?")
-            self.write(16, self.left+15, 360, self.game.directory.getItemName(self.party[self.combatOrder[self.currentTurn][1]].spells[self.spellID])+": Costs "+str(self.game.directory.getManaCost(self.party[self.combatOrder[self.currentTurn][1]].spells[self.spellID]))+" MP")
-            if self.party[self.combatOrder[self.currentTurn][1]].spells[self.spellID] < 400:
-                self.writeOrientation(16,self.right-10, 360, str(self.game.directory.getAtkSpell(self.party[self.combatOrder[self.currentTurn][1]].spells[self.spellID]).attack)+" Damage","R")
+            self.write(16, self.left+15, 360, self.game.directory.getItemName(self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID])+": Costs "+str(self.game.directory.getManaCost(self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID]))+" MP")
+            if self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID] < 400:
+                self.writeOrientation(16,self.right-10, 360, str(self.game.directory.getAtkSpell(self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID]).attack)+" Damage","R")
             else:
-                if self.game.directory.getSptSpell(self.party[self.combatOrder[self.currentTurn][1]].spells[self.spellID]).type == "Heal":
-                    self.writeOrientation(16,self.right-10, 360, "Restores "+str(self.game.directory.getSptSpell(self.party[self.combatOrder[self.currentTurn][1]].spells[self.spellID]).getHeal())+" HP","R")
-                if self.game.directory.getSptSpell(self.party[self.combatOrder[self.currentTurn][1]].spells[self.spellID]).type == "Buff":
+                if self.game.directory.getSptSpell(self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID]).type == "Heal":
+                    self.writeOrientation(16,self.right-10, 360, "Restores "+str(self.game.directory.getSptSpell(self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID]).getHeal())+" HP","R")
+                if self.game.directory.getSptSpell(self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID]).type == "Buff":
                     i = 0
-                    for id, buff in enumerate(self.game.directory.getSptSpell(self.party[self.combatOrder[self.currentTurn][1]].spells[self.spellID]).potency):
+                    for id, buff in enumerate(self.game.directory.getSptSpell(self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID]).potency):
                         if buff > 0:
                             self.writeOrientation(16,self.right-10, 360+(i*20), self.lookupBuffName(id)+" "+str(buff),"R")
                             i += 1
-            self.write(16, self.left+15, 380, self.game.directory.getItemDesc(self.party[self.combatOrder[self.currentTurn][1]].spells[self.spellID]))
+            self.write(16, self.left+15, 380, self.game.directory.getItemDesc(self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID]))
             self.write(20,150,425,"A) CONFIRM")
             self.write(20,385,425,"B) BACK")
 
@@ -307,9 +307,9 @@ class Combat():
             combatStr = ""
             if self.actions[self.exTurn-1].action == 0:
                 if self.actions[self.exTurn-1].source[0] == "Encounter":
-                    combatStr = self.encounter[self.actions[self.exTurn-1].source[1]].name + " attacks " + self.party[self.actions[self.exTurn-1].target].name + " for " + str(self.dmg) + " damage!"
+                    combatStr = self.encounter[self.actions[self.exTurn-1].source[1]].name + " attacks " + self.party.members[self.actions[self.exTurn-1].target].name + " for " + str(self.dmg) + " damage!"
                 else:
-                    combatStr = self.party[self.actions[self.exTurn-1].source[1]].name + " attacks " + self.encounter[self.actions[self.exTurn-1].target].name + " for " + str(self.dmg) + " damage!"
+                    combatStr = self.party.members[self.actions[self.exTurn-1].source[1]].name + " attacks " + self.encounter[self.actions[self.exTurn-1].target].name + " for " + str(self.dmg) + " damage!"
             elif self.actions[self.exTurn-1].action == -2:
                 combatStr = self.encounter[self.actions[self.exTurn-1].source[1]].name + " is paralyzed, and cannot move!"
             elif self.actions[self.exTurn-1].action == -3:
@@ -317,35 +317,35 @@ class Combat():
             elif self.actions[self.exTurn-1].action >= 300 and self.actions[self.exTurn-1].action < 400:
                 if self.actions[self.exTurn-1].source[0] == "Encounter":
                     if self.game.directory.getAtkSpell(self.actions[self.exTurn-1].action).target == "Single":
-                        combatStr = self.encounter[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + " at " + self.party[self.actions[self.exTurn-1].target].name + " for " + str(self.dmg) + " damage!"
+                        combatStr = self.encounter[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + " at " + self.party.members[self.actions[self.exTurn-1].target].name + " for " + str(self.dmg) + " damage!"
                     else:
                         combatStr = self.encounter[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + " for " + str(self.dmg) + " damage!"
                 else:
                     if self.game.directory.getAtkSpell(self.actions[self.exTurn-1].action).target == "Single":
-                        combatStr = self.party[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + " at " + self.encounter[self.actions[self.exTurn-1].target].name + " for " + str(self.dmg) + " damage!"
+                        combatStr = self.party.members[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + " at " + self.encounter[self.actions[self.exTurn-1].target].name + " for " + str(self.dmg) + " damage!"
                     else:
-                        combatStr = self.party[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + " for " + str(self.dmg) + " damage!"
+                        combatStr = self.party.members[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + " for " + str(self.dmg) + " damage!"
             elif self.actions[self.exTurn-1].action >= 400 and self.actions[self.exTurn-1].action < 500:
                 if self.game.directory.getSptSpell(self.actions[self.exTurn-1].action).type == "Buff":
                     if self.game.directory.getSptSpell(self.actions[self.exTurn-1].action).target == "Single":
-                        combatStr = self.party[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + " on " + self.party[self.actions[self.exTurn-1].target].name + "!"
+                        combatStr = self.party.members[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + " on " + self.party.members[self.actions[self.exTurn-1].target].name + "!"
                     else:
-                        combatStr = self.party[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + "!"
+                        combatStr = self.party.members[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + "!"
                 elif self.game.directory.getSptSpell(self.actions[self.exTurn-1].action).type == "Heal":
                     if self.game.directory.getSptSpell(self.actions[self.exTurn-1].action).target == "Single":
-                        combatStr = self.party[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + " on " + self.party[self.actions[self.exTurn-1].target].name + ", restoring " + str(self.game.directory.getSptSpell(self.actions[self.exTurn-1].action).getHeal()) + " HP!"
+                        combatStr = self.party.members[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + " on " + self.party.members[self.actions[self.exTurn-1].target].name + ", restoring " + str(self.game.directory.getSptSpell(self.actions[self.exTurn-1].action).getHeal()) + " HP!"
                     else:
-                        combatStr = self.party[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + ", restoring " + str(self.game.directory.getSptSpell(self.actions[self.exTurn-1].action).getHeal()) + " HP!"
+                        combatStr = self.party.members[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + ", restoring " + str(self.game.directory.getSptSpell(self.actions[self.exTurn-1].action).getHeal()) + " HP!"
                 elif self.game.directory.getSptSpell(self.actions[self.exTurn-1].action).type == "Raise":
                     if self.game.directory.getSptSpell(self.actions[self.exTurn-1].action).target == "Single":
-                        combatStr = self.party[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + " on " + self.party[self.actions[self.exTurn-1].target].name + ", bringing them back to life!"
+                        combatStr = self.party.members[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + " on " + self.party.members[self.actions[self.exTurn-1].target].name + ", bringing them back to life!"
                     else:
-                        combatStr = self.party[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + ", raising all fallen party members!"
+                        combatStr = self.party.members[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + ", raising all fallen party members!"
                 elif self.game.directory.getSptSpell(self.actions[self.exTurn-1].action).type == "Cleanse":
                     if self.game.directory.getSptSpell(self.actions[self.exTurn-1].action).target == "Single":
-                        combatStr = self.party[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + " on " + self.party[self.actions[self.exTurn-1].target].name + ", removing status effects!"
+                        combatStr = self.party.members[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + " on " + self.party.members[self.actions[self.exTurn-1].target].name + ", removing status effects!"
                     else:
-                        combatStr = self.party[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + ", removing all status effects!"
+                        combatStr = self.party.members[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + ", removing all status effects!"
             self.write(20, self.left+15, 325, combatStr)
 
         if self.state == "win":
@@ -391,8 +391,8 @@ class Combat():
             textWidth, textHeight = self.font.size(self.encounter[i].name)
             if textWidth > maxEncWidth:
                 maxEncWidth = textWidth
-        for i in range(0,len(self.party)):
-            textWidth, textHeight = self.font.size(self.party[i].name)
+        for i in range(0,len(self.party.members)):
+            textWidth, textHeight = self.font.size(self.party.members[i].name)
             if textWidth > maxPtyWidth:
                 maxPtyWidth = textWidth
         #Writing names and health bars
@@ -411,23 +411,23 @@ class Combat():
                     self.write(20, 280+maxEncWidth, 30+offset, "<B>")
                 elif self.encounter[i].status == "Freezing":
                     self.write(20, 280+maxEncWidth, 30+offset, "<F>")
-        for i in range(0,len(self.party)):
+        for i in range(0,len(self.party.members)):
             offset = 30*i
-            textWidth, textHeight = self.font.size(self.party[i].name)
-            self.write(20, self.right-textWidth-20, 170+offset, self.party[i].name)
-            partyHPRect = pygame.Rect(self.right-maxPtyWidth-140,170+offset,(self.party[i].hp/self.party[i].hpMax)*100,10)
-            partyMPRect = pygame.Rect(self.right-maxPtyWidth-140,180+offset,(self.party[i].mp/self.party[i].mpMax)*100,10)
+            textWidth, textHeight = self.font.size(self.party.members[i].name)
+            self.write(20, self.right-textWidth-20, 170+offset, self.party.members[i].name)
+            partyHPRect = pygame.Rect(self.right-maxPtyWidth-140,170+offset,(self.party.members[i].hp/self.party.members[i].hpMax)*100,10)
+            partyMPRect = pygame.Rect(self.right-maxPtyWidth-140,180+offset,(self.party.members[i].mp/self.party.members[i].mpMax)*100,10)
             outlineRect = pygame.Rect(self.right-maxPtyWidth-140,170+offset,100,20)
             pygame.draw.rect(self.game.screen,self.game.white,partyHPRect)
             pygame.draw.rect(self.game.screen,self.game.white,partyMPRect)
             pygame.draw.rect(self.game.screen,self.game.white,outlineRect,1)
-            self.write(20, self.right-maxPtyWidth-220, 170+offset, str(self.party[i].hp)+"/"+str(self.party[i].hpMax))
-            if self.party[i].status != "None":
-                if self.party[i].status == "Paralyzed":
+            self.write(20, self.right-maxPtyWidth-220, 170+offset, str(self.party.members[i].hp)+"/"+str(self.party.members[i].hpMax))
+            if self.party.members[i].status != "None":
+                if self.party.members[i].status == "Paralyzed":
                     self.write(20, self.right-maxPtyWidth-290, 170+offset, "<P>")
-                elif self.party[i].status == "Burned":
+                elif self.party.members[i].status == "Burned":
                     self.write(20, self.right-maxPtyWidth-290, 170+offset, "<B>")
-                elif self.party[i].status == "Freezing":
+                elif self.party.members[i].status == "Freezing":
                     self.write(20, self.right-maxPtyWidth-290, 170+offset, "<F>")
         #Setting border
         pygame.draw.line(self.game.screen,self.game.white,(self.left,320),(self.right+9,320),2)
@@ -435,24 +435,24 @@ class Combat():
     def statBlock(self):
         pygame.draw.line(self.game.screen,self.game.white,(self.left,350),(350,350),2)
         pygame.draw.line(self.game.screen,self.game.white,(350,320),(350,self.bottom+7),2)
-        self.write(11, 360, 328, self.party[self.combatOrder[self.currentTurn][1]].name+", Level "+str(self.party[self.combatOrder[self.currentTurn][1]].level)+" "+self.party[self.combatOrder[self.currentTurn][1]].type.name)
-        self.write(11, 360, 345, "HP "+str(self.party[self.combatOrder[self.currentTurn][1]].hp)+"/"+str(self.party[self.combatOrder[self.currentTurn][1]].hpMax))
-        self.write(11, 420, 345, "MP "+str(self.party[self.combatOrder[self.currentTurn][1]].mp)+"/"+str(self.party[self.combatOrder[self.currentTurn][1]].mpMax))
-        self.write(11, 360, 360, "ATK "+str(self.party[self.combatOrder[self.currentTurn][1]].getAttack()))
-        self.write(11, 420, 360, "DEF "+str(self.party[self.combatOrder[self.currentTurn][1]].getDefense()))
-        self.write(11, 360, 375, "ACC "+str(self.party[self.combatOrder[self.currentTurn][1]].getAccuracy()))
-        self.write(11, 420, 375, "DDG "+str(self.party[self.combatOrder[self.currentTurn][1]].getDodge()))
-        self.write(11, 360, 390, "CRT "+str(self.party[self.combatOrder[self.currentTurn][1]].getCritRate()))
-        self.write(11, 420, 390, "LCK "+str(self.party[self.combatOrder[self.currentTurn][1]].getLuck()))
-        self.write(11, 360, 405, "AMP "+str(self.party[self.combatOrder[self.currentTurn][1]].getAmplifier()))
-        self.write(11, 420, 405, "MPG "+str(self.party[self.combatOrder[self.currentTurn][1]].getManaRegen()))
+        self.write(11, 360, 328, self.party.members[self.combatOrder[self.currentTurn][1]].name+", Level "+str(self.party.members[self.combatOrder[self.currentTurn][1]].level)+" "+self.party.members[self.combatOrder[self.currentTurn][1]].type.name)
+        self.write(11, 360, 345, "HP "+str(self.party.members[self.combatOrder[self.currentTurn][1]].hp)+"/"+str(self.party.members[self.combatOrder[self.currentTurn][1]].hpMax))
+        self.write(11, 420, 345, "MP "+str(self.party.members[self.combatOrder[self.currentTurn][1]].mp)+"/"+str(self.party.members[self.combatOrder[self.currentTurn][1]].mpMax))
+        self.write(11, 360, 360, "ATK "+str(self.party.members[self.combatOrder[self.currentTurn][1]].getAttack()))
+        self.write(11, 420, 360, "DEF "+str(self.party.members[self.combatOrder[self.currentTurn][1]].getDefense()))
+        self.write(11, 360, 375, "ACC "+str(self.party.members[self.combatOrder[self.currentTurn][1]].getAccuracy()))
+        self.write(11, 420, 375, "DDG "+str(self.party.members[self.combatOrder[self.currentTurn][1]].getDodge()))
+        self.write(11, 360, 390, "CRT "+str(self.party.members[self.combatOrder[self.currentTurn][1]].getCritRate()))
+        self.write(11, 420, 390, "LCK "+str(self.party.members[self.combatOrder[self.currentTurn][1]].getLuck()))
+        self.write(11, 360, 405, "AMP "+str(self.party.members[self.combatOrder[self.currentTurn][1]].getAmplifier()))
+        self.write(11, 420, 405, "MPG "+str(self.party.members[self.combatOrder[self.currentTurn][1]].getManaRegen()))
         self.write(16, 360, 430, "\""+self.combatDialogue+"\"")
         iNext = 0
-        for i in range(len(self.party[self.combatOrder[self.currentTurn][1]].activeBuffs)):
-            self.writeOrientation(11, self.right, 330+(i*15), self.party[self.combatOrder[self.currentTurn][1]].activeBuffs[i][0]+" ("+str(self.party[self.combatOrder[self.currentTurn][1]].activeBuffs[i][1])+")","R")
+        for i in range(len(self.party.members[self.combatOrder[self.currentTurn][1]].activeBuffs)):
+            self.writeOrientation(11, self.right, 330+(i*15), self.party.members[self.combatOrder[self.currentTurn][1]].activeBuffs[i][0]+" ("+str(self.party.members[self.combatOrder[self.currentTurn][1]].activeBuffs[i][1])+")","R")
             iNext += 1
-        if self.party[self.combatOrder[self.currentTurn][1]].status != "None":
-            self.writeOrientation(11, self.right, 330+(iNext*15), self.party[self.combatOrder[self.currentTurn][1]].status+" ("+str(self.party[self.combatOrder[self.currentTurn][1]].statusCount)+")","R")
+        if self.party.members[self.combatOrder[self.currentTurn][1]].status != "None":
+            self.writeOrientation(11, self.right, 330+(iNext*15), self.party.members[self.combatOrder[self.currentTurn][1]].status+" ("+str(self.party.members[self.combatOrder[self.currentTurn][1]].statusCount)+")","R")
 
     def next(self):
         self.currentTurn += 1
@@ -465,9 +465,9 @@ class Combat():
                 return
             if self.currentTurn >= len(self.combatOrder):
                 self.startExecute()
-            #print(self.party[self.combatOrder[self.currentTurn][1]].name)
+            #print(self.party.members[self.combatOrder[self.currentTurn][1]].name)
         if self.combatOrder[self.currentTurn][0] == "Party":
-            self.combatDialogue = getCombatDialogue(self.party[self.combatOrder[self.currentTurn][1]])
+            self.combatDialogue = getCombatDialogue(self.party.members[self.combatOrder[self.currentTurn][1]])
 
     def enemyAction(self,source):
         if not self.isAlive(source):
@@ -479,10 +479,10 @@ class Combat():
         elif self.encounter[self.combatOrder[self.currentTurn][1]].status == "Freezing" and random.randint(0,2)==0:
             self.actions.append(Action(source,0,-3))
             return
-        target = random.randint(0,len(self.party)-1)
+        target = random.randint(0,len(self.party.members)-1)
         timeout = 0
-        while self.party[target].hp <= 0 and timeout < 20:
-            target = random.randint(0,len(self.party)-1)
+        while self.party.members[target].hp <= 0 and timeout < 20:
+            target = random.randint(0,len(self.party.members)-1)
             timeout += 1
         move = random.randint(0,len(self.encounter[self.combatOrder[self.currentTurn][1]].knownSpells))
         if move == 0 or self.encounter[self.combatOrder[self.currentTurn][1]].spellCooldown > 0:
@@ -496,16 +496,16 @@ class Combat():
 
     def attack(self,source,target):
         if source[0] == "Encounter":
-            if self.encounter[source[1]].attack - self.party[target].getDefense() < 0:
+            if self.encounter[source[1]].attack - self.party.members[target].getDefense() < 0:
                 self.dmg = 0
             else:
-                self.dmg = self.encounter[source[1]].attack - self.party[target].getDefense()
-            self.party[target].takeDamage(self.dmg)
+                self.dmg = self.encounter[source[1]].attack - self.party.members[target].getDefense()
+            self.party.members[target].takeDamage(self.dmg)
         if source[0] == "Party":
-            if self.party[source[1]].getAttack() - self.encounter[target].defense < 0:
+            if self.party.members[source[1]].getAttack() - self.encounter[target].defense < 0:
                 self.dmg = 0
             else:
-                self.dmg = self.party[source[1]].getAttack() - self.encounter[target].defense
+                self.dmg = self.party.members[source[1]].getAttack() - self.encounter[target].defense
             self.encounter[target].takeDamage(self.dmg)
 
     def cast(self,source,target,spellID):
@@ -515,19 +515,19 @@ class Combat():
                 if source[0] == "Encounter":
                     if spell.type == "Attack":
                         print("Attack!")
-                        self.dmg = self.party[target].takeDamage(spell.attack)
+                        self.dmg = self.party.members[target].takeDamage(spell.attack)
                     elif spell.type == "Debuff":
                         print("Debuff!")
                         if (spell.id > 326) or random.randint(0,1) == 1: # 50% Chance for 324, 325, 326
                             if spell.element == "Lightning":
-                                self.party[target].status = "Paralyzed"
-                                self.party[target].statusCount = 3
+                                self.party.members[target].status = "Paralyzed"
+                                self.party.members[target].statusCount = 3
                             elif spell.element == "Fire":
-                                self.party[target].status = "Burned"
-                                self.party[target].statusCount = -1
+                                self.party.members[target].status = "Burned"
+                                self.party.members[target].statusCount = -1
                             elif spell.element == "Ice":
-                                self.party[target].status = "Freezing"
-                                self.party[target].statusCount = -1
+                                self.party.members[target].status = "Freezing"
+                                self.party.members[target].statusCount = -1
                 else:
                     if spell.type == "Attack":
                         print("Attack!")
@@ -535,7 +535,7 @@ class Combat():
                         if spell.element == self.encounter[target].resistance:
                             self.dmg = int(self.dmg/2)
                         self.encounter[target].takeDamage(self.dmg)
-                        self.party[source[1]].mp -= spell.manacost
+                        self.party.members[source[1]].mp -= spell.manacost
                     elif spell.type == "Debuff":
                         print("Debuff!")
                         if spell.id > 326 or random.randint(0,1) == 1: # 50% Chance for 324, 325, 326
@@ -548,15 +548,15 @@ class Combat():
                             elif spell.element == "Ice":
                                 self.encounter[target].status = "Freezing"
                                 self.encounter[target].statusCount = -1
-                        self.party[source[1]].mp -= spell.manacost
+                        self.party.members[source[1]].mp -= spell.manacost
             else:
                 if source[0] == "Encounter":
                     if spell.type == "Attack":
-                        for member in self.party:
+                        for member in self.party.members:
                             self.dmg = member.takeDamage(spell.attack)
                     elif spell.type == "Debuff":
                         print("Debuff!")
-                        for member in self.party:
+                        for member in self.party.members:
                             if spell.element == "Lightning":
                                 member.status = "Paralyzed"
                                 member.statusCount = 3
@@ -574,7 +574,7 @@ class Combat():
                                 self.dmg = int(self.dmg/2)
                             member.takeDamage(self.dmg)
                         self.dmg = spell.attack
-                        self.party[source[1]].mp -= spell.manacost
+                        self.party.members[source[1]].mp -= spell.manacost
                     elif spell.type == "Debuff":
                         print("Debuff!")
                         for member in self.encounter:
@@ -588,29 +588,29 @@ class Combat():
                                 elif spell.element == "Ice":
                                     member.status = "Freezing"
                                     member.statusCount = -1
-                        self.party[source[1]].mp -= spell.manacost
+                        self.party.members[source[1]].mp -= spell.manacost
         elif spellID < 500:
             spell = self.game.directory.getSptSpell(spellID)
             if spell.target == "Single":
                 if spell.type == "Heal":
-                    if self.party[target].hp > 0:
-                        self.party[target].hp += spell.getHeal()
-                    if self.party[target].hp > self.party[target].hpMax:
-                        self.party[target].hp = self.party[target].hpMax
+                    if self.party.members[target].hp > 0:
+                        self.party.members[target].hp += spell.getHeal()
+                    if self.party.members[target].hp > self.party.members[target].hpMax:
+                        self.party.members[target].hp = self.party.members[target].hpMax
                 elif spell.type == "Buff":
                     self.applyBuff(spell,target)
                 elif spell.type == "Raise":
-                    if self.party[target].hp <= 0:
-                        self.party[target].hp += spell.getHeal()
-                    if self.party[target].hp > self.party[target].hpMax:
-                        self.party[target].hp = self.party[target].hpMax
+                    if self.party.members[target].hp <= 0:
+                        self.party.members[target].hp += spell.getHeal()
+                    if self.party.members[target].hp > self.party.members[target].hpMax:
+                        self.party.members[target].hp = self.party.members[target].hpMax
                 elif spell.type == "Cleanse":
-                    if self.party[target].hp > 0:
-                        self.party[target].resetStatus()
-                self.party[source[1]].mp -= spell.manacost
+                    if self.party.members[target].hp > 0:
+                        self.party.members[target].resetStatus()
+                self.party.members[source[1]].mp -= spell.manacost
             elif spell.target == "All":
                 if spell.type == "Heal":
-                    for member in self.party:
+                    for member in self.party.members:
                         if member.hp > 0:
                             member.hp += spell.getHeal()
                         if member.hp > member.hpMax:
@@ -618,16 +618,16 @@ class Combat():
                 elif spell.type == "Buff":
                     self.applyBuff(spell,-1)
                 elif spell.type == "Raise":
-                    for member in self.party:
+                    for member in self.party.members:
                         if member.hp <= 0:
                             member.hp += spell.getHeal()
                         if member.hp > member.hpMax:
                             member.hp = member.hpMax
                 elif spell.type == "Cleanse":
-                    for member in self.party:
+                    for member in self.party.members:
                         if member.hp > 0:
                             member.resetStatus()
-                self.party[source[1]].mp -= spell.manacost
+                self.party.members[source[1]].mp -= spell.manacost
 
     def validManaCost(self,user,spell):
         return user.mp > self.game.directory.getManaCost(spell)
@@ -664,7 +664,7 @@ class Combat():
 
     def isAlive(self,source):
         if source[0]=="Party":
-            if self.party[source[1]].hp<=0:
+            if self.party.members[source[1]].hp<=0:
                 return False
         if source[0]=="Encounter":
             if self.encounter[source[1]].hp<=0:
@@ -695,7 +695,7 @@ class Combat():
         self.next()
 
     def upkeep(self):
-        for member in self.party:
+        for member in self.party.members:
             member.mp += member.getManaRegen()
             if member.mp > member.mpMax:
                 member.mp = member.mpMax
@@ -740,27 +740,27 @@ class Combat():
         print(newBuff.target)
         self.buffs.append(newBuff)
         if newBuff.target == -1:
-            for member in self.party:
+            for member in self.party.members:
                 member.addBuffs(newBuff)
         else:
-            self.party[newBuff.target].addBuffs(newBuff)
+            self.party.members[newBuff.target].addBuffs(newBuff)
 
     def processBuffs(self):
-        for member in self.party:
+        for member in self.party.members:
             member.resetBuffs()
         for bf in self.buffs:
             if bf.target == -1:
-                for member in self.party:
+                for member in self.party.members:
                     member.addBuffs(bf)
             else:
-                self.party[bf.target].addBuffs(bf)
+                self.party.members[bf.target].addBuffs(bf)
             print(f'{bf.name}, {bf.duration}')
             bf.tick()
         for i in range(len(self.buffs)-1,-1,-1):
             if self.buffs[i].checkExpiry():
                 print(f'{bf.name} expired.')
                 self.buffs.pop(i)
-        for member in self.party:
+        for member in self.party.members:
             print(member.buffs)
 
     def lookupBuffName(self,i):

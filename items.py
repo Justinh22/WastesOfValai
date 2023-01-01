@@ -245,33 +245,33 @@ def initPotionDirectory():
     potionDirectory = []
 
     #1
-    Potion_of_Minor_Healing = Potion("Potion of Minor Healing","A potion capable of restoring a meager amount of life.",1,200,10,0);
+    Potion_of_Minor_Healing = Potion("Potion of Minor Healing","A potion capable of restoring a meager amount of life.",1,200,15,0);
     potionDirectory.append(Potion_of_Minor_Healing);
-    Potion_of_Minor_Calming = Potion("Potion of Minor Calming","A potion capable of restoring a meager amount of magical ability.",1,201,0,10);
+    Potion_of_Minor_Calming = Potion("Potion of Minor Calming","A potion capable of restoring a meager amount of magical ability.",1,201,0,15);
     potionDirectory.append(Potion_of_Minor_Calming);
     #2
-    Potion_of_Lesser_Healing = Potion("Potion of Lesser Healing","A potion capable of restoring a small amount of life.",2,202,20,0);
+    Potion_of_Lesser_Healing = Potion("Potion of Lesser Healing","A potion capable of restoring a small amount of life.",2,202,30,0);
     potionDirectory.append(Potion_of_Lesser_Healing);
-    Potion_of_Lesser_Calming = Potion("Potion of Lesser Calming","A potion capable of restoring a small amount of magical ability.",2,203,0,20);
+    Potion_of_Lesser_Calming = Potion("Potion of Lesser Calming","A potion capable of restoring a small amount of magical ability.",2,203,0,30);
     potionDirectory.append(Potion_of_Lesser_Calming);
     #3
-    Potion_of_Healing = Potion("Potion of Healing","A potion capable of restoring life.",3,204,30,0);
+    Potion_of_Healing = Potion("Potion of Healing","A potion capable of restoring life.",3,204,50,0);
     potionDirectory.append(Potion_of_Healing);
-    Potion_of_Calming = Potion("Potion of Calming","A potion capable of restoring magical ability.",3,205,0,30);
+    Potion_of_Calming = Potion("Potion of Calming","A potion capable of restoring magical ability.",3,205,0,50);
     potionDirectory.append(Potion_of_Calming);
     #4
-    Potion_of_Greater_Healing = Potion("Potion of Greater Healing","A potion capable of restoring a great amount of life.",4,206,50,0);
+    Potion_of_Greater_Healing = Potion("Potion of Greater Healing","A potion capable of restoring a great amount of life.",4,206,80,0);
     potionDirectory.append(Potion_of_Greater_Healing);
-    Potion_of_Greater_Calming = Potion("Potion of Greater Calming","A potion capable of restoring a great amount of magical ability.",4,207,0,50);
+    Potion_of_Greater_Calming = Potion("Potion of Greater Calming","A potion capable of restoring a great amount of magical ability.",4,207,0,80);
     potionDirectory.append(Potion_of_Greater_Calming);
-    Potion_of_Replenishment = Potion("Potion of Replenishment","A potion capable of restoring both life and magical ability.",4,208,30,30);
+    Potion_of_Replenishment = Potion("Potion of Replenishment","A potion capable of restoring both life and magical ability.",4,208,50,50);
     potionDirectory.append(Potion_of_Replenishment);
     #5
-    Potion_of_Full_Healing = Potion("Potion of Full Healing","A potion capable of restoring all life.",5,209,100,0);
-    potionDirectory.append(Potion_of_Full_Healing);
-    Potion_of_Full_Calming = Potion("Potion of Full Calming","A potion capable of restoring all magical ability.",5,210,0,100);
-    potionDirectory.append(Potion_of_Full_Calming);
-    Potion_of_Greater_Replenishment = Potion("Potion of Greater Replenishment","A potion capable of restoring both life and magical ability.",5,211,50,50);
+    Potion_of_Major_Healing = Potion("Potion of Major Healing","A potion capable of restoring a massive amount of life.",5,209,150,0);
+    potionDirectory.append(Potion_of_Major_Healing);
+    Potion_of_Major_Calming = Potion("Potion of Major Calming","A potion capable of restoring a massive amount of magical ability.",5,210,0,150);
+    potionDirectory.append(Potion_of_Major_Calming);
+    Potion_of_Greater_Replenishment = Potion("Potion of Greater Replenishment","A potion capable of restoring both life and magical ability.",5,211,80,80);
     potionDirectory.append(Potion_of_Greater_Replenishment);
 
     return potionDirectory

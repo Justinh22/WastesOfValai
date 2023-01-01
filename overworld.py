@@ -11,14 +11,8 @@ class Overworld():
         self.height = self.game.height - 60
         self.font = pygame.font.Font('freesansbold.ttf',20)
         self.combat = Combat(self.game)
-        self.party = []
-        self.lvlTot = 0
-        for i in range(0,random.randint(3,4)):
-            lvl = random.randint(1,8)
-            self.party.append(Character(getCharacterName(),10,self.game.directory.classDirectory[random.randint(0,11)],random.randint(0,5))) #random.randint(0,11)
-            self.party[i].eqpWpn = game.directory.getWeapon(game.directory.getItemByRarities("Weapon",lvl-1,lvl))
-            self.party[i].eqpAmr = game.directory.getArmor(game.directory.getItemByRarities("Armor",lvl-1,lvl))
-            self.lvlTot += lvl
+        self.party = Party()
+        self.party.initializeMembers(self.game.directory)
 
     def blitScreen(self):
         self.game.screen.blit(self.game.screen, (0,0))
@@ -60,7 +54,7 @@ class Overworld():
             self.drawScreen()
         if self.game.B:
             encounter = []
-            encounter = self.game.directory.buildEncounter(self.lvlTot,self.getBiome(self.currentPos[0],self.currentPos[1]))
+            encounter = self.game.directory.buildEncounter(self.party.power,self.getBiome(self.currentPos[0],self.currentPos[1]))
             self.combat.initialize(self.party,encounter)
         if self.game.X:
             self.inWorld = False
