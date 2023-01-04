@@ -31,6 +31,7 @@ class Combat():
         self.waitFlag = False
         self.cursorPos = -1
         self.menuTop = -1
+        self.itemID = -1
         self.spellID = -1
         self.lowMana = False
         self.buffs = []
@@ -118,7 +119,9 @@ class Combat():
                     self.menuTop = 0
                     print("SPELL")
                 elif self.cursorPos == 1:
-                    self.state = "useMenu"
+                    self.state = "itemList"
+                    self.cursorPos = 0
+                    self.menuTop = 0
                     print("ITEM")
                 elif self.cursorPos == 2:
                     self.state = "useMenu"
@@ -141,6 +144,11 @@ class Combat():
                     self.spellID = self.menuTop + self.cursorPos
                     self.state = "spellSummary"
                     print("SPELLSUMMARY")
+            elif self.state == "itemList":
+                if self.cursorPos+self.menuTop < len(self.party.inventory):
+                    self.itemID = self.menuTop + self.cursorPos
+                    self.state = "itemSummary"
+                    print("ITEMSUMMARY")
             elif self.state =="spellSummary":
                 if self.validManaCost(self.party.members[self.combatOrder[self.currentTurn][1]],self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID]):
                     self.lowMana = False
@@ -158,6 +166,12 @@ class Combat():
                     print("SPELL")
                 else:
                     self.lowMana = True
+            elif self.state =="itemSummary":
+                self.actionVal = self.party.inventory[self.itemID]
+                self.party.inventory.pop(self.itemID)
+                self.state = "targetSelect"
+                self.cursorPos = 0
+                print("ITEM")
         if self.game.B:
             if self.state == "mainWindow":
                 self.state = "useMenu"
@@ -173,8 +187,14 @@ class Combat():
             elif self.state == "spellList":
                 self.state = "useMenu"
                 print("BACK")
+            elif self.state == "itemList":
+                self.state = "useMenu"
+                print("BACK")
             elif self.state == "spellSummary":
                 self.state = "spellList"
+                print("BACK")
+            elif self.state == "itemSummary":
+                self.state = "itemList"
                 print("BACK")
         if self.game.X:
             if self.state == "mainWindow":
@@ -191,7 +211,7 @@ class Combat():
             elif self.state == "useMenu":
                 if self.cursorPos == 2 or self.cursorPos == 3:
                     self.cursorPos -= 2
-            elif self.state == "spellList":
+            elif self.state == "spellList" or self.state == "itemList":
                 if self.cursorPos == 0 or self.cursorPos == 1:
                     if self.menuTop > 0:
                         self.menuTop -= 2
@@ -199,7 +219,7 @@ class Combat():
                     self.cursorPos -= 2
         if self.game.DOWN:
             if self.state == "targetSelect":
-                if (self.actionVal < 400 and self.cursorPos < len(self.encounter)-1) or (self.actionVal >= 400 and self.cursorPos < len(self.party.members)-1):
+                if (self.actionVal < 200 and self.cursorPos < len(self.encounter)-1) or (self.actionVal >= 200 and self.cursorPos < len(self.party.members)-1):
                     self.cursorPos += 1
             elif self.state == "useMenu":
                 if self.cursorPos == 0 or self.cursorPos == 1:
@@ -210,15 +230,21 @@ class Combat():
                         self.menuTop += 2
                 else:
                     self.cursorPos += 2
+            elif self.state == "itemList":
+                if self.cursorPos == 2 or self.cursorPos == 3:
+                    if self.menuTop+4 < len(self.party.inventory):
+                        self.menuTop += 2
+                else:
+                    self.cursorPos += 2
         if self.game.LEFT:
-            if self.state == "spellList":
+            if self.state == "spellList" or self.state == "itemList":
                 if self.cursorPos == 1 or self.cursorPos == 3:
                     self.cursorPos -= 1
             elif self.state == "useMenu":
                 if self.cursorPos > 0:
                     self.cursorPos -= 1
         if self.game.RIGHT:
-            if self.state == "spellList":
+            if self.state == "spellList" or self.state == "itemList":
                 if self.cursorPos == 0 or self.cursorPos == 2:
                     self.cursorPos += 1
             elif self.state == "useMenu":
@@ -248,7 +274,7 @@ class Combat():
         if self.state == "targetSelect":
             pygame.draw.line(self.game.screen,self.game.white,(self.left,350),(self.right+9,350),2)
             self.write(20, self.left+15, 325, "Select a target")
-            if self.actionVal < 400:
+            if self.actionVal < 200 or (self.actionVal >= 300 and self.actionVal < 400):
                 self.write(20, 480, 30+(self.cursorPos*30), "<")
                 self.write(20,30,400,"A) SELECT")
                 self.write(20,180,400,"B) BACK")
@@ -259,26 +285,46 @@ class Combat():
         if self.state == "spellList":
             pygame.draw.line(self.game.screen,self.game.white,(self.left,350),(self.right+9,350),2)
             if self.lowMana:
-                self.write(20, self.left+15, 325, "You don't have enough mana to cast that.")
+                self.write(18, self.left+15, 325, "You don't have enough mana to cast that.")
             else:
-                self.write(20, self.left+15, 325, "Select a spell: (B to cancel)")
+                self.write(18, self.left+15, 325, "Select a spell: (B to cancel)")
             self.write(20, 40+((self.cursorPos%2)*300), 380+((int(self.cursorPos/2))*40), ">")
             if self.menuTop < len(self.party.members[self.combatOrder[self.currentTurn][1]].spells):
-                self.write(20,60,380,str(self.menuTop+1)+") "+self.game.directory.getItemName(self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.menuTop]))
+                self.write(18,60,380,str(self.menuTop+1)+") "+self.game.directory.getItemName(self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.menuTop]))
             else:
-                self.write(20,60,380,str(self.menuTop+1)+")")
+                self.write(18,60,380,str(self.menuTop+1)+")")
             if self.menuTop+1 < len(self.party.members[self.combatOrder[self.currentTurn][1]].spells):
-                self.write(20,360,380,str(self.menuTop+2)+") "+self.game.directory.getItemName(self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.menuTop+1]))
+                self.write(18,360,380,str(self.menuTop+2)+") "+self.game.directory.getItemName(self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.menuTop+1]))
             else:
-                self.write(20,360,380,str(self.menuTop+2)+")")
+                self.write(18,360,380,str(self.menuTop+2)+")")
             if self.menuTop+2 < len(self.party.members[self.combatOrder[self.currentTurn][1]].spells):
-                self.write(20,60,420,str(self.menuTop+3)+") "+self.game.directory.getItemName(self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.menuTop+2]))
+                self.write(18,60,420,str(self.menuTop+3)+") "+self.game.directory.getItemName(self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.menuTop+2]))
             else:
-                self.write(20,60,420,str(self.menuTop+3)+")")
+                self.write(18,60,420,str(self.menuTop+3)+")")
             if self.menuTop+3 < len(self.party.members[self.combatOrder[self.currentTurn][1]].spells):
-                self.write(20,360,420,str(self.menuTop+4)+") "+self.game.directory.getItemName(self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.menuTop+3]))
+                self.write(18,360,420,str(self.menuTop+4)+") "+self.game.directory.getItemName(self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.menuTop+3]))
             else:
-                self.write(20,360,420,str(self.menuTop+4)+")")
+                self.write(18,360,420,str(self.menuTop+4)+")")
+        if self.state == "itemList":
+            pygame.draw.line(self.game.screen,self.game.white,(self.left,350),(self.right+9,350),2)
+            self.write(20, self.left+15, 325, "Select an item: (B to cancel)")
+            self.write(20, 40+((self.cursorPos%2)*300), 380+((int(self.cursorPos/2))*40), ">")
+            if self.menuTop < len(self.party.inventory):
+                self.write(18,60,380,str(self.menuTop+1)+") "+self.game.directory.getItemName(self.party.inventory[self.menuTop]))
+            else:
+                self.write(18,60,380,str(self.menuTop+1)+")")
+            if self.menuTop+1 < len(self.party.inventory):
+                self.write(18,360,380,str(self.menuTop+2)+") "+self.game.directory.getItemName(self.party.inventory[self.menuTop+1]))
+            else:
+                self.write(18,360,380,str(self.menuTop+2)+")")
+            if self.menuTop+2 < len(self.party.inventory):
+                self.write(18,60,420,str(self.menuTop+3)+") "+self.game.directory.getItemName(self.party.inventory[self.menuTop+2]))
+            else:
+                self.write(18,60,420,str(self.menuTop+3)+")")
+            if self.menuTop+3 < len(self.party.inventory):
+                self.write(18,360,420,str(self.menuTop+4)+") "+self.game.directory.getItemName(self.party.inventory[self.menuTop+3]))
+            else:
+                self.write(18,360,420,str(self.menuTop+4)+")")
         if self.state == "spellSummary":
             pygame.draw.line(self.game.screen,self.game.white,(self.left,350),(self.right+9,350),2)
             self.write(20, self.left+15, 325, "Do you want to cast this spell?")
@@ -295,6 +341,19 @@ class Combat():
                             self.writeOrientation(16,self.right-10, 360+(i*20), self.lookupBuffName(id)+" "+str(buff),"R")
                             i += 1
             self.write(16, self.left+15, 380, self.game.directory.getItemDesc(self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID]))
+            self.write(20,150,425,"A) CONFIRM")
+            self.write(20,385,425,"B) BACK")
+        if self.state == "itemSummary":
+            pygame.draw.line(self.game.screen,self.game.white,(self.left,350),(self.right+9,350),2)
+            self.write(20, self.left+15, 325, "Do you want to use this item?")
+            self.write(16, self.left+15, 360, self.game.directory.getItemName(self.party.inventory[self.itemID]))
+            if self.game.directory.getPotion(self.party.inventory[self.itemID]).hpGain > 0 and self.game.directory.getPotion(self.party.inventory[self.itemID]).mpGain > 0:
+                self.writeOrientation(16,self.right-10, 360, "Restores "+str(self.game.directory.getPotion(self.party.inventory[self.itemID]).hpGain)+" HP and "+str(self.game.directory.getPotion(self.party.inventory[self.itemID]).mpGain)+" MP","R")
+            elif self.game.directory.getPotion(self.party.inventory[self.itemID]).hpGain > 0 and self.game.directory.getPotion(self.party.inventory[self.itemID]).mpGain == 0:
+                self.writeOrientation(16,self.right-10, 360, "Restores "+str(self.game.directory.getPotion(self.party.inventory[self.itemID]).hpGain)+" HP","R")
+            elif self.game.directory.getPotion(self.party.inventory[self.itemID]).hpGain == 0 and self.game.directory.getPotion(self.party.inventory[self.itemID]).mpGain > 0:
+                self.writeOrientation(16,self.right-10, 360, "Restores "+str(self.game.directory.getPotion(self.party.inventory[self.itemID]).mpGain)+" MP","R")
+            self.write(16, self.left+15, 380, self.game.directory.getItemDesc(self.party.inventory[self.itemID]))
             self.write(20,150,425,"A) CONFIRM")
             self.write(20,385,425,"B) BACK")
 
@@ -314,6 +373,8 @@ class Combat():
                 combatStr = self.encounter[self.actions[self.exTurn-1].source[1]].name + " is paralyzed, and cannot move!"
             elif self.actions[self.exTurn-1].action == -3:
                 combatStr = self.encounter[self.actions[self.exTurn-1].source[1]].name + " is freezing, and cannot move!"
+            elif self.actions[self.exTurn-1].action >= 200 and self.actions[self.exTurn-1].action < 300:
+                combatStr = self.party.members[self.actions[self.exTurn-1].source[1]].name + " used " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + " on " + self.party.members[self.actions[self.exTurn-1].target].name + "!"
             elif self.actions[self.exTurn-1].action >= 300 and self.actions[self.exTurn-1].action < 400:
                 if self.actions[self.exTurn-1].source[0] == "Encounter":
                     if self.game.directory.getAtkSpell(self.actions[self.exTurn-1].action).target == "Single":
@@ -508,6 +569,9 @@ class Combat():
                 self.dmg = self.party.members[source[1]].getAttack() - self.encounter[target].defense
             self.encounter[target].takeDamage(self.dmg)
 
+    def usePotion(self,target,itemID):
+        self.party.usePotion(target,itemID,self.game.directory)
+
     def cast(self,source,target,spellID):
         if spellID < 400:
             spell = self.game.directory.getAtkSpell(spellID)
@@ -557,15 +621,16 @@ class Combat():
                     elif spell.type == "Debuff":
                         print("Debuff!")
                         for member in self.party.members:
-                            if spell.element == "Lightning":
-                                member.status = "Paralyzed"
-                                member.statusCount = 3
-                            elif spell.element == "Fire":
-                                member.status = "Burned"
-                                member.statusCount = -1
-                            elif spell.element == "Ice":
-                                member.status = "Freezing"
-                                member.statusCount = -1
+                            if random.randint(0,1) == 1:
+                                if spell.element == "Lightning":
+                                    member.status = "Paralyzed"
+                                    member.statusCount = 3
+                                elif spell.element == "Fire":
+                                    member.status = "Burned"
+                                    member.statusCount = -1
+                                elif spell.element == "Ice":
+                                    member.status = "Freezing"
+                                    member.statusCount = -1
                 else:
                     if spell.type == "Attack":
                         for member in self.encounter:
@@ -646,6 +711,8 @@ class Combat():
                 print(f'Action: {self.actions[self.exTurn].source} -> {self.actions[self.exTurn].target}, {self.actions[self.exTurn].action} (exTurn {self.exTurn})')
                 if self.actions[self.exTurn].action == 0:
                     self.attack(self.actions[self.exTurn].source,self.actions[self.exTurn].target)
+                elif self.actions[self.exTurn].action >= 200 and self.actions[self.exTurn].action < 300:
+                    self.usePotion(self.actions[self.exTurn].target,self.actions[self.exTurn].action)
                 elif self.actions[self.exTurn].action >= 300 and self.actions[self.exTurn].action < 400:
                     self.cast(self.actions[self.exTurn].source,self.actions[self.exTurn].target,self.actions[self.exTurn].action)
                 elif self.actions[self.exTurn].action >= 400 and self.actions[self.exTurn].action < 500:

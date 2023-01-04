@@ -118,7 +118,14 @@ class Character():
     def resetStatus(self):
         self.status = "None"
         self.statusCount = 0
-
+    def gainHP(self,val):
+        self.hp += val
+        if self.hp > self.hpMax:
+            self.hp = self.hpMax
+    def gainMP(self,val):
+        self.mp += val
+        if self.mp > self.mpMax:
+            self.mp = self.mpMax
 
 class ClassType():
     def __init__(self,nm,wpnPrf,amrPrf,atkLv,sptLv,hpg,mpg,atg,ctg,dfg,dgg,lkg,sdg,splsLrn,idIN):
@@ -152,6 +159,15 @@ class Party():
             self.members[i].eqpWpn = dir.getWeapon(dir.getItemByRarities("Weapon",lvl-1,lvl))
             self.members[i].eqpAmr = dir.getArmor(dir.getItemByRarities("Armor",lvl-1,lvl))
             self.power += lvl
+    def debug_RandomInventory(self,dir):
+        while len(self.inventory) < 10:
+            self.addItem(dir.getItemByRarities("Potion",1,5))
+    def addItem(self,item):
+        if len(self.inventory) <= 10:
+            self.inventory.append(item)
+    def usePotion(self,member,item,dir):
+        self.members[member].gainHP(dir.getPotion(item).hpGain)
+        self.members[member].gainMP(dir.getPotion(item).mpGain)
 
 class Creature():
     def __init__(self,nm,lv,idIN,hpIN,at,ac,df,dg,sd,res,type,spells):

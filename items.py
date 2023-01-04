@@ -271,7 +271,7 @@ def initPotionDirectory():
     potionDirectory.append(Potion_of_Major_Healing);
     Potion_of_Major_Calming = Potion("Potion of Major Calming","A potion capable of restoring a massive amount of magical ability.",5,210,0,150);
     potionDirectory.append(Potion_of_Major_Calming);
-    Potion_of_Greater_Replenishment = Potion("Potion of Greater Replenishment","A potion capable of restoring both life and magical ability.",5,211,80,80);
+    Potion_of_Greater_Replenishment = Potion("Potion of Gr. Replenishment","A potion capable of restoring both life and magical ability.",5,211,80,80);
     potionDirectory.append(Potion_of_Greater_Replenishment);
 
     return potionDirectory
@@ -328,11 +328,11 @@ def initAtkSpellDirectory():
     Frost_Wave_III = AttackMagic("Frost Wave III","Launches a massive wave of ice toward all foes.",2,320,16,18,"Attack","Ice","All");
     attackSpellDirectory.append(Frost_Wave_III);
     #5
-    Thunderstorm = AttackMagic("Thunderstorm","Calls down a raging storm to electrify a target.",5,321,20,28,"Attack","Lightning","All");
+    Thunderstorm = AttackMagic("Thunderstorm","Calls down a raging storm to electrify all enemies.",5,321,20,28,"Attack","Lightning","All");
     attackSpellDirectory.append(Thunderstorm);
-    Inferno = AttackMagic("Inferno","Calls a raging inferno to incinerate a target.",5,322,19,26,"Attack","Fire","All");
+    Inferno = AttackMagic("Inferno","Calls a raging inferno to incinerate all enemies.",5,322,19,26,"Attack","Fire","All");
     attackSpellDirectory.append(Inferno);
-    Blizzard = AttackMagic("Blizzard","Calls a raging blizzard to freeze a target.",5,323,18,24,"Attack","Ice","All");
+    Blizzard = AttackMagic("Blizzard","Calls a raging blizzard to freeze all enemies.",5,323,18,24,"Attack","Ice","All");
     attackSpellDirectory.append(Blizzard);
 
     #DEBUFFS

@@ -55,6 +55,7 @@ class Overworld():
         if self.game.B:
             encounter = []
             encounter = self.game.directory.buildEncounter(self.party.power,self.getBiome(self.currentPos[0],self.currentPos[1]))
+            self.party.debug_RandomInventory(self.game.directory)
             self.combat.initialize(self.party,encounter)
         if self.game.X:
             self.inWorld = False
