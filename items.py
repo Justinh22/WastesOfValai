@@ -491,3 +491,43 @@ def initSptSpellDirectory():
     sptSpellDirectory.append(Cleanse_Aura);
 
     return sptSpellDirectory
+
+########## SKILLS ##########
+
+def initSkillDirectory():
+    skillDirectory = []
+
+    Fortify = Skill("Fortify","Halve physical damage taken this turn.",1,500,0,"Support","Self")
+    skillDirectory.append(Fortify)
+    Breathe = Skill("Breathe","Halve magical damage taken this turn.",1,501,0,"Support","Self")
+    skillDirectory.append(Breathe)
+    Meditate = Skill("Meditate","Restore 5 MP.",1,508,0,"Support","Self")
+    skillDirectory.append(Meditate)
+    Enrage = Skill("Enrage","Draw attention away from allies.",1,502,2,"Support","Self")
+    skillDirectory.append(Enrage)
+    Strike_True = Skill("Strike True","Attack an enemy for 50% damage, with no chance of missing.",1,503,3,"Attack","Single")
+    skillDirectory.append(Strike_True)
+    Defend = Skill("Defend","Protect a party member.",1,504,3,"Support","Ally")
+    skillDirectory.append(Defend)
+    Riposte = Skill("Riposte","Deal half of damage taken back to attacker.",1,505,3,"Support","Self")
+    skillDirectory.append(Riposte)
+    Wild_Swing = Skill("Wild Swing","Attack with 150% damage, with ACC reduced by 10%",1,506,4,"Attack","Single")
+    skillDirectory.append(Wild_Swing)
+    Eviscerate = Skill("Eviscerate","Attack with CRT increased by 15%.",1,507,4,"Attack","Single")
+    skillDirectory.append(Eviscerate)
+    Pierce = Skill("Pierce","Attack an enemy, ignoring 50% of their defense.",1,509,6,"Attack","Single")
+    skillDirectory.append(Pierce)
+    Swift_Strike = Skill("Swift Strike","Attack first in the combat order.",1,510,6,"Attack","Single")
+    skillDirectory.append(Swift_Strike)
+    Cleave = Skill("Cleave","Attack all enemies.",1,511,8,"Attack","All")
+    skillDirectory.append(Cleave)
+    Soulrend = Skill("Heartrend","Attack an enemy, restoring half of damage dealt as HP.",1,512,8,"Attack","Single")
+    skillDirectory.append(Heartrend)
+    Soulrend = Skill("Soulrend","Attack an enemy, restoring half of damage dealt as MP.",1,512,8,"Attack","Single")
+    skillDirectory.append(Soulrend)
+    Blitz = Skill("Blitz","Attack an enemy twice.",1,513,10,"Attack","Single")
+    skillDirectory.append(Blitz)
+    Havoc = Skill("Havoc","Attack random enemies 5 times for half damage.",1,514,10,"Attack","All")
+    skillDirectory.append(Havoc)
+
+    return skillDirectory

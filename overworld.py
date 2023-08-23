@@ -1,5 +1,6 @@
 import pygame
 from combat import *
+from pausemenu import *
 from directory import *
 
 class Overworld():
@@ -10,6 +11,7 @@ class Overworld():
         self.width = self.game.width - 60
         self.height = self.game.height - 60
         self.font = pygame.font.Font('freesansbold.ttf',20)
+        self.pausemenu = PauseMenu(self.game)
         self.combat = Combat(self.game)
         self.party = Party()
         self.party.initializeMembers(self.game.directory)
@@ -52,6 +54,8 @@ class Overworld():
             if self.game.WorldMap.map[self.currentPos[0]][self.currentPos[1]-1] != ' ' and self.game.WorldMap.map[self.currentPos[0]][self.currentPos[1]-1] != 'X':
                 self.currentPos[1] -= 1
             self.drawScreen()
+        if self.game.A:
+            self.pausemenu.pause()
         if self.game.B:
             encounter = []
             encounter = self.game.directory.buildEncounter(self.party.power,self.getBiome(self.currentPos[0],self.currentPos[1]))

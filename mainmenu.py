@@ -42,6 +42,7 @@ class MainMenu():
                 self.blitScreen()
                 self.game.WorldMap.generateMap()
                 print("Start!")
+                print(self.game.WorldMap.startingPos)
             if self.cursorState == "Load":
                 self.game.inGame = True
                 self.displayRunning = False
