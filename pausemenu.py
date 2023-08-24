@@ -80,10 +80,13 @@ class PauseMenu():
                     if r == self.currentPos[0] and c == self.currentPos[1]:
                         mapChar = '@'
                     if mapChar == '_':
-                        revMapList = list(self.game.WorldMap.revealedMap[r])
-                        revMapList[c] = '1'
-                        self.game.WorldMap.revealedMap[r] = ''.join(revMapList)
-                        mapChar = self.game.WorldMap.map[r][c]
+                        if self.game.WorldMap.revealedMap[r][c] == '1':
+                            mapChar = self.game.WorldMap.map[r][c]
+                        else:
+                            if self.game.WorldMap.map[r][c] == 'X':
+                                mapChar = self.game.WorldMap.map[r][c]
+                            else:
+                                mapChar = ' '
 
                     text = mapFont.render(mapChar,True,self.game.white)
                     textWidth, textHeight = mapFont.size(mapChar)
@@ -118,9 +121,9 @@ class PauseMenu():
                 print(self.game.party.members[self.cursorPos].name)
             if self.state == "map":
                 print("ZOOMIN")
-                if self.mapZoomSize <= 40 and self.mapZoomSize >= 10:
+                if self.mapZoomSize < 40 and self.mapZoomSize >= 10:
                     self.mapZoomSize += 5
-                elif self.mapZoomSize <= 50:
+                elif self.mapZoomSize < 40 and self.mapZoomSize >= 4:
                     self.mapZoomSize += 2
         if self.game.B:
             if self.state == "partySelect":
