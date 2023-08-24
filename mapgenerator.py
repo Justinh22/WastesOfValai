@@ -4,6 +4,7 @@ import random
 class Map():
     def __init__(self):
         self.map = []
+        self.revealedMap = []
         self.sizeR = 200
         self.sizeC = 400
         self.startingPos = (0,0)
@@ -13,6 +14,10 @@ class Map():
         with open("generated_map.txt","r") as file:
             for row in file:
                 self.map.append(row)
+        with open("revealed_map.txt","r") as file:
+            for row in file:
+                self.revealedMap.append(row.strip())
+                
         #Setting starting position...
         r = random.randint(round(self.sizeR/3),round((self.sizeR/3)*2))
         c = random.randint(round(self.sizeC/3),round((self.sizeR/3)*2))
@@ -23,6 +28,7 @@ class Map():
 
     def generateMap(self):
         row = []
+        revealedRow = []
         for i in range(0,self.sizeR):
             for j in range(0,self.sizeC):
                 randomChar = random.randint(1,4)
@@ -34,8 +40,11 @@ class Map():
                     row.append('.')
                 else:
                     row.append(' ')
+                revealedRow.append('0')
             self.map.append(row)
+            self.revealedMap.append(revealedRow)
             row = []
+            revealedRow = []
         print("Building map...")
         self.grow(50)
         print("Smoothing corners...")
@@ -112,10 +121,16 @@ class Map():
 
         self.ensurePath(r,c)
         print("Generating landmarks...")
-        self.placeLandmarks(700)
+        self.placeLandmarks(1000)
 
         with open("generated_map.txt","w") as file:
             for row in self.map:
+                for element in row:
+                    file.write(element)
+                file.write("\n")
+
+        with open("revealed_map.txt","w") as file:
+            for row in self.revealedMap:
                 for element in row:
                     file.write(element)
                 file.write("\n")
@@ -195,7 +210,7 @@ class Map():
         for i in range(0,landmarks):
             r = random.randint(1,self.sizeR-1)
             c = random.randint(1,self.sizeC-1)
-            sel = random.randint(1,7)
+            sel = random.randint(1,5)
             if self.map[r][c] == '.':
                 if sel == 1:
                     self.map[r][c] = 'W' # Well
@@ -223,3 +238,10 @@ class Map():
                     self.map[r][c] = 'G' # Shrine
                 else:
                     self.map[r][c] = 'S' # Shack
+
+    def saveRevealed(self):
+        with open("revealed_map.txt","w") as file:
+            for row in self.revealedMap:
+                for element in row:
+                    file.write(element)
+                file.write("\n")

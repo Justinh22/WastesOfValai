@@ -6,15 +6,13 @@ from directory import *
 class Overworld():
     def __init__(self,game):
         self.game = game
-        self.currentPos = list(self.game.WorldMap.startingPos)
         self.inWorld = True
         self.width = self.game.width - 60
         self.height = self.game.height - 60
         self.font = pygame.font.Font('freesansbold.ttf',20)
         self.pausemenu = PauseMenu(self.game)
         self.combat = Combat(self.game)
-        self.party = Party()
-        self.party.initializeMembers(self.game.directory)
+        self.party = self.game.party
 
     def blitScreen(self):
         self.game.screen.blit(self.game.screen, (0,0))
@@ -24,9 +22,9 @@ class Overworld():
     def display(self):
         self.inWorld = True
         self.game.screen.fill((0,0,0))
-        self.currentPos = list(self.game.WorldMap.startingPos)
+        self.game.currentPos = list(self.game.WorldMap.startingPos)
         self.drawScreen()
-        while self.inWorld:
+        while self.inWorld and self.game.inGame:
             self.game.eventHandler()
             self.getInput()
             if self.combat.inCombat:
@@ -39,31 +37,31 @@ class Overworld():
 
     def getInput(self):
         if self.game.UP:
-            if self.game.WorldMap.map[self.currentPos[0]-1][self.currentPos[1]] != ' ' and self.game.WorldMap.map[self.currentPos[0]-1][self.currentPos[1]] != 'X':
-                self.currentPos[0] -= 1
+            if self.game.WorldMap.map[self.game.currentPos[0]-1][self.game.currentPos[1]] != ' ' and self.game.WorldMap.map[self.game.currentPos[0]-1][self.game.currentPos[1]] != 'X':
+                self.game.currentPos[0] -= 1
             self.drawScreen()
         if self.game.RIGHT:
-            if self.game.WorldMap.map[self.currentPos[0]][self.currentPos[1]+1] != ' ' and self.game.WorldMap.map[self.currentPos[0]][self.currentPos[1]+1] != 'X':
-                self.currentPos[1] += 1
+            if self.game.WorldMap.map[self.game.currentPos[0]][self.game.currentPos[1]+1] != ' ' and self.game.WorldMap.map[self.game.currentPos[0]][self.game.currentPos[1]+1] != 'X':
+                self.game.currentPos[1] += 1
             self.drawScreen()
         if self.game.DOWN:
-            if self.game.WorldMap.map[self.currentPos[0]+1][self.currentPos[1]] != ' ' and self.game.WorldMap.map[self.currentPos[0]+1][self.currentPos[1]] != 'X':
-                self.currentPos[0] += 1
+            if self.game.WorldMap.map[self.game.currentPos[0]+1][self.game.currentPos[1]] != ' ' and self.game.WorldMap.map[self.game.currentPos[0]+1][self.game.currentPos[1]] != 'X':
+                self.game.currentPos[0] += 1
             self.drawScreen()
         if self.game.LEFT:
-            if self.game.WorldMap.map[self.currentPos[0]][self.currentPos[1]-1] != ' ' and self.game.WorldMap.map[self.currentPos[0]][self.currentPos[1]-1] != 'X':
-                self.currentPos[1] -= 1
+            if self.game.WorldMap.map[self.game.currentPos[0]][self.game.currentPos[1]-1] != ' ' and self.game.WorldMap.map[self.game.currentPos[0]][self.game.currentPos[1]-1] != 'X':
+                self.game.currentPos[1] -= 1
             self.drawScreen()
         if self.game.A:
-            self.pausemenu.pause()
+            self.pausemenu.pause(self.game.currentPos)
         if self.game.B:
             encounter = []
-            encounter = self.game.directory.buildEncounter(self.party.power,self.getBiome(self.currentPos[0],self.currentPos[1]))
+            encounter = self.game.directory.buildEncounter(self.party.power,self.getBiome(self.game.currentPos[0],self.game.currentPos[1]))
             self.party.debug_RandomInventory(self.game.directory)
             self.combat.initialize(self.party,encounter)
         if self.game.X:
             self.inWorld = False
-            pygame.quit()
+            self.game.inGame = False
 
     def drawScreen(self):
         blockSize = 30 #Set the size of the grid block
@@ -74,16 +72,19 @@ class Overworld():
                 gridHeight = self.height / blockSize
                 rect = pygame.Rect(x, y, blockSize, blockSize)
                 pygame.draw.rect(self.game.screen, (255,255,255), rect, 1)
-                r = int(((y / blockSize)-(gridHeight/2))+self.currentPos[0])
-                c = int(((x / blockSize)-(gridWidth/2))+self.currentPos[1])
+                r = int(((y / blockSize)-(gridHeight/2))+self.game.currentPos[0])
+                c = int(((x / blockSize)-(gridWidth/2))+self.game.currentPos[1])
                 mapChar = '_'
                 if r < 0 or r >= self.game.WorldMap.sizeR:
                     mapChar = ' '
                 if c < 0 or c >= self.game.WorldMap.sizeC:
                     mapChar = ' '
-                if r == self.currentPos[0] and c == self.currentPos[1]:
+                if r == self.game.currentPos[0] and c == self.game.currentPos[1]:
                     mapChar = '@'
                 if mapChar == '_':
+                    revMapList = list(self.game.WorldMap.revealedMap[r])
+                    revMapList[c] = '1'
+                    self.game.WorldMap.revealedMap[r] = ''.join(revMapList)
                     mapChar = self.game.WorldMap.map[r][c]
 
                 text = self.font.render(mapChar,True,self.game.white)

@@ -25,9 +25,13 @@ class Game():
         pygame.time.set_timer(self.REFRESH, 1000//self.FPS)
 
         self.directory = Directory()
+
+        self.party = Party()
+        self.party.initializeMembers(self.directory)
         
         self.mainmenu = MainMenu(self)
         self.WorldMap = Map()
+        self.currentPos = list(self.WorldMap.startingPos)
         self.overworld = Overworld(self)
 
     def run(self):
@@ -37,6 +41,7 @@ class Game():
             self.overworld.display()
             self.screen.blit(self.screen, [0,0])
             pygame.display.update()
+        self.WorldMap.saveRevealed()
 
     def write(self,size,x,y,text):
         font = pygame.font.Font('freesansbold.ttf',size)

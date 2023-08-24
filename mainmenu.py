@@ -1,3 +1,4 @@
+import sys
 import pygame
 
 class MainMenu():
@@ -54,6 +55,7 @@ class MainMenu():
             if self.cursorState == "Quit":
                 print("Quit!")
                 pygame.quit()
+                sys.exit()
 
     def cursorHandler(self):
         if self.game.DOWN:
