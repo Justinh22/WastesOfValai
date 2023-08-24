@@ -6,7 +6,7 @@ class Map():
         self.map = []
         self.revealedMap = []
         self.sizeR = 200
-        self.sizeC = 400
+        self.sizeC = 300
         self.startingPos = (0,0)
         self.finishPos = (0,0)
 

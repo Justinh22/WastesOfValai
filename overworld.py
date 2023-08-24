@@ -60,8 +60,9 @@ class Overworld():
             self.party.debug_RandomInventory(self.game.directory)
             self.combat.initialize(self.party,encounter)
         if self.game.X:
-            self.inWorld = False
-            self.game.inGame = False
+            print("X")
+            #self.inWorld = False
+            #self.game.inGame = False
 
     def drawScreen(self):
         blockSize = 30 #Set the size of the grid block

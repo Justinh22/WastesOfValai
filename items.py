@@ -521,7 +521,7 @@ def initSkillDirectory():
     skillDirectory.append(Swift_Strike)
     Cleave = Skill("Cleave","Attack all enemies.",1,511,8,"Attack","All")
     skillDirectory.append(Cleave)
-    Soulrend = Skill("Heartrend","Attack an enemy, restoring half of damage dealt as HP.",1,512,8,"Attack","Single")
+    Heartrend = Skill("Heartrend","Attack an enemy, restoring half of damage dealt as HP.",1,512,8,"Attack","Single")
     skillDirectory.append(Heartrend)
     Soulrend = Skill("Soulrend","Attack an enemy, restoring half of damage dealt as MP.",1,512,8,"Attack","Single")
     skillDirectory.append(Soulrend)

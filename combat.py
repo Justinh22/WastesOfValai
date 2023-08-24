@@ -413,6 +413,11 @@ class Combat():
             pygame.draw.line(self.game.screen,self.game.white,(self.left,350),(self.right+9,350),2)
             self.write(20, self.left+15, 325, "You win!")
             if pygame.time.get_ticks() - self.timeStart >= 3000:
+                difficulty = 0
+                for monster in self.encounter:
+                    difficulty += monster.level
+                for member in self.party.members:
+                    member.gainXP((difficulty * 3) + (round(difficulty/2) * random.randint(2,4)))
                 self.inCombat = False
 
         if self.state == "lose":

@@ -9,6 +9,7 @@ class PauseMenu():
         self.cursorPos = 0
         self.mapPos = (0,0)
         self.currentPos = (0,0)
+        self.targetPartyMember = 0
         self.delay = 0
         self.left = 10
         self.top = 10
@@ -58,6 +59,20 @@ class PauseMenu():
                 self.write(30, 210, 75 + (self.cursorPos*100), "->")
             for i in range(0,len(self.game.party.members)):
                 self.drawMinStatBlock(250, 45 + (i*100), self.game.party.members[i])
+        if self.state == "partyMember":
+            screenOutline = pygame.Rect(self.left,self.top,self.right,self.bottom)
+            pygame.draw.rect(self.game.screen,self.game.white,screenOutline,2)
+            self.write(40, 30, 40, self.game.party.members[self.targetPartyMember].name)
+            self.write(20, 60, 90, "Return")
+            self.write(20, 60, 115, "Equip")
+            self.write(20, 60, 140, "Inventory")
+            self.write(20, 60, 165, "Spells")
+            self.write(20, 30, 87 + (self.cursorPos*25), "->")
+            self.drawMinStatBlock(250, 45, self.game.party.members[self.targetPartyMember])
+            weapon = self.game.party.members[self.targetPartyMember].eqpWpn
+            self.write(12, 250, 150, "Weapon: " + weapon.name + " (" + str(weapon.attack) + " ATK, " + str(weapon.accuracy) + " ACC, " + str(weapon.critrate) + " CRT, " + str(weapon.amplifier) + " AMP)")
+            armor = self.game.party.members[self.targetPartyMember].eqpAmr
+            self.write(12, 250, 170, "Armor: " + armor.name + " (" + str(armor.defense) + " DEF, " + str(armor.dodge) + " DDG, " + str(armor.manaregen) + " MPG)")
         if self.state == "map":
             screenOutline = pygame.Rect(self.left,self.top,self.right,self.bottom)
             pygame.draw.rect(self.game.screen,self.game.white,screenOutline,2)
@@ -117,14 +132,20 @@ class PauseMenu():
                     print("QUIT")
                     self.paused = False
                     self.game.inGame = False
-            if self.state == "partySelect":
+            elif self.state == "partySelect":
                 print(self.game.party.members[self.cursorPos].name)
-            if self.state == "map":
+                self.state = "partyMember"
+                self.targetPartyMember = self.cursorPos
+                self.cursorPos = 0
+            elif self.state == "map":
                 print("ZOOMIN")
                 if self.mapZoomSize < 40 and self.mapZoomSize >= 10:
                     self.mapZoomSize += 5
                 elif self.mapZoomSize < 40 and self.mapZoomSize >= 4:
                     self.mapZoomSize += 2
+            elif self.state == "partyMember":
+                if self.cursorPos == 0:
+                    self.state = "main"
         if self.game.B:
             if self.state == "partySelect":
                 self.state = "main"
@@ -135,8 +156,14 @@ class PauseMenu():
                     self.mapZoomSize -= 5
                 elif self.mapZoomSize > 4:
                     self.mapZoomSize -= 2
+            if self.state == "partyMember":
+                self.state = "partySelect"
+                self.cursorPos = self.targetPartyMember
         if self.game.X:
-            self.paused = False
+            if self.state == "map":
+                self.state = "main"
+            else:
+                self.paused = False
         if self.game.Y:
             print('Y')
         if self.game.UP:
@@ -150,6 +177,10 @@ class PauseMenu():
                     self.cursorPos = len(self.game.party.members)-1
             if self.state == "map":
                 self.mapPos[0] -= self.panMap()
+            if self.state == "partyMember":
+                self.cursorPos -= 1
+                if self.cursorPos < 0:
+                    self.cursorPos = 3
         if self.game.DOWN:
             if self.state == "main":
                 self.cursorPos += 1
@@ -161,6 +192,10 @@ class PauseMenu():
                     self.cursorPos = 0
             if self.state == "map":
                 self.mapPos[0] += self.panMap()
+            if self.state == "partyMember":
+                self.cursorPos += 1
+                if self.cursorPos > 3:
+                    self.cursorPos = 0
         if self.game.LEFT:
             if self.state == "map":
                 self.mapPos[1] -= self.panMap()
@@ -182,6 +217,7 @@ class PauseMenu():
         self.write(14, xPos+10, yPos+10, character.name + ", Level " + str(character.level) + " " + character.type.name)
         self.write(14, xPos+10, yPos+30, "HP " + str(character.hp) + "/" + str(character.hpMax))
         self.write(14, xPos+10, yPos+50, "MP " + str(character.mp) + "/" + str(character.mpMax))
+        self.write(14, xPos+10, yPos+70, "XP " + str(character.xp) + "/" + str(character.nextLevel))
         self.write(14, xPos+218, yPos+10, "ATK " + str(character.getAttack()))
         self.write(14, xPos+283, yPos+10, "DEF " + str(character.getDefense()))
         self.write(14, xPos+218, yPos+28, "ACC " + str(character.getAccuracy()))

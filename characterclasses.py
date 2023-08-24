@@ -126,6 +126,24 @@ class Character():
         self.mp += val
         if self.mp > self.mpMax:
             self.mp = self.mpMax
+    def gainXP(self,val):
+        self.xp += val
+        if self.xp > self.nextLevel and self.level < 10:
+            self.xp -= self.nextLevel
+            self.nextLevel += 20
+            self.levelUp()
+    def levelUp(self):
+        self.level += 1
+        growth = self.type.getGrowths()
+        self.hpMax += growth[0]
+        self.mpMax += growth[1]
+        self.attack += growth[2]
+        self.critrate += growth[3]
+        self.defense += growth[4]
+        self.dodge += growth[5]
+        self.luck += growth[6]
+        self.speed += growth[7]
+        self.spells.append(self.type.knownSpells[self.level-1])
 
 class ClassType():
     def __init__(self,nm,wpnPrf,amrPrf,atkLv,sptLv,hpg,mpg,atg,ctg,dfg,dgg,lkg,sdg,splsLrn,idIN):
@@ -154,7 +172,7 @@ class Party():
         self.power = 0
     def initializeMembers(self,dir):
         for i in range(0,random.randint(3,4)):
-            lvl = 10
+            lvl = 2
             self.members.append(Character(dir.getCharacterName(self.members),lvl,dir.classDirectory[random.randint(0,11)],random.randint(0,5))) #random.randint(0,11)
             self.members[i].eqpWpn = dir.getWeapon(dir.getItemByRarities("Weapon",lvl-1,lvl))
             self.members[i].eqpAmr = dir.getArmor(dir.getItemByRarities("Armor",lvl-1,lvl))
