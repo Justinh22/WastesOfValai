@@ -1,7 +1,7 @@
 import pygame;
 
 class Item():
-    def __init__(self,nm,desc,rar,i):
+    def __init__(self,nm="NULLITEM",desc="NULLITEM",rar=-1,i=-1):
         self.name = nm
         self.description = desc
         self.rarity = rar

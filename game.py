@@ -13,7 +13,7 @@ class Game():
         self.A, self.B, self.X, self.Y = False, False, False, False
         self.UP, self.DOWN, self.LEFT, self.RIGHT = False, False, False, False
         self.SELECT, self.START = False, False
-        self.white, self.black = (255,255,255), (0,0,0)
+        self.white, self.gray, self.black = (255,255,255), (150,150,150), (0,0,0)
         self.red, self.blue = (255,0,0), (0,0,255)
 
         self.width, self.height = 640, 480
@@ -33,6 +33,10 @@ class Game():
         self.WorldMap = Map()
         self.currentPos = list(self.WorldMap.startingPos)
         self.overworld = Overworld(self)
+
+        self.steps = 0
+        self.stepsThreshold = 100
+        self.difficulty = 1
 
     def run(self):
         while self.inGame:
@@ -80,3 +84,9 @@ class Game():
                     self.START = True
                 if event.key==pygame.K_m:
                     self.SELECT = True
+
+    def stir(self):
+        self.steps += 1
+        if self.steps > self.stepsThreshold:
+            self.difficulty += 1
+            self.steps = 0

@@ -1,6 +1,8 @@
 from items import *
 from characters import *
 from encounterbuilder import *
+from constants import *
+from enum import Enum
 import copy
 
 class Directory():
@@ -87,31 +89,31 @@ class Directory():
 
     def getItemByRarity(self,type,rarity):
         options = []
-        if type == "Weapon":
+        if type == Type.Weapon:
             for item in self.weaponDirectory:
                 if item.rarity == rarity:
                     options.append(item.id)
-        elif type == "Armor":
+        elif type == Type.Armor:
             for item in self.armorDirectory:
                 if item.rarity == rarity:
                     options.append(item.id)
-        elif type == "Potion":
+        elif type == Type.Potion:
             for item in self.potionDirectory:
                 if item.rarity == rarity:
                     options.append(item.id)
-        elif type == "AtkSpell":
+        elif type == Type.AtkSpell:
             for item in self.atkSpellDirectory:
                 if item.rarity == rarity:
                     options.append(item.id)
-        elif type == "SptSpell":
+        elif type == Type.SptSpell:
             for item in self.sptSpellDirectory:
                 if item.rarity == rarity:
                     options.append(item.id)
-        elif type == "Creature":
+        elif type == Type.Creature:
             for item in self.creatureDirectory:
                 if item.rarity == rarity:
                     options.append(item.id)
-        elif type == "Class":
+        elif type == Type.Class:
             for item in self.classDirectory:
                 if item.rarity == rarity:
                     options.append(item.id)
@@ -121,37 +123,37 @@ class Directory():
 
     def getItemByRarities(self,type,rarityA,rarityB):
         options = []
-        if type == "Weapon":
+        if type == Type.Weapon:
             for item in self.weaponDirectory:
                 for rarity in range(rarityA,rarityB+1):
                     if item.rarity == rarity:
                         options.append(item.id)
-        elif type == "Armor":
+        elif type == Type.Armor:
             for item in self.armorDirectory:
                 for rarity in range(rarityA,rarityB+1):
                     if item.rarity == rarity:
                         options.append(item.id)
-        elif type == "Potion":
+        elif type == Type.Potion:
             for item in self.potionDirectory:
                 for rarity in range(rarityA,rarityB+1):
                     if item.rarity == rarity:
                         options.append(item.id)
-        elif type == "AtkSpell":
+        elif type == Type.AtkSpell:
             for item in self.atkSpellDirectory:
                 for rarity in range(rarityA,rarityB+1):
                     if item.rarity == rarity:
                         options.append(item.id)
-        elif type == "SptSpell":
+        elif type == Type.SptSpell:
             for item in self.sptSpellDirectory:
                 for rarity in range(rarityA,rarityB+1):
                     if item.rarity == rarity:
                         options.append(item.id)
-        elif type == "Creature":
+        elif type == Type.Creature:
             for item in self.creatureDirectory:
                 for rarity in range(rarityA,rarityB+1):
                     if item.rarity == rarity:
                         options.append(item.id)
-        elif type == "Class":
+        elif type == Type.Class:
             for item in self.classDirectory:
                 for rarity in range(rarityA,rarityB+1):
                     if item.rarity == rarity:

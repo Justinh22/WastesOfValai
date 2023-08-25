@@ -39,18 +39,22 @@ class Overworld():
         if self.game.UP:
             if self.game.WorldMap.map[self.game.currentPos[0]-1][self.game.currentPos[1]] != ' ' and self.game.WorldMap.map[self.game.currentPos[0]-1][self.game.currentPos[1]] != 'X':
                 self.game.currentPos[0] -= 1
+                self.game.stir()
             self.drawScreen()
         if self.game.RIGHT:
             if self.game.WorldMap.map[self.game.currentPos[0]][self.game.currentPos[1]+1] != ' ' and self.game.WorldMap.map[self.game.currentPos[0]][self.game.currentPos[1]+1] != 'X':
                 self.game.currentPos[1] += 1
+                self.game.stir()
             self.drawScreen()
         if self.game.DOWN:
             if self.game.WorldMap.map[self.game.currentPos[0]+1][self.game.currentPos[1]] != ' ' and self.game.WorldMap.map[self.game.currentPos[0]+1][self.game.currentPos[1]] != 'X':
                 self.game.currentPos[0] += 1
+                self.game.stir()
             self.drawScreen()
         if self.game.LEFT:
             if self.game.WorldMap.map[self.game.currentPos[0]][self.game.currentPos[1]-1] != ' ' and self.game.WorldMap.map[self.game.currentPos[0]][self.game.currentPos[1]-1] != 'X':
                 self.game.currentPos[1] -= 1
+                self.game.stir()
             self.drawScreen()
         if self.game.A:
             self.pausemenu.pause(self.game.currentPos)

@@ -121,7 +121,7 @@ class Map():
 
         self.ensurePath(r,c)
         print("Generating landmarks...")
-        self.placeLandmarks(1000)
+        self.placeLandmarks(800)
 
         with open("generated_map.txt","w") as file:
             for row in self.map:
@@ -210,23 +210,27 @@ class Map():
         for i in range(0,landmarks):
             r = random.randint(1,self.sizeR-1)
             c = random.randint(1,self.sizeC-1)
-            sel = random.randint(1,5)
+            sel = random.randint(1,6)
             if self.map[r][c] == '.':
                 if sel == 1:
                     self.map[r][c] = 'W' # Well
                 elif sel == 2:
                     self.map[r][c] = 'P' # Pyramid
                 elif sel == 3:
-                    self.map[r][c] = 'H' # Sinkhole
+                    self.map[r][c] = 'A' # Abandoned Camp
+                elif sel == 4:
+                    self.map[r][c] = 'H' # Haven
                 else:
                     self.map[r][c] = 'S' # Shack
             if self.map[r][c] == ';':
                 if sel == 1:
-                    self.map[r][c] = 'A' # Abandoned Cabin
+                    self.map[r][c] = 'B' # Bandit Camp
                 elif sel == 2:
                     self.map[r][c] = 'C' # Cave
                 elif sel == 3:
-                    self.map[r][c] = 'B' # Bandit Camp
+                    self.map[r][c] = 'A' # Abandoned Camp
+                elif sel == 4:
+                    self.map[r][c] = 'H' # Haven
                 else:
                     self.map[r][c] = 'S' # Shack
             if self.map[r][c] == '#':
@@ -235,7 +239,9 @@ class Map():
                 elif sel == 2:
                     self.map[r][c] = 'T' # Treehouse
                 elif sel == 3:
-                    self.map[r][c] = 'G' # Shrine
+                    self.map[r][c] = 'A' # Abandoned Camp
+                elif sel == 4:
+                    self.map[r][c] = 'H' # Haven
                 else:
                     self.map[r][c] = 'S' # Shack
 

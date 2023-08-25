@@ -1,6 +1,8 @@
 import pygame;
 import random;
+import math;
 from items import *
+from constants import *
 
 class Character():
     charNum = 100
@@ -10,7 +12,7 @@ class Character():
         Character.charNum += 1
         self.id = Character.charNum
         self.xp = 0
-        self.nextLevel = 20*lv
+        self.nextLevel = 100*lv
         self.type = tp
         self.spells = []
         for i in range(self.level):
@@ -130,7 +132,7 @@ class Character():
         self.xp += val
         if self.xp > self.nextLevel and self.level < 10:
             self.xp -= self.nextLevel
-            self.nextLevel += 20
+            self.nextLevel += 100
             self.levelUp()
     def levelUp(self):
         self.level += 1
@@ -169,14 +171,12 @@ class Party():
     def __init__(self):
         self.members = []
         self.inventory = []
-        self.power = 0
     def initializeMembers(self,dir):
         for i in range(0,random.randint(3,4)):
             lvl = 2
             self.members.append(Character(dir.getCharacterName(self.members),lvl,dir.classDirectory[random.randint(0,11)],random.randint(0,5))) #random.randint(0,11)
             self.members[i].eqpWpn = dir.getWeapon(dir.getItemByRarities("Weapon",lvl-1,lvl))
             self.members[i].eqpAmr = dir.getArmor(dir.getItemByRarities("Armor",lvl-1,lvl))
-            self.power += lvl
     def debug_RandomInventory(self,dir):
         while len(self.inventory) < 10:
             self.addItem(dir.getItemByRarities("Potion",1,5))
@@ -186,6 +186,18 @@ class Party():
     def usePotion(self,member,item,dir):
         self.members[member].gainHP(dir.getPotion(item).hpGain)
         self.members[member].gainMP(dir.getPotion(item).mpGain)
+    def getPower(self):
+        power = 0
+        for member in self.members:
+            power += member.level
+        return power
+    def getLootRarity(self,type):
+        rarity = 1
+        if type == Type.Weapon or type == Type.Armor:
+            rarity = math.ceil(self.getPower() / 4)
+        elif type == Type.Potion or type == Type.AtkSpell or type == Type.SptSpell:
+            rarity = math.ceil(self.getPower() / 8)
+        return rarity
 
 class Creature():
     def __init__(self,nm,lv,idIN,hpIN,at,ac,df,dg,sd,res,type,spells):

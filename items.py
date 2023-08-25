@@ -245,34 +245,34 @@ def initPotionDirectory():
     potionDirectory = []
 
     #1
-    Potion_of_Minor_Healing = Potion("Potion of Minor Healing","A potion capable of restoring a meager amount of life.",1,200,15,0);
-    potionDirectory.append(Potion_of_Minor_Healing);
-    Potion_of_Minor_Calming = Potion("Potion of Minor Calming","A potion capable of restoring a meager amount of magical ability.",1,201,0,15);
-    potionDirectory.append(Potion_of_Minor_Calming);
+    Potion_of_Minor_Healing = Potion("Minor Healing Potion","A potion capable of restoring a meager amount of life.",1,200,15,0)
+    potionDirectory.append(Potion_of_Minor_Healing)
+    Potion_of_Minor_Calming = Potion("Minor Calming Potion","A potion capable of restoring a meager amount of magical ability.",1,201,0,15)
+    potionDirectory.append(Potion_of_Minor_Calming)
     #2
-    Potion_of_Lesser_Healing = Potion("Potion of Lesser Healing","A potion capable of restoring a small amount of life.",2,202,30,0);
-    potionDirectory.append(Potion_of_Lesser_Healing);
-    Potion_of_Lesser_Calming = Potion("Potion of Lesser Calming","A potion capable of restoring a small amount of magical ability.",2,203,0,30);
-    potionDirectory.append(Potion_of_Lesser_Calming);
+    Potion_of_Lesser_Healing = Potion("Lesser Healing Potion","A potion capable of restoring a small amount of life.",2,202,30,0)
+    potionDirectory.append(Potion_of_Lesser_Healing)
+    Potion_of_Lesser_Calming = Potion("Lesser Calming Potion","A potion capable of restoring a small amount of magical ability.",2,203,0,30)
+    potionDirectory.append(Potion_of_Lesser_Calming)
     #3
-    Potion_of_Healing = Potion("Potion of Healing","A potion capable of restoring life.",3,204,50,0);
-    potionDirectory.append(Potion_of_Healing);
-    Potion_of_Calming = Potion("Potion of Calming","A potion capable of restoring magical ability.",3,205,0,50);
-    potionDirectory.append(Potion_of_Calming);
+    Potion_of_Healing = Potion("Healing Potion","A potion capable of restoring life.",3,204,50,0)
+    potionDirectory.append(Potion_of_Healing)
+    Potion_of_Calming = Potion("Calming Potion","A potion capable of restoring magical ability.",3,205,0,50)
+    potionDirectory.append(Potion_of_Calming)
     #4
-    Potion_of_Greater_Healing = Potion("Potion of Greater Healing","A potion capable of restoring a great amount of life.",4,206,80,0);
-    potionDirectory.append(Potion_of_Greater_Healing);
-    Potion_of_Greater_Calming = Potion("Potion of Greater Calming","A potion capable of restoring a great amount of magical ability.",4,207,0,80);
-    potionDirectory.append(Potion_of_Greater_Calming);
-    Potion_of_Replenishment = Potion("Potion of Replenishment","A potion capable of restoring both life and magical ability.",4,208,50,50);
-    potionDirectory.append(Potion_of_Replenishment);
+    Potion_of_Greater_Healing = Potion("Greater Healing Potion","A potion capable of restoring a great amount of life.",4,206,80,0)
+    potionDirectory.append(Potion_of_Greater_Healing)
+    Potion_of_Greater_Calming = Potion("Greater Calming Potion","A potion capable of restoring a great amount of magical ability.",4,207,0,80)
+    potionDirectory.append(Potion_of_Greater_Calming)
+    Potion_of_Replenishment = Potion("Replenishment Potion","A potion capable of restoring both life and magical ability.",4,208,50,50)
+    potionDirectory.append(Potion_of_Replenishment)
     #5
-    Potion_of_Major_Healing = Potion("Potion of Major Healing","A potion capable of restoring a massive amount of life.",5,209,150,0);
-    potionDirectory.append(Potion_of_Major_Healing);
-    Potion_of_Major_Calming = Potion("Potion of Major Calming","A potion capable of restoring a massive amount of magical ability.",5,210,0,150);
-    potionDirectory.append(Potion_of_Major_Calming);
-    Potion_of_Greater_Replenishment = Potion("Potion of Gr. Replenishment","A potion capable of restoring both life and magical ability.",5,211,80,80);
-    potionDirectory.append(Potion_of_Greater_Replenishment);
+    Potion_of_Major_Healing = Potion("Major Healing Potion","A potion capable of restoring a massive amount of life.",5,209,150,0)
+    potionDirectory.append(Potion_of_Major_Healing)
+    Potion_of_Major_Calming = Potion("Major Calming Potion","A potion capable of restoring a massive amount of magical ability.",5,210,0,150)
+    potionDirectory.append(Potion_of_Major_Calming)
+    Potion_of_Greater_Replenishment = Potion("Gr. Replenishment Potion","A potion capable of restoring both life and magical ability.",5,211,80,80)
+    potionDirectory.append(Potion_of_Greater_Replenishment)
 
     return potionDirectory
 
@@ -282,80 +282,80 @@ def initAtkSpellDirectory():
     attackSpellDirectory = []
 
     #1
-    Jolt = AttackMagic("Jolt","Fires a small jolt of lightning at a target.",1,300,4,10,"Attack","Lightning","Single");
-    attackSpellDirectory.append(Jolt);
-    Ember = AttackMagic("Ember","Fires a small burst of flame at a target.",1,301,3,8,"Attack","Fire","Single");
-    attackSpellDirectory.append(Ember);
-    Frostbite = AttackMagic("Frostbite","Fires a small burst of cold at a target.",1,302,2,6,"Attack","Ice","Single");
-    attackSpellDirectory.append(Frostbite);
+    Jolt = AttackMagic("Jolt","Fires a small jolt of lightning at a target.",1,300,4,10,"Attack","Lightning","Single")
+    attackSpellDirectory.append(Jolt)
+    Ember = AttackMagic("Ember","Fires a small burst of flame at a target.",1,301,3,8,"Attack","Fire","Single")
+    attackSpellDirectory.append(Ember)
+    Frostbite = AttackMagic("Frostbite","Fires a small burst of cold at a target.",1,302,2,6,"Attack","Ice","Single")
+    attackSpellDirectory.append(Frostbite)
     #2
-    Thunderbolt = AttackMagic("Thunderbolt","Fires a bolt of lightning at a target.",2,303,8,16,"Attack","Lightning","Single");
-    attackSpellDirectory.append(Thunderbolt);
-    Firebolt = AttackMagic("Firebolt","Fires a bolt of fire at a target.",2,304,7,14,"Attack","Fire","Single");
-    attackSpellDirectory.append(Firebolt);
-    Frostbolt = AttackMagic("Frostbolt","Fires a bolt of freezing energy at a target.",2,305,6,12,"Attack","Ice","Single");
-    attackSpellDirectory.append(Frostbolt);
-    Thunder_Wave = AttackMagic("Thunder Wave","Summons a wave of electricity toward all foes.",2,306,10,10,"Attack","Lightning","All");
-    attackSpellDirectory.append(Thunder_Wave);
-    Fire_Wave = AttackMagic("Fire Wave","Summons a wave of flame toward all foes.",2,307,9,8,"Attack","Fire","All");
-    attackSpellDirectory.append(Fire_Wave);
-    Frost_Wave = AttackMagic("Frost Wave","Summons a wave of ice toward all foes.",2,308,8,6,"Attack","Ice","All");
-    attackSpellDirectory.append(Frost_Wave);
+    Thunderbolt = AttackMagic("Thunderbolt","Fires a bolt of lightning at a target.",2,303,8,16,"Attack","Lightning","Single")
+    attackSpellDirectory.append(Thunderbolt)
+    Firebolt = AttackMagic("Firebolt","Fires a bolt of fire at a target.",2,304,7,14,"Attack","Fire","Single")
+    attackSpellDirectory.append(Firebolt)
+    Frostbolt = AttackMagic("Frostbolt","Fires a bolt of freezing energy at a target.",2,305,6,12,"Attack","Ice","Single")
+    attackSpellDirectory.append(Frostbolt)
+    Thunder_Wave = AttackMagic("Thunder Wave","Summons a wave of electricity toward all foes.",2,306,10,10,"Attack","Lightning","All")
+    attackSpellDirectory.append(Thunder_Wave)
+    Fire_Wave = AttackMagic("Fire Wave","Summons a wave of flame toward all foes.",2,307,9,8,"Attack","Fire","All")
+    attackSpellDirectory.append(Fire_Wave)
+    Frost_Wave = AttackMagic("Frost Wave","Summons a wave of ice toward all foes.",2,308,8,6,"Attack","Ice","All")
+    attackSpellDirectory.append(Frost_Wave)
     #3
-    Lightning_Strike = AttackMagic("Lightning Strike","Strikes down a bolt of lightning at a target.",3,309,12,22,"Attack","Lightning","Single");
-    attackSpellDirectory.append(Lightning_Strike);
-    Fireball = AttackMagic("Fireball","Hurls a fireball at a target.",3,310,11,20,"Attack","Fire","Single");
-    attackSpellDirectory.append(Fireball);
-    Hail = AttackMagic("Hail","Launches a blast of freezing magic at a target.",3,311,10,18,"Attack","Ice","Single");
-    attackSpellDirectory.append(Hail);
-    Thunder_Wave_II = AttackMagic("Thunder Wave II","Hurls a large wave of electricity toward all foes.",2,312,14,16,"Attack","Lightning","All");
-    attackSpellDirectory.append(Thunder_Wave_II);
-    Fire_Wave_II = AttackMagic("Fire Wave II","Hurls a large wave of flame toward all foes.",2,313,13,14,"Attack","Fire","All");
-    attackSpellDirectory.append(Fire_Wave_II);
-    Frost_Wave_II = AttackMagic("Frost Wave II","Hurls a large wave of ice toward all foes.",2,314,12,12,"Attack","Ice","All");
-    attackSpellDirectory.append(Frost_Wave_II);
+    Lightning_Strike = AttackMagic("Lightning Strike","Strikes down a bolt of lightning at a target.",3,309,12,22,"Attack","Lightning","Single")
+    attackSpellDirectory.append(Lightning_Strike)
+    Fireball = AttackMagic("Fireball","Hurls a fireball at a target.",3,310,11,20,"Attack","Fire","Single")
+    attackSpellDirectory.append(Fireball)
+    Hail = AttackMagic("Hail","Launches a blast of freezing magic at a target.",3,311,10,18,"Attack","Ice","Single")
+    attackSpellDirectory.append(Hail)
+    Thunder_Wave_II = AttackMagic("Thunder Wave II","Hurls a large wave of electricity toward all foes.",2,312,14,16,"Attack","Lightning","All")
+    attackSpellDirectory.append(Thunder_Wave_II)
+    Fire_Wave_II = AttackMagic("Fire Wave II","Hurls a large wave of flame toward all foes.",2,313,13,14,"Attack","Fire","All")
+    attackSpellDirectory.append(Fire_Wave_II)
+    Frost_Wave_II = AttackMagic("Frost Wave II","Hurls a large wave of ice toward all foes.",2,314,12,12,"Attack","Ice","All")
+    attackSpellDirectory.append(Frost_Wave_II)
     #4
-    Electrocute = AttackMagic("Electrocute","Unleashes a massive jolt of electricity at a target.",4,315,16,28,"Attack","Lightning","Single");
-    attackSpellDirectory.append(Electrocute);
-    Fire_Blast = AttackMagic("Fire Blast","Unleashes a blast of flame at a target.",4,316,15,26,"Attack","Fire","Single");
-    attackSpellDirectory.append(Fire_Blast);
-    Cryo_Beam = AttackMagic("Cryo Beam","Fires a beam of pure freezing magic at a target.",4,317,14,24,"Attack","Ice","Single");
-    attackSpellDirectory.append(Cryo_Beam);
-    Thunder_Wave_III = AttackMagic("Thunder Wave III","Launches a massive wave of electricity toward all foes.",2,318,18,22,"Attack","Lightning","All");
-    attackSpellDirectory.append(Thunder_Wave_III);
-    Fire_Wave_III = AttackMagic("Fire Wave III","Launches a massive wave of flame toward all foes.",2,319,17,20,"Attack","Fire","All");
-    attackSpellDirectory.append(Fire_Wave_III);
-    Frost_Wave_III = AttackMagic("Frost Wave III","Launches a massive wave of ice toward all foes.",2,320,16,18,"Attack","Ice","All");
-    attackSpellDirectory.append(Frost_Wave_III);
+    Electrocute = AttackMagic("Electrocute","Unleashes a massive jolt of electricity at a target.",4,315,16,28,"Attack","Lightning","Single")
+    attackSpellDirectory.append(Electrocute)
+    Fire_Blast = AttackMagic("Fire Blast","Unleashes a blast of flame at a target.",4,316,15,26,"Attack","Fire","Single")
+    attackSpellDirectory.append(Fire_Blast)
+    Cryo_Beam = AttackMagic("Cryo Beam","Fires a beam of pure freezing magic at a target.",4,317,14,24,"Attack","Ice","Single")
+    attackSpellDirectory.append(Cryo_Beam)
+    Thunder_Wave_III = AttackMagic("Thunder Wave III","Launches a massive wave of electricity toward all foes.",2,318,18,22,"Attack","Lightning","All")
+    attackSpellDirectory.append(Thunder_Wave_III)
+    Fire_Wave_III = AttackMagic("Fire Wave III","Launches a massive wave of flame toward all foes.",2,319,17,20,"Attack","Fire","All")
+    attackSpellDirectory.append(Fire_Wave_III)
+    Frost_Wave_III = AttackMagic("Frost Wave III","Launches a massive wave of ice toward all foes.",2,320,16,18,"Attack","Ice","All")
+    attackSpellDirectory.append(Frost_Wave_III)
     #5
-    Thunderstorm = AttackMagic("Thunderstorm","Calls down a raging storm to electrify all enemies.",5,321,20,28,"Attack","Lightning","All");
-    attackSpellDirectory.append(Thunderstorm);
-    Inferno = AttackMagic("Inferno","Calls a raging inferno to incinerate all enemies.",5,322,19,26,"Attack","Fire","All");
-    attackSpellDirectory.append(Inferno);
-    Blizzard = AttackMagic("Blizzard","Calls a raging blizzard to freeze all enemies.",5,323,18,24,"Attack","Ice","All");
-    attackSpellDirectory.append(Blizzard);
+    Thunderstorm = AttackMagic("Thunderstorm","Calls down a raging storm to electrify all enemies.",5,321,20,28,"Attack","Lightning","All")
+    attackSpellDirectory.append(Thunderstorm)
+    Inferno = AttackMagic("Inferno","Calls a raging inferno to incinerate all enemies.",5,322,19,26,"Attack","Fire","All")
+    attackSpellDirectory.append(Inferno)
+    Blizzard = AttackMagic("Blizzard","Calls a raging blizzard to freeze all enemies.",5,323,18,24,"Attack","Ice","All")
+    attackSpellDirectory.append(Blizzard)
 
     #DEBUFFS
-    Paralyze = AttackMagic("Paralyze","Has a chance to inflict Paralysis on a target.",2,324,10,0,"Debuff","Lightning","Single");
-    attackSpellDirectory.append(Paralyze);
-    Burn = AttackMagic("Burn","Has a chance to inflict Burned on a target.",2,325,10,0,"Debuff","Fire","Single");
-    attackSpellDirectory.append(Burn);
-    Freeze = AttackMagic("Freeze","Has a chance to inflict Freezing on a target.",2,326,10,0,"Debuff","Ice","Single");
-    attackSpellDirectory.append(Freeze);
+    Paralyze = AttackMagic("Paralyze","Has a chance to inflict Paralysis on a target.",2,324,10,0,"Debuff","Lightning","Single")
+    attackSpellDirectory.append(Paralyze)
+    Burn = AttackMagic("Burn","Has a chance to inflict Burned on a target.",2,325,10,0,"Debuff","Fire","Single")
+    attackSpellDirectory.append(Burn)
+    Freeze = AttackMagic("Freeze","Has a chance to inflict Freezing on a target.",2,326,10,0,"Debuff","Ice","Single")
+    attackSpellDirectory.append(Freeze)
 
-    Paralyze_II = AttackMagic("Paralyze II","Inflicts Paralysis on a target.",3,327,16,0,"Debuff","Lightning","Single");
-    attackSpellDirectory.append(Paralyze_II);
-    Burn_II = AttackMagic("Burn II","Inflicts Burned on a target.",3,328,16,0,"Debuff","Fire","Single");
-    attackSpellDirectory.append(Burn_II);
-    Freeze_II = AttackMagic("Freeze II","Inflicts Freezing on a target.",3,329,16,0,"Debuff","Ice","Single");
-    attackSpellDirectory.append(Freeze_II);
+    Paralyze_II = AttackMagic("Paralyze II","Inflicts Paralysis on a target.",3,327,16,0,"Debuff","Lightning","Single")
+    attackSpellDirectory.append(Paralyze_II)
+    Burn_II = AttackMagic("Burn II","Inflicts Burned on a target.",3,328,16,0,"Debuff","Fire","Single")
+    attackSpellDirectory.append(Burn_II)
+    Freeze_II = AttackMagic("Freeze II","Inflicts Freezing on a target.",3,329,16,0,"Debuff","Ice","Single")
+    attackSpellDirectory.append(Freeze_II)
 
-    Paralyze_Wave = AttackMagic("Paralyze Wave","Has a chance to inflict Paralysis on all targets.",4,330,30,0,"Debuff","Lightning","All");
-    attackSpellDirectory.append(Paralyze_Wave);
-    Burn_Wave = AttackMagic("Burn Wave","Has a chance to inflict Burned on all targets.",4,331,30,0,"Debuff","Fire","All");
-    attackSpellDirectory.append(Burn_Wave);
-    Freeze_Wave = AttackMagic("Freeze Wave","Has a chance to inflict Freezing on all targets.",4,332,30,0,"Debuff","Ice","All");
-    attackSpellDirectory.append(Freeze_Wave);
+    Paralyze_Wave = AttackMagic("Paralyze Wave","Has a chance to inflict Paralysis on all targets.",4,330,30,0,"Debuff","Lightning","All")
+    attackSpellDirectory.append(Paralyze_Wave)
+    Burn_Wave = AttackMagic("Burn Wave","Has a chance to inflict Burned on all targets.",4,331,30,0,"Debuff","Fire","All")
+    attackSpellDirectory.append(Burn_Wave)
+    Freeze_Wave = AttackMagic("Freeze Wave","Has a chance to inflict Freezing on all targets.",4,332,30,0,"Debuff","Ice","All")
+    attackSpellDirectory.append(Freeze_Wave)
 
     return attackSpellDirectory
 
@@ -367,128 +367,128 @@ def initSptSpellDirectory():
     # [ ATK ACC CRT DEF DDG LCK HP ]
 
     #1
-    Rage =  SupportMagic("Rage","Increases Atk.",1,400,[5,0,0,0,0,0,0],8,"Buff","Single");
-    sptSpellDirectory.append(Rage);
-    Focus = SupportMagic("Focus","Increases Acc.",1,401,[0,15,0,0,0,0,0],8,"Buff","Single");
-    sptSpellDirectory.append(Focus);
-    Sense = SupportMagic("Sense","Increases Crt.",1,402,[0,0,15,0,0,0,0],8,"Buff","Single");
-    sptSpellDirectory.append(Sense);
-    Brace = SupportMagic("Brace","Increases Def.",1,403,[0,0,0,5,0,0,0],8,"Buff","Single");
-    sptSpellDirectory.append(Brace);
-    Speed = SupportMagic("Speed","Increases Ddg.",1,404,[0,0,0,0,15,0,0],8,"Buff","Single");
-    sptSpellDirectory.append(Speed);
-    Fortune = SupportMagic("Fortune","Increases Lck.",1,405,[0,0,0,0,0,15,0],8,"Buff","Single");
-    sptSpellDirectory.append(Fortune);
-    Minor_Heal = SupportMagic("Minor Heal","Heals for a small amount of health.",1,406,[0,0,0,0,0,0,10],5,"Heal","Single");
-    sptSpellDirectory.append(Minor_Heal);
+    Rage =  SupportMagic("Rage","Increases Atk.",1,400,[5,0,0,0,0,0,0],8,"Buff","Single")
+    sptSpellDirectory.append(Rage)
+    Focus = SupportMagic("Focus","Increases Acc.",1,401,[0,15,0,0,0,0,0],8,"Buff","Single")
+    sptSpellDirectory.append(Focus)
+    Sense = SupportMagic("Sense","Increases Crt.",1,402,[0,0,15,0,0,0,0],8,"Buff","Single")
+    sptSpellDirectory.append(Sense)
+    Brace = SupportMagic("Brace","Increases Def.",1,403,[0,0,0,5,0,0,0],8,"Buff","Single")
+    sptSpellDirectory.append(Brace)
+    Speed = SupportMagic("Speed","Increases Ddg.",1,404,[0,0,0,0,15,0,0],8,"Buff","Single")
+    sptSpellDirectory.append(Speed)
+    Fortune = SupportMagic("Fortune","Increases Lck.",1,405,[0,0,0,0,0,15,0],8,"Buff","Single")
+    sptSpellDirectory.append(Fortune)
+    Minor_Heal = SupportMagic("Minor Heal","Heals for a small amount of health.",1,406,[0,0,0,0,0,0,10],5,"Heal","Single")
+    sptSpellDirectory.append(Minor_Heal)
     #2
-    Rally = SupportMagic("Rally","Increases Atk and Def.",2,407,[5,0,0,5,0,0,0],16,"Buff","Single");
-    sptSpellDirectory.append(Rally);
-    Wrath = SupportMagic("Wrath","Increases Atk and Acc.",2,408,[5,15,0,0,0,0,0],16,"Buff","Single");
-    sptSpellDirectory.append(Wrath);
-    Precision = SupportMagic("Precision","Increases Acc and Crt.",2,409,[0,15,15,0,0,0,0],16,"Buff","Single");
-    sptSpellDirectory.append(Precision);
-    Trance = SupportMagic("Trance","Increases Acc and Ddg.",2,410,[0,15,0,0,15,0,0],16,"Buff","Single");
-    sptSpellDirectory.append(Trance);
-    Veil = SupportMagic("Veil","Increases Def and Ddg.",2,411,[0,0,0,5,15,0,0],16,"Buff","Single");
-    sptSpellDirectory.append(Veil);
-    Fate = SupportMagic("Fate","Increases Crt and Lck.",2,412,[0,0,15,0,0,15,0],16,"Buff","Single");
-    sptSpellDirectory.append(Fate);
-    Heal = SupportMagic("Heal","Heals for a moderate amount of health.",2,413,[0,0,0,0,0,0,30],12,"Heal","Single");
-    sptSpellDirectory.append(Heal);
-    Minor_Regenerate = SupportMagic("Minor Regenerate","Heals for a small amount of health over time.",2,414,[0,0,0,0,0,0,6],12,"Buff","Single");
-    sptSpellDirectory.append(Minor_Regenerate);
+    Rally = SupportMagic("Rally","Increases Atk and Def.",2,407,[5,0,0,5,0,0,0],16,"Buff","Single")
+    sptSpellDirectory.append(Rally)
+    Wrath = SupportMagic("Wrath","Increases Atk and Acc.",2,408,[5,15,0,0,0,0,0],16,"Buff","Single")
+    sptSpellDirectory.append(Wrath)
+    Precision = SupportMagic("Precision","Increases Acc and Crt.",2,409,[0,15,15,0,0,0,0],16,"Buff","Single")
+    sptSpellDirectory.append(Precision)
+    Trance = SupportMagic("Trance","Increases Acc and Ddg.",2,410,[0,15,0,0,15,0,0],16,"Buff","Single")
+    sptSpellDirectory.append(Trance)
+    Veil = SupportMagic("Veil","Increases Def and Ddg.",2,411,[0,0,0,5,15,0,0],16,"Buff","Single")
+    sptSpellDirectory.append(Veil)
+    Fate = SupportMagic("Fate","Increases Crt and Lck.",2,412,[0,0,15,0,0,15,0],16,"Buff","Single")
+    sptSpellDirectory.append(Fate)
+    Heal = SupportMagic("Heal","Heals for a moderate amount of health.",2,413,[0,0,0,0,0,0,30],12,"Heal","Single")
+    sptSpellDirectory.append(Heal)
+    Minor_Regenerate = SupportMagic("Minor Regenerate","Heals for a small amount of health over time.",2,414,[0,0,0,0,0,0,6],12,"Buff","Single")
+    sptSpellDirectory.append(Minor_Regenerate)
     #3
-    Rage_II =  SupportMagic("Rage II","Increases Atk by a great amount.",1,415,[10,0,0,0,0,0,0],16,"Buff","Single");
-    sptSpellDirectory.append(Rage_II);
-    Focus_II = SupportMagic("Focus II","Increases Acc by a great amount.",1,416,[0,30,0,0,0,0,0],16,"Buff","Single");
-    sptSpellDirectory.append(Focus_II);
-    Sense_II = SupportMagic("Sense","Increases Crt by a great amount.",1,417,[0,0,30,0,0,0,0],16,"Buff","Single");
-    sptSpellDirectory.append(Sense_II);
-    Brace_II = SupportMagic("Brace II","Increases Def by a great amount.",1,418,[0,0,0,10,0,0,0],16,"Buff","Single");
-    sptSpellDirectory.append(Brace_II);
-    Speed_II = SupportMagic("Speed II","Increases Ddg by a great amount.",1,419,[0,0,0,0,30,0,0],16,"Buff","Single");
-    sptSpellDirectory.append(Speed_II);
-    Fortune_II = SupportMagic("Fortune II","Increases Lck by a great amount.",1,420,[0,0,0,0,0,30,0],16,"Buff","Single");
-    sptSpellDirectory.append(Fortune_II);
-    Rage_Aura =  SupportMagic("Rage Aura","Increases your party's Atk.",1,421,[5,0,0,0,0,0,0],20,"Buff","All");
-    sptSpellDirectory.append(Rage_Aura);
-    Focus_Aura = SupportMagic("Focus Aura","Increases your party's Acc.",1,422,[0,15,0,0,0,0,0],20,"Buff","All");
-    sptSpellDirectory.append(Focus_Aura);
-    Sense_Aura = SupportMagic("Sense Aura","Increases your party's Crt.",1,423,[0,0,15,0,0,0,0],20,"Buff","All");
-    sptSpellDirectory.append(Sense_Aura);
-    Brace_Aura = SupportMagic("Brace Aura","Increases your party's Def.",1,424,[0,0,0,5,0,0,0],20,"Buff","All");
-    sptSpellDirectory.append(Brace_Aura);
-    Speed_Aura = SupportMagic("Speed Aura","Increases your party's Ddg.",1,425,[0,0,0,0,15,0,0],20,"Buff","All");
-    sptSpellDirectory.append(Speed_Aura);
-    Fortune_Aura = SupportMagic("Fortune Aura","Increases your party's Lck.",1,426,[0,0,0,0,0,15,0],20,"Buff","All");
-    sptSpellDirectory.append(Fortune_Aura);
-    Minor_Heal_Aura = SupportMagic("Minor Heal Aura","Heals all party members for a small amount of health.",1,427,[0,0,0,0,0,0,10],12,"Heal","All");
-    sptSpellDirectory.append(Minor_Heal_Aura);
-    Regenerate = SupportMagic("Regenerate","Heals for a moderate amount of health over time.",3,428,[0,0,0,0,0,0,12],24,"Buff","Single");
-    sptSpellDirectory.append(Regenerate);
+    Rage_II =  SupportMagic("Rage II","Increases Atk by a great amount.",1,415,[10,0,0,0,0,0,0],16,"Buff","Single")
+    sptSpellDirectory.append(Rage_II)
+    Focus_II = SupportMagic("Focus II","Increases Acc by a great amount.",1,416,[0,30,0,0,0,0,0],16,"Buff","Single")
+    sptSpellDirectory.append(Focus_II)
+    Sense_II = SupportMagic("Sense","Increases Crt by a great amount.",1,417,[0,0,30,0,0,0,0],16,"Buff","Single")
+    sptSpellDirectory.append(Sense_II)
+    Brace_II = SupportMagic("Brace II","Increases Def by a great amount.",1,418,[0,0,0,10,0,0,0],16,"Buff","Single")
+    sptSpellDirectory.append(Brace_II)
+    Speed_II = SupportMagic("Speed II","Increases Ddg by a great amount.",1,419,[0,0,0,0,30,0,0],16,"Buff","Single")
+    sptSpellDirectory.append(Speed_II)
+    Fortune_II = SupportMagic("Fortune II","Increases Lck by a great amount.",1,420,[0,0,0,0,0,30,0],16,"Buff","Single")
+    sptSpellDirectory.append(Fortune_II)
+    Rage_Aura =  SupportMagic("Rage Aura","Increases your party's Atk.",1,421,[5,0,0,0,0,0,0],20,"Buff","All")
+    sptSpellDirectory.append(Rage_Aura)
+    Focus_Aura = SupportMagic("Focus Aura","Increases your party's Acc.",1,422,[0,15,0,0,0,0,0],20,"Buff","All")
+    sptSpellDirectory.append(Focus_Aura)
+    Sense_Aura = SupportMagic("Sense Aura","Increases your party's Crt.",1,423,[0,0,15,0,0,0,0],20,"Buff","All")
+    sptSpellDirectory.append(Sense_Aura)
+    Brace_Aura = SupportMagic("Brace Aura","Increases your party's Def.",1,424,[0,0,0,5,0,0,0],20,"Buff","All")
+    sptSpellDirectory.append(Brace_Aura)
+    Speed_Aura = SupportMagic("Speed Aura","Increases your party's Ddg.",1,425,[0,0,0,0,15,0,0],20,"Buff","All")
+    sptSpellDirectory.append(Speed_Aura)
+    Fortune_Aura = SupportMagic("Fortune Aura","Increases your party's Lck.",1,426,[0,0,0,0,0,15,0],20,"Buff","All")
+    sptSpellDirectory.append(Fortune_Aura)
+    Minor_Heal_Aura = SupportMagic("Minor Heal Aura","Heals all party members for a small amount of health.",1,427,[0,0,0,0,0,0,10],12,"Heal","All")
+    sptSpellDirectory.append(Minor_Heal_Aura)
+    Regenerate = SupportMagic("Regenerate","Heals for a moderate amount of health over time.",3,428,[0,0,0,0,0,0,12],24,"Buff","Single")
+    sptSpellDirectory.append(Regenerate)
     #4
-    Rally_II = SupportMagic("Rally II","Increases Atk and Def by a great amount.",2,429,[10,0,0,10,0,0],24,"Buff","Single");
-    sptSpellDirectory.append(Rally_II);
-    Wrath_II = SupportMagic("Wrath II","Increases Atk and Acc by a great amount.",2,430,[10,30,0,0,0,0,0],24,"Buff","Single");
-    sptSpellDirectory.append(Wrath_II);
-    Precision_II = SupportMagic("Precision II","Increases Acc and Crt by a great amount.",2,431,[0,30,30,0,0,0,0],24,"Buff","Single");
-    sptSpellDirectory.append(Precision_II);
-    Trance_II = SupportMagic("Trance II","Increases Acc and Ddg by a great amount.",2,432,[0,30,0,0,30,0,0],24,"Buff","Single");
-    sptSpellDirectory.append(Trance_II);
-    Veil_II = SupportMagic("Veil II","Increases Def and Ddg by a great amount.",2,433,[0,0,0,10,30,0,0],24,"Buff","Single");
-    sptSpellDirectory.append(Veil_II);
-    Fate_II = SupportMagic("Fate II","Increases Crt and Lck by a great amount.",2,434,[0,0,30,0,0,30,0],24,"Buff","Single");
-    sptSpellDirectory.append(Fate_II);
-    Rally_Aura = SupportMagic("Rally Aura","Increases your party's Atk and Def.",2,435,[5,0,0,5,0,0,0],28,"Buff","All");
-    sptSpellDirectory.append(Rally_Aura);
-    Wrath_Aura = SupportMagic("Wrath Aura","Increases your party's Atk and Acc.",2,436,[5,15,0,0,0,0,0],28,"Buff","All");
-    sptSpellDirectory.append(Wrath_Aura);
-    Precision_Aura = SupportMagic("Precision Aura","Increases your party's Acc and Crt.",2,437,[0,15,15,0,0,0,0],28,"Buff","All");
-    sptSpellDirectory.append(Precision_Aura);
-    Trance_Aura = SupportMagic("Trance Aura","Increases your party's Acc and Ddg.",2,438,[0,15,0,0,15,0,0],28,"Buff","All");
-    sptSpellDirectory.append(Trance_Aura);
-    Veil_Aura = SupportMagic("Veil Aura","Increases your party's Def and Ddg.",2,439,[0,0,0,5,15,0,0],28,"Buff","All");
-    sptSpellDirectory.append(Veil_Aura);
-    Fate_Aura = SupportMagic("Fate Aura","Increases your party's Crt and Lck.",2,440,[0,0,15,0,0,15,0],28,"Buff","All");
-    sptSpellDirectory.append(Fate_Aura);
-    Spectrum = SupportMagic("Spectrum","Increases all stats.",2,441,[5,5,15,5,5,15,0],30,"Buff","Single");
-    sptSpellDirectory.append(Spectrum);
-    Heal_Aura = SupportMagic("Heal Aura","Heals all party members for a moderate amount of health.",1,442,[0,0,0,0,0,0,30],30,"Heal","All");
-    sptSpellDirectory.append(Heal_Aura);
-    Minor_Regenerate_Aura = SupportMagic("Minor Regenerate Aura","Heals all party members for a small amount of health over time.",2,443,[0,0,0,0,0,0,6],24,"Buff","All");
-    sptSpellDirectory.append(Minor_Regenerate_Aura);
-    Major_Heal = SupportMagic("Major Heal","Heals for a large amount of health.",2,444,[0,0,0,0,0,0,60],30,"Heal","Single");
-    sptSpellDirectory.append(Major_Heal);
-    Raise = SupportMagic("Raise","Raises a party member from the dead with 30 HP.",2,445,[0,0,0,0,0,0,30],30,"Raise","Single");
-    sptSpellDirectory.append(Raise);
+    Rally_II = SupportMagic("Rally II","Increases Atk and Def by a great amount.",2,429,[10,0,0,10,0,0],24,"Buff","Single")
+    sptSpellDirectory.append(Rally_II)
+    Wrath_II = SupportMagic("Wrath II","Increases Atk and Acc by a great amount.",2,430,[10,30,0,0,0,0,0],24,"Buff","Single")
+    sptSpellDirectory.append(Wrath_II)
+    Precision_II = SupportMagic("Precision II","Increases Acc and Crt by a great amount.",2,431,[0,30,30,0,0,0,0],24,"Buff","Single")
+    sptSpellDirectory.append(Precision_II)
+    Trance_II = SupportMagic("Trance II","Increases Acc and Ddg by a great amount.",2,432,[0,30,0,0,30,0,0],24,"Buff","Single")
+    sptSpellDirectory.append(Trance_II)
+    Veil_II = SupportMagic("Veil II","Increases Def and Ddg by a great amount.",2,433,[0,0,0,10,30,0,0],24,"Buff","Single")
+    sptSpellDirectory.append(Veil_II)
+    Fate_II = SupportMagic("Fate II","Increases Crt and Lck by a great amount.",2,434,[0,0,30,0,0,30,0],24,"Buff","Single")
+    sptSpellDirectory.append(Fate_II)
+    Rally_Aura = SupportMagic("Rally Aura","Increases your party's Atk and Def.",2,435,[5,0,0,5,0,0,0],28,"Buff","All")
+    sptSpellDirectory.append(Rally_Aura)
+    Wrath_Aura = SupportMagic("Wrath Aura","Increases your party's Atk and Acc.",2,436,[5,15,0,0,0,0,0],28,"Buff","All")
+    sptSpellDirectory.append(Wrath_Aura)
+    Precision_Aura = SupportMagic("Precision Aura","Increases your party's Acc and Crt.",2,437,[0,15,15,0,0,0,0],28,"Buff","All")
+    sptSpellDirectory.append(Precision_Aura)
+    Trance_Aura = SupportMagic("Trance Aura","Increases your party's Acc and Ddg.",2,438,[0,15,0,0,15,0,0],28,"Buff","All")
+    sptSpellDirectory.append(Trance_Aura)
+    Veil_Aura = SupportMagic("Veil Aura","Increases your party's Def and Ddg.",2,439,[0,0,0,5,15,0,0],28,"Buff","All")
+    sptSpellDirectory.append(Veil_Aura)
+    Fate_Aura = SupportMagic("Fate Aura","Increases your party's Crt and Lck.",2,440,[0,0,15,0,0,15,0],28,"Buff","All")
+    sptSpellDirectory.append(Fate_Aura)
+    Spectrum = SupportMagic("Spectrum","Increases all stats.",2,441,[5,5,15,5,5,15,0],30,"Buff","Single")
+    sptSpellDirectory.append(Spectrum)
+    Heal_Aura = SupportMagic("Heal Aura","Heals all party members for a moderate amount of health.",1,442,[0,0,0,0,0,0,30],30,"Heal","All")
+    sptSpellDirectory.append(Heal_Aura)
+    Minor_Regenerate_Aura = SupportMagic("Minor Regenerate Aura","Heals all party members for a small amount of health over time.",2,443,[0,0,0,0,0,0,6],24,"Buff","All")
+    sptSpellDirectory.append(Minor_Regenerate_Aura)
+    Major_Heal = SupportMagic("Major Heal","Heals for a large amount of health.",2,444,[0,0,0,0,0,0,60],30,"Heal","Single")
+    sptSpellDirectory.append(Major_Heal)
+    Raise = SupportMagic("Raise","Raises a party member from the dead with 30 HP.",2,445,[0,0,0,0,0,0,30],30,"Raise","Single")
+    sptSpellDirectory.append(Raise)
     #5
-    Rage_Aura_II =  SupportMagic("Rage Aura II","Increases your party's Atk by a great amount.",1,446,[10,0,0,0,0,0,0],32,"Buff","All");
-    sptSpellDirectory.append(Rage_Aura_II);
-    Focus_Aura_II = SupportMagic("Focus Aura II","Increases your party's Acc by a great amount.",1,447,[0,30,0,0,0,0,0],32,"Buff","All");
-    sptSpellDirectory.append(Focus_Aura_II);
-    Sense_Aura_II = SupportMagic("Sense Aura II","Increases your party's Crt by a great amount.",1,448,[0,0,30,0,0,0,0],32,"Buff","All");
-    sptSpellDirectory.append(Sense_Aura_II);
-    Brace_Aura_II = SupportMagic("Brace Aura II","Increases your party's Def by a great amount.",1,449,[0,0,0,10,0,0,0],32,"Buff","All");
-    sptSpellDirectory.append(Brace_Aura_II);
-    Speed_Aura_II = SupportMagic("Speed Aura II","Increases your party's Ddg by a great amount.",1,450,[0,0,0,0,30,0,0],32,"Buff","All");
-    sptSpellDirectory.append(Speed_Aura_II);
-    Fortune_Aura_II = SupportMagic("Fortune Aura II","Increases your party's Lck by a great amount.",1,451,[0,0,0,0,0,30,0],32,"Buff","All");
-    sptSpellDirectory.append(Fortune_Aura_II);
-    Spectrum_Aura = SupportMagic("Spectrum Aura","Increases all stats for all party members.",2,452,[5,5,15,5,5,15,0],40,"Buff","All");
-    sptSpellDirectory.append(Spectrum_Aura);
-    Major_Regenerate = SupportMagic("Major Regenerate","Heals for a large amount of health over time.",3,453,[0,0,0,0,0,0,24],40,"Buff","Single");
-    sptSpellDirectory.append(Major_Regenerate);
-    Regenerate_Aura = SupportMagic("Regenerate Aura","Heals all party members for a moderate amount of health over time.",2,454,[0,0,0,0,0,0,12],40,"Buff","All");
-    sptSpellDirectory.append(Regenerate_Aura);
-    Raise_Aura = SupportMagic("Raise Aura","Raises all fallen party members from the dead with 30 HP.",2,455,[0,0,0,0,0,0,30],50,"Raise","All");
-    sptSpellDirectory.append(Raise_Aura);
+    Rage_Aura_II =  SupportMagic("Rage Aura II","Increases your party's Atk by a great amount.",1,446,[10,0,0,0,0,0,0],32,"Buff","All")
+    sptSpellDirectory.append(Rage_Aura_II)
+    Focus_Aura_II = SupportMagic("Focus Aura II","Increases your party's Acc by a great amount.",1,447,[0,30,0,0,0,0,0],32,"Buff","All")
+    sptSpellDirectory.append(Focus_Aura_II)
+    Sense_Aura_II = SupportMagic("Sense Aura II","Increases your party's Crt by a great amount.",1,448,[0,0,30,0,0,0,0],32,"Buff","All")
+    sptSpellDirectory.append(Sense_Aura_II)
+    Brace_Aura_II = SupportMagic("Brace Aura II","Increases your party's Def by a great amount.",1,449,[0,0,0,10,0,0,0],32,"Buff","All")
+    sptSpellDirectory.append(Brace_Aura_II)
+    Speed_Aura_II = SupportMagic("Speed Aura II","Increases your party's Ddg by a great amount.",1,450,[0,0,0,0,30,0,0],32,"Buff","All")
+    sptSpellDirectory.append(Speed_Aura_II)
+    Fortune_Aura_II = SupportMagic("Fortune Aura II","Increases your party's Lck by a great amount.",1,451,[0,0,0,0,0,30,0],32,"Buff","All")
+    sptSpellDirectory.append(Fortune_Aura_II)
+    Spectrum_Aura = SupportMagic("Spectrum Aura","Increases all stats for all party members.",2,452,[5,5,15,5,5,15,0],40,"Buff","All")
+    sptSpellDirectory.append(Spectrum_Aura)
+    Major_Regenerate = SupportMagic("Major Regenerate","Heals for a large amount of health over time.",3,453,[0,0,0,0,0,0,24],40,"Buff","Single")
+    sptSpellDirectory.append(Major_Regenerate)
+    Regenerate_Aura = SupportMagic("Regenerate Aura","Heals all party members for a moderate amount of health over time.",2,454,[0,0,0,0,0,0,12],40,"Buff","All")
+    sptSpellDirectory.append(Regenerate_Aura)
+    Raise_Aura = SupportMagic("Raise Aura","Raises all fallen party members from the dead with 30 HP.",2,455,[0,0,0,0,0,0,30],50,"Raise","All")
+    sptSpellDirectory.append(Raise_Aura)
 
     #Cleansing Spells
-    Cleanse = SupportMagic("Cleanse","Cleanses a party member of status effects.",2,456,[0,0,0,0,0,0,0],10,"Cleanse","Single");
-    sptSpellDirectory.append(Cleanse);
-    Cleanse_Aura = SupportMagic("Cleanse Aura","Cleanses all party members of status effects.",4,457,[0,0,0,0,0,0,0],24,"Cleanse","All");
-    sptSpellDirectory.append(Cleanse_Aura);
+    Cleanse = SupportMagic("Cleanse","Cleanses a party member of status effects.",2,456,[0,0,0,0,0,0,0],10,"Cleanse","Single")
+    sptSpellDirectory.append(Cleanse)
+    Cleanse_Aura = SupportMagic("Cleanse Aura","Cleanses all party members of status effects.",4,457,[0,0,0,0,0,0,0],24,"Cleanse","All")
+    sptSpellDirectory.append(Cleanse_Aura)
 
     return sptSpellDirectory
 
