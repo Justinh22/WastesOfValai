@@ -175,11 +175,11 @@ class Party():
         for i in range(0,random.randint(3,4)):
             lvl = 2
             self.members.append(Character(dir.getCharacterName(self.members),lvl,dir.classDirectory[random.randint(0,11)],random.randint(0,5))) #random.randint(0,11)
-            self.members[i].eqpWpn = dir.getWeapon(dir.getItemByRarities("Weapon",lvl-1,lvl))
-            self.members[i].eqpAmr = dir.getArmor(dir.getItemByRarities("Armor",lvl-1,lvl))
+            self.members[i].eqpWpn = dir.getWeapon(dir.getItemByRarities(Type.Weapon,lvl-1,lvl))
+            self.members[i].eqpAmr = dir.getArmor(dir.getItemByRarities(Type.Armor,lvl-1,lvl))
     def debug_RandomInventory(self,dir):
         while len(self.inventory) < 10:
-            self.addItem(dir.getItemByRarities("Potion",1,5))
+            self.addItem(dir.getItemByRarities(Type.Potion,1,5))
     def addItem(self,item):
         if len(self.inventory) <= 10:
             self.inventory.append(item)
