@@ -4,13 +4,13 @@ from feature import *
 
 class RoomDatabase():
     def __init__(self):
-        self.rooms = {}                 # List of Room : Complete list of all implemented Rooms in the world
+        self.rooms = {}                 # Dictionary of {(int, int): Room} : Complete list of all implemented Rooms in the world, organized by coords
 
     def addRoom(self,coords,room):
         self.rooms[coords] = room
 
     def getRoom(self,coords):
-        if not self.rooms.has_key(coords): # If the requested room has not yet been implemented, implement it
+        if not self.rooms.has_key(coords): # If the requested room has not yet been implemented, implement it and store in dictionary
             newRoom = Room(coords)
             self.rooms[coords] = newRoom
         return self.rooms[coords]
