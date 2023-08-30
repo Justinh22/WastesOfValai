@@ -10,7 +10,7 @@ class RoomDatabase():
         self.rooms[coords] = room
 
     def getRoom(self,coords):
-        if not self.rooms.has_key(coords): # If the requested room has not yet been implemented, implement it and store in dictionary
+        if coords not in self.rooms.keys(): # If the requested room has not yet been implemented, implement it and store in dictionary
             newRoom = Room(coords)
             self.rooms[coords] = newRoom
         return self.rooms[coords]
@@ -35,7 +35,7 @@ class Room():
         self.description = template.description
         for featID in template.features:
             feat = featureList.getFeature(featID)
-            feat.rollForLoot()
+            feat.rollForLoot(2) # DEBUG VALUE; will need to be altered to reflect games current difficulty
             self.features.append(feat)
 
 
@@ -58,7 +58,7 @@ class RoomTemplateList():
         good = False
         bruteForceCount = 10
         for bruteForceVal in range(0,bruteForceCount): # Attempt brute force room guess up to bruteForceCount times
-            id = random.randint(0,len(self.roomTemplateList))
+            id = random.randint(0,len(self.roomTemplateList)-1)
             if self.roomSeenList[id] == False:
                 good = True
                 break
@@ -83,7 +83,7 @@ class RoomTemplateList():
         R1 = RoomTemplate(1,"You enter a room with walls and floors of stone. A desk sits at its center, with an open spellbook atop it. Shimmering runes adorn the walls.",[1,9,10,17])
         self.roomTemplateList.append(R1)
 
-        R2 = RoomTemplate(2,"You enter an old hunting cabin. A hearth is lit at the back of the cabin with a painting hanging above it. A suit of armor stands against the opposite wall, next to a weapon rack. The floorboards creak under your feet.",[4,7,14,random.randint((15,16),18)])
+        R2 = RoomTemplate(2,"You enter an old hunting cabin. A hearth is lit at the back of the cabin with a painting hanging above it. A suit of armor stands against the opposite wall, next to a weapon rack. The floorboards creak under your feet.",[4,7,14,random.randint(15,16),18])
         self.roomTemplateList.append(R2)
 
         R3 = RoomTemplate(3,"You enter metal chamber with a cold atmostphere. A few metal shelves climb the walls, and in the middle of the floor you see a lockbox sitting on a table, with black slime creeping up its legs. You hear a faint whispering...",[8,11,12,19,20])

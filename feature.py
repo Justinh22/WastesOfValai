@@ -5,26 +5,30 @@ from constants import *
 
 class Feature():
     def __init__(self,id=-1,name="",desc="",lootType=[Type.Empty],lootOdds=LootOdds.Impossible,lootRarity=LootRarity.Common):
-        self.id = id                    # int : Numeric id of this Feature
-        self.name = name                # String : Contains written name of this Feature
-        self.description = desc         # String : Contains written description of this Feature
-        self.lootType = lootType        # List of Type : Types of loot that could be contained in this Feature.
-        self.lootOdds = lootOdds        # List of LootOdds : Odds of loot appearing in this Feature
-        self.lootRarity = lootRarity    # List of LootRarity : Rarity of the potential item found in this feature, relative to party's power
-        self.loot = Item()              # Item() Implementation : The loot item contained within this Feature, if applicable
+        self.id = id                                        # int : Numeric id of this Feature
+        self.name = name                                    # String : Contains written name of this Feature
+        self.description = desc                             # String : Contains written description of this Feature
+        self.lootType = lootType                            # List of Type : Types of loot that could be contained in this Feature.
+        self.lootOdds = lootOdds                            # List of LootOdds : Odds of loot appearing in this Feature
+        self.lootRarity = lootRarity                        # List of LootRarity : Rarity of the potential item found in this feature, relative to party's power
+        self.loot = Item()                                  # Item() Implementation : The loot item contained within this Feature, if applicable
+        self.lootStatus = LootStatus.Undiscovered       # bool : Boolean value representing whether the loot in this feature has been discovered by the player
 
     def rollForLoot(self,rarity):
         odds = random.randint(1,5)
-        if self.lootOdds >= odds:
-            itemRarity = rarity + self.lootRarity
+        if self.lootOdds.value >= odds:
+            itemRarity = rarity + self.lootRarity.value
             if itemRarity < 1:
                 itemRarity = 1
             if itemRarity > 10:
                 itemRarity = 10
-            item = Directory.getItemByRarity(self.lootType,itemRarity)
+            item = dir.getItemByRarity(self.lootType,itemRarity)
         else:
             item = Item()
         self.loot = item
+
+    def changeStatus(self,status):
+        self.lootStatus = status
 
 
 class FeatureList():
@@ -33,7 +37,7 @@ class FeatureList():
         self.initFeatureList()
 
     def getFeature(self,id):
-        return self.featureList[id] # This will only work as long as the ids in the featureList align with their index.
+        return copy.deepcopy(self.featureList[id]) # This will only work as long as the ids in the featureList align with their index.
     
     def initFeatureList(self):
 ######################################################################## FEATURE LIST #########################################################################################
@@ -129,3 +133,5 @@ class FeatureList():
                              [Type.Empty], LootOdds.Impossible, LootRarity.Common)
         self.featureList.append(StoneWalls_Smooth)
 ##################################################################################################################################################################################
+
+dir = Directory()

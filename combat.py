@@ -94,7 +94,7 @@ class Combat():
             self.game.eventHandler()
             self.getInput()
             if self.inCombat == False:
-                break;
+                break
             self.execute()
             self.gameStatus()
             self.drawScreen()

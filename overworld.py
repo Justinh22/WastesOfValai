@@ -2,6 +2,7 @@ import pygame
 from combat import *
 from pausemenu import *
 from directory import *
+from roomhandler import *
 
 class Overworld():
     def __init__(self,game):
@@ -39,22 +40,22 @@ class Overworld():
         if self.game.UP:
             if self.game.WorldMap.map[self.game.currentPos[0]-1][self.game.currentPos[1]] != ' ' and self.game.WorldMap.map[self.game.currentPos[0]-1][self.game.currentPos[1]] != 'X':
                 self.game.currentPos[0] -= 1
-                self.game.stir()
+                self.stepTo(self.game.currentPos[0],self.game.currentPos[1])
             self.drawScreen()
         if self.game.RIGHT:
             if self.game.WorldMap.map[self.game.currentPos[0]][self.game.currentPos[1]+1] != ' ' and self.game.WorldMap.map[self.game.currentPos[0]][self.game.currentPos[1]+1] != 'X':
                 self.game.currentPos[1] += 1
-                self.game.stir()
+                self.stepTo(self.game.currentPos[0],self.game.currentPos[1])
             self.drawScreen()
         if self.game.DOWN:
             if self.game.WorldMap.map[self.game.currentPos[0]+1][self.game.currentPos[1]] != ' ' and self.game.WorldMap.map[self.game.currentPos[0]+1][self.game.currentPos[1]] != 'X':
                 self.game.currentPos[0] += 1
-                self.game.stir()
+                self.stepTo(self.game.currentPos[0],self.game.currentPos[1])
             self.drawScreen()
         if self.game.LEFT:
             if self.game.WorldMap.map[self.game.currentPos[0]][self.game.currentPos[1]-1] != ' ' and self.game.WorldMap.map[self.game.currentPos[0]][self.game.currentPos[1]-1] != 'X':
                 self.game.currentPos[1] -= 1
-                self.game.stir()
+                self.stepTo(self.game.currentPos[0],self.game.currentPos[1])
             self.drawScreen()
         if self.game.A:
             self.pausemenu.pause(self.game.currentPos)
@@ -107,3 +108,9 @@ class Overworld():
             return "Desert"
         else:
             return "Dungeon"
+
+    def stepTo(self,r,c): # Simplified; any non-terrain space is treated as a Shack
+        self.game.stir()
+        if self.game.WorldMap.map[r][c] != '#' and self.game.WorldMap.map[r][c] != ';' and self.game.WorldMap.map[r][c] != '.':
+            newRoom = RoomHandler(self.game, self.game.roomDB.getRoom((r,c)))
+            newRoom.enter()

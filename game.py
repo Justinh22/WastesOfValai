@@ -3,6 +3,7 @@ from mainmenu import *
 from mapgenerator import *
 from directory import *
 from overworld import *
+from room import *
 
 class Game():
     def __init__(self):
@@ -33,6 +34,7 @@ class Game():
         self.WorldMap = Map()
         self.currentPos = list(self.WorldMap.startingPos)
         self.overworld = Overworld(self)
+        self.roomDB = RoomDatabase()
 
         self.steps = 0
         self.stepsThreshold = 100

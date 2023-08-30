@@ -26,3 +26,8 @@ class LootRarity(Enum):
     Common = -1
     Uncommon = 0
     Rare = 1
+
+class LootStatus(Enum):
+    Undiscovered = 0
+    Discovered = 1
+    Taken = 2
