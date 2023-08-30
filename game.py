@@ -91,5 +91,6 @@ class Game():
     def stir(self):
         self.steps += 1
         if self.steps > self.stepsThreshold:
-            self.difficulty += 1
+            if self.difficulty < 25:
+                self.difficulty += 1
             self.steps = 0

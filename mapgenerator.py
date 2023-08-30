@@ -1,10 +1,12 @@
 import pygame
 import random
+import math
 
 class Map():
     def __init__(self):
         self.map = []
         self.revealedMap = []
+        self.difficultyMap = []
         self.sizeR = 200
         self.sizeC = 300
         self.startingPos = (0,0)
@@ -17,6 +19,9 @@ class Map():
         with open("revealed_map.txt","r") as file:
             for row in file:
                 self.revealedMap.append(row.strip())
+        with open("difficulty_map.txt","r") as file:
+            for row in file:
+                self.difficultyMap.append(row)
                 
         #Setting starting position...
         r = random.randint(round(self.sizeR/3),round((self.sizeR/3)*2))
@@ -49,6 +54,8 @@ class Map():
         self.grow(50)
         print("Smoothing corners...")
         self.smoothCorners()
+        print("Generate difficulty map...")
+        self.genDifficultyMapBiomes()
         self.border()
 
         #Setting starting position...
@@ -131,6 +138,12 @@ class Map():
 
         with open("revealed_map.txt","w") as file:
             for row in self.revealedMap:
+                for element in row:
+                    file.write(element)
+                file.write("\n")
+
+        with open("difficulty_map.txt","w") as file:
+            for row in self.difficultyMap:
                 for element in row:
                     file.write(element)
                 file.write("\n")
@@ -251,3 +264,149 @@ class Map():
                 for element in row:
                     file.write(element)
                 file.write("\n")
+
+    def genDifficultyMapBiomes(self):
+        radius = 1
+        diff = 1
+        biomeList = []
+        self.difficultyMap = [ [0]*self.sizeC for i in range(self.sizeR)]
+        startingPoint = (round(self.sizeR/2),round(self.sizeC/2))
+        currentBiome = self.map[startingPoint[0]][startingPoint[1]]
+        while (startingPoint[0] + radius < self.sizeR) or (startingPoint[0] - radius >= self.sizeR) or (startingPoint[1] + radius < self.sizeC) or (startingPoint[1] - radius >= self.sizeC):
+            r, c = (startingPoint[0] - radius), (startingPoint[1] - radius)
+            currentBiome = self.map[r][c]
+            biomeList.clear()
+            biomeList.append(currentBiome)
+            self.difficultyMap[r][c] = diff
+            #self.printCoords(r,c)
+            while r < startingPoint[0] + radius:
+                if r < self.sizeR-1:
+                    r += 1
+                else:
+                    break
+                #self.printCoords(r,c)
+                currentBiome = self.map[r][c]
+                if currentBiome != biomeList[-1] and self.difficultyMap[r][c] == 0:
+                    diff = self.checkDiffAtCoords((r,c))
+                    self.spread(self.sizeR, self.sizeC, r, c, currentBiome, diff)
+                diff = self.difficultyMap[r][c]
+            while c < startingPoint[1] + radius:
+                if c < self.sizeC-1:
+                    c += 1
+                else:
+                    break
+                #self.printCoords(r,c)
+                currentBiome = self.map[r][c]
+                if currentBiome != biomeList[-1] and self.difficultyMap[r][c] == 0:
+                    diff = self.checkDiffAtCoords((r,c))
+                    self.spread(self.sizeR, self.sizeC, r, c, currentBiome, diff)
+                diff = self.difficultyMap[r][c]
+            while r >= startingPoint[0] - radius:
+                if r > 0:
+                    r -= 1
+                else:
+                    break
+                #self.printCoords(r,c)
+                currentBiome = self.map[r][c]
+                if currentBiome != biomeList[-1] and self.difficultyMap[r][c] == 0:
+                    diff = self.checkDiffAtCoords((r,c))
+                    self.spread(self.sizeR, self.sizeC, r, c, currentBiome, diff)
+                diff = self.difficultyMap[r][c]
+            while c > startingPoint[1] - radius:
+                if c > 0:
+                    c -= 1
+                else:
+                    break
+                #self.printCoords(r,c)
+                currentBiome = self.map[r][c]
+                if currentBiome != biomeList[-1] and self.difficultyMap[r][c] == 0:
+                    diff = self.checkDiffAtCoords((r,c))
+                    self.spread(self.sizeR, self.sizeC, r, c, currentBiome, diff)
+                diff = self.difficultyMap[r][c]
+            radius += 1
+
+        for r in range(len(self.difficultyMap)):
+            for c in range(len(self.difficultyMap[0])):
+                if self.difficultyMap[r][c] < 1 or self.difficultyMap[r][c] > 25:
+                    diff = self.checkDiffAtCoords((r,c))
+                    self.spread(self.sizeR, self.sizeC, r, c, self.difficultyMap[r][c], diff)
+
+        valMap = self.difficultyMap
+        self.difficultyMap = []
+
+        for r in range(len(valMap)):
+            line = ""
+            for c in range(len(valMap[0])):
+                letter = self.valToLetter(valMap[r][c])
+                if self.map[r][c] == ' ':
+                    letter = ' '
+                line += letter
+            self.difficultyMap.append(line)
+
+
+    def printCoords(self,r,c):
+        print(f'({r},{c})')
+
+
+    def genDifficultyMapUniform(self):
+        for r in range(0,self.sizeR):
+            row = []
+            for c in range(0,self.sizeC):
+                row.append(self.checkDiffAtCoords((r,c)))
+            self.difficultyMap.append(row)
+
+
+    def checkDiffAtCoords(self,coords):
+        r, c = coords[0], coords[1]
+        scaledR, scaledC = abs(r-(round(self.sizeR/2))), abs(c-(round(self.sizeC/2)))
+        divisionValR, divisionValC = (round(self.sizeR/2)) / 25, (round(self.sizeC/2)) / 25
+        difficultyValR = math.ceil(scaledR / divisionValR)
+        difficultyValC = math.ceil(scaledC / divisionValC)
+        return max(difficultyValR,difficultyValC)
+    
+
+    def isInMap(self,r,c):
+        if r >= 0 and r < self.sizeR and c >= 0 and c < self.sizeC:
+            return True
+        return False
+
+
+    def isValid(self, m, n, r, c, biome, diff):
+        if r<0 or r>= m or c<0 or c>= n or self.map[r][c] != biome or self.difficultyMap[r][c] == diff:
+            return False
+        return True
+ 
+
+    def spread(self, m, n, r, c, biome, diff):
+        queue = []
+        queue.append([r, c])
+        self.difficultyMap[r][c] = diff
+
+        while queue:
+            currPixel = queue.pop()
+            posX = currPixel[0]
+            posY = currPixel[1]
+            
+            if self.isValid(m, n, posX + 1, posY, biome, diff):
+                self.difficultyMap[posX+1][posY] = diff
+                queue.append([posX+1, posY])
+            
+            if self.isValid(m, n, posX-1, posY, biome, diff):
+                self.difficultyMap[posX-1][posY]= diff
+                queue.append([posX-1, posY])
+            
+            if self.isValid(m, n, posX, posY + 1, biome, diff):
+                self.difficultyMap[posX][posY+1]= diff
+                queue.append([posX, posY+1])
+            
+            if self.isValid(m, n, posX, posY-1, biome, diff):
+                self.difficultyMap[posX][posY-1]= diff
+                queue.append([posX, posY-1])
+
+
+    def valToLetter(self,val):
+        return chr(val+64)
+    
+
+    def letterToVal(self,letter):
+        return ord(letter)-64

@@ -6,6 +6,7 @@ class PauseMenu():
         self.game = game
         self.paused = False
         self.state = "main"
+        self.mapMode = "biome"
         self.cursorPos = 0
         self.mapPos = (0,0)
         self.currentPos = (0,0)
@@ -98,12 +99,18 @@ class PauseMenu():
                     if mapChar == '_':
                         if self.game.WorldMap.revealedMap[r][c] == '1':
                             mapChar = self.game.WorldMap.map[r][c]
-                            if mapChar == '#': # Forest
-                                color = self.game.green
-                            elif mapChar == ';': # Plains
-                                color = self.game.lightgreen
-                            elif mapChar == '.': # Desert
-                                color = self.game.tan
+                            if self.mapMode == "biome":
+                                if mapChar == '#': # Forest
+                                    color = self.game.green
+                                elif mapChar == ';': # Plains
+                                    color = self.game.lightgreen
+                                elif mapChar == '.': # Desert
+                                    color = self.game.tan
+                            elif self.mapMode == "difficulty" and mapChar != ' ':
+                                print(f'MapChar: {mapChar}')
+                                diff = self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c])
+                                print(f'Diff: {diff}')
+                                color = (255,225-(9*diff),225-(9*diff))
                         else:
                             if self.game.WorldMap.map[r][c] == 'X':
                                 mapChar = self.game.WorldMap.map[r][c]
@@ -139,6 +146,7 @@ class PauseMenu():
                     print("QUIT")
                     self.paused = False
                     self.game.inGame = False
+                    self.game.running = False
             elif self.state == "partySelect":
                 print(self.game.party.members[self.cursorPos].name)
                 self.state = "partyMember"
@@ -172,7 +180,11 @@ class PauseMenu():
             else:
                 self.paused = False
         if self.game.Y:
-            print('Y')
+            if self.state == "map":
+                if self.mapMode == "biome":
+                    self.mapMode = "difficulty"
+                else:
+                    self.mapMode = "biome"
         if self.game.UP:
             if self.state == "main":
                 self.cursorPos -= 1
