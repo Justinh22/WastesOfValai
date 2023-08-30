@@ -81,6 +81,7 @@ class PauseMenu():
             mapFont = pygame.font.Font('freesansbold.ttf',round(blockSize/1.5))
             for x in range(30, self.right, blockSize):
                 for y in range(30, self.bottom, blockSize):
+                    color = self.game.white
                     gridWidth = self.right / blockSize
                     gridHeight = self.bottom / blockSize
                     rect = pygame.Rect(x, y, blockSize, blockSize)
@@ -97,13 +98,19 @@ class PauseMenu():
                     if mapChar == '_':
                         if self.game.WorldMap.revealedMap[r][c] == '1':
                             mapChar = self.game.WorldMap.map[r][c]
+                            if mapChar == '#': # Forest
+                                color = self.game.green
+                            elif mapChar == ';': # Plains
+                                color = self.game.lightgreen
+                            elif mapChar == '.': # Desert
+                                color = self.game.tan
                         else:
                             if self.game.WorldMap.map[r][c] == 'X':
                                 mapChar = self.game.WorldMap.map[r][c]
                             else:
                                 mapChar = ' '
 
-                    text = mapFont.render(mapChar,True,self.game.white)
+                    text = mapFont.render(mapChar,True,color)
                     textWidth, textHeight = mapFont.size(mapChar)
                     offset = (blockSize-textWidth)/2
 

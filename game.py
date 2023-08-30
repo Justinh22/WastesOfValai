@@ -15,6 +15,7 @@ class Game():
         self.UP, self.DOWN, self.LEFT, self.RIGHT = False, False, False, False
         self.SELECT, self.START = False, False
         self.white, self.gray, self.black = (255,255,255), (150,150,150), (0,0,0)
+        self.tan, self.lightgreen, self.green = (232, 235, 96), (181, 247, 94), (90, 176, 72)
         self.red, self.blue = (255,0,0), (0,0,255)
 
         self.width, self.height = 640, 480

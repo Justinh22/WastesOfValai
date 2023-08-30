@@ -74,6 +74,7 @@ class Overworld():
         self.game.screen.fill((0,0,0))
         for x in range(30, self.width, blockSize):
             for y in range(30, self.height, blockSize):
+                color = self.game.white
                 gridWidth = self.width / blockSize
                 gridHeight = self.height / blockSize
                 rect = pygame.Rect(x, y, blockSize, blockSize)
@@ -92,8 +93,13 @@ class Overworld():
                     revMapList[c] = '1'
                     self.game.WorldMap.revealedMap[r] = ''.join(revMapList)
                     mapChar = self.game.WorldMap.map[r][c]
-
-                text = self.font.render(mapChar,True,self.game.white)
+                    if mapChar == '#': # Forest
+                        color = self.game.green
+                    elif mapChar == ';': # Plains
+                        color = self.game.lightgreen
+                    elif mapChar == '.': # Desert
+                        color = self.game.tan
+                text = self.font.render(mapChar,True,color)
                 textWidth, textHeight = self.font.size(mapChar)
                 offset = (blockSize-textWidth)/2
 
