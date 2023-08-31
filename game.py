@@ -11,7 +11,7 @@ class Game():
         self.running = True
         self.inGame = False
 
-        self.A, self.B, self.X, self.Y = False, False, False, False
+        self.A, self.B, self.X, self.Y, self.L, self.R = False, False, False, False, False, False
         self.UP, self.DOWN, self.LEFT, self.RIGHT = False, False, False, False
         self.SELECT, self.START = False, False
         self.white, self.gray, self.black = (255,255,255), (150,150,150), (0,0,0)
@@ -83,6 +83,10 @@ class Game():
                     self.X = True
                 if event.key==pygame.K_SEMICOLON:
                     self.Y = True
+                if event.key==pygame.K_q:
+                    self.L = True
+                if event.key==pygame.K_e:
+                    self.R = True
                 if event.key==pygame.K_n:
                     self.START = True
                 if event.key==pygame.K_m:
@@ -91,6 +95,6 @@ class Game():
     def stir(self):
         self.steps += 1
         if self.steps > self.stepsThreshold:
-            if self.difficulty < 25:
+            if self.difficulty < MAX_DIFFICULTY:
                 self.difficulty += 1
             self.steps = 0

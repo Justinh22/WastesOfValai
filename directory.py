@@ -16,6 +16,20 @@ class Directory():
         self.creatureDirectory = initCreatureDirectory()
         self.nameDirectory = initNameDirectory()
 
+    def getItem(self,id):
+        item = Item()
+        if id < 100:
+            item = self.weaponDirectory[id]
+        elif id < 200:
+            item = self.armorDirectory[id-100]
+        elif id < 300:
+            item = self.potionDirectory[id-200]
+        elif id < 400:
+            item = self.atkSpellDirectory[id-300]
+        elif id < 500:
+            item = self.sptSpellDirectory[id-400]
+        return item
+
     def getItemName(self,id):
         name = "NULL"
         if id < 100:
@@ -119,7 +133,7 @@ class Directory():
                     options.append(item.id)
         else:
             return -1
-        return options[random.randint(0,len(options))]
+        return options[random.randint(0,len(options)-1)]
 
     def getItemByRarities(self,type,rarityA,rarityB):
         options = []

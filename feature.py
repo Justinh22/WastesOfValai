@@ -11,24 +11,45 @@ class Feature():
         self.lootType = lootType                            # List of Type : Types of loot that could be contained in this Feature.
         self.lootOdds = lootOdds                            # List of LootOdds : Odds of loot appearing in this Feature
         self.lootRarity = lootRarity                        # List of LootRarity : Rarity of the potential item found in this feature, relative to party's power
-        self.loot = Item()                                  # Item() Implementation : The loot item contained within this Feature, if applicable
+        self.loot = -1                                 # Item() Implementation : The loot item contained within this Feature, if applicable
         self.lootStatus = LootStatus.Undiscovered       # bool : Boolean value representing whether the loot in this feature has been discovered by the player
 
     def rollForLoot(self,rarity):
         odds = random.randint(1,5)
         if self.lootOdds.value >= odds:
+            chosenType = self.lootType[random.randint(0,len(self.lootType)-1)]
             itemRarity = rarity + self.lootRarity.value
             if itemRarity < 1:
                 itemRarity = 1
             if itemRarity > 10:
                 itemRarity = 10
-            item = dir.getItemByRarity(self.lootType,itemRarity)
+            itemRarity = self.getLootRarity(itemRarity, chosenType)
+            print(f'type: {chosenType}, rarity: {itemRarity}')
+            item = dir.getItemByRarity(chosenType,itemRarity)
         else:
-            item = Item()
+            item = -1
         self.loot = item
 
     def changeStatus(self,status):
         self.lootStatus = status
+
+    def getLootRarity(self,rarity,type):
+        if type == Type.Weapon:
+            divVal = MAX_DIFFICULTY / MAX_WEAPON_RARITY
+            lootRarity = math.ceil(rarity / divVal)
+        if type == Type.Armor:
+            divVal = MAX_DIFFICULTY / MAX_ARMOR_RARITY
+            lootRarity = math.ceil(rarity / divVal)
+        if type == Type.Potion:
+            divVal = MAX_DIFFICULTY / MAX_POTION_RARITY
+            lootRarity = math.ceil(rarity / divVal)
+        if type == Type.AtkSpell:
+            divVal = MAX_DIFFICULTY / MAX_ATKSPELL_RARITY
+            lootRarity = math.ceil(rarity / divVal)
+        if type == Type.SptSpell:
+            divVal = MAX_DIFFICULTY / MAX_SPTSPELL_RARITY
+            lootRarity = math.ceil(rarity / divVal)
+        return lootRarity
 
 
 class FeatureList():

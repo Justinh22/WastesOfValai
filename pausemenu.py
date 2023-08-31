@@ -106,7 +106,7 @@ class PauseMenu():
                                     color = self.game.lightgreen
                                 elif mapChar == '.': # Desert
                                     color = self.game.tan
-                            elif self.mapMode == "difficulty" and mapChar != ' ':
+                            elif self.mapMode == "difficulty" and mapChar != ' ' and mapChar != 'X':
                                 diff = self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c])
                                 color = (255,225-(9*diff),225-(9*diff))
                         else:

@@ -2,6 +2,13 @@ import pygame
 import random
 from enum import Enum
 
+MAX_DIFFICULTY = 25
+MAX_WEAPON_RARITY = 10
+MAX_ARMOR_RARITY = 10
+MAX_POTION_RARITY = 5
+MAX_ATKSPELL_RARITY = 5
+MAX_SPTSPELL_RARITY = 5
+
 class Type(Enum):
     Empty = 0
     Weapon = 1

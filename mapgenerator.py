@@ -1,6 +1,7 @@
 import pygame
 import random
 import math
+from constants import *
 
 class Map():
     def __init__(self):
@@ -23,13 +24,7 @@ class Map():
             for row in file:
                 self.difficultyMap.append(row)
                 
-        #Setting starting position...
-        r = random.randint(round(self.sizeR/3),round((self.sizeR/3)*2))
-        c = random.randint(round(self.sizeC/3),round((self.sizeR/3)*2))
-        while self.map[r][c] == ' ':
-            r = random.randint(round(self.sizeR/3),round((self.sizeR/3)*2))
-            c = random.randint(round(self.sizeC/3),round((self.sizeR/3)*2))
-        self.startingPos = (r,c)
+        self.startingPos = (round(self.sizeR/2),round(self.sizeC/2))
 
     def generateMap(self):
         row = []
@@ -58,13 +53,7 @@ class Map():
         self.genDifficultyMapBiomes()
         self.border()
 
-        #Setting starting position...
-        r = random.randint(round(self.sizeR/3),round((self.sizeR/3)*2))
-        c = random.randint(round(self.sizeC/3),round((self.sizeR/3)*2))
-        while self.map[r][c] == ' ':
-            r = random.randint(round(self.sizeR/3),round((self.sizeR/3)*2))
-            c = random.randint(round(self.sizeC/3),round((self.sizeR/3)*2))
-        self.startingPos = (r,c)
+        self.startingPos = (round(self.sizeR/2),round(self.sizeC/2))
 
         endSet = random.randint(1,8)
         if endSet == 1:
@@ -126,7 +115,6 @@ class Map():
             cEnd = random.randint(randCA,randCB)
         self.map[-rEnd][-cEnd] = 'V'
 
-        self.ensurePath(r,c)
         print("Generating landmarks...")
         self.placeLandmarks(800)
 
@@ -327,7 +315,7 @@ class Map():
 
         for r in range(len(self.difficultyMap)):
             for c in range(len(self.difficultyMap[0])):
-                if self.difficultyMap[r][c] < 1 or self.difficultyMap[r][c] > 25:
+                if self.difficultyMap[r][c] < 1 or self.difficultyMap[r][c] > MAX_DIFFICULTY:
                     diff = self.checkDiffAtCoords((r,c))
                     self.spread(self.sizeR, self.sizeC, r, c, self.difficultyMap[r][c], diff)
 
@@ -359,7 +347,7 @@ class Map():
     def checkDiffAtCoords(self,coords):
         r, c = coords[0], coords[1]
         scaledR, scaledC = abs(r-(round(self.sizeR/2))), abs(c-(round(self.sizeC/2)))
-        divisionValR, divisionValC = (round(self.sizeR/2)) / 25, (round(self.sizeC/2)) / 25
+        divisionValR, divisionValC = (round(self.sizeR/2)) / MAX_DIFFICULTY, (round(self.sizeC/2)) / MAX_DIFFICULTY
         difficultyValR = math.ceil(scaledR / divisionValR)
         difficultyValC = math.ceil(scaledC / divisionValC)
         return max(difficultyValR,difficultyValC)
