@@ -73,13 +73,13 @@ class RoomHandler():
         self.game.screen.blit(text_surface,text_rect)
         return font.size(text)
 
-    def roomWrite(self,size,text):
+    def roomWrite(self,size,text,y=20):
         font = pygame.font.Font('freesansbold.ttf',size)
         textList = self.wrap(font,text)
         for i in range(0,len(textList)):
             text_surface = font.render(textList[i], True, self.game.white)
             text_rect = text_surface.get_rect()
-            text_rect.topleft = (self.left+10,(self.top+10)+((size+5)*i))
+            text_rect.topleft = (self.left+10,y+((size+5)*i))
             self.game.screen.blit(text_surface,text_rect)
         return font.size(text)
     

@@ -14,6 +14,7 @@ class Overworld():
         self.pausemenu = PauseMenu(self.game)
         self.combat = Combat(self.game)
         self.party = self.game.party
+        self.steps = 0
 
     def blitScreen(self):
         self.game.screen.blit(self.game.screen, (0,0))
@@ -116,7 +117,23 @@ class Overworld():
             return "Dungeon"
 
     def stepTo(self,r,c): # Simplified; any non-terrain space is treated as a Shack
-        self.game.stir()
+        # self.game.stir()
+        self.steps += 1
         if self.game.WorldMap.map[r][c] != '#' and self.game.WorldMap.map[r][c] != ';' and self.game.WorldMap.map[r][c] != '.':
             newRoom = RoomHandler(self.game, self.game.roomDB.getRoom((r,c)))
             newRoom.enter()
+        else: # Roll for random encounter
+            if self.steps < 5:
+                odds = 15
+            elif self.steps < 10:
+                odds = 1
+            elif self.steps < 15:
+                odds = 2
+            else:
+                odds = 3
+            if random.randint(odds,15) == 14:
+                self.steps = 0
+                encounter = []
+                encounter = self.game.directory.buildEncounter(self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]),self.getBiome(self.game.currentPos[0],self.game.currentPos[1]))
+                self.party.debug_RandomInventory(self.game.directory)
+                self.combat.initialize(self.party,encounter)
