@@ -5,16 +5,21 @@ from constants import *
 from enum import Enum
 import copy
 
+# The Directory class is responsible for compiling all distinct items, creatures, classes, and names into a comprehensive 
+# class. All items are assigned a unique ID, making it so other parts of the program need only hold/transfer an item's 
+# ID, and Directory can be used to pull the proper item accordingly. This helps to avoid complications from having multiple 
+# data types populating the same list, as inventories will all contain IDs (integer values).
+
 class Directory():
     def __init__(self):
-        self.weaponDirectory = initWeaponDirectory()
-        self.armorDirectory = initArmorDirectory()
-        self.potionDirectory = initPotionDirectory()
-        self.atkSpellDirectory = initAtkSpellDirectory()
-        self.sptSpellDirectory = initSptSpellDirectory()
-        self.classDirectory = initClassDirectory()
-        self.creatureDirectory = initCreatureDirectory()
-        self.nameDirectory = initNameDirectory()
+        self.weaponDirectory = initWeaponDirectory()        # 0 - 99
+        self.armorDirectory = initArmorDirectory()          # 100 - 199
+        self.potionDirectory = initPotionDirectory()        # 200 - 299
+        self.atkSpellDirectory = initAtkSpellDirectory()    # 300 - 399
+        self.sptSpellDirectory = initSptSpellDirectory()    # 400 - 499
+        self.classDirectory = initClassDirectory()          # 0 - 99
+        self.creatureDirectory = initCreatureDirectory()    # 0 - 99
+        self.nameDirectory = initNameDirectory()            # 0 - 99
 
     def getItem(self,id):
         item = Item()
@@ -30,7 +35,7 @@ class Directory():
             item = self.sptSpellDirectory[id-400]
         return item
 
-    def getItemName(self,id):
+    def getItemName(self,id,scroll=False):
         name = "NULL"
         if id < 100:
             name = self.weaponDirectory[id].name
@@ -40,8 +45,12 @@ class Directory():
             name = self.potionDirectory[id-200].name
         elif id < 400:
             name = self.atkSpellDirectory[id-300].name
+            if scroll:
+                name += " Scroll"
         elif id < 500:
             name = self.sptSpellDirectory[id-400].name
+            if scroll:
+                name += " Scroll"
         return name
 
     def getItemDesc(self,id):
@@ -71,6 +80,22 @@ class Directory():
         elif id < 500:
             rarity = self.sptSpellDirectory[id-400].rarity
         return rarity
+    
+    def getItemType(self,id):
+        type = Type.Empty
+        if id < 0:
+            type = Type.Empty
+        elif id < 100:
+            type = Type.Weapon
+        elif id < 200:
+            type = Type.Armor
+        elif id < 300:
+            type = Type.Potion
+        elif id < 400:
+            type = Type.AtkSpell
+        elif id < 500:
+            type = Type.SptSpell
+        return type
 
     def getSpellTarget(self,id):
         if id < 400:

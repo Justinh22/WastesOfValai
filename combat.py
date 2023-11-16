@@ -167,8 +167,7 @@ class Combat():
                 else:
                     self.lowMana = True
             elif self.state =="itemSummary":
-                self.actionVal = self.party.inventory[self.itemID]
-                self.party.inventory.pop(self.itemID)
+                self.actionVal = self.party.inventory[self.itemID].id
                 self.state = "targetSelect"
                 self.cursorPos = 0
                 print("ITEM")
@@ -310,19 +309,19 @@ class Combat():
             self.write(20, self.left+15, 325, "Select an item: (B to cancel)")
             self.write(20, 40+((self.cursorPos%2)*300), 380+((int(self.cursorPos/2))*40), ">")
             if self.menuTop < len(self.party.inventory):
-                self.write(18,60,380,str(self.menuTop+1)+") "+self.game.directory.getItemName(self.party.inventory[self.menuTop]))
+                self.write(18,60,380,str(self.menuTop+1)+") "+self.party.inventory[self.menuTop].name)
             else:
                 self.write(18,60,380,str(self.menuTop+1)+")")
             if self.menuTop+1 < len(self.party.inventory):
-                self.write(18,360,380,str(self.menuTop+2)+") "+self.game.directory.getItemName(self.party.inventory[self.menuTop+1]))
+                self.write(18,360,380,str(self.menuTop+2)+") "+self.party.inventory[self.menuTop+1].name)
             else:
                 self.write(18,360,380,str(self.menuTop+2)+")")
             if self.menuTop+2 < len(self.party.inventory):
-                self.write(18,60,420,str(self.menuTop+3)+") "+self.game.directory.getItemName(self.party.inventory[self.menuTop+2]))
+                self.write(18,60,420,str(self.menuTop+3)+") "+self.party.inventory[self.menuTop+2].name)
             else:
                 self.write(18,60,420,str(self.menuTop+3)+")")
             if self.menuTop+3 < len(self.party.inventory):
-                self.write(18,360,420,str(self.menuTop+4)+") "+self.game.directory.getItemName(self.party.inventory[self.menuTop+3]))
+                self.write(18,360,420,str(self.menuTop+4)+") "+self.party.inventory[self.menuTop+3].name)
             else:
                 self.write(18,360,420,str(self.menuTop+4)+")")
         if self.state == "spellSummary":
@@ -346,14 +345,14 @@ class Combat():
         if self.state == "itemSummary":
             pygame.draw.line(self.game.screen,self.game.white,(self.left,350),(self.right+9,350),2)
             self.write(20, self.left+15, 325, "Do you want to use this item?")
-            self.write(16, self.left+15, 360, self.game.directory.getItemName(self.party.inventory[self.itemID]))
-            if self.game.directory.getPotion(self.party.inventory[self.itemID]).hpGain > 0 and self.game.directory.getPotion(self.party.inventory[self.itemID]).mpGain > 0:
-                self.writeOrientation(16,self.right-10, 360, "Restores "+str(self.game.directory.getPotion(self.party.inventory[self.itemID]).hpGain)+" HP and "+str(self.game.directory.getPotion(self.party.inventory[self.itemID]).mpGain)+" MP","R")
-            elif self.game.directory.getPotion(self.party.inventory[self.itemID]).hpGain > 0 and self.game.directory.getPotion(self.party.inventory[self.itemID]).mpGain == 0:
-                self.writeOrientation(16,self.right-10, 360, "Restores "+str(self.game.directory.getPotion(self.party.inventory[self.itemID]).hpGain)+" HP","R")
-            elif self.game.directory.getPotion(self.party.inventory[self.itemID]).hpGain == 0 and self.game.directory.getPotion(self.party.inventory[self.itemID]).mpGain > 0:
-                self.writeOrientation(16,self.right-10, 360, "Restores "+str(self.game.directory.getPotion(self.party.inventory[self.itemID]).mpGain)+" MP","R")
-            self.write(16, self.left+15, 380, self.game.directory.getItemDesc(self.party.inventory[self.itemID]))
+            self.write(16, self.left+15, 360, self.party.inventory[self.itemID].name)
+            if self.party.inventory[self.itemID].hpGain > 0 and self.party.inventory[self.itemID].mpGain > 0:
+                self.writeOrientation(16,self.right-10, 360, "Restores "+str(self.party.inventory[self.itemID].hpGain)+" HP and "+str(self.party.inventory[self.itemID].mpGain)+" MP","R")
+            elif self.party.inventory[self.itemID].hpGain > 0 and self.party.inventory[self.itemID].mpGain == 0:
+                self.writeOrientation(16,self.right-10, 360, "Restores "+str(self.party.inventory[self.itemID].hpGain)+" HP","R")
+            elif self.party.inventory[self.itemID].hpGain == 0 and self.party.inventory[self.itemID].mpGain > 0:
+                self.writeOrientation(16,self.right-10, 360, "Restores "+str(self.party.inventory[self.itemID].mpGain)+" MP","R")
+            self.write(16, self.left+15, 380, self.party.inventory[self.itemID].description)
             self.write(20,150,425,"A) CONFIRM")
             self.write(20,385,425,"B) BACK")
 
@@ -575,7 +574,11 @@ class Combat():
             self.encounter[target].takeDamage(self.dmg)
 
     def usePotion(self,target,itemID):
-        self.party.usePotion(target,itemID,self.game.directory)
+        for i in range(len(self.party.inventory)):
+            if self.party.inventory[i].id == itemID:
+                index = i
+                break
+        self.party.usePotion(target,index)
 
     def cast(self,source,target,spellID):
         if spellID < 400:

@@ -49,6 +49,10 @@ class RoomHandler():
             elif self.state == "lookList":
                 self.delay = 5
                 self.state = "featureCheck"
+            elif self.state == "featureCheck":
+                self.delay = 5
+                if self.room.features[self.cursorPos].lootStatus != LootStatus.Taken:
+                    self.takeItem(self.cursorPos)
             print("A")
         if self.game.B:
             if self.state == "main":
@@ -99,9 +103,10 @@ class RoomHandler():
                 self.write(20,self.left+35,(self.top+310)+(25*i),str(i+1)+") "+self.room.features[i].name)
         if self.state == "featureCheck":
             text = self.room.features[self.cursorPos].description
-            if self.room.features[self.cursorPos].loot != -1:
+            if self.room.features[self.cursorPos].loot != -1 and self.room.features[self.cursorPos].lootStatus != LootStatus.Taken:
                 self.write(25,self.right-150,self.top+340,"A) Take")
-                text += " You see a " + self.game.directory.getItemName(self.room.features[self.cursorPos].loot) + "."
+                text += " You see a " + self.game.directory.getItemName(self.room.features[self.cursorPos].loot,True) + "."
+                self.room.features[self.cursorPos].lootStatus = LootStatus.Discovered
             self.write(25,self.right-150,self.top+390,"B) Back")
             self.roomWrite(15,text,self.right-self.left-200,self.left+10,self.top+310)
 
@@ -143,3 +148,23 @@ class RoomHandler():
                     line = ' '.join(lineList)
             fullText.append(line)
         return fullText
+    
+    def takeItem(self,index):
+        id = self.room.features[index].loot
+        type = self.game.directory.getItemType(id)
+        if type == Type.Weapon or type == Type.Armor:
+            if self.game.party.addEquipment(id):
+                self.room.features[index].lootStatus = LootStatus.Taken
+            else:
+                return False
+        elif type == Type.Potion:
+            if self.game.party.addItem(id):
+                self.room.features[index].lootStatus = LootStatus.Taken
+            else:
+                return False
+        elif type == Type.AtkSpell or type == Type.SptSpell:
+            if self.game.party.addItem(id):
+                self.room.features[index].lootStatus = LootStatus.Taken
+            else:
+                return False
+        return True

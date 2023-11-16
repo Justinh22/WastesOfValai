@@ -170,7 +170,9 @@ class ClassType():
 class Party():
     def __init__(self):
         self.members = []
-        self.inventory = []
+        self.inventory = []         # List of int : Contains id of all items in inventory
+        self.equipment = []         # List of int : Contains id of all equipment in inventory
+        self.spellbook = []         # List of int : Contains id of all spells in inventory
     def initializeMembers(self,dir):
         for i in range(0,random.randint(3,4)):
             lvl = 2
@@ -178,26 +180,35 @@ class Party():
             self.members[i].eqpWpn = dir.getWeapon(dir.getItemByRarities(Type.Weapon,lvl-1,lvl))
             self.members[i].eqpAmr = dir.getArmor(dir.getItemByRarities(Type.Armor,lvl-1,lvl))
     def debug_RandomInventory(self,dir):
-        while len(self.inventory) < 10:
+        while len(self.inventory) < MAX_INVENTORY_SIZE:
             self.addItem(dir.getItemByRarities(Type.Potion,1,5))
     def addItem(self,item):
-        if len(self.inventory) <= 10:
+        if len(self.inventory) <= MAX_INVENTORY_SIZE:
             self.inventory.append(item)
-    def usePotion(self,member,item,dir):
-        self.members[member].gainHP(dir.getPotion(item).hpGain)
-        self.members[member].gainMP(dir.getPotion(item).mpGain)
+            return True
+        return False
+    def addEquipment(self,item):
+        if len(self.equipment) <= MAX_INVENTORY_SIZE:
+            self.equipment.append(item)
+            return True
+        return False
+    def addSpell(self,item):
+        if len(self.spellbook) <= MAX_INVENTORY_SIZE:
+            self.spellbook.append(item)
+            return True
+        return False
+    def learnSpell(self,target):
+        spell = self.inventory.pop(target)
+        self.addSpell(spell)
+    def usePotion(self,member,index):
+        self.members[member].gainHP(self.inventory[index].hpGain)
+        self.members[member].gainMP(self.inventory[index].mpGain)
+        self.inventory.pop(index)
     def getPower(self):
         power = 0
         for member in self.members:
             power += member.level
         return power
-    def getLootRarity(self,type):
-        rarity = 1
-        if type == Type.Weapon or type == Type.Armor:
-            rarity = math.ceil(self.getPower() / 4)
-        elif type == Type.Potion or type == Type.AtkSpell or type == Type.SptSpell:
-            rarity = math.ceil(self.getPower() / 8)
-        return rarity
 
 class Creature():
     def __init__(self,nm,lv,idIN,hpIN,at,ac,df,dg,sd,res,type,spells):

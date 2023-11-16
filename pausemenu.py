@@ -1,5 +1,7 @@
 import pygame
 import copy
+import math
+import constants
 
 class PauseMenu():
     def __init__(self,game):
@@ -11,6 +13,7 @@ class PauseMenu():
         self.mapPos = (0,0)
         self.currentPos = (0,0)
         self.targetPartyMember = 0
+        self.menuSelection = 0
         self.delay = 0
         self.left = 10
         self.top = 10
@@ -60,20 +63,30 @@ class PauseMenu():
                 self.write(30, 210, 75 + (self.cursorPos*100), "->")
             for i in range(0,len(self.game.party.members)):
                 self.drawMinStatBlock(250, 45 + (i*100), self.game.party.members[i])
-        if self.state == "partyMember":
+        if self.state == "partyMember" or self.state == "equipment" or self.state == "inventory" or self.state == "spellbook":
             screenOutline = pygame.Rect(self.left,self.top,self.right,self.bottom)
             pygame.draw.rect(self.game.screen,self.game.white,screenOutline,2)
             self.write(40, 30, 40, self.game.party.members[self.targetPartyMember].name)
             self.write(20, 60, 90, "Return")
-            self.write(20, 60, 115, "Equip")
+            self.write(20, 60, 115, "Equipment")
             self.write(20, 60, 140, "Inventory")
             self.write(20, 60, 165, "Spells")
-            self.write(20, 30, 87 + (self.cursorPos*25), "->")
             self.drawMinStatBlock(250, 45, self.game.party.members[self.targetPartyMember])
             weapon = self.game.party.members[self.targetPartyMember].eqpWpn
             self.write(12, 250, 150, "Weapon: " + weapon.name + " (" + str(weapon.attack) + " ATK, " + str(weapon.accuracy) + " ACC, " + str(weapon.critrate) + " CRT, " + str(weapon.amplifier) + " AMP)")
             armor = self.game.party.members[self.targetPartyMember].eqpAmr
             self.write(12, 250, 170, "Armor: " + armor.name + " (" + str(armor.defense) + " DEF, " + str(armor.dodge) + " DDG, " + str(armor.manaregen) + " MPG)")
+        if self.state == "partyMember":
+            self.write(20, 30, 87 + (self.cursorPos*25), "->")
+        if self.state == "equipment":
+            self.write(20, 270, 230, "Equipment")
+            self.printInventory("equipment")
+        if self.state == "inventory":
+            self.write(20, 270, 230, "Inventory")
+            self.printInventory("inventory")
+        if self.state == "spellbook":
+            self.write(20, 270, 230, "Spellbook")
+            self.printInventory("spellbook")
         if self.state == "map":
             screenOutline = pygame.Rect(self.left,self.top,self.right,self.bottom)
             pygame.draw.rect(self.game.screen,self.game.white,screenOutline,2)
@@ -159,6 +172,20 @@ class PauseMenu():
             elif self.state == "partyMember":
                 if self.cursorPos == 0:
                     self.state = "main"
+                elif self.cursorPos == 1:
+                    self.state = "equipment"
+                    self.menuSelection = self.cursorPos
+                    self.cursorPos = 0
+                elif self.cursorPos == 2:
+                    self.state = "inventory"
+                    self.menuSelection = self.cursorPos
+                    self.cursorPos = 0
+                elif self.cursorPos ==  3:
+                    self.state = "spellbook"
+                    self.menuSelection = self.cursorPos
+                    self.cursorPos = 0
+            elif self.state == "equipment" or self.state == "inventory" or self.state == "spellbook":
+                self.state = "itemSummary"
         if self.game.B:
             if self.state == "partySelect":
                 self.state = "main"
@@ -172,6 +199,9 @@ class PauseMenu():
             if self.state == "partyMember":
                 self.state = "partySelect"
                 self.cursorPos = self.targetPartyMember
+            if self.state == "equipment" or self.state == "inventory" or self.state == "spellbook":
+                self.state = "partyMember"
+                self.cursorPos = self.menuSelection
         if self.game.X:
             if self.state == "map":
                 self.state = "main"
@@ -198,27 +228,47 @@ class PauseMenu():
                 self.cursorPos -= 1
                 if self.cursorPos < 0:
                     self.cursorPos = 3
+            elif self.state == "equipment" or self.state == "inventory" or self.state == "spellbook":
+                if self.cursorPos <= 1:
+                    self.cursorPos += 8
+                else:
+                    self.cursorPos -= 2
         if self.game.DOWN:
             if self.state == "main":
                 self.cursorPos += 1
                 if self.cursorPos > 4:
                     self.cursorPos = 0
-            if self.state == "partySelect":
+            elif self.state == "partySelect":
                 self.cursorPos += 1
                 if self.cursorPos > len(self.game.party.members)-1:
                     self.cursorPos = 0
-            if self.state == "map":
+            elif self.state == "map":
                 self.mapPos[0] += self.panMap()
-            if self.state == "partyMember":
+            elif self.state == "partyMember":
                 self.cursorPos += 1
                 if self.cursorPos > 3:
                     self.cursorPos = 0
+            elif self.state == "equipment" or self.state == "inventory" or self.state == "spellbook":
+                if self.cursorPos >= 8:
+                    self.cursorPos -= 8
+                else:
+                    self.cursorPos += 2
         if self.game.LEFT:
             if self.state == "map":
                 self.mapPos[1] -= self.panMap()
+            elif self.state == "equipment" or self.state == "inventory" or self.state == "spellbook":
+                if self.cursorPos % 2 == 0:
+                    self.cursorPos += 1
+                else:
+                    self.cursorPos -= 1
         if self.game.RIGHT:
             if self.state == "map":
                 self.mapPos[1] += self.panMap()
+            elif self.state == "equipment" or self.state == "inventory" or self.state == "spellbook":
+                if self.cursorPos % 2 == 0:
+                    self.cursorPos += 1
+                else:
+                    self.cursorPos -= 1
 
     def write(self,size,x,y,text):
         font = pygame.font.Font('freesansbold.ttf',size)
@@ -265,3 +315,24 @@ class PauseMenu():
             return 10
         elif self.mapZoomSize == 4:
             return 10
+        
+    def printInventory(self, type):
+        scroll = False
+        if type == "equipment":
+            list = self.game.party.equipment
+        elif type == "inventory":
+            list = self.game.party.inventory
+            scroll = True
+        elif type == "spellbook":
+            list = self.game.party.spellbook
+
+        for i in range(math.ceil(constants.MAX_INVENTORY_SIZE/2)):
+            if i*2 < len(list):
+                self.write(15, 100, 275 + (25*i), str((i*2)+1) + ") " + self.game.directory.getItemName(list[i*2],scroll))
+            else:
+                self.write(15, 100, 275 + (25*i), str((i*2)+1) + ") ")
+            if (i*2)+1 < len(list):
+                self.write(15, 350, 275 + (25*i), str((i*2)+2) + ") " + self.game.directory.getItemName(list[(i*2)+1],scroll))
+            else:
+                self.write(15, 350, 275 + (25*i), str((i*2)+2) + ") ")
+        self.write(15, 85 + ((self.cursorPos%2)*250), 272 + (25*(math.floor(self.cursorPos/2))), ">")

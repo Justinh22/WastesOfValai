@@ -13,6 +13,7 @@ class Map():
         self.startingPos = (0,0)
         self.finishPos = (0,0)
 
+
     def loadMap(self):
         with open("generated_map.txt","r") as file:
             for row in file:
@@ -25,6 +26,7 @@ class Map():
                 self.difficultyMap.append(row)
                 
         self.startingPos = (round(self.sizeR/2),round(self.sizeC/2))
+
 
     def generateMap(self):
         row = []
@@ -97,7 +99,6 @@ class Map():
             randCA = round((self.sizeC/3)*2)
             randCB = round(self.sizeC-5)
 
-
         #Setting tower position...
         rEnd = random.randint(randRA,randRB)
         cEnd = random.randint(randCA,randCB)
@@ -136,6 +137,7 @@ class Map():
                     file.write(element)
                 file.write("\n")
 
+
     def grow(self,cycles):
         r_first = 1
         r_last = self.sizeR-1
@@ -155,6 +157,7 @@ class Map():
                         neighbors = self.getNeighbors(r,c)
                         self.map[r][c] = max(neighbors, key=neighbors.get)
             vert += 1
+
 
     def getNeighbors(self,r,c):
         neighbors = {}
@@ -183,6 +186,7 @@ class Map():
                     neighbors[self.map[r][c-1]] += 1
         return neighbors
 
+
     def smoothCorners(self):
         for r in range(1,self.sizeR-1):
             for c in range(1,self.sizeC-1):
@@ -195,6 +199,7 @@ class Map():
                 elif (self.map[r][c]==self.map[r][c-1] and self.map[r][c]==self.map[r-1][c-1] and self.map[r][c]==self.map[r-1][c] and self.map[r][c]!=self.map[r+1][c] and self.map[r][c]!=self.map[r][c+1]):
                     self.map[r][c] = self.map[r][c+1]
 
+
     def border(self):
         for i in range(0,self.sizeR):
             self.map[i][0] = 'X'
@@ -203,8 +208,10 @@ class Map():
             self.map[self.sizeR-1][i] = 'X'
             self.map[0][i] = 'X'
 
+
     def ensurePath(self,r,c): #Try looking from ocean tiles at top and following them down
         return True
+
 
     def placeLandmarks(self,num):
         landmarks = num
@@ -246,12 +253,14 @@ class Map():
                 else:
                     self.map[r][c] = 'S' # Shack
 
+
     def saveRevealed(self):
         with open("revealed_map.txt","w") as file:
             for row in self.revealedMap:
                 for element in row:
                     file.write(element)
                 file.write("\n")
+
 
     def genDifficultyMapBiomes(self):
         radius = 1
