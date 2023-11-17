@@ -2,17 +2,20 @@ import pygame
 import copy
 import math
 import constants
+from writing import *
 
 class PauseMenu():
     def __init__(self,game):
         self.game = game
         self.paused = False
         self.state = "main"
+        self.substate = "none"
         self.mapMode = "biome"
         self.cursorPos = 0
         self.mapPos = (0,0)
         self.currentPos = (0,0)
         self.targetPartyMember = 0
+        self.targetElement = 0
         self.menuSelection = 0
         self.delay = 0
         self.left = 10
@@ -48,49 +51,68 @@ class PauseMenu():
 
     def drawScreen(self):
         self.game.screen.fill(self.game.black)
+
         if self.state == "main" or self.state == "partySelect":
             screenOutline = pygame.Rect(self.left,self.top,self.right,self.bottom)
             pygame.draw.rect(self.game.screen,self.game.white,screenOutline,2)
-            self.write(40, 30, 40, "Paused")
-            self.write(20, 60, 90, "Resume")
-            self.write(20, 60, 115, "Party")
-            self.write(20, 60, 140, "Inventory")
-            self.write(20, 60, 165, "Map")
-            self.write(20, 60, 190, "Quit")
+            write(self.game, 40, 30, 40, "Paused")
+            write(self.game, 20, 60, 90, "Resume")
+            write(self.game, 20, 60, 115, "Party")
+            write(self.game, 20, 60, 140, "Inventory")
+            write(self.game, 20, 60, 165, "Map")
+            write(self.game, 20, 60, 190, "Quit")
             if self.state == "main":
-                self.write(20, 30, 87 + (self.cursorPos*25), "->")
+                write(self.game, 20, 30, 87 + (self.cursorPos*25), "->")
             if self.state == "partySelect":
-                self.write(30, 210, 75 + (self.cursorPos*100), "->")
+                write(self.game, 30, 210, 75 + (self.cursorPos*100), "->")
             for i in range(0,len(self.game.party.members)):
                 self.drawMinStatBlock(250, 45 + (i*100), self.game.party.members[i])
-        if self.state == "partyMember" or self.state == "equipment" or self.state == "inventory" or self.state == "spellbook":
+
+        if self.state == "partyMember" or self.state == "equipment" or self.state == "inventory" or self.state == "spellbook" or self.state == "itemSummary":
             screenOutline = pygame.Rect(self.left,self.top,self.right,self.bottom)
             pygame.draw.rect(self.game.screen,self.game.white,screenOutline,2)
-            self.write(40, 30, 40, self.game.party.members[self.targetPartyMember].name)
-            self.write(20, 60, 90, "Return")
-            self.write(20, 60, 115, "Equipment")
-            self.write(20, 60, 140, "Inventory")
-            self.write(20, 60, 165, "Spells")
+            write(self.game, 40, 30, 40, self.game.party.members[self.targetPartyMember].name)
+            write(self.game, 20, 60, 90, "Return")
+            write(self.game, 20, 60, 115, "Equipment")
+            write(self.game, 20, 60, 140, "Inventory")
+            write(self.game, 20, 60, 165, "Spells")
             self.drawMinStatBlock(250, 45, self.game.party.members[self.targetPartyMember])
             weapon = self.game.party.members[self.targetPartyMember].eqpWpn
-            self.write(12, 250, 150, "Weapon: " + weapon.name + " (" + str(weapon.attack) + " ATK, " + str(weapon.accuracy) + " ACC, " + str(weapon.critrate) + " CRT, " + str(weapon.amplifier) + " AMP)")
+            write(self.game, 12, 250, 150, "Weapon: " + weapon.name + " (" + str(weapon.attack) + " ATK, " + str(weapon.accuracy) + " ACC, " + str(weapon.critrate) + " CRT, " + str(weapon.amplifier) + " AMP)")
             armor = self.game.party.members[self.targetPartyMember].eqpAmr
-            self.write(12, 250, 170, "Armor: " + armor.name + " (" + str(armor.defense) + " DEF, " + str(armor.dodge) + " DDG, " + str(armor.manaregen) + " MPG)")
+            write(self.game, 12, 250, 170, "Armor: " + armor.name + " (" + str(armor.defense) + " DEF, " + str(armor.dodge) + " DDG, " + str(armor.manaregen) + " MPG)")
+
         if self.state == "partyMember":
-            self.write(20, 30, 87 + (self.cursorPos*25), "->")
+            write(self.game, 20, 30, 87 + (self.cursorPos*25), "->")
+
         if self.state == "equipment":
-            self.write(20, 270, 230, "Equipment")
+            write(self.game, 20, 270, 230, "Equipment")
             self.printInventory("equipment")
+
         if self.state == "inventory":
-            self.write(20, 270, 230, "Inventory")
+            write(self.game, 20, 270, 230, "Inventory")
             self.printInventory("inventory")
+
         if self.state == "spellbook":
-            self.write(20, 270, 230, "Spellbook")
+            write(self.game, 20, 270, 230, "Spellbook")
             self.printInventory("spellbook")
+
+        if self.state == "itemSummary":
+            summaryOutline = pygame.Rect(40,200,self.right-60,self.bottom-210)
+            pygame.draw.rect(self.game.screen,self.game.white,summaryOutline,2)
+            if self.substate == "spellbook":
+                tgt = self.game.directory.getItem(self.game.party.members[self.targetPartyMember].spells[self.targetElement])
+                text = self.game.directory.getItemName(tgt)+" - "+self.game.directory.getItemDescription(tgt)
+            elif self.substate == "equipment":
+                tgt = self.game.directory.getItem(self.game.party.equipment[self.targetElement])
+            elif self.substate == "inventory":
+                tgt = self.game.directory.getItem(self.game.party.inventory[self.targetElement])
+            write(self.game, 20, 60, 240, self.game.directory.getItemName(tgt)+" - "+self.game.directory.getItemDescription(tgt))
+
         if self.state == "map":
             screenOutline = pygame.Rect(self.left,self.top,self.right,self.bottom)
             pygame.draw.rect(self.game.screen,self.game.white,screenOutline,2)
-            blockSize = self.mapZoomSize #Set the size of the grid block
+            blockSize = self.mapZoomSize # Set the size of the grid block
             self.game.screen.fill((0,0,0))
             mapFont = pygame.font.Font('freesansbold.ttf',round(blockSize/1.5))
             for x in range(30, self.right, blockSize):
@@ -133,6 +155,7 @@ class PauseMenu():
                     offset = (blockSize-textWidth)/2
 
                     self.game.screen.blit(text,(x+offset,y+(round(blockSize/6))))
+
 
     def getInput(self):
         if self.delay > 0:
@@ -185,6 +208,8 @@ class PauseMenu():
                     self.menuSelection = self.cursorPos
                     self.cursorPos = 0
             elif self.state == "equipment" or self.state == "inventory" or self.state == "spellbook":
+                self.targetElement = self.cursorPos
+                self.substate = self.state
                 self.state = "itemSummary"
         if self.game.B:
             if self.state == "partySelect":
@@ -269,30 +294,22 @@ class PauseMenu():
                     self.cursorPos += 1
                 else:
                     self.cursorPos -= 1
-
-    def write(self,size,x,y,text):
-        font = pygame.font.Font('freesansbold.ttf',size)
-        text_surface = font.render(text, True, self.game.white)
-        text_rect = text_surface.get_rect()
-        text_rect.topleft = (x,y)
-        self.game.screen.blit(text_surface,text_rect)
-        return font.size(text)
     
     def drawMinStatBlock(self,xPos,yPos,character):
         outlineRect = pygame.Rect(xPos,yPos,350,90)
         pygame.draw.rect(self.game.screen,self.game.white,outlineRect,2)
-        self.write(14, xPos+10, yPos+10, character.name + ", Level " + str(character.level) + " " + character.type.name)
-        self.write(14, xPos+10, yPos+30, "HP " + str(character.hp) + "/" + str(character.hpMax))
-        self.write(14, xPos+10, yPos+50, "MP " + str(character.mp) + "/" + str(character.mpMax))
-        self.write(14, xPos+10, yPos+70, "XP " + str(character.xp) + "/" + str(character.nextLevel))
-        self.write(14, xPos+218, yPos+10, "ATK " + str(character.getAttack()))
-        self.write(14, xPos+283, yPos+10, "DEF " + str(character.getDefense()))
-        self.write(14, xPos+218, yPos+28, "ACC " + str(character.getAccuracy()))
-        self.write(14, xPos+283, yPos+28, "DDG " + str(character.getDodge()))
-        self.write(14, xPos+218, yPos+46, "CRT " + str(character.getCritRate()))
-        self.write(14, xPos+283, yPos+46, "LCK " + str(character.getLuck()))
-        self.write(14, xPos+218, yPos+64, "AMP " + str(character.getAmplifier()))
-        self.write(14, xPos+283, yPos+64, "MPG " + str(character.getManaRegen()))
+        write(self.game, 14, xPos+10, yPos+10, character.name + ", Level " + str(character.level) + " " + character.type.name)
+        write(self.game, 14, xPos+10, yPos+30, "HP " + str(character.hp) + "/" + str(character.hpMax))
+        write(self.game, 14, xPos+10, yPos+50, "MP " + str(character.mp) + "/" + str(character.mpMax))
+        write(self.game, 14, xPos+10, yPos+70, "XP " + str(character.xp) + "/" + str(character.nextLevel))
+        write(self.game, 14, xPos+218, yPos+10, "ATK " + str(character.getAttack()))
+        write(self.game, 14, xPos+283, yPos+10, "DEF " + str(character.getDefense()))
+        write(self.game, 14, xPos+218, yPos+28, "ACC " + str(character.getAccuracy()))
+        write(self.game, 14, xPos+283, yPos+28, "DDG " + str(character.getDodge()))
+        write(self.game, 14, xPos+218, yPos+46, "CRT " + str(character.getCritRate()))
+        write(self.game, 14, xPos+283, yPos+46, "LCK " + str(character.getLuck()))
+        write(self.game, 14, xPos+218, yPos+64, "AMP " + str(character.getAmplifier()))
+        write(self.game, 14, xPos+283, yPos+64, "MPG " + str(character.getManaRegen()))
 
     def panMap(self):
         if self.mapZoomSize == 40:
@@ -324,15 +341,15 @@ class PauseMenu():
             list = self.game.party.inventory
             scroll = True
         elif type == "spellbook":
-            list = self.game.party.spellbook
+            list = self.game.party.members[self.targetPartyMember].spells
 
-        for i in range(math.ceil(constants.MAX_INVENTORY_SIZE/2)):
+        for i in range(math.ceil(constants.MAX_INVENTORY_SIZE/2)): # FIX: Allow for no capacity on spellbook
             if i*2 < len(list):
-                self.write(15, 100, 275 + (25*i), str((i*2)+1) + ") " + self.game.directory.getItemName(list[i*2],scroll))
+                write(self.game, 15, 100, 275 + (25*i), str((i*2)+1) + ") " + self.game.directory.getItemName(list[i*2],scroll))
             else:
-                self.write(15, 100, 275 + (25*i), str((i*2)+1) + ") ")
+                write(self.game, 15, 100, 275 + (25*i), str((i*2)+1) + ") ")
             if (i*2)+1 < len(list):
-                self.write(15, 350, 275 + (25*i), str((i*2)+2) + ") " + self.game.directory.getItemName(list[(i*2)+1],scroll))
+                write(self.game, 15, 350, 275 + (25*i), str((i*2)+2) + ") " + self.game.directory.getItemName(list[(i*2)+1],scroll))
             else:
-                self.write(15, 350, 275 + (25*i), str((i*2)+2) + ") ")
-        self.write(15, 85 + ((self.cursorPos%2)*250), 272 + (25*(math.floor(self.cursorPos/2))), ">")
+                write(self.game, 15, 350, 275 + (25*i), str((i*2)+2) + ") ")
+        write(self.game, 15, 85 + ((self.cursorPos%2)*250), 272 + (25*(math.floor(self.cursorPos/2))), ">")

@@ -4,6 +4,7 @@ import time
 from characters import Action
 from characters import Buff
 from dialogue import *
+from writing import *
 
 class Combat():
     def __init__(self,game):
@@ -255,106 +256,106 @@ class Combat():
         pygame.draw.rect(self.game.screen,self.game.white,screenOutline,2)
         self.combatInfo()
         if self.state == "mainWindow":
-            self.write(20, self.left+15, 325, self.party.members[self.combatOrder[self.currentTurn][1]].name+"'s turn!")
-            self.write(20,45,375,"A) ATTACK")
-            self.write(20,210,375,"B) USE") #SPELL, ITEM, COMBAT ART
-            self.write(20,45,420,"X) CANCEL")
-            self.write(20,210,420,"Y) RUN")
+            write(self.game, 20, self.left+15, 325, self.party.members[self.combatOrder[self.currentTurn][1]].name+"'s turn!")
+            write(self.game, 20,45,375,"A) ATTACK")
+            write(self.game, 20,210,375,"B) USE") #SPELL, ITEM, COMBAT ART
+            write(self.game, 20,45,420,"X) CANCEL")
+            write(self.game, 20,210,420,"Y) RUN")
             self.statBlock()
         if self.state == "useMenu":
-            self.write(20, self.left+15, 325, "Use what?")
-            self.write(20, 28+(int(self.cursorPos%2)*165), 373+(int(self.cursorPos/2)*45), ">")
-            self.write(20,45,375,"SPELL")
-            self.write(13,45,395,str(self.party.members[self.combatOrder[self.currentTurn][1]].mp)+"/"+str(self.party.members[self.combatOrder[self.currentTurn][1]].mpMax))
-            self.write(20,210,375,"ITEM")
-            self.write(20,45,420,"ART")
-            self.write(20,210,420,"CANCEL")
+            write(self.game, 20, self.left+15, 325, "Use what?")
+            write(self.game, 20, 28+(int(self.cursorPos%2)*165), 373+(int(self.cursorPos/2)*45), ">")
+            write(self.game, 20,45,375,"SPELL")
+            write(self.game, 13,45,395,str(self.party.members[self.combatOrder[self.currentTurn][1]].mp)+"/"+str(self.party.members[self.combatOrder[self.currentTurn][1]].mpMax))
+            write(self.game, 20,210,375,"ITEM")
+            write(self.game, 20,45,420,"ART")
+            write(self.game, 20,210,420,"CANCEL")
             self.statBlock()
         if self.state == "targetSelect":
             pygame.draw.line(self.game.screen,self.game.white,(self.left,350),(self.right+9,350),2)
-            self.write(20, self.left+15, 325, "Select a target")
+            write(self.game, 20, self.left+15, 325, "Select a target")
             if self.actionVal < 200 or (self.actionVal >= 300 and self.actionVal < 400):
-                self.write(20, 480, 30+(self.cursorPos*30), "<")
-                self.write(20,30,400,"A) SELECT")
-                self.write(20,180,400,"B) BACK")
+                write(self.game, 20, 480, 30+(self.cursorPos*30), "<")
+                write(self.game, 20,30,400,"A) SELECT")
+                write(self.game, 20,180,400,"B) BACK")
             else:
-                self.write(20, 230, 172+(self.cursorPos*30), ">")
-                self.write(20,30,400,"A) SELECT")
-                self.write(20,180,400,"B) BACK")
+                write(self.game, 20, 230, 172+(self.cursorPos*30), ">")
+                write(self.game, 20,30,400,"A) SELECT")
+                write(self.game, 20,180,400,"B) BACK")
         if self.state == "spellList":
             pygame.draw.line(self.game.screen,self.game.white,(self.left,350),(self.right+9,350),2)
             if self.lowMana:
-                self.write(18, self.left+15, 325, "You don't have enough mana to cast that.")
+                write(self.game, 18, self.left+15, 325, "You don't have enough mana to cast that.")
             else:
-                self.write(18, self.left+15, 325, "Select a spell: (B to cancel)")
-            self.write(20, 40+((self.cursorPos%2)*300), 380+((int(self.cursorPos/2))*40), ">")
+                write(self.game, 18, self.left+15, 325, "Select a spell: (B to cancel)")
+            write(self.game, 20, 40+((self.cursorPos%2)*300), 380+((int(self.cursorPos/2))*40), ">")
             if self.menuTop < len(self.party.members[self.combatOrder[self.currentTurn][1]].spells):
-                self.write(18,60,380,str(self.menuTop+1)+") "+self.game.directory.getItemName(self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.menuTop]))
+                write(self.game, 18,60,380,str(self.menuTop+1)+") "+self.game.directory.getItemName(self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.menuTop]))
             else:
-                self.write(18,60,380,str(self.menuTop+1)+")")
+                write(self.game, 18,60,380,str(self.menuTop+1)+")")
             if self.menuTop+1 < len(self.party.members[self.combatOrder[self.currentTurn][1]].spells):
-                self.write(18,360,380,str(self.menuTop+2)+") "+self.game.directory.getItemName(self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.menuTop+1]))
+                write(self.game, 18,360,380,str(self.menuTop+2)+") "+self.game.directory.getItemName(self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.menuTop+1]))
             else:
-                self.write(18,360,380,str(self.menuTop+2)+")")
+                write(self.game, 18,360,380,str(self.menuTop+2)+")")
             if self.menuTop+2 < len(self.party.members[self.combatOrder[self.currentTurn][1]].spells):
-                self.write(18,60,420,str(self.menuTop+3)+") "+self.game.directory.getItemName(self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.menuTop+2]))
+                write(self.game, 18,60,420,str(self.menuTop+3)+") "+self.game.directory.getItemName(self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.menuTop+2]))
             else:
-                self.write(18,60,420,str(self.menuTop+3)+")")
+                write(self.game, 18,60,420,str(self.menuTop+3)+")")
             if self.menuTop+3 < len(self.party.members[self.combatOrder[self.currentTurn][1]].spells):
-                self.write(18,360,420,str(self.menuTop+4)+") "+self.game.directory.getItemName(self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.menuTop+3]))
+                write(self.game, 18,360,420,str(self.menuTop+4)+") "+self.game.directory.getItemName(self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.menuTop+3]))
             else:
-                self.write(18,360,420,str(self.menuTop+4)+")")
+                write(self.game, 18,360,420,str(self.menuTop+4)+")")
         if self.state == "itemList":
             pygame.draw.line(self.game.screen,self.game.white,(self.left,350),(self.right+9,350),2)
-            self.write(20, self.left+15, 325, "Select an item: (B to cancel)")
-            self.write(20, 40+((self.cursorPos%2)*300), 380+((int(self.cursorPos/2))*40), ">")
+            write(self.game, 20, self.left+15, 325, "Select an item: (B to cancel)")
+            write(self.game, 20, 40+((self.cursorPos%2)*300), 380+((int(self.cursorPos/2))*40), ">")
             if self.menuTop < len(self.party.inventory):
-                self.write(18,60,380,str(self.menuTop+1)+") "+self.party.inventory[self.menuTop].name)
+                write(self.game, 18,60,380,str(self.menuTop+1)+") "+self.party.inventory[self.menuTop].name)
             else:
-                self.write(18,60,380,str(self.menuTop+1)+")")
+                write(self.game, 18,60,380,str(self.menuTop+1)+")")
             if self.menuTop+1 < len(self.party.inventory):
-                self.write(18,360,380,str(self.menuTop+2)+") "+self.party.inventory[self.menuTop+1].name)
+                write(self.game, 18,360,380,str(self.menuTop+2)+") "+self.party.inventory[self.menuTop+1].name)
             else:
-                self.write(18,360,380,str(self.menuTop+2)+")")
+                write(self.game, 18,360,380,str(self.menuTop+2)+")")
             if self.menuTop+2 < len(self.party.inventory):
-                self.write(18,60,420,str(self.menuTop+3)+") "+self.party.inventory[self.menuTop+2].name)
+                write(self.game, 18,60,420,str(self.menuTop+3)+") "+self.party.inventory[self.menuTop+2].name)
             else:
-                self.write(18,60,420,str(self.menuTop+3)+")")
+                write(self.game, 18,60,420,str(self.menuTop+3)+")")
             if self.menuTop+3 < len(self.party.inventory):
-                self.write(18,360,420,str(self.menuTop+4)+") "+self.party.inventory[self.menuTop+3].name)
+                write(self.game, 18,360,420,str(self.menuTop+4)+") "+self.party.inventory[self.menuTop+3].name)
             else:
-                self.write(18,360,420,str(self.menuTop+4)+")")
+                write(self.game, 18,360,420,str(self.menuTop+4)+")")
         if self.state == "spellSummary":
             pygame.draw.line(self.game.screen,self.game.white,(self.left,350),(self.right+9,350),2)
-            self.write(20, self.left+15, 325, "Do you want to cast this spell?")
-            self.write(16, self.left+15, 360, self.game.directory.getItemName(self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID])+": Costs "+str(self.game.directory.getManaCost(self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID]))+" MP")
+            write(self.game, 20, self.left+15, 325, "Do you want to cast this spell?")
+            write(self.game, 16, self.left+15, 360, self.game.directory.getItemName(self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID])+": Costs "+str(self.game.directory.getManaCost(self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID]))+" MP")
             if self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID] < 400:
-                self.writeOrientation(16,self.right-10, 360, str(self.game.directory.getAtkSpell(self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID]).attack)+" Damage","R")
+                writeOrientation(self.game, 16,self.right-10, 360, str(self.game.directory.getAtkSpell(self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID]).attack)+" Damage","R")
             else:
                 if self.game.directory.getSptSpell(self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID]).type == "Heal":
-                    self.writeOrientation(16,self.right-10, 360, "Restores "+str(self.game.directory.getSptSpell(self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID]).getHeal())+" HP","R")
+                    writeOrientation(self.game, 16,self.right-10, 360, "Restores "+str(self.game.directory.getSptSpell(self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID]).getHeal())+" HP","R")
                 if self.game.directory.getSptSpell(self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID]).type == "Buff":
                     i = 0
                     for id, buff in enumerate(self.game.directory.getSptSpell(self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID]).potency):
                         if buff > 0:
-                            self.writeOrientation(16,self.right-10, 360+(i*20), self.lookupBuffName(id)+" "+str(buff),"R")
+                            writeOrientation(self.game, 16,self.right-10, 360+(i*20), self.lookupBuffName(id)+" "+str(buff),"R")
                             i += 1
-            self.write(16, self.left+15, 380, self.game.directory.getItemDesc(self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID]))
-            self.write(20,150,425,"A) CONFIRM")
-            self.write(20,385,425,"B) BACK")
+            write(self.game, 16, self.left+15, 380, self.game.directory.getItemDesc(self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID]))
+            write(self.game, 20,150,425,"A) CONFIRM")
+            write(self.game, 20,385,425,"B) BACK")
         if self.state == "itemSummary":
             pygame.draw.line(self.game.screen,self.game.white,(self.left,350),(self.right+9,350),2)
-            self.write(20, self.left+15, 325, "Do you want to use this item?")
-            self.write(16, self.left+15, 360, self.party.inventory[self.itemID].name)
+            write(self.game, 20, self.left+15, 325, "Do you want to use this item?")
+            write(self.game, 16, self.left+15, 360, self.party.inventory[self.itemID].name)
             if self.party.inventory[self.itemID].hpGain > 0 and self.party.inventory[self.itemID].mpGain > 0:
-                self.writeOrientation(16,self.right-10, 360, "Restores "+str(self.party.inventory[self.itemID].hpGain)+" HP and "+str(self.party.inventory[self.itemID].mpGain)+" MP","R")
+                writeOrientation(self.game, 16,self.right-10, 360, "Restores "+str(self.party.inventory[self.itemID].hpGain)+" HP and "+str(self.party.inventory[self.itemID].mpGain)+" MP","R")
             elif self.party.inventory[self.itemID].hpGain > 0 and self.party.inventory[self.itemID].mpGain == 0:
-                self.writeOrientation(16,self.right-10, 360, "Restores "+str(self.party.inventory[self.itemID].hpGain)+" HP","R")
+                writeOrientation(self.game, 16,self.right-10, 360, "Restores "+str(self.party.inventory[self.itemID].hpGain)+" HP","R")
             elif self.party.inventory[self.itemID].hpGain == 0 and self.party.inventory[self.itemID].mpGain > 0:
-                self.writeOrientation(16,self.right-10, 360, "Restores "+str(self.party.inventory[self.itemID].mpGain)+" MP","R")
-            self.write(16, self.left+15, 380, self.party.inventory[self.itemID].description)
-            self.write(20,150,425,"A) CONFIRM")
-            self.write(20,385,425,"B) BACK")
+                writeOrientation(self.game, 16,self.right-10, 360, "Restores "+str(self.party.inventory[self.itemID].mpGain)+" MP","R")
+            write(self.game, 16, self.left+15, 380, self.party.inventory[self.itemID].description)
+            write(self.game, 20,150,425,"A) CONFIRM")
+            write(self.game, 20,385,425,"B) BACK")
 
         #if self.state == "itemList":
 
@@ -406,11 +407,11 @@ class Combat():
                         combatStr = self.party.members[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + " on " + self.party.members[self.actions[self.exTurn-1].target].name + ", removing status effects!"
                     else:
                         combatStr = self.party.members[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + ", removing all status effects!"
-            self.write(20, self.left+15, 325, combatStr)
+            write(self.game, 20, self.left+15, 325, combatStr)
 
         if self.state == "win":
             pygame.draw.line(self.game.screen,self.game.white,(self.left,350),(self.right+9,350),2)
-            self.write(20, self.left+15, 325, "You win!")
+            write(self.game, 20, self.left+15, 325, "You win!")
             if pygame.time.get_ticks() - self.timeStart >= 3000:
                 difficulty = 0
                 for monster in self.encounter:
@@ -421,29 +422,10 @@ class Combat():
 
         if self.state == "lose":
             pygame.draw.line(self.game.screen,self.game.white,(self.left,350),(self.right+9,350),2)
-            self.write(20, self.left+15, 325, "You have fallen...")
+            write(self.game, 20, self.left+15, 325, "You have fallen...")
             if pygame.time.get_ticks() - self.timeStart >= 3000:
                 self.inCombat = False
                 pygame.quit()
-
-    def write(self,size,x,y,text):
-        font = pygame.font.Font('freesansbold.ttf',size)
-        text_surface = font.render(text, True, self.game.white)
-        text_rect = text_surface.get_rect()
-        text_rect.topleft = (x,y)
-        self.game.screen.blit(text_surface,text_rect)
-        return font.size(text)
-
-    def writeOrientation(self,size,x,y,text,orn):
-        font = pygame.font.Font('freesansbold.ttf',size)
-        text_surface = font.render(text, True, self.game.white)
-        text_rect = text_surface.get_rect()
-        if orn == "L":
-            text_rect.topleft = (x,y)
-        elif orn == "R":
-            text_rect.topright = (x,y)
-        self.game.screen.blit(text_surface,text_rect)
-        return font.size(text)
 
     def combatInfo(self):
         self.game.screen.fill(self.game.black)
@@ -463,61 +445,61 @@ class Combat():
         #Writing names and health bars
         for i in range(0,len(self.encounter)):
             offset = 30*i
-            textWidth, textHeight = self.write(20, 30, 30+offset, self.encounter[i].name)
+            textWidth, textHeight = write(self.game, 20, 30, 30+offset, self.encounter[i].name)
             enemyRect = pygame.Rect(50+maxEncWidth,30+offset,(self.encounter[i].hp/self.encounter[i].hpMax)*100,20)
             outlineRect = pygame.Rect(50+maxEncWidth,30+offset,100,20)
             pygame.draw.rect(self.game.screen,self.game.white,enemyRect)
             pygame.draw.rect(self.game.screen,self.game.white,outlineRect,1)
-            self.write(20, 180+maxEncWidth, 30+offset, str(self.encounter[i].hp)+"/"+str(self.encounter[i].hpMax))
+            write(self.game, 20, 180+maxEncWidth, 30+offset, str(self.encounter[i].hp)+"/"+str(self.encounter[i].hpMax))
             if self.encounter[i].status != "None":
                 if self.encounter[i].status == "Paralyzed":
-                    self.write(20, 280+maxEncWidth, 30+offset, "<P"+str(self.encounter[i].statusCount)+">")
+                    write(self.game, 20, 280+maxEncWidth, 30+offset, "<P"+str(self.encounter[i].statusCount)+">")
                 elif self.encounter[i].status == "Burned":
-                    self.write(20, 280+maxEncWidth, 30+offset, "<B>")
+                    write(self.game, 20, 280+maxEncWidth, 30+offset, "<B>")
                 elif self.encounter[i].status == "Freezing":
-                    self.write(20, 280+maxEncWidth, 30+offset, "<F>")
+                    write(self.game, 20, 280+maxEncWidth, 30+offset, "<F>")
         for i in range(0,len(self.party.members)):
             offset = 30*i
             textWidth, textHeight = self.font.size(self.party.members[i].name)
-            self.write(20, self.right-textWidth-20, 170+offset, self.party.members[i].name)
+            write(self.game, 20, self.right-textWidth-20, 170+offset, self.party.members[i].name)
             partyHPRect = pygame.Rect(self.right-maxPtyWidth-140,170+offset,(self.party.members[i].hp/self.party.members[i].hpMax)*100,10)
             partyMPRect = pygame.Rect(self.right-maxPtyWidth-140,180+offset,(self.party.members[i].mp/self.party.members[i].mpMax)*100,10)
             outlineRect = pygame.Rect(self.right-maxPtyWidth-140,170+offset,100,20)
             pygame.draw.rect(self.game.screen,self.game.white,partyHPRect)
             pygame.draw.rect(self.game.screen,self.game.white,partyMPRect)
             pygame.draw.rect(self.game.screen,self.game.white,outlineRect,1)
-            self.write(20, self.right-maxPtyWidth-220, 170+offset, str(self.party.members[i].hp)+"/"+str(self.party.members[i].hpMax))
+            write(self.game, 20, self.right-maxPtyWidth-220, 170+offset, str(self.party.members[i].hp)+"/"+str(self.party.members[i].hpMax))
             if self.party.members[i].status != "None":
                 if self.party.members[i].status == "Paralyzed":
-                    self.write(20, self.right-maxPtyWidth-290, 170+offset, "<P>")
+                    write(self.game, 20, self.right-maxPtyWidth-290, 170+offset, "<P>")
                 elif self.party.members[i].status == "Burned":
-                    self.write(20, self.right-maxPtyWidth-290, 170+offset, "<B>")
+                    write(self.game, 20, self.right-maxPtyWidth-290, 170+offset, "<B>")
                 elif self.party.members[i].status == "Freezing":
-                    self.write(20, self.right-maxPtyWidth-290, 170+offset, "<F>")
+                    write(self.game, 20, self.right-maxPtyWidth-290, 170+offset, "<F>")
         #Setting border
         pygame.draw.line(self.game.screen,self.game.white,(self.left,320),(self.right+9,320),2)
 
     def statBlock(self):
         pygame.draw.line(self.game.screen,self.game.white,(self.left,350),(350,350),2)
         pygame.draw.line(self.game.screen,self.game.white,(350,320),(350,self.bottom+7),2)
-        self.write(11, 360, 328, self.party.members[self.combatOrder[self.currentTurn][1]].name+", Level "+str(self.party.members[self.combatOrder[self.currentTurn][1]].level)+" "+self.party.members[self.combatOrder[self.currentTurn][1]].type.name)
-        self.write(11, 360, 345, "HP "+str(self.party.members[self.combatOrder[self.currentTurn][1]].hp)+"/"+str(self.party.members[self.combatOrder[self.currentTurn][1]].hpMax))
-        self.write(11, 420, 345, "MP "+str(self.party.members[self.combatOrder[self.currentTurn][1]].mp)+"/"+str(self.party.members[self.combatOrder[self.currentTurn][1]].mpMax))
-        self.write(11, 360, 360, "ATK "+str(self.party.members[self.combatOrder[self.currentTurn][1]].getAttack()))
-        self.write(11, 420, 360, "DEF "+str(self.party.members[self.combatOrder[self.currentTurn][1]].getDefense()))
-        self.write(11, 360, 375, "ACC "+str(self.party.members[self.combatOrder[self.currentTurn][1]].getAccuracy()))
-        self.write(11, 420, 375, "DDG "+str(self.party.members[self.combatOrder[self.currentTurn][1]].getDodge()))
-        self.write(11, 360, 390, "CRT "+str(self.party.members[self.combatOrder[self.currentTurn][1]].getCritRate()))
-        self.write(11, 420, 390, "LCK "+str(self.party.members[self.combatOrder[self.currentTurn][1]].getLuck()))
-        self.write(11, 360, 405, "AMP "+str(self.party.members[self.combatOrder[self.currentTurn][1]].getAmplifier()))
-        self.write(11, 420, 405, "MPG "+str(self.party.members[self.combatOrder[self.currentTurn][1]].getManaRegen()))
-        self.write(16, 360, 430, "\""+self.combatDialogue+"\"")
+        write(self.game, 11, 360, 328, self.party.members[self.combatOrder[self.currentTurn][1]].name+", Level "+str(self.party.members[self.combatOrder[self.currentTurn][1]].level)+" "+self.party.members[self.combatOrder[self.currentTurn][1]].type.name)
+        write(self.game, 11, 360, 345, "HP "+str(self.party.members[self.combatOrder[self.currentTurn][1]].hp)+"/"+str(self.party.members[self.combatOrder[self.currentTurn][1]].hpMax))
+        write(self.game, 11, 420, 345, "MP "+str(self.party.members[self.combatOrder[self.currentTurn][1]].mp)+"/"+str(self.party.members[self.combatOrder[self.currentTurn][1]].mpMax))
+        write(self.game, 11, 360, 360, "ATK "+str(self.party.members[self.combatOrder[self.currentTurn][1]].getAttack()))
+        write(self.game, 11, 420, 360, "DEF "+str(self.party.members[self.combatOrder[self.currentTurn][1]].getDefense()))
+        write(self.game, 11, 360, 375, "ACC "+str(self.party.members[self.combatOrder[self.currentTurn][1]].getAccuracy()))
+        write(self.game, 11, 420, 375, "DDG "+str(self.party.members[self.combatOrder[self.currentTurn][1]].getDodge()))
+        write(self.game, 11, 360, 390, "CRT "+str(self.party.members[self.combatOrder[self.currentTurn][1]].getCritRate()))
+        write(self.game, 11, 420, 390, "LCK "+str(self.party.members[self.combatOrder[self.currentTurn][1]].getLuck()))
+        write(self.game, 11, 360, 405, "AMP "+str(self.party.members[self.combatOrder[self.currentTurn][1]].getAmplifier()))
+        write(self.game, 11, 420, 405, "MPG "+str(self.party.members[self.combatOrder[self.currentTurn][1]].getManaRegen()))
+        write(self.game, 16, 360, 430, "\""+self.combatDialogue+"\"")
         iNext = 0
         for i in range(len(self.party.members[self.combatOrder[self.currentTurn][1]].activeBuffs)):
-            self.writeOrientation(11, self.right, 330+(i*15), self.party.members[self.combatOrder[self.currentTurn][1]].activeBuffs[i][0]+" ("+str(self.party.members[self.combatOrder[self.currentTurn][1]].activeBuffs[i][1])+")","R")
+            writeOrientation(self.game, 11, self.right, 330+(i*15), self.party.members[self.combatOrder[self.currentTurn][1]].activeBuffs[i][0]+" ("+str(self.party.members[self.combatOrder[self.currentTurn][1]].activeBuffs[i][1])+")","R")
             iNext += 1
         if self.party.members[self.combatOrder[self.currentTurn][1]].status != "None":
-            self.writeOrientation(11, self.right, 330+(iNext*15), self.party.members[self.combatOrder[self.currentTurn][1]].status+" ("+str(self.party.members[self.combatOrder[self.currentTurn][1]].statusCount)+")","R")
+            writeOrientation(self.game, 11, self.right, 330+(iNext*15), self.party.members[self.combatOrder[self.currentTurn][1]].status+" ("+str(self.party.members[self.combatOrder[self.currentTurn][1]].statusCount)+")","R")
 
     def next(self):
         self.currentTurn += 1

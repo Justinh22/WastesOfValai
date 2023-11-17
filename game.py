@@ -3,6 +3,7 @@ from mainmenu import *
 from mapgenerator import *
 from directory import *
 from overworld import *
+from writing import *
 from room import *
 
 class Game():

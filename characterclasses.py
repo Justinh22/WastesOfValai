@@ -134,6 +134,11 @@ class Character():
             self.xp -= self.nextLevel
             self.nextLevel += 100
             self.levelUp()
+    def addSpell(self,spellID):
+        if spellID not in self.spells:
+            self.spells.append(spellID)
+            return True 
+        return False
     def levelUp(self):
         self.level += 1
         growth = self.type.getGrowths()
@@ -172,7 +177,6 @@ class Party():
         self.members = []
         self.inventory = []         # List of int : Contains id of all items in inventory
         self.equipment = []         # List of int : Contains id of all equipment in inventory
-        self.spellbook = []         # List of int : Contains id of all spells in inventory
     def initializeMembers(self,dir):
         for i in range(0,random.randint(3,4)):
             lvl = 2
@@ -192,14 +196,8 @@ class Party():
             self.equipment.append(item)
             return True
         return False
-    def addSpell(self,item):
-        if len(self.spellbook) <= MAX_INVENTORY_SIZE:
-            self.spellbook.append(item)
-            return True
-        return False
-    def learnSpell(self,target):
-        spell = self.inventory.pop(target)
-        self.addSpell(spell)
+    def learnSpell(self,spellID,target):
+        return self.members[target].addSpell(spellID)
     def usePotion(self,member,index):
         self.members[member].gainHP(self.inventory[index].hpGain)
         self.members[member].gainMP(self.inventory[index].mpGain)

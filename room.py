@@ -35,7 +35,7 @@ class Room():
         self.description = template.description
         for featID in template.features:
             feat = featureList.getFeature(featID)
-            feat.rollForLoot(rarity) # DEBUG VALUE; will need to be altered to reflect games current difficulty
+            feat.rollForLoot(rarity)
             self.features.append(feat)
 
 

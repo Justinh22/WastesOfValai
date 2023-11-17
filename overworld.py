@@ -3,6 +3,7 @@ from combat import *
 from pausemenu import *
 from directory import *
 from roomhandler import *
+from writing import *
 
 class Overworld():
     def __init__(self,game):
@@ -73,8 +74,8 @@ class Overworld():
         blockSize = 30 #Set the size of the grid block
         self.game.screen.fill((0,0,0))
         diffText = self.getBiome(self.game.currentPos[0],self.game.currentPos[1]) + ": Difficulty " + str(self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[self.game.currentPos[0]][self.game.currentPos[1]]))
-        self.write(20,30,self.height+10,diffText)
-        self.write(20,self.width-75,self.height+10,"A) Pause")
+        write(self.game, 20,30,self.height+10,diffText)
+        write(self.game, 20,self.width-75,self.height+10,"A) Pause")
         for x in range(30, self.width, blockSize):
             for y in range(30, self.height, blockSize):
                 color = self.game.white
@@ -139,11 +140,3 @@ class Overworld():
                 encounter = self.game.directory.buildEncounter(self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]),self.getBiome(self.game.currentPos[0],self.game.currentPos[1]))
                 self.party.debug_RandomInventory(self.game.directory)
                 self.combat.initialize(self.party,encounter)
-
-    def write(self,size,x,y,text):
-        font = pygame.font.Font('freesansbold.ttf',size)
-        text_surface = font.render(text, True, self.game.white)
-        text_rect = text_surface.get_rect()
-        text_rect.topleft = (x,y)
-        self.game.screen.blit(text_surface,text_rect)
-        return font.size(text)

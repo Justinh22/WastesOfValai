@@ -2,6 +2,7 @@ import pygame
 import random
 import math
 from constants import *
+from writing import *
 
 class Map():
     def __init__(self):
