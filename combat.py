@@ -132,9 +132,9 @@ class Combat():
                     print("CANCEL")
             elif self.state == "targetSelect":
                 self.state = "mainWindow"
-                if self.party.members[self.combatOrder[self.currentTurn][1]].status == "Paralyzed":
+                if self.party.members[self.combatOrder[self.currentTurn][1]].status == Status.Paralyzed:
                     self.actionVal = -2
-                if self.party.members[self.combatOrder[self.currentTurn][1]].status == "Freezing" and random.randint(0,2)==0:
+                if self.party.members[self.combatOrder[self.currentTurn][1]].status == Status.Freezing and random.randint(0,2)==0:
                     self.actionVal = -3
                 self.actions.append(Action(self.combatOrder[self.currentTurn],self.cursorPos,self.actionVal))
                 self.next()
@@ -154,12 +154,12 @@ class Combat():
                 if self.validManaCost(self.party.members[self.combatOrder[self.currentTurn][1]],self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID]):
                     self.lowMana = False
                     self.actionVal = self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID]
-                    if self.game.directory.getSpellTarget(self.actionVal) == "Single":
+                    if self.game.directory.getSpellTarget(self.actionVal) == Target.Single:
                         self.state = "targetSelect"
                         self.cursorPos = 0
                     else:
                         self.state = "mainWindow"
-                        if self.party.members[self.combatOrder[self.currentTurn][1]].status == "Paralyzed" or (self.party.members[self.combatOrder[self.currentTurn][1]].status == "Freezing" and random.randint(0,2)==0):
+                        if self.party.members[self.combatOrder[self.currentTurn][1]].status == Status.Paralyzed or (self.party.members[self.combatOrder[self.currentTurn][1]].status == Status.Freezing and random.randint(0,2)==0):
                             self.actionVal = -1
                         self.actions.append(Action(self.combatOrder[self.currentTurn],0,self.actionVal))
                         self.next()
@@ -332,9 +332,9 @@ class Combat():
             if self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID] < 400:
                 writeOrientation(self.game, 16,self.right-10, 360, str(self.game.directory.getAtkSpell(self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID]).attack)+" Damage","R")
             else:
-                if self.game.directory.getSptSpell(self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID]).type == "Heal":
+                if self.game.directory.getSptSpell(self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID]).type == SpellType.Heal:
                     writeOrientation(self.game, 16,self.right-10, 360, "Restores "+str(self.game.directory.getSptSpell(self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID]).getHeal())+" HP","R")
-                if self.game.directory.getSptSpell(self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID]).type == "Buff":
+                if self.game.directory.getSptSpell(self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID]).type == SpellType.Buff:
                     i = 0
                     for id, buff in enumerate(self.game.directory.getSptSpell(self.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID]).potency):
                         if buff > 0:
@@ -377,33 +377,33 @@ class Combat():
                 combatStr = self.party.members[self.actions[self.exTurn-1].source[1]].name + " used " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + " on " + self.party.members[self.actions[self.exTurn-1].target].name + "!"
             elif self.actions[self.exTurn-1].action >= 300 and self.actions[self.exTurn-1].action < 400:
                 if self.actions[self.exTurn-1].source[0] == "Encounter":
-                    if self.game.directory.getAtkSpell(self.actions[self.exTurn-1].action).target == "Single":
+                    if self.game.directory.getAtkSpell(self.actions[self.exTurn-1].action).target == Target.Single:
                         combatStr = self.encounter[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + " at " + self.party.members[self.actions[self.exTurn-1].target].name + " for " + str(self.dmg) + " damage!"
                     else:
                         combatStr = self.encounter[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + " for " + str(self.dmg) + " damage!"
                 else:
-                    if self.game.directory.getAtkSpell(self.actions[self.exTurn-1].action).target == "Single":
+                    if self.game.directory.getAtkSpell(self.actions[self.exTurn-1].action).target == Target.Single:
                         combatStr = self.party.members[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + " at " + self.encounter[self.actions[self.exTurn-1].target].name + " for " + str(self.dmg) + " damage!"
                     else:
                         combatStr = self.party.members[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + " for " + str(self.dmg) + " damage!"
             elif self.actions[self.exTurn-1].action >= 400 and self.actions[self.exTurn-1].action < 500:
-                if self.game.directory.getSptSpell(self.actions[self.exTurn-1].action).type == "Buff":
-                    if self.game.directory.getSptSpell(self.actions[self.exTurn-1].action).target == "Single":
+                if self.game.directory.getSptSpell(self.actions[self.exTurn-1].action).type == SpellType.Buff:
+                    if self.game.directory.getSptSpell(self.actions[self.exTurn-1].action).target == Target.Single:
                         combatStr = self.party.members[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + " on " + self.party.members[self.actions[self.exTurn-1].target].name + "!"
                     else:
                         combatStr = self.party.members[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + "!"
-                elif self.game.directory.getSptSpell(self.actions[self.exTurn-1].action).type == "Heal":
-                    if self.game.directory.getSptSpell(self.actions[self.exTurn-1].action).target == "Single":
+                elif self.game.directory.getSptSpell(self.actions[self.exTurn-1].action).type == SpellType.Heal:
+                    if self.game.directory.getSptSpell(self.actions[self.exTurn-1].action).target == Target.Single:
                         combatStr = self.party.members[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + " on " + self.party.members[self.actions[self.exTurn-1].target].name + ", restoring " + str(self.game.directory.getSptSpell(self.actions[self.exTurn-1].action).getHeal()) + " HP!"
                     else:
                         combatStr = self.party.members[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + ", restoring " + str(self.game.directory.getSptSpell(self.actions[self.exTurn-1].action).getHeal()) + " HP!"
-                elif self.game.directory.getSptSpell(self.actions[self.exTurn-1].action).type == "Raise":
-                    if self.game.directory.getSptSpell(self.actions[self.exTurn-1].action).target == "Single":
+                elif self.game.directory.getSptSpell(self.actions[self.exTurn-1].action).type == SpellType.Raise:
+                    if self.game.directory.getSptSpell(self.actions[self.exTurn-1].action).target == Target.Single:
                         combatStr = self.party.members[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + " on " + self.party.members[self.actions[self.exTurn-1].target].name + ", bringing them back to life!"
                     else:
                         combatStr = self.party.members[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + ", raising all fallen party members!"
-                elif self.game.directory.getSptSpell(self.actions[self.exTurn-1].action).type == "Cleanse":
-                    if self.game.directory.getSptSpell(self.actions[self.exTurn-1].action).target == "Single":
+                elif self.game.directory.getSptSpell(self.actions[self.exTurn-1].action).type == SpellType.Cleanse:
+                    if self.game.directory.getSptSpell(self.actions[self.exTurn-1].action).target == Target.Single:
                         combatStr = self.party.members[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + " on " + self.party.members[self.actions[self.exTurn-1].target].name + ", removing status effects!"
                     else:
                         combatStr = self.party.members[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + ", removing all status effects!"
@@ -452,11 +452,11 @@ class Combat():
             pygame.draw.rect(self.game.screen,self.game.white,outlineRect,1)
             write(self.game, 20, 180+maxEncWidth, 30+offset, str(self.encounter[i].hp)+"/"+str(self.encounter[i].hpMax))
             if self.encounter[i].status != "None":
-                if self.encounter[i].status == "Paralyzed":
+                if self.encounter[i].status == Status.Paralyzed:
                     write(self.game, 20, 280+maxEncWidth, 30+offset, "<P"+str(self.encounter[i].statusCount)+">")
-                elif self.encounter[i].status == "Burned":
+                elif self.encounter[i].status == Status.Burned:
                     write(self.game, 20, 280+maxEncWidth, 30+offset, "<B>")
-                elif self.encounter[i].status == "Freezing":
+                elif self.encounter[i].status == Status.Freezing:
                     write(self.game, 20, 280+maxEncWidth, 30+offset, "<F>")
         for i in range(0,len(self.party.members)):
             offset = 30*i
@@ -470,11 +470,11 @@ class Combat():
             pygame.draw.rect(self.game.screen,self.game.white,outlineRect,1)
             write(self.game, 20, self.right-maxPtyWidth-220, 170+offset, str(self.party.members[i].hp)+"/"+str(self.party.members[i].hpMax))
             if self.party.members[i].status != "None":
-                if self.party.members[i].status == "Paralyzed":
+                if self.party.members[i].status == Status.Paralyzed:
                     write(self.game, 20, self.right-maxPtyWidth-290, 170+offset, "<P>")
-                elif self.party.members[i].status == "Burned":
+                elif self.party.members[i].status == Status.Burned:
                     write(self.game, 20, self.right-maxPtyWidth-290, 170+offset, "<B>")
-                elif self.party.members[i].status == "Freezing":
+                elif self.party.members[i].status == Status.Freezing:
                     write(self.game, 20, self.right-maxPtyWidth-290, 170+offset, "<F>")
         #Setting border
         pygame.draw.line(self.game.screen,self.game.white,(self.left,320),(self.right+9,320),2)
@@ -520,10 +520,10 @@ class Combat():
         if not self.isAlive(source):
             self.actions.append(Action(source,0,-1))
             return
-        elif self.encounter[self.combatOrder[self.currentTurn][1]].status == "Paralyzed":
+        elif self.encounter[self.combatOrder[self.currentTurn][1]].status == Status.Paralyzed:
             self.actions.append(Action(source,0,-2))
             return
-        elif self.encounter[self.combatOrder[self.currentTurn][1]].status == "Freezing" and random.randint(0,2)==0:
+        elif self.encounter[self.combatOrder[self.currentTurn][1]].status == Status.Freezing and random.randint(0,2)==0:
             self.actions.append(Action(source,0,-3))
             return
         target = random.randint(0,len(self.party.members)-1)
@@ -565,64 +565,64 @@ class Combat():
     def cast(self,source,target,spellID):
         if spellID < 400:
             spell = self.game.directory.getAtkSpell(spellID)
-            if spell.target == "Single":
+            if spell.target == Target.Single:
                 if source[0] == "Encounter":
-                    if spell.type == "Attack":
+                    if spell.type == SpellType.Attack:
                         print("Attack!")
                         self.dmg = self.party.members[target].takeDamage(spell.attack)
-                    elif spell.type == "Debuff":
+                    elif spell.type == SpellType.Debuff:
                         print("Debuff!")
                         if (spell.id > 326) or random.randint(0,1) == 1: # 50% Chance for 324, 325, 326
-                            if spell.element == "Lightning":
-                                self.party.members[target].status = "Paralyzed"
+                            if spell.element == Element.Lightning:
+                                self.party.members[target].status = Status.Paralyzed
                                 self.party.members[target].statusCount = 3
-                            elif spell.element == "Fire":
-                                self.party.members[target].status = "Burned"
+                            elif spell.element == Element.Fire:
+                                self.party.members[target].status = Status.Burned
                                 self.party.members[target].statusCount = -1
-                            elif spell.element == "Ice":
-                                self.party.members[target].status = "Freezing"
+                            elif spell.element == Element.Ice:
+                                self.party.members[target].status = Status.Freezing
                                 self.party.members[target].statusCount = -1
                 else:
-                    if spell.type == "Attack":
+                    if spell.type == SpellType.Attack:
                         print("Attack!")
                         self.dmg = spell.attack
                         if spell.element == self.encounter[target].resistance:
                             self.dmg = int(self.dmg/2)
                         self.encounter[target].takeDamage(self.dmg)
                         self.party.members[source[1]].mp -= spell.manacost
-                    elif spell.type == "Debuff":
+                    elif spell.type == SpellType.Debuff:
                         print("Debuff!")
                         if spell.id > 326 or random.randint(0,1) == 1: # 50% Chance for 324, 325, 326
-                            if spell.element == "Lightning":
-                                self.encounter[target].status = "Paralyzed"
+                            if spell.element == Element.Lightning:
+                                self.encounter[target].status = Status.Paralyzed
                                 self.encounter[target].statusCount = 3
-                            elif spell.element == "Fire":
-                                self.encounter[target].status = "Burned"
+                            elif spell.element == Element.Fire:
+                                self.encounter[target].status = Status.Burned
                                 self.encounter[target].statusCount = -1
-                            elif spell.element == "Ice":
-                                self.encounter[target].status = "Freezing"
+                            elif spell.element == Element.Ice:
+                                self.encounter[target].status = Status.Freezing
                                 self.encounter[target].statusCount = -1
                         self.party.members[source[1]].mp -= spell.manacost
             else:
                 if source[0] == "Encounter":
-                    if spell.type == "Attack":
+                    if spell.type == SpellType.Attack:
                         for member in self.party.members:
                             self.dmg = member.takeDamage(spell.attack)
-                    elif spell.type == "Debuff":
+                    elif spell.type == SpellType.Debuff:
                         print("Debuff!")
                         for member in self.party.members:
                             if random.randint(0,1) == 1:
-                                if spell.element == "Lightning":
-                                    member.status = "Paralyzed"
+                                if spell.element == Element.Lightning:
+                                    member.status = Status.Paralyzed
                                     member.statusCount = 3
-                                elif spell.element == "Fire":
-                                    member.status = "Burned"
+                                elif spell.element == Element.Fire:
+                                    member.status = Status.Burned
                                     member.statusCount = -1
-                                elif spell.element == "Ice":
-                                    member.status = "Freezing"
+                                elif spell.element == Element.Ice:
+                                    member.status = Status.Freezing
                                     member.statusCount = -1
                 else:
-                    if spell.type == "Attack":
+                    if spell.type == SpellType.Attack:
                         for member in self.encounter:
                             self.dmg = spell.attack
                             if spell.element == member.resistance:
@@ -630,55 +630,55 @@ class Combat():
                             member.takeDamage(self.dmg)
                         self.dmg = spell.attack
                         self.party.members[source[1]].mp -= spell.manacost
-                    elif spell.type == "Debuff":
+                    elif spell.type == SpellType.Debuff:
                         print("Debuff!")
                         for member in self.encounter:
                             if random.randint(0,1) == 1:
-                                if spell.element == "Lightning":
-                                    member.status = "Paralyzed"
+                                if spell.element == Element.Lightning:
+                                    member.status = Status.Paralyzed
                                     member.statusCount = 3
-                                elif spell.element == "Fire":
-                                    member.status = "Burned"
+                                elif spell.element == Element.Fire:
+                                    member.status = Status.Burned
                                     member.statusCount = -1
-                                elif spell.element == "Ice":
-                                    member.status = "Freezing"
+                                elif spell.element == Element.Ice:
+                                    member.status = Status.Freezing
                                     member.statusCount = -1
                         self.party.members[source[1]].mp -= spell.manacost
         elif spellID < 500:
             spell = self.game.directory.getSptSpell(spellID)
-            if spell.target == "Single":
-                if spell.type == "Heal":
+            if spell.target == Target.Single:
+                if spell.type == SpellType.Heal:
                     if self.party.members[target].hp > 0:
                         self.party.members[target].hp += spell.getHeal()
                     if self.party.members[target].hp > self.party.members[target].hpMax:
                         self.party.members[target].hp = self.party.members[target].hpMax
-                elif spell.type == "Buff":
+                elif spell.type == SpellType.Buff:
                     self.applyBuff(spell,target)
-                elif spell.type == "Raise":
+                elif spell.type == SpellType.Raise:
                     if self.party.members[target].hp <= 0:
                         self.party.members[target].hp += spell.getHeal()
                     if self.party.members[target].hp > self.party.members[target].hpMax:
                         self.party.members[target].hp = self.party.members[target].hpMax
-                elif spell.type == "Cleanse":
+                elif spell.type == SpellType.Cleanse:
                     if self.party.members[target].hp > 0:
                         self.party.members[target].resetStatus()
                 self.party.members[source[1]].mp -= spell.manacost
-            elif spell.target == "All":
-                if spell.type == "Heal":
+            elif spell.target == Target.All:
+                if spell.type == SpellType.Heal:
                     for member in self.party.members:
                         if member.hp > 0:
                             member.hp += spell.getHeal()
                         if member.hp > member.hpMax:
                             member.hp = member.hpMax
-                elif spell.type == "Buff":
+                elif spell.type == SpellType.Buff:
                     self.applyBuff(spell,-1)
-                elif spell.type == "Raise":
+                elif spell.type == SpellType.Raise:
                     for member in self.party.members:
                         if member.hp <= 0:
                             member.hp += spell.getHeal()
                         if member.hp > member.hpMax:
                             member.hp = member.hpMax
-                elif spell.type == "Cleanse":
+                elif spell.type == SpellType.Cleanse:
                     for member in self.party.members:
                         if member.hp > 0:
                             member.resetStatus()
@@ -757,11 +757,11 @@ class Combat():
             if member.mp > member.mpMax:
                 member.mp = member.mpMax
             member.tickStatus()
-            if member.status == "Burned":
+            if member.status == Status.Burned:
                 member.takeDamage(5)
         for member in self.encounter:
             member.tickStatus()
-            if member.status == "Burned":
+            if member.status == Status.Burned:
                 member.takeDamage(5)
 
     def skip(self):

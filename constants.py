@@ -39,3 +39,31 @@ class LootStatus(Enum):
     Undiscovered = 0
     Discovered = 1
     Taken = 2
+
+class Element(Enum):
+    Lightning = 0
+    Fire = 1
+    Ice = 2
+
+class SpellType(Enum):
+    Attack = 0
+    Debuff = 1
+    Buff = 2
+    Heal = 3
+    Raise = 4
+    Cleanse = 5
+
+class Target(Enum):
+    Single = 0
+    All = 0
+
+class Biome(Enum):
+    Forest = 0
+    Plains = 1
+    Desert = 2
+    Dungeon = 3
+
+class Status(Enum):
+    Paralyzed = 0
+    Burned = 1
+    Freezing = 2

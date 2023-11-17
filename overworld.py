@@ -73,7 +73,7 @@ class Overworld():
     def drawScreen(self):
         blockSize = 30 #Set the size of the grid block
         self.game.screen.fill((0,0,0))
-        diffText = self.getBiome(self.game.currentPos[0],self.game.currentPos[1]) + ": Difficulty " + str(self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[self.game.currentPos[0]][self.game.currentPos[1]]))
+        diffText = self.getBiome(self.game.currentPos[0],self.game.currentPos[1]).name + ": Difficulty " + str(self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[self.game.currentPos[0]][self.game.currentPos[1]]))
         write(self.game, 20,30,self.height+10,diffText)
         write(self.game, 20,self.width-75,self.height+10,"A) Pause")
         for x in range(30, self.width, blockSize):
@@ -111,13 +111,13 @@ class Overworld():
 
     def getBiome(self,r,c):
         if self.game.WorldMap.map[r][c] == '#':
-            return "Forest"
+            return Biome.Forest
         elif self.game.WorldMap.map[r][c] == ';':
-            return "Plains"
+            return Biome.Plains
         elif self.game.WorldMap.map[r][c] == '.':
-            return "Desert"
+            return Biome.Desert
         else:
-            return "Dungeon"
+            return Biome.Dungeon
 
     def stepTo(self,r,c): # Simplified; any non-terrain space is treated as a Shack
         # self.game.stir()

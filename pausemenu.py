@@ -102,7 +102,8 @@ class PauseMenu():
             pygame.draw.rect(self.game.screen,self.game.white,summaryOutline,2)
             if self.substate == "spellbook":
                 tgt = self.game.directory.getItem(self.game.party.members[self.targetPartyMember].spells[self.targetElement])
-                text = self.game.directory.getItemName(tgt)+" - "+self.game.directory.getItemDescription(tgt)
+                write(self.game, 20, 60, 240, tgt.name)
+                writeOrientation(self.game, 20, self.right-80, 240, tgt.manacost + " MP")
             elif self.substate == "equipment":
                 tgt = self.game.directory.getItem(self.game.party.equipment[self.targetElement])
             elif self.substate == "inventory":

@@ -38,17 +38,17 @@ class AttackMagic(Item):
         Item.__init__(self,nm,desc,rar,i)
         self.attack = atk
         self.manacost = mpc
-        self.type = tp
-        self.element = el
-        self.target = tgt
+        self.type = tp      # Attack, Debuff
+        self.element = el   # Lightning, Fire, Ice
+        self.target = tgt   # Single, All
 
 class SupportMagic(Item):
     def __init__(self,nm,desc,rar,i,ptc,mpc,tp,tgt):
         Item.__init__(self,nm,desc,rar,i)
         self.potency = ptc
         self.manacost = mpc
-        self.type = tp
-        self.target = tgt
+        self.type = tp      # Buff, Heal, Raise, Cleanse
+        self.target = tgt   # Single, All
     def getHeal(self):
         return self.potency[6]
 
