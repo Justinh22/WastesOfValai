@@ -13,7 +13,7 @@ class Character():
         self.id = Character.charNum
         self.xp = 0
         self.nextLevel = 100*lv
-        self.type = tp
+        self.type = tp # Class; Type is used to avoid defined 'class' name
         self.spells = []
         for i in range(self.level):
             if self.type.knownSpells[i] >= 0:
@@ -151,6 +151,55 @@ class Character():
         self.luck += growth[6]
         self.speed += growth[7]
         self.spells.append(self.type.knownSpells[self.level-1])
+    def equip(self,item,dir):
+        if dir.getItemType(item) == Type.Weapon:
+            returner = self.eqpWpn.id
+            self.eqpWpn = dir.getItem(item)
+        elif dir.getItemType(item) == Type.Armor:
+            returner = self.eqpAmr.id
+            self.eqpAmr = dir.getItem(item)
+        return returner
+    def checkProficiency(self,id,dir):
+        idType = dir.getItemType(id)
+        if idType == Type.Weapon:
+            return self.checkWeaponProficiency(id,dir)
+        elif idType == Type.Armor:
+            return self.checkArmorProficiency(id,dir)
+        elif idType == Type.AtkSpell:
+            return self.checkAtkSpellProficiency(id,dir)
+        elif idType == Type.SptSpell:
+            return self.checkSptSpellProficiency(id,dir)
+    def checkWeaponProficiency(self,id,dir):
+        idType = (dir.getItem(id)).type
+        if idType == WeaponType.Axe:
+            return self.type.weaponProficiency[0]==1
+        elif idType == WeaponType.Sword:
+            return self.type.weaponProficiency[1]==1
+        elif idType == WeaponType.Spear:
+            return self.type.weaponProficiency[2]==1
+        elif idType == WeaponType.Dagger:
+            return self.type.weaponProficiency[3]==1
+        elif idType == WeaponType.Staff:
+            return self.type.weaponProficiency[4]==1
+    def checkArmorProficiency(self,id,dir):
+        idType = (dir.getItem(id)).type
+        if idType == ArmorType.Light:
+            return self.type.armorProficiency[0]==1
+        elif idType == ArmorType.Medium:
+            return self.type.armorProficiency[1]==1
+        elif idType == ArmorType.Heavy:
+            return self.type.armorProficiency[2]==1
+        elif idType == ArmorType.Robe:
+            return self.type.armorProficiency[3]==1
+        elif idType == ArmorType.Arcanist:
+            return self.type.armorProficiency[4]==1
+    def checkAtkSpellProficiency(self,id,dir):
+        idRarity = dir.getItemRarity(id)
+        return self.type.attackMagicLevel[self.level] >= idRarity
+    def checkSptSpellProficiency(self,id,dir):
+        idRarity = dir.getItemRarity(id)
+        return self.type.supportMagicLevel[self.level] >= idRarity
+
 
 class ClassType():
     def __init__(self,nm,wpnPrf,amrPrf,atkLv,sptLv,hpg,mpg,atg,ctg,dfg,dgg,lkg,sdg,splsLrn,idIN):
@@ -196,17 +245,22 @@ class Party():
             self.equipment.append(item)
             return True
         return False
-    def learnSpell(self,spellID,target):
-        return self.members[target].addSpell(spellID)
-    def usePotion(self,member,index):
-        self.members[member].gainHP(self.inventory[index].hpGain)
-        self.members[member].gainMP(self.inventory[index].mpGain)
+    def learnSpell(self,member,index):
+        self.members[member].addSpell(self.inventory[index])
+        self.inventory.pop(index)
+    def usePotion(self,member,index,dir):
+        self.members[member].gainHP(dir.getPotion(self.inventory[index]).hpGain)
+        self.members[member].gainMP(dir.getPotion(self.inventory[index]).mpGain)
         self.inventory.pop(index)
     def getPower(self):
         power = 0
         for member in self.members:
             power += member.level
         return power
+    def dropEquipment(self,index):
+        self.equipment.pop(index)
+    def dropItem(self,index):
+        self.inventory.pop(index)
 
 class Creature():
     def __init__(self,nm,lv,idIN,hpIN,at,ac,df,dg,sd,res,type,spells):

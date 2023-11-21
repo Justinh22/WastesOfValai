@@ -17,6 +17,7 @@ class Directory():
         self.potionDirectory = initPotionDirectory()        # 200 - 299
         self.atkSpellDirectory = initAtkSpellDirectory()    # 300 - 399
         self.sptSpellDirectory = initSptSpellDirectory()    # 400 - 499
+        self.customDirectory = []                           # 500 - 599
         self.classDirectory = initClassDirectory()          # 0 - 99
         self.creatureDirectory = initCreatureDirectory()    # 0 - 99
         self.nameDirectory = initNameDirectory()            # 0 - 99
@@ -24,15 +25,15 @@ class Directory():
     def getItem(self,id):
         item = Item()
         if id < 100:
-            item = self.weaponDirectory[id]
+            item = self.getWeapon(id)
         elif id < 200:
-            item = self.armorDirectory[id-100]
+            item = self.getArmor(id)
         elif id < 300:
-            item = self.potionDirectory[id-200]
+            item = self.getPotion(id)
         elif id < 400:
-            item = self.atkSpellDirectory[id-300]
+            item = self.getAtkSpell(id)
         elif id < 500:
-            item = self.sptSpellDirectory[id-400]
+            item = self.getSptSpell(id)
         return item
 
     def getItemName(self,id,scroll=False):

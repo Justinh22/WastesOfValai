@@ -1,5 +1,3 @@
-import pygame
-import random
 from enum import Enum
 
 MAX_DIFFICULTY = 25
@@ -39,6 +37,20 @@ class LootStatus(Enum):
     Undiscovered = 0
     Discovered = 1
     Taken = 2
+
+class WeaponType(Enum):
+    Axe = 0
+    Spear = 1
+    Sword = 2
+    Dagger = 3
+    Staff = 4
+
+class ArmorType(Enum):
+    Light = 0
+    Medium = 1
+    Heavy = 2
+    Robe = 3
+    Arcanist = 4
 
 class Element(Enum):
     Lightning = 0
