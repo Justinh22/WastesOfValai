@@ -3,6 +3,8 @@ from mainmenu import *
 from mapgenerator import *
 from directory import *
 from overworld import *
+from writing import *
+from room import *
 
 class Game():
     def __init__(self):
@@ -10,10 +12,11 @@ class Game():
         self.running = True
         self.inGame = False
 
-        self.A, self.B, self.X, self.Y = False, False, False, False
+        self.A, self.B, self.X, self.Y, self.L, self.R = False, False, False, False, False, False
         self.UP, self.DOWN, self.LEFT, self.RIGHT = False, False, False, False
         self.SELECT, self.START = False, False
-        self.white, self.black = (255,255,255), (0,0,0)
+        self.white, self.gray, self.black = (255,255,255), (150,150,150), (0,0,0)
+        self.tan, self.lightgreen, self.green = (232, 235, 96), (181, 247, 94), (90, 176, 72)
         self.red, self.blue = (255,0,0), (0,0,255)
 
         self.width, self.height = 640, 480
@@ -25,10 +28,19 @@ class Game():
         pygame.time.set_timer(self.REFRESH, 1000//self.FPS)
 
         self.directory = Directory()
+
+        self.party = Party()
+        self.party.initializeMembers(self.directory)
         
         self.mainmenu = MainMenu(self)
         self.WorldMap = Map()
+        self.currentPos = list(self.WorldMap.startingPos)
         self.overworld = Overworld(self)
+        self.roomDB = RoomDatabase()
+
+        self.steps = 0
+        self.stepsThreshold = 100
+        self.difficulty = 1
 
     def run(self):
         while self.inGame:
@@ -37,6 +49,7 @@ class Game():
             self.overworld.display()
             self.screen.blit(self.screen, [0,0])
             pygame.display.update()
+        self.WorldMap.saveRevealed()
 
     def write(self,size,x,y,text):
         font = pygame.font.Font('freesansbold.ttf',size)
@@ -71,7 +84,18 @@ class Game():
                     self.X = True
                 if event.key==pygame.K_SEMICOLON:
                     self.Y = True
+                if event.key==pygame.K_q:
+                    self.L = True
+                if event.key==pygame.K_e:
+                    self.R = True
                 if event.key==pygame.K_n:
                     self.START = True
                 if event.key==pygame.K_m:
                     self.SELECT = True
+
+    def stir(self):
+        self.steps += 1
+        if self.steps > self.stepsThreshold:
+            if self.difficulty < MAX_DIFFICULTY:
+                self.difficulty += 1
+            self.steps = 0

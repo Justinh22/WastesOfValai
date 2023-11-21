@@ -1,19 +1,42 @@
 from items import *
 from characters import *
 from encounterbuilder import *
+from constants import *
+from enum import Enum
 import copy
+
+# The Directory class is responsible for compiling all distinct items, creatures, classes, and names into a comprehensive 
+# class. All items are assigned a unique ID, making it so other parts of the program need only hold/transfer an item's 
+# ID, and Directory can be used to pull the proper item accordingly. This helps to avoid complications from having multiple 
+# data types populating the same list, as inventories will all contain IDs (integer values).
 
 class Directory():
     def __init__(self):
-        self.weaponDirectory = initWeaponDirectory()
-        self.armorDirectory = initArmorDirectory()
-        self.potionDirectory = initPotionDirectory()
-        self.atkSpellDirectory = initAtkSpellDirectory()
-        self.sptSpellDirectory = initSptSpellDirectory()
-        self.classDirectory = initClassDirectory()
-        self.creatureDirectory = initCreatureDirectory()
+        self.weaponDirectory = initWeaponDirectory()        # 0 - 99
+        self.armorDirectory = initArmorDirectory()          # 100 - 199
+        self.potionDirectory = initPotionDirectory()        # 200 - 299
+        self.atkSpellDirectory = initAtkSpellDirectory()    # 300 - 399
+        self.sptSpellDirectory = initSptSpellDirectory()    # 400 - 499
+        self.customDirectory = []                           # 500 - 599
+        self.classDirectory = initClassDirectory()          # 0 - 99
+        self.creatureDirectory = initCreatureDirectory()    # 0 - 99
+        self.nameDirectory = initNameDirectory()            # 0 - 99
 
-    def getItemName(self,id):
+    def getItem(self,id):
+        item = Item()
+        if id < 100:
+            item = self.getWeapon(id)
+        elif id < 200:
+            item = self.getArmor(id)
+        elif id < 300:
+            item = self.getPotion(id)
+        elif id < 400:
+            item = self.getAtkSpell(id)
+        elif id < 500:
+            item = self.getSptSpell(id)
+        return item
+
+    def getItemName(self,id,scroll=False):
         name = "NULL"
         if id < 100:
             name = self.weaponDirectory[id].name
@@ -23,8 +46,12 @@ class Directory():
             name = self.potionDirectory[id-200].name
         elif id < 400:
             name = self.atkSpellDirectory[id-300].name
+            if scroll:
+                name += " Scroll"
         elif id < 500:
             name = self.sptSpellDirectory[id-400].name
+            if scroll:
+                name += " Scroll"
         return name
 
     def getItemDesc(self,id):
@@ -54,6 +81,22 @@ class Directory():
         elif id < 500:
             rarity = self.sptSpellDirectory[id-400].rarity
         return rarity
+    
+    def getItemType(self,id):
+        type = Type.Empty
+        if id < 0:
+            type = Type.Empty
+        elif id < 100:
+            type = Type.Weapon
+        elif id < 200:
+            type = Type.Armor
+        elif id < 300:
+            type = Type.Potion
+        elif id < 400:
+            type = Type.AtkSpell
+        elif id < 500:
+            type = Type.SptSpell
+        return type
 
     def getSpellTarget(self,id):
         if id < 400:
@@ -86,71 +129,71 @@ class Directory():
 
     def getItemByRarity(self,type,rarity):
         options = []
-        if type == "Weapon":
+        if type == Type.Weapon:
             for item in self.weaponDirectory:
                 if item.rarity == rarity:
                     options.append(item.id)
-        elif type == "Armor":
+        elif type == Type.Armor:
             for item in self.armorDirectory:
                 if item.rarity == rarity:
                     options.append(item.id)
-        elif type == "Potion":
+        elif type == Type.Potion:
             for item in self.potionDirectory:
                 if item.rarity == rarity:
                     options.append(item.id)
-        elif type == "AtkSpell":
+        elif type == Type.AtkSpell:
             for item in self.atkSpellDirectory:
                 if item.rarity == rarity:
                     options.append(item.id)
-        elif type == "SptSpell":
+        elif type == Type.SptSpell:
             for item in self.sptSpellDirectory:
                 if item.rarity == rarity:
                     options.append(item.id)
-        elif type == "Creature":
+        elif type == Type.Creature:
             for item in self.creatureDirectory:
                 if item.rarity == rarity:
                     options.append(item.id)
-        elif type == "Class":
+        elif type == Type.Class:
             for item in self.classDirectory:
                 if item.rarity == rarity:
                     options.append(item.id)
         else:
             return -1
-        return options[random.randint(0,len(options))]
+        return options[random.randint(0,len(options)-1)]
 
     def getItemByRarities(self,type,rarityA,rarityB):
         options = []
-        if type == "Weapon":
+        if type == Type.Weapon:
             for item in self.weaponDirectory:
                 for rarity in range(rarityA,rarityB+1):
                     if item.rarity == rarity:
                         options.append(item.id)
-        elif type == "Armor":
+        elif type == Type.Armor:
             for item in self.armorDirectory:
                 for rarity in range(rarityA,rarityB+1):
                     if item.rarity == rarity:
                         options.append(item.id)
-        elif type == "Potion":
+        elif type == Type.Potion:
             for item in self.potionDirectory:
                 for rarity in range(rarityA,rarityB+1):
                     if item.rarity == rarity:
                         options.append(item.id)
-        elif type == "AtkSpell":
+        elif type == Type.AtkSpell:
             for item in self.atkSpellDirectory:
                 for rarity in range(rarityA,rarityB+1):
                     if item.rarity == rarity:
                         options.append(item.id)
-        elif type == "SptSpell":
+        elif type == Type.SptSpell:
             for item in self.sptSpellDirectory:
                 for rarity in range(rarityA,rarityB+1):
                     if item.rarity == rarity:
                         options.append(item.id)
-        elif type == "Creature":
+        elif type == Type.Creature:
             for item in self.creatureDirectory:
                 for rarity in range(rarityA,rarityB+1):
                     if item.rarity == rarity:
                         options.append(item.id)
-        elif type == "Class":
+        elif type == Type.Class:
             for item in self.classDirectory:
                 for rarity in range(rarityA,rarityB+1):
                     if item.rarity == rarity:
@@ -158,6 +201,16 @@ class Directory():
         else:
             return -1
         return options[random.randint(0,len(options)-1)]
+
+    def getCharacterName(self,members):
+        good = False
+        while good == False:
+            good = True
+            candidate = self.nameDirectory[random.randint(0,len(self.nameDirectory)-1)]
+            for member in members:
+                if candidate == member.name:
+                    good = False
+        return candidate
 
     def buildEncounter(self,level,biome):
         biomeCreatures = []

@@ -1,4 +1,6 @@
 generated_map.txt
+revealed_map.txt
+difficulty_map.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -1,4 +1,6 @@
+import sys
 import pygame
+from writing import *
 
 class MainMenu():
     def __init__(self,game):
@@ -42,6 +44,7 @@ class MainMenu():
                 self.blitScreen()
                 self.game.WorldMap.generateMap()
                 print("Start!")
+                print(self.game.WorldMap.startingPos)
             if self.cursorState == "Load":
                 self.game.inGame = True
                 self.displayRunning = False
@@ -53,6 +56,7 @@ class MainMenu():
             if self.cursorState == "Quit":
                 print("Quit!")
                 pygame.quit()
+                sys.exit()
 
     def cursorHandler(self):
         if self.game.DOWN:
