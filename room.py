@@ -9,9 +9,9 @@ class RoomDatabase():
     def addRoom(self,coords,room):
         self.rooms[coords] = room
 
-    def getRoom(self,coords,rarity):
+    def getRoom(self,coords,difficulty):
         if coords not in self.rooms.keys(): # If the requested room has not yet been implemented, implement it and store in dictionary
-            newRoom = Room(coords,rarity)
+            newRoom = Room(coords,difficulty)
             self.addRoom(coords,newRoom)
         return self.rooms[coords]
         
@@ -20,14 +20,14 @@ class RoomDatabase():
 
 
 class Room():
-    def __init__(self,coords,rarity,id=-1):
+    def __init__(self,coords,difficulty,id=-1):
         self.coords = coords            # (int, int) : Contains row and column coordinates of this room
         self.id = id                    # int : Numeric id of this room
         self.description = ""           # String : Contains written description of the room
         self.features = []              # List of Feature : Contains all Features in the room
-        self.implementRoomTemplate(self.id,rarity)
+        self.implementRoomTemplate(self.id,difficulty)
 
-    def implementRoomTemplate(self,id,rarity):
+    def implementRoomTemplate(self,id,difficulty):
         if id == -1:
             id = templateList.randomId()
         template = templateList.getRoomTemplate(id)
@@ -35,7 +35,7 @@ class Room():
         self.description = template.description
         for featID in template.features:
             feat = featureList.getFeature(featID)
-            feat.rollForLoot(rarity)
+            feat.rollForLoot(difficulty)
             self.features.append(feat)
 
 

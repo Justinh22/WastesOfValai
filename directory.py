@@ -201,6 +201,34 @@ class Directory():
         else:
             return -1
         return options[random.randint(0,len(options)-1)]
+    
+    def getLootRarity(self,rarity,type):
+        if type == Type.Weapon:
+            divVal = MAX_DIFFICULTY / MAX_WEAPON_RARITY
+            lootRarity = math.ceil(rarity / divVal)
+        if type == Type.Armor:
+            divVal = MAX_DIFFICULTY / MAX_ARMOR_RARITY
+            lootRarity = math.ceil(rarity / divVal)
+        if type == Type.Potion:
+            divVal = MAX_DIFFICULTY / MAX_POTION_RARITY
+            lootRarity = math.ceil(rarity / divVal)
+        if type == Type.AtkSpell:
+            divVal = MAX_DIFFICULTY / MAX_ATKSPELL_RARITY
+            lootRarity = math.ceil(rarity / divVal)
+        if type == Type.SptSpell:
+            divVal = MAX_DIFFICULTY / MAX_SPTSPELL_RARITY
+            lootRarity = math.ceil(rarity / divVal)
+        return lootRarity
+    
+    def rollForLoot(self,difficulty,itemRarity,types):
+        chosenType = types[random.randint(0,len(types)-1)]
+        itemRarity = difficulty + itemRarity.value
+        if itemRarity < 1:
+            itemRarity = 1
+        if itemRarity > MAX_DIFFICULTY:
+            itemRarity = MAX_DIFFICULTY
+        itemRarity = self.getLootRarity(itemRarity, chosenType)
+        return self.getItemByRarity(chosenType,itemRarity)
 
     def getCharacterName(self,members):
         good = False

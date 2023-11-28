@@ -8,6 +8,8 @@ MAX_ATKSPELL_RARITY = 5
 MAX_SPTSPELL_RARITY = 5
 MAX_INVENTORY_SIZE = 10
 
+LANDMARK_COUNT = 500
+
 class Type(Enum):
     Empty = 0
     Weapon = 1

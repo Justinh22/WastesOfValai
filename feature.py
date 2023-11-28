@@ -21,8 +21,8 @@ class Feature():
             itemRarity = rarity + self.lootRarity.value
             if itemRarity < 1:
                 itemRarity = 1
-            if itemRarity > 10:
-                itemRarity = 10
+            if itemRarity > MAX_DIFFICULTY:
+                itemRarity = MAX_DIFFICULTY
             itemRarity = self.getLootRarity(itemRarity, chosenType)
             print(f'type: {chosenType}, rarity: {itemRarity}')
             item = dir.getItemByRarity(chosenType,itemRarity)

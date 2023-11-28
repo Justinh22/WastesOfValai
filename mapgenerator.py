@@ -118,7 +118,7 @@ class Map():
         self.map[-rEnd][-cEnd] = 'V'
 
         print("Generating landmarks...")
-        self.placeLandmarks(800)
+        self.placeLandmarks(LANDMARK_COUNT)
 
         with open("generated_map.txt","w") as file:
             for row in self.map:

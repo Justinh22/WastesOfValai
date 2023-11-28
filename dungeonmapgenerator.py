@@ -3,12 +3,15 @@ import random
 import math
 from directory import *
 
-WALL_CHAR = '1'
+WALL_CHAR = '='
 FLOOR_CHAR = ' '
+ENTRANCE_CHAR = 'O'
+LOOT_CHAR = 'L'
 
 
 class DungeonMap():
-    def __init__(self,coords,level=0,type=0,hallFreq=2):
+    def __init__(self,dir,coords,level=0,type=0,hallFreq=2):
+        self.dir = dir
         self.map = []
         self.coords = coords        # Coords         : Duple containing (row,col)
         self.rooms = []             # Rooms          : List of DungeonRooms
@@ -26,6 +29,9 @@ class DungeonMap():
         self.minRoomRows = 4
         self.maxRoomRows = 8
         self.roomBuffer = 1
+        self.entrance = (0,0)
+        self.loot = []
+        self.monsters = []
 
     def initializeMap(self):
         for i in range(0,self.maxRows):
@@ -119,8 +125,8 @@ class DungeonMap():
 
     def connect(self,indexA,indexB):
         print(f'Connecting {indexA} to {indexB}')
-        connA = self.rooms[indexA].getConnectionPoint()
-        connB = self.rooms[indexB].getConnectionPoint()
+        connA = self.rooms[indexA].getRandomPoint()
+        connB = self.rooms[indexB].getRandomPoint()
         if random.randint(1,2) == 1:
 
             if connA[1] < connB[1]:
@@ -184,6 +190,12 @@ class DungeonMap():
             if self.visited[connection] == 0:
                 self.dfs(connection)
 
+    def addEntrance(self):
+        for roomIndex in self.connectedRooms:
+            if len(roomIndex) == 1:
+                self.entrance = roomIndex.setEntrance()
+                break
+        self.entrance = self.connectedRooms[0].setEntrance()
 
 
 class DungeonRoom():
@@ -193,7 +205,7 @@ class DungeonRoom():
         self.height = height
         self.width = width
     
-    def getConnectionPoint(self):
+    def getRandomPoint(self):
         return ((random.randint(self.row+1,self.row+self.height-1), random.randint(self.col+1,self.col+self.width-1)))
     
     def toString(self):
@@ -204,3 +216,28 @@ class DungeonRoom():
     
     def getDistanceFrom(self,coords):
         return abs(self.row-coords[0]) + abs(self.col-coords[1])
+    
+    def setEntrance(self):
+        coords = self.getRandomPoint()
+        self.map[coords[0]][coords[1]] = ENTRANCE_CHAR
+        return coords
+
+    def setLoot(self):
+        coords = self.getRandomPoint()
+        self.map[coords[0]][coords[1]] = LOOT_CHAR
+        return coords
+    
+
+class DungeonLoot():
+    def __init__(self,coords,level,types):
+        self.coords = coords
+        self.level = level
+        self.types = types
+        self.rarity = LootRarity.Uncommon
+        self.loot = self.rollItem()
+
+    def setLootRarity(self,rarity):
+        self.rarity = rarity
+
+    def rollItem(self):
+        return self.dir.rollForLoot(self.level,self.rarity,self.types)
