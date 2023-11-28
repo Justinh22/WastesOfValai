@@ -12,7 +12,7 @@ class RoomDatabase():
     def getRoom(self,coords,rarity):
         if coords not in self.rooms.keys(): # If the requested room has not yet been implemented, implement it and store in dictionary
             newRoom = Room(coords,rarity)
-            self.rooms[coords] = newRoom
+            self.addRoom(coords,newRoom)
         return self.rooms[coords]
         
 #   def save(self):

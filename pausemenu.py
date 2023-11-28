@@ -3,6 +3,7 @@ import copy
 import math
 from constants import *
 from writing import *
+from dungeonmapgenerator import *
 
 class PauseMenu():
     def __init__(self,game):
@@ -362,6 +363,9 @@ class PauseMenu():
                     self.mapMode = "difficulty"
                 else:
                     self.mapMode = "biome"
+            elif self.state == "main":
+                newDgn = DungeonMap((0,0))
+                newDgn.generate()
         if self.game.UP:
             if self.state == "main":
                 self.cursorPos -= 1
