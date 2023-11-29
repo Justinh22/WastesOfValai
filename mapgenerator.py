@@ -9,8 +9,8 @@ class Map():
         self.map = []
         self.revealedMap = []
         self.difficultyMap = []
-        self.sizeR = 200
-        self.sizeC = 300
+        self.sizeR = MAP_HEIGHT
+        self.sizeC = MAP_WIDTH
         self.startingPos = (0,0)
         self.finishPos = (0,0)
 
@@ -27,6 +27,11 @@ class Map():
                 self.difficultyMap.append(row)
                 
         self.startingPos = (round(self.sizeR/2),round(self.sizeC/2))
+        while self.map[self.startingPos[0]][self.startingPos[1]] == ' ':
+            if self.startingPos[0] > round(self.sizeR/3):
+                self.startingPos = (self.startingPos[0]-1, self.startingPos[1])
+            else:
+                self.startingPos = (self.startingPos[0], self.startingPos[1]+1)
 
 
     def generateMap(self):
@@ -49,7 +54,7 @@ class Map():
             row = []
             revealedRow = []
         print("Building map...")
-        self.grow(50)
+        self.grow(MAP_GROWTH_CYCLES)
         print("Smoothing corners...")
         self.smoothCorners()
         print("Generate difficulty map...")

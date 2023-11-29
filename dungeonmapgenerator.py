@@ -3,25 +3,31 @@ import random
 import math
 from directory import *
 
-WALL_CHAR = '='
+WELL_WALL = '='
+PYRAMID_WALL = '+'
+BANDIT_WALL = '-'
+CAVE_WALL = '|'
+RUINS_WALL = '%'
+TREEHOUSE_WALL = '~'
 FLOOR_CHAR = ' '
 ENTRANCE_CHAR = 'O'
 LOOT_CHAR = 'L'
 
 
 class DungeonMap():
-    def __init__(self,dir,coords,level=0,type=0,hallFreq=2):
+    def __init__(self,dir,coords,type=DungeonType.Well,level=0,hallFreq=2):
         self.dir = dir
         self.map = []
-        self.coords = coords        # Coords         : Duple containing (row,col)
+        self.coords = coords        # Coords         : Duple containing (row,col) of where the dungeon is located in the world
         self.rooms = []             # Rooms          : List of DungeonRooms
+        self.entranceRoom = -1
         self.connectedRooms = {}    # ConnectedRooms : Dictionary of indexes in rooms, depicting how many connections each room has
         self.visited = []
         self.dungeonLevel = level
         self.dungeonType = type
         self.hallwayFreq = hallFreq
-        self.maxRows = 40
-        self.maxCols = 40
+        self.maxRows = DUNGEON_DIM
+        self.maxCols = DUNGEON_DIM
         self.minRooms = 6
         self.maxRooms = 12
         self.minRoomCols = 4
@@ -32,12 +38,27 @@ class DungeonMap():
         self.entrance = (0,0)
         self.loot = []
         self.monsters = []
+        self.wallChar = self.getWallChar(type)
+
+    def getWallChar(self,type):
+        if type == DungeonType.Well:
+            return WELL_WALL
+        elif type == DungeonType.Pyramid:
+            return PYRAMID_WALL
+        elif type == DungeonType.BanditCamp:
+            return BANDIT_WALL
+        elif type == DungeonType.Cave:
+            return CAVE_WALL
+        elif type == DungeonType.Ruins:
+            return RUINS_WALL
+        elif type == DungeonType.Treehouse:
+            return TREEHOUSE_WALL
 
     def initializeMap(self):
         for i in range(0,self.maxRows):
             row = []
             for j in range(0,self.maxCols):
-                row.append(WALL_CHAR)
+                row.append(self.wallChar)
             self.map.append(row)
 
     def setRoomSizeRange(self,minR,maxR,minC,maxC):
@@ -52,12 +73,16 @@ class DungeonMap():
 
     def generate(self):
         self.initializeMap()
-        for i in range(random.randint(self.minRooms,self.maxRooms)):
+        numRooms = random.randint(self.minRooms,self.maxRooms)
+        for i in range(numRooms):
             coords = self.makeRoom()
             self.fitRoom(coords,20)
         for room in self.rooms:
             print(room.toString())
         self.buildHallways(self.hallwayFreq)
+        self.addEntrance()
+        numLoot = math.ceil(numRooms/3) + random.choice([-1,0,0,0,1,1])
+        self.addLoot(numLoot)
         self.writeMap()
 
     def writeMap(self):
@@ -191,11 +216,31 @@ class DungeonMap():
                 self.dfs(connection)
 
     def addEntrance(self):
-        for roomIndex in self.connectedRooms:
-            if len(roomIndex) == 1:
-                self.entrance = roomIndex.setEntrance()
-                break
-        self.entrance = self.connectedRooms[0].setEntrance()
+        connections = 1
+        done = False
+        while done == False:
+            for i in range(len(self.connectedRooms)):
+                if len(self.connectedRooms[i]) == connections:
+                    self.entrance = self.rooms[i].setEntrance(self.map)
+                    self.entranceRoom = self.rooms[i].getCoords()
+                    print(f'Entrance in room at {self.entranceRoom}')
+                    done = True
+                    break
+            connections += 1
+
+    def addLoot(self,lootCount):
+        lootRooms = self.rooms
+        random.shuffle(lootRooms)
+        for i in range(lootCount):
+            if lootRooms[i].getCoords() == self.entranceRoom:
+                continue
+            types = self.getLootTypesFromDungeonType()
+            self.loot.append(DungeonLoot(lootRooms[i].setLoot(self.map),self.dungeonLevel,types,self.dir))
+            print(f'Loot in room {i}')
+
+    def getLootTypesFromDungeonType(self):
+        # As of now, all dungeons are capable of containing the same loot
+        return [Type.Weapon, Type.Armor, Type.Potion, Type.AtkSpell, Type.SptSpell]
 
 
 class DungeonRoom():
@@ -217,27 +262,27 @@ class DungeonRoom():
     def getDistanceFrom(self,coords):
         return abs(self.row-coords[0]) + abs(self.col-coords[1])
     
-    def setEntrance(self):
+    def setEntrance(self,map):
         coords = self.getRandomPoint()
-        self.map[coords[0]][coords[1]] = ENTRANCE_CHAR
+        map[coords[0]][coords[1]] = ENTRANCE_CHAR
         return coords
 
-    def setLoot(self):
+    def setLoot(self,map):
         coords = self.getRandomPoint()
-        self.map[coords[0]][coords[1]] = LOOT_CHAR
+        map[coords[0]][coords[1]] = LOOT_CHAR
         return coords
     
 
 class DungeonLoot():
-    def __init__(self,coords,level,types):
+    def __init__(self,coords,level,types,dir):
         self.coords = coords
         self.level = level
         self.types = types
         self.rarity = LootRarity.Uncommon
-        self.loot = self.rollItem()
+        self.loot = self.rollItem(dir)
 
     def setLootRarity(self,rarity):
         self.rarity = rarity
 
-    def rollItem(self):
-        return self.dir.rollForLoot(self.level,self.rarity,self.types)
+    def rollItem(self,dir):
+        return dir.rollForLoot(self.level,self.rarity,self.types)

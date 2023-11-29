@@ -86,7 +86,7 @@ class RoomTemplateList():
         R2 = RoomTemplate(2,"You enter an old hunting cabin. A hearth is lit at the back of the cabin with a painting hanging above it. A suit of armor stands against the opposite wall, next to a weapon rack. The floorboards creak under your feet.",[4,7,14,random.randint(15,16),18])
         self.roomTemplateList.append(R2)
 
-        R3 = RoomTemplate(3,"You enter metal chamber with a cold atmostphere. A few metal shelves climb the walls, and in the middle of the floor you see a lockbox sitting on a table, with black slime creeping up its legs. You hear a faint whispering...",[8,11,12,19,20])
+        R3 = RoomTemplate(3,"You enter a metal chamber with a cold atmostphere. A few metal shelves climb the walls, and in the middle of the floor you see a lockbox sitting on a table, with black slime creeping up its legs. You hear a faint whispering...",[8,11,12,19,20])
         self.roomTemplateList.append(R3)
 
         R4 = RoomTemplate(4,"You enter an empty room with a stone altar at its center. The walls are impossibly smooth, contrasting the cobblestone floor. An ancient scroll sits atop the altar.",[5,13,21,22])

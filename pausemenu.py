@@ -364,7 +364,7 @@ class PauseMenu():
                 else:
                     self.mapMode = "biome"
             elif self.state == "main":
-                newDgn = DungeonMap(self.game.directory,(0,0))
+                newDgn = DungeonMap(self.game.directory,(0,0),DungeonType.Ruins)
                 newDgn.generate()
         if self.game.UP:
             if self.state == "main":

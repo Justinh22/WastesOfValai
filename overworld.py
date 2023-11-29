@@ -4,11 +4,14 @@ from pausemenu import *
 from directory import *
 from roomhandler import *
 from writing import *
+from dungeoncrawler import *
 
 class Overworld():
     def __init__(self,game):
         self.game = game
         self.inWorld = True
+        self.inDungeon = False
+        self.currentDungeon = 0
         self.width = self.game.width - 60
         self.height = self.game.height - 60
         self.font = pygame.font.Font('freesansbold.ttf',20)
@@ -33,6 +36,11 @@ class Overworld():
             if self.combat.inCombat:
                 self.game.screen.fill(self.game.black)
                 self.combat.display()
+            if self.inDungeon:
+                self.game.screen.fill(self.game.black)
+                self.currentDungeon.display()
+                if self.currentDungeon.inDungeon == False:
+                    self.inDungeon = False
             self.drawScreen()
             self.blitScreen()
         self.game.screen.fill(self.game.black)
@@ -118,23 +126,44 @@ class Overworld():
             return Biome.Desert
         else:
             return Biome.Dungeon
+        
+    def getDungeonType(self,r,c):
+        if self.game.WorldMap.map[r][c] == 'W':
+            return DungeonType.Well
+        elif self.game.WorldMap.map[r][c] == 'P':
+            return DungeonType.Pyramid
+        elif self.game.WorldMap.map[r][c] == 'B':
+            return DungeonType.BanditCamp
+        elif self.game.WorldMap.map[r][c] == 'C':
+            return DungeonType.Cave
+        elif self.game.WorldMap.map[r][c] == 'R':
+            return DungeonType.Ruins
+        elif self.game.WorldMap.map[r][c] == 'T':
+            return DungeonType.Treehouse
 
     def stepTo(self,r,c): # Simplified; any non-terrain space is treated as a Shack
         # self.game.stir()
         self.steps += 1
         if self.game.WorldMap.map[r][c] != '#' and self.game.WorldMap.map[r][c] != ';' and self.game.WorldMap.map[r][c] != '.':
-            newRoom = RoomHandler(self.game, self.game.roomDB.getRoom((r,c),self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c])))
-            newRoom.enter()
+            if self.game.WorldMap.map[r][c] == 'A' or self.game.WorldMap.map[r][c] == 'H' or self.game.WorldMap.map[r][c] == 'S':
+                newRoom = RoomHandler(self.game, self.game.roomDB.getRoom((r,c),self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c])))
+                newRoom.enter()
+            else:
+                newDungeon = DungeonMap(self.game.directory,self.game.currentPos,self.getDungeonType(r,c),self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]))
+                newDungeon.generate()
+                self.currentDungeon = Crawler(self.game,newDungeon)
+                self.currentDungeon.inDungeon = True
+                self.inDungeon = True
         else: # Roll for random encounter
             if self.steps < 5:
-                odds = 15
+                odds = 30
             elif self.steps < 10:
                 odds = 1
             elif self.steps < 15:
-                odds = 2
+                odds = 10
             else:
-                odds = 3
-            if random.randint(odds,15) == 14:
+                odds = 20
+            if random.randint(odds,30) == 29:
                 self.steps = 0
                 encounter = []
                 encounter = self.game.directory.buildEncounter(self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]),self.getBiome(self.game.currentPos[0],self.game.currentPos[1]))

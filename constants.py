@@ -9,6 +9,10 @@ MAX_SPTSPELL_RARITY = 5
 MAX_INVENTORY_SIZE = 10
 
 LANDMARK_COUNT = 500
+MAP_WIDTH = 200
+MAP_HEIGHT = 200
+DUNGEON_DIM = 40
+MAP_GROWTH_CYCLES = 30
 
 class Type(Enum):
     Empty = 0
@@ -81,3 +85,11 @@ class Status(Enum):
     Paralyzed = 0
     Burned = 1
     Freezing = 2
+
+class DungeonType(Enum):
+    Well = 0
+    Pyramid = 1
+    BanditCamp = 2
+    Cave = 3
+    Ruins = 4
+    Treehouse = 5
