@@ -37,7 +37,6 @@ class DungeonMap():
         self.roomBuffer = 1
         self.entrance = (0,0)
         self.loot = []
-        self.monsters = []
         self.wallChar = self.getWallChar(type)
 
     def getWallChar(self,type):
@@ -237,6 +236,16 @@ class DungeonMap():
             types = self.getLootTypesFromDungeonType()
             self.loot.append(DungeonLoot(lootRooms[i].setLoot(self.map),self.dungeonLevel,types,self.dir))
             print(f'Loot in room {i}')
+
+    def getRandomEnemySpawnCoords(self):
+        possRooms = self.rooms
+        random.shuffle(possRooms)
+        valid = False
+        while valid == False:
+            room = random.randint(0,len(possRooms)-1)
+            if possRooms[room] != self.entranceRoom:
+                valid == True
+                return possRooms[room].getRandomPoint()
 
     def getLootTypesFromDungeonType(self):
         # As of now, all dungeons are capable of containing the same loot
