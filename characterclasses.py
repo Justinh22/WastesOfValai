@@ -218,8 +218,52 @@ class ClassType():
         self.spdGrowth = sdg
         self.knownSpells = splsLrn
         self.id = idIN
+        self.description = ""
+        self.rating = []
+    def setAdditionalInfo(self,rating,desc):
+        self.description = desc
+        self.rating = rating
     def getGrowths(self):
         return [self.hpGrowth[random.randint(0,2)], self.mpGrowth[random.randint(0,2)], self.atkGrowth[random.randint(0,2)], self.crtGrowth[random.randint(0,2)], self.defGrowth[random.randint(0,2)], self.ddgGrowth[random.randint(0,2)], self.lckGrowth[random.randint(0,2)], self.spdGrowth[random.randint(0,2)]]
+    def wpnProfToString(self):
+        ret = ""
+        comma = ""
+        if self.weaponProficiency[0] == 1:
+            ret += "Axe"
+            comma = ", "
+        if self.weaponProficiency[1] == 1:
+            ret += comma + "Sword"
+            comma = ", "
+        if self.weaponProficiency[2] == 1:
+            ret += comma + "Spear"
+            comma = ", "
+        if self.weaponProficiency[3] == 1:
+            ret += comma + "Dagger"
+            comma = ", "
+        if self.weaponProficiency[4] == 1:
+            ret += comma + "Staff"
+            comma = ", "
+        return ret
+    def amrProfToString(self):
+        ret = ""
+        comma = ""
+        if self.armorProficiency[0] == 1:
+            ret += "Light"
+            comma = ", "
+        if self.armorProficiency[1] == 1:
+            ret += comma + "Medium"
+            comma = ", "
+        if self.armorProficiency[2] == 1:
+            ret += comma + "Heavy"
+            comma = ", "
+        if self.armorProficiency[3] == 1:
+            ret += comma + "Robe"
+            comma = ", "
+        if self.armorProficiency[4] == 1:
+            ret += comma + "Arcanist"
+            comma = ", "
+        return ret
+
 
 class Party():
     def __init__(self):
@@ -235,6 +279,12 @@ class Party():
     def debug_RandomInventory(self,dir):
         while len(self.inventory) < MAX_INVENTORY_SIZE:
             self.addItem(dir.getItemByRarities(Type.Potion,1,5))
+    def add(self,item,dir):
+        print(dir.getItemType(item))
+        if dir.getItemType(item) == Type.Weapon or dir.getItemType(item) == Type.Armor:
+            return self.addEquipment(item)
+        else:
+            return self.addItem(item)
     def addItem(self,item):
         if len(self.inventory) <= MAX_INVENTORY_SIZE:
             self.inventory.append(item)

@@ -242,6 +242,14 @@ class DungeonMap():
             self.loot.append(DungeonLoot(lootRooms[i].setLoot(self.map),self.dungeonLevel,types,self.dir))
             #print(f'Loot in room {i}')
 
+    def removeLoot(self,loot):
+        for i in range(len(self.loot)):
+            if loot.coords == self.loot[i].coords:
+                self.loot.pop(i)
+                self.map[loot.coords[0]][loot.coords[1]] = ' '
+                self.writeMap()
+                break
+
     def getRandomEnemySpawnCoords(self,pos):
         possRooms = self.rooms
         random.shuffle(possRooms)

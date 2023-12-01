@@ -68,7 +68,7 @@ class Overworld():
                 self.stepTo(self.game.currentPos[0],self.game.currentPos[1])
             self.drawScreen()
         if self.game.A:
-            self.pausemenu.pause(self.game.currentPos)
+            print("A")
         if self.game.B:
             encounter = []
             encounter = self.game.directory.buildEncounter(self.party.getPower(),self.getBiome(self.game.currentPos[0],self.game.currentPos[1]))
@@ -77,13 +77,15 @@ class Overworld():
             print("X")
             #self.inWorld = False
             #self.game.inGame = False
+        if self.game.START:
+            self.pausemenu.pause(self.game.currentPos)
 
     def drawScreen(self):
         blockSize = 30 #Set the size of the grid block
         self.game.screen.fill((0,0,0))
         diffText = self.getBiome(self.game.currentPos[0],self.game.currentPos[1]).name + ": Difficulty " + str(self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[self.game.currentPos[0]][self.game.currentPos[1]]))
         write(self.game, 20,30,self.height+10,diffText)
-        write(self.game, 20,self.width-75,self.height+10,"A) Pause")
+        write(self.game, 20,self.width-80,self.height+10,"ST) Pause")
         for x in range(30, self.width, blockSize):
             for y in range(30, self.height, blockSize):
                 color = self.game.white

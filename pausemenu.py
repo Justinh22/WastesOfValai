@@ -87,6 +87,27 @@ class PauseMenu():
             armor = self.game.party.members[self.targetPartyMember].eqpAmr
             write(self.game, 12, 250, 170, "Armor: " + armor.name + " (" + str(armor.defense) + " DEF, " + str(armor.dodge) + " DDG, " + str(armor.manaregen) + " MPG)")
 
+            if self.state == "partyMember":
+                classOutline = pygame.Rect(250,200,350,240)
+                pygame.draw.rect(self.game.screen,self.game.white,classOutline,2)
+                write(self.game, 20, 260, 215, self.game.party.members[self.targetPartyMember].type.name)
+                write(self.game, 12, 260, 242, "Weapon Prf: "+self.game.party.members[self.targetPartyMember].type.wpnProfToString())
+                write(self.game, 12, 260, 262, "Armor Prf: "+self.game.party.members[self.targetPartyMember].type.amrProfToString())
+                write(self.game, 12, 300, 295, "POWER: ")
+                write(self.game, 12, 390, 293, self.intToRating(self.game.party.members[self.targetPartyMember].type.rating[0]))
+                write(self.game, 12, 300, 310, "STURDINESS: ")
+                write(self.game, 12, 390, 308, self.intToRating(self.game.party.members[self.targetPartyMember].type.rating[1]))
+                write(self.game, 12, 300, 325, "NIMBLENESS: ")
+                write(self.game, 12, 390, 323, self.intToRating(self.game.party.members[self.targetPartyMember].type.rating[2]))
+                write(self.game, 12, 450, 295, "ARCANA: ")
+                write(self.game, 12, 514, 293, self.intToRating(self.game.party.members[self.targetPartyMember].type.rating[3]))
+                write(self.game, 12, 450, 310, "FAITH: ")
+                write(self.game, 12, 514, 308, self.intToRating(self.game.party.members[self.targetPartyMember].type.rating[4]))
+                write(self.game, 12, 450, 325, "LUCK: ")
+                write(self.game, 12, 514, 323, self.intToRating(self.game.party.members[self.targetPartyMember].type.rating[5]))
+                wrapWrite(self.game, 12, self.game.party.members[self.targetPartyMember].type.description, 340, 260, 355)
+
+
         if self.state == "partyMember":
             write(self.game, 20, 30, 87 + (self.cursorPos*25), "->")
 
@@ -432,6 +453,8 @@ class PauseMenu():
                 if self.substate == "equipment" or self.substate == "inventory":
                     if self.cursorPos > 1:
                         self.cursorPos = 0
+        if self.game.START:
+            self.paused = False
     
     def drawMinStatBlock(self,xPos,yPos,character):
         outlineRect = pygame.Rect(xPos,yPos,350,90)
@@ -507,3 +530,9 @@ class PauseMenu():
             elif self.game.directory.getItemType(self.game.party.inventory[targetElement]) == Type.AtkSpell or self.game.directory.getItemType(self.game.party.inventory[targetElement]) == Type.SptSpell:
                 if self.game.party.members[targetPartyMember].checkProficiency(self.game.party.inventory[targetElement],self.game.directory):
                     self.game.party.learnSpell(targetPartyMember, targetElement)
+
+    def intToRating(self,val):
+        ret = ""
+        for i in range(val):
+            ret += "+"
+        return ret

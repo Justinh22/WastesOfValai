@@ -20,6 +20,7 @@ class Crawler():
         self.dungeonMap = dungeonMap
         self.dungeonPos = self.setEntry()
         self.inDungeon = True
+        self.state = "main"
         self.width = self.game.width - 60
         self.height = self.game.height - 60
         self.font = pygame.font.Font('freesansbold.ttf',20)
@@ -27,6 +28,8 @@ class Crawler():
         self.combat = Combat(self.game)
         self.party = self.game.party
         self.enemyList = []
+        self.message = ""
+        self.messageTimer = 0
         for loot in self.dungeonMap.loot:
             print(self.game.directory.getItemName(loot.loot))
 
@@ -58,34 +61,52 @@ class Crawler():
                 self.dungeonPos[0] -= 1
                 self.stepTo(self.dungeonPos[0],self.dungeonPos[1])
             self.drawScreen()
+            if self.state == "lootSummary":
+                self.state == "main"
         if self.game.RIGHT:
             if self.dungeonMap.map[self.dungeonPos[0]][self.dungeonPos[1]+1] != self.dungeonMap.wallChar:
                 self.dungeonPos[1] += 1
                 self.stepTo(self.dungeonPos[0],self.dungeonPos[1])
             self.drawScreen()
+            if self.state == "lootSummary":
+                self.state == "main"
         if self.game.DOWN:
             if self.dungeonMap.map[self.dungeonPos[0]+1][self.dungeonPos[1]] != self.dungeonMap.wallChar:
                 self.dungeonPos[0] += 1
                 self.stepTo(self.dungeonPos[0],self.dungeonPos[1])
             self.drawScreen()
+            if self.state == "lootSummary":
+                self.state == "main"
         if self.game.LEFT:
             if self.dungeonMap.map[self.dungeonPos[0]][self.dungeonPos[1]-1] != self.dungeonMap.wallChar:
                 self.dungeonPos[1] -= 1
                 self.stepTo(self.dungeonPos[0],self.dungeonPos[1])
             self.drawScreen()
+            if self.state == "lootSummary":
+                self.state == "main"
         if self.game.A:
-            self.pausemenu.pause(self.game.currentPos)
+            print("A")
+            if self.state == "lootSummary":
+                if self.game.party.add(self.lootLookup().loot,self.game.directory):
+                    self.message = "You picked up the " + self.game.directory.getItemName(self.lootLookup().loot,True)
+                    self.dungeonMap.removeLoot(self.lootLookup())
+                    self.state = "main"
+                else:
+                    self.message = "Your inventory is full"
+                self.messageTimer = 1000
         if self.game.B:
             print("B")
         if self.game.X:
             print("X")
             #self.inDungeon = False
             #self.game.inGame = False
+        if self.game.START:
+            self.pausemenu.pause(self.game.currentPos)
 
     def drawScreen(self):
         blockSize = 30 #Set the size of the grid block
         self.game.screen.fill((0,0,0))
-        write(self.game, 20,self.width-75,self.height+10,"A) Pause")
+        write(self.game, 20,self.width-80,self.height+10,"ST) Pause")
         for x in range(30, self.width, blockSize):
             for y in range(30, self.height, blockSize):
                 color = self.game.white
@@ -113,8 +134,15 @@ class Crawler():
                 text = self.font.render(mapChar,True,color)
                 textWidth, textHeight = self.font.size(mapChar)
                 offset = (blockSize-textWidth)/2
-
                 self.game.screen.blit(text,(x+offset,y+5))
+        if self.state == "lootSummary":
+            text = "Inside the chest is a " + self.game.directory.getItemName(self.lootLookup().loot,True)
+            if self.messageTimer == 0:
+                write(self.game, 20, 30,self.height+10,text)
+        if self.messageTimer > 0:
+            write(self.game, 20, 30,self.height+10,self.message)
+            self.messageTimer -= 1
+
 
     def setEntry(self):
         if self.dungeonMap.map[self.dungeonMap.entrance[0]-1][self.dungeonMap.entrance[1]] == ' ':
@@ -164,14 +192,24 @@ class Crawler():
         if defeatedEnemy != -1:
             self.enemyList.pop(defeatedEnemy)
 
-
     def stepTo(self,r,c):
         #print(f'({r}, {c})')
         if self.dungeonMap.map[r][c] == 'O':
             self.inDungeon = False
+        elif self.dungeonMap.map[r][c] == 'L':
+            self.state = "lootSummary"
+        else:
+            self.state = "main"
 
     def getDistance(self,start,target):
         return (abs(start[0]-target[0]) + abs(start[1]-target[1]))
+    
+    def lootLookup(self):
+        for loot in self.dungeonMap.loot:
+            if loot.coords[0] == self.dungeonPos[0] and loot.coords[1] == self.dungeonPos[1]:
+                return loot
+        print("Uh oh")
+        return "Uh oh"
 
 
 class Enemy():
@@ -225,7 +263,8 @@ class Enemy():
     def hunt(self,target):
         self.huntPath = []
         self.pathfind(tuple(self.coords),tuple(target),self.huntPath)
-        self.coords = list(self.huntPath[1])
+        if len(self.huntPath) > 1:
+            self.coords = list(self.huntPath[1])
 
     def returnToPath(self):
         if self.returnPathSet == False:
