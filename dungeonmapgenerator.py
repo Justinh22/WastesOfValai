@@ -124,12 +124,12 @@ class DungeonMap():
     def buildHallways(self,n):
         for i in range(len(self.rooms)):
             if i not in self.connectedRooms:
-                print(f'Connecting room {i}')
+                #print(f'Connecting room {i}')
                 closestRooms = self.findNClosestRooms(i,n)
                 for closeRoom in closestRooms:
                     self.connect(i,closeRoom)
         self.ensureAllRoomsConnect()
-        print(self.connectedRooms)
+        #print(self.connectedRooms)
 
     def findNClosestRooms(self,roomIndex,n):
         lowestNDistances = []
@@ -144,11 +144,11 @@ class DungeonMap():
             elif distance < max(lowestNDistances):
                 lowestNDistances[lowestNDistances.index(max(lowestNDistances))] = distance
                 lowestNIndexes[lowestNDistances.index(max(lowestNDistances))] = i
-        print(f'Closest rooms are {lowestNIndexes}')
+        #print(f'Closest rooms are {lowestNIndexes}')
         return lowestNIndexes
 
     def connect(self,indexA,indexB):
-        print(f'Connecting {indexA} to {indexB}')
+        #print(f'Connecting {indexA} to {indexB}')
         connA = self.rooms[indexA].getRandomPoint()
         connB = self.rooms[indexB].getRandomPoint()
         if random.randint(1,2) == 1:
@@ -192,23 +192,28 @@ class DungeonMap():
             self.connectedRooms[indexB] = [indexA]
 
     def ensureAllRoomsConnect(self):
-        for index in self.connectedRooms.keys():
-            self.visited = [0]*len(self.rooms)
-            self.dfs(index)
-            if 0 in self.visited:
-                print(f'Not all nodes reachable from {index}')
-                timeout = 0
-                while(timeout<10):
-                    closest = self.findNClosestRooms(index,1)
-                    if closest not in self.connectedRooms[index]:
-                        self.connect(closest[0],index)
-                        timeout = 10
-                    timeout += 1
-            else:
-                print(f'All nodes reachable from {index}')
+        repeat = True
+        n = 1
+        while repeat:
+            print("Ensuring...")
+            repeat = False
+            for index in self.connectedRooms.keys():
+                self.visited = [0]*len(self.rooms)
+                self.dfs(index)
+                if 0 in self.visited:
+                    #print(f'Not all nodes reachable from {index}')
+                    timeout = 0
+                    while(timeout<10):
+                        closest = self.findNClosestRooms(index,n)
+                        if closest not in self.connectedRooms[index]:
+                            self.connect(closest[0],index)
+                            timeout = 10
+                        timeout += 1
+                    repeat = True
+                    n += 1
 
     def dfs(self,node):
-        print(node)
+        #print(node)
         self.visited[node] = 1
         for connection in self.connectedRooms[node]:
             if self.visited[connection] == 0:
@@ -222,7 +227,7 @@ class DungeonMap():
                 if len(self.connectedRooms[i]) == connections:
                     self.entrance = self.rooms[i].setEntrance(self.map)
                     self.entranceRoom = self.rooms[i].getCoords()
-                    print(f'Entrance in room at {self.entranceRoom}')
+                    #print(f'Entrance in room at {self.entranceRoom}')
                     done = True
                     break
             connections += 1
@@ -235,17 +240,22 @@ class DungeonMap():
                 continue
             types = self.getLootTypesFromDungeonType()
             self.loot.append(DungeonLoot(lootRooms[i].setLoot(self.map),self.dungeonLevel,types,self.dir))
-            print(f'Loot in room {i}')
+            #print(f'Loot in room {i}')
 
-    def getRandomEnemySpawnCoords(self):
+    def getRandomEnemySpawnCoords(self,pos):
         possRooms = self.rooms
         random.shuffle(possRooms)
-        valid = False
-        while valid == False:
+        patrolPoints = []
+        while len(patrolPoints) <= 3:
             room = random.randint(0,len(possRooms)-1)
+            if possRooms[room].getCoords() == self.entranceRoom:
+                continue
             if possRooms[room] != self.entranceRoom:
-                valid == True
-                return possRooms[room].getRandomPoint()
+                point = possRooms[room].getRandomPoint()
+                if abs(pos[0]-point[0])+abs(pos[1]-point[1]) < 12:
+                    continue
+                patrolPoints.append(possRooms[room].getRandomPoint())
+        return patrolPoints
 
     def getLootTypesFromDungeonType(self):
         # As of now, all dungeons are capable of containing the same loot

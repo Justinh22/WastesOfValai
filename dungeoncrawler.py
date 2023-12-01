@@ -1,4 +1,6 @@
+from collections import deque
 import pygame
+import time
 from combat import *
 from pausemenu import *
 from directory import *
@@ -24,9 +26,9 @@ class Crawler():
         self.pausemenu = PauseMenu(self.game)
         self.combat = Combat(self.game)
         self.party = self.game.party
-        self.enemyStepTick = 0
-        self.enemyStepSpeed = 100
         self.enemyList = []
+        for loot in self.dungeonMap.loot:
+            print(self.game.directory.getItemName(loot.loot))
 
     def blitScreen(self):
         self.game.screen.blit(self.game.screen, (0,0))
@@ -142,221 +144,140 @@ class Crawler():
         return color
     
     def enemyHandler(self):
-        if self.enemyStepTick < self.enemyStepSpeed:
-            self.enemyStepTick += 1
-        else:
-            print("tick")
-            self.enemyStepTick = 0
-            if len(self.enemyList) < 2:
-                newEnemy = Enemy(self.dungeonMap.getRandomEnemySpawnCoords(),self.dungeonMap)
-                self.enemyList.append(newEnemy)
-                return
-            for enemy in self.enemyList:
-                enemy.patrol()
+        defeatedEnemy = -1
+        if len(self.enemyList) < math.ceil(len(self.dungeonMap.rooms)/4):
+            newEnemy = Enemy(self.dungeonMap.getRandomEnemySpawnCoords(self.dungeonPos),self.dungeonMap)
+            self.enemyList.append(newEnemy)
+        for i, enemy in enumerate(self.enemyList):
+            enemy.tickEnemy()
+            if enemy.actReady:
+                if self.getDistance(self.dungeonPos,enemy.coords) <= enemy.fov and (enemy.mode == "patrol" or enemy.mode == "return"):
+                    enemy.mode = "hunt"
+                elif self.getDistance(self.dungeonPos,enemy.coords) > enemy.huntFov and enemy.mode == "hunt":
+                    enemy.mode = "return"
+                enemy.act(self.dungeonPos)
+                if enemy.coords == self.dungeonPos:
+                    encounter = []
+                    encounter = self.game.directory.buildEncounter(self.dungeonMap.dungeonLevel,Biome.Dungeon)
+                    self.combat.initialize(self.party,encounter)
+                    defeatedEnemy = i
+        if defeatedEnemy != -1:
+            self.enemyList.pop(defeatedEnemy)
+
 
     def stepTo(self,r,c):
-        print(f'({r}, {c})')
+        #print(f'({r}, {c})')
         if self.dungeonMap.map[r][c] == 'O':
             self.inDungeon = False
+
+    def getDistance(self,start,target):
+        return (abs(start[0]-target[0]) + abs(start[1]-target[1]))
 
 
 class Enemy():
     def __init__(self,coords,dungeonMap):
-        self.coords = list(coords)
+        self.patrolPoints = coords
+        self.coords = list(self.patrolPoints[0])
+        self.tick = 0
+        self.speed = 150
         self.mode = "patrol"
-        self.confidence = 0
-        self.submode = "walk"
-        self.fov = 10
-        self.patrolDir = "north"
+        self.fov = 6
+        self.huntFov = 10
         self.map = dungeonMap
+        self.path = []
+        self.huntPath = []
+        self.pathIndex = 0
+        self.huntIndex = []
+        self.actReady = False
+        self.returnPathSet = False
+        self.pathfind(self.patrolPoints[0],self.patrolPoints[1],self.path)
+        self.pathfind(self.patrolPoints[1],self.patrolPoints[2],self.path)
+        self.pathfind(self.patrolPoints[2],self.patrolPoints[0],self.path)
+
+    def tickEnemy(self):
+        self.setSpeed()
+        self.tick += 1
+        if self.tick >= self.speed:
+            self.actReady = True
+            self.tick = 0
+
+    def setSpeed(self):
+        if self.mode == "patrol" or self.mode == "return":
+            self.speed = 150
+        elif self.mode == "hunt":
+            self.speed = 100
+
+    def act(self,coords):
+        self.actReady = False
+        if self.mode == "patrol":
+            self.patrol()
+        if self.mode == "hunt":
+            self.hunt(coords)
+        if self.mode == "return":
+            self.returnToPath()
 
     def patrol(self):
-        self.confidence -= 1
-        if self.confidence <= 0:
-            decision = random.randint(1,2)
-            if decision == 1:
-                self.submode == "walk"
-            elif decision == 2:
-                self.submode == "turn"
-            self.confidence = 5
+        self.pathIndex += 1
+        if self.pathIndex >= len(self.path):
+            self.pathIndex = 0
+        self.coords = list(self.path[self.pathIndex])
 
-        if self.submode == "turn":
-            self.patrolDir = self.checkForTurnChoice()
-        if self.isFeasible(self.patrolDir):
-            self.coords = self.nextSpace()
-            self.patrolDir = self.checkForTurnChoice()
-        else:
-            feas = []
-            feas.append(self.scanInDir("north"))
-            feas.append(self.scanInDir("east"))
-            feas.append(self.scanInDir("south"))
-            feas.append(self.scanInDir("west"))
-            self.turnBias(feas)
-            best = feas.index(min(feas))
-            if best == 0:
-                self.patrolDir = "north"
-            elif best == 1:
-                self.patrolDir = "east"
-            elif best == 2:
-                self.patrolDir = "south"
-            elif best == 3:
-                self.patrolDir = "west"
+    def hunt(self,target):
+        self.huntPath = []
+        self.pathfind(tuple(self.coords),tuple(target),self.huntPath)
+        self.coords = list(self.huntPath[1])
 
-    def turnBias(self,feas):
-        if self.patrolDir == "north":
-            feas[1] -= 10
-            feas[3] -= 10
-        elif self.patrolDir == "east":
-            feas[0] -= 10
-            feas[2] -= 10
-        elif self.patrolDir == "south":
-            feas[1] -= 10
-            feas[3] -= 10
-        elif self.patrolDir == "west":
-            feas[0] -= 10
-            feas[2] -= 10
-
-    def checkForTurnChoice(self):
-        valid = True
-        direction = "none"
-        straightStepper = 1
-        leftStepper = 1
-        rightStepper = 1
-        if self.patrolDir == "north":
-            while valid:
-                if self.map.map[self.coords[0]][self.coords[1]-leftStepper] != ' ':
-                    valid = False
-                leftStepper += 1
-            valid = True
-            while valid:
-                if self.map.map[self.coords[0]][self.coords[1]+rightStepper] != ' ':
-                    valid = False
-                rightStepper += 1
-            valid = True
-            while valid:
-                if self.map.map[self.coords[0]-straightStepper][self.coords[1]] != ' ':
-                    valid = False
-                straightStepper += 1
-        elif self.patrolDir == "east":
-            while valid:
-                if self.map.map[self.coords[0]-leftStepper][self.coords[1]] != ' ':
-                    valid = False
-                leftStepper += 1
-            valid = True
-            while valid:
-                if self.map.map[self.coords[0]+rightStepper][self.coords[1]] != ' ':
-                    valid = False
-                rightStepper += 1
-            valid = True
-            while valid:
-                if self.map.map[self.coords[0]][self.coords[1]+straightStepper] != ' ':
-                    valid = False
-                straightStepper += 1
-        elif self.patrolDir == "south":
-            while valid:
-                if self.map.map[self.coords[0]][self.coords[1]+leftStepper] != ' ':
-                    valid = False
-                leftStepper += 1
-            valid = True
-            while valid:
-                if self.map.map[self.coords[0]][self.coords[1]-rightStepper] != ' ':
-                    valid = False
-                rightStepper += 1
-            valid = True
-            while valid:
-                if self.map.map[self.coords[0]+straightStepper][self.coords[1]] != ' ':
-                    valid = False
-                straightStepper += 1
-        elif self.patrolDir == "west":
-            while valid:
-                if self.map.map[self.coords[0]+leftStepper][self.coords[1]] != ' ':
-                    valid = False
-                leftStepper += 1
-            valid = True
-            while valid:
-                if self.map.map[self.coords[0]-rightStepper][self.coords[1]] != ' ':
-                    valid = False
-                rightStepper += 1
-            valid = True
-            while valid:
-                if self.map.map[self.coords[0]][self.coords[1]-straightStepper] != ' ':
-                    valid = False
-                straightStepper += 1
-        threshold = 4 + random.randint(0,2)
-        if leftStepper > rightStepper and leftStepper >= threshold and leftStepper > straightStepper:
-            direction = "left"
-            print("Turning left")
-        elif rightStepper >= leftStepper and rightStepper >= threshold and rightStepper > straightStepper:
-            direction = "right"
-            print("Turning right")
-        if direction == "none":
-            print("Staying straight")
-        return self.getTurn(self.patrolDir,direction)
-
-    #def hunt(self):
-
-    def getTurn(self,dir,turn):
-        if dir == "north":
-            if turn == "left":
-                return "west"
-            elif turn == "right":
-                return "east"
-            else:
-                return "north"
-        if dir == "east":
-            if turn == "left":
-                return "north"
-            elif turn == "right":
-                return "south"
-            else:
-                return "east"
-        if dir == "south":
-            if turn == "left":
-                return "east"
-            elif turn == "right":
-                return "west"
-            else:
-                return "south"
-        if dir == "west":
-            if turn == "left":
-                return "south"
-            elif turn == "right":
-                return "north"
-            else:
-                return "west"
-
-    def nextSpace(self):
-        if self.patrolDir == "north":
-            return ((self.coords[0]-1,self.coords[1]))
-        elif self.patrolDir == "east":
-            return ((self.coords[0],self.coords[1]+1))
-        elif self.patrolDir == "south":
-            return ((self.coords[0]+1,self.coords[1]))
-        elif self.patrolDir == "west":
-            return ((self.coords[0],self.coords[1]-1))
+    def returnToPath(self):
+        if self.returnPathSet == False:
+            self.huntPath = []
+            self.huntIndex = 0
+            self.pathfind(tuple(self.coords),tuple(self.path[self.pathIndex]),self.huntPath)
+        self.huntIndex += 1
+        if self.huntIndex >= len(self.huntPath):
+            self.huntIndex = 0
+            self.mode = "patrol"
+        self.coords = list(self.huntPath[self.huntIndex])
         
-    def isFeasible(self,dir):
-        return self.scanInDir(dir) < 40
-        
-    def scanInDir(self,dir):
-        feasibility = 0
-        for i in range(5):
-            for j in range(5):
-                if dir == "north":
-                    feasibility += self.checkKernal((self.coords[0]-i-1,self.coords[1]-j-2),(i,j))
-                elif dir == "east":
-                    feasibility += self.checkKernal((self.coords[0]-i-2,self.coords[1]+j+1),(i,j))
-                elif dir == "south":
-                    feasibility += self.checkKernal((self.coords[0]+i+1,self.coords[1]-j-2),(i,j))
-                elif dir == "west":
-                    feasibility += self.checkKernal((self.coords[0]-i-2,self.coords[1]-j-1),(i,j))
-        print(f'Feasibility: {feasibility}')
-        return feasibility
-                    
-    def checkKernal(self,mapCoords,kernalCoords):
-        if mapCoords[0] > len(self.map.map)-1 or mapCoords[0] < 0 or mapCoords[1] > len(self.map.map[0])-1 or mapCoords[1] < 0:
-            return 0
-        if self.map.map[mapCoords[0]][mapCoords[1]] == self.map.wallChar:
-            return ENEMY_VISION_KERNAL[kernalCoords[0]][kernalCoords[1]]
-        else:
-            return 0
+    def pathfind(self,start,target,path):
+        pathfinder = Pathfinder(start,target,self.map)
+        path += pathfinder.calculatePath()
+
+class Pathfinder():
+    def __init__(self,start,end,map):
+        self.startPoint = start
+        self.endPoint = end
+        self.map = map
+        self.path = []
+        self.workingPath = set()
+
+    def calculatePath(self):
+        path = self.bfs(self.startPoint)
+        return path
+    
+    def isValid(self,row,col):
+        return self.map.map[row][col] != self.map.wallChar
+
+    def bfs(self,start):
+        queue = deque([(start, [])])
+        visited = set()
+
+        while queue:
+            current, path = queue.popleft()
+            row, col = current
+
+            if current == self.endPoint:
+                return path + [current]
+            
+            if current in visited:
+                continue
+
+            visited.add(current)
+
+            for r, c in [(0,1), (1,0), (0,-1), (-1,0)]:
+                newR, newC = row + r, col + c
+                nextPos = (newR, newC)
+
+                if self.isValid(newR, newC):
+                    queue.append((nextPos, path + [current]))
+
+        return None
