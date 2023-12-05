@@ -22,12 +22,12 @@ class Character():
         self.eqpAmr = Armor()
         self.hpMax = 20
         self.mpMax = 20
-        self.attack = 0
+        self.attack = 3
         self.critrate = 0
-        self.defense = 0
+        self.defense = 1
         self.dodge = 0
         self.luck = 0
-        self.speed = 0
+        self.speed = 1
         for i in range(0,lv):
             growth = tp.getGrowths()
             self.hpMax += growth[0]
@@ -140,6 +140,7 @@ class Character():
         self.luck += growth[6]
         self.speed += growth[7]
         self.spells.append(self.type.knownSpells[self.level-1])
+        return growth
     def equip(self,item,dir):
         if dir.getItemType(item) == Type.Weapon:
             returner = self.eqpWpn.id
@@ -191,6 +192,13 @@ class Character():
     def fullRestore(self):
         self.hp = self.hpMax
         self.mp = self.mpMax
+        self.resetBuffs()
+    def canCast(self,spellbookIndex,dir):
+        return dir.getManaCost(self.spells[spellbookIndex]) <= self.mp
+    def expendMana(self,spellbookIndex,dir):
+        self.mp -= dir.getManaCost(self.spells[spellbookIndex])
+        if self.mp < 0:
+            self.mp = 0
 
 
 class ClassType():
@@ -281,13 +289,13 @@ class Party():
         else:
             return self.addItem(item)
     def addItem(self,item):
-        if len(self.inventory) <= MAX_INVENTORY_SIZE:
+        if len(self.inventory) < MAX_INVENTORY_SIZE:
             self.inventory.append(item)
             return True
         print("Item inventory is full")
         return False
     def addEquipment(self,item):
-        if len(self.equipment) <= MAX_INVENTORY_SIZE:
+        if len(self.equipment) < MAX_INVENTORY_SIZE:
             self.equipment.append(item)
             return True
         print("Equipment inventory is full")

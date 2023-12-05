@@ -315,19 +315,19 @@ class Combat():
             write(self.game, 20, self.left+15, 325, "Select an item: (B to cancel)")
             write(self.game, 20, 40+((self.cursorPos%2)*300), 380+((int(self.cursorPos/2))*40), ">")
             if self.menuTop < len(self.party.inventory):
-                write(self.game, 18,60,380,str(self.menuTop+1)+") "+self.party.inventory[self.menuTop].name)
+                write(self.game, 18,60,380,str(self.menuTop+1)+") "+self.game.directory.getItemName(self.party.inventory[self.menuTop]))
             else:
                 write(self.game, 18,60,380,str(self.menuTop+1)+")")
             if self.menuTop+1 < len(self.party.inventory):
-                write(self.game, 18,360,380,str(self.menuTop+2)+") "+self.party.inventory[self.menuTop+1].name)
+                write(self.game, 18,360,380,str(self.menuTop+2)+") "+self.game.directory.getItemName(self.party.inventory[self.menuTop+1]))
             else:
                 write(self.game, 18,360,380,str(self.menuTop+2)+")")
             if self.menuTop+2 < len(self.party.inventory):
-                write(self.game, 18,60,420,str(self.menuTop+3)+") "+self.party.inventory[self.menuTop+2].name)
+                write(self.game, 18,60,420,str(self.menuTop+3)+") "+self.game.directory.getItemName(self.party.inventory[self.menuTop+2]))
             else:
                 write(self.game, 18,60,420,str(self.menuTop+3)+")")
             if self.menuTop+3 < len(self.party.inventory):
-                write(self.game, 18,360,420,str(self.menuTop+4)+") "+self.party.inventory[self.menuTop+3].name)
+                write(self.game, 18,360,420,str(self.menuTop+4)+") "+self.game.directory.getItemName(self.party.inventory[self.menuTop+3]))
             else:
                 write(self.game, 18,360,420,str(self.menuTop+4)+")")
         if self.state == "spellSummary":
@@ -351,14 +351,14 @@ class Combat():
         if self.state == "itemSummary":
             pygame.draw.line(self.game.screen,self.game.white,(self.left,350),(self.right+9,350),2)
             write(self.game, 20, self.left+15, 325, "Do you want to use this item?")
-            write(self.game, 16, self.left+15, 360, self.party.inventory[self.itemID].name)
-            if self.party.inventory[self.itemID].hpGain > 0 and self.party.inventory[self.itemID].mpGain > 0:
-                writeOrientation(self.game, 16,self.right-10, 360, "Restores "+str(self.party.inventory[self.itemID].hpGain)+" HP and "+str(self.party.inventory[self.itemID].mpGain)+" MP","R")
-            elif self.party.inventory[self.itemID].hpGain > 0 and self.party.inventory[self.itemID].mpGain == 0:
-                writeOrientation(self.game, 16,self.right-10, 360, "Restores "+str(self.party.inventory[self.itemID].hpGain)+" HP","R")
-            elif self.party.inventory[self.itemID].hpGain == 0 and self.party.inventory[self.itemID].mpGain > 0:
-                writeOrientation(self.game, 16,self.right-10, 360, "Restores "+str(self.party.inventory[self.itemID].mpGain)+" MP","R")
-            write(self.game, 16, self.left+15, 380, self.party.inventory[self.itemID].description)
+            write(self.game, 16, self.left+15, 360, self.game.directory.getItemName(self.party.inventory[self.itemID]))
+            if self.game.directory.getItem(self.party.inventory[self.itemID]).hpGain > 0 and self.game.directory.getItem(self.party.inventory[self.itemID]).mpGain > 0:
+                writeOrientation(self.game, 16,self.right-10, 360, "Restores "+str(self.game.directory.getItem(self.party.inventory[self.itemID]).hpGain)+" HP and "+str(self.game.directory.getItem(self.party.inventory[self.itemID]).mpGain)+" MP","R")
+            elif self.game.directory.getItem(self.party.inventory[self.itemID]).hpGain > 0 and self.game.directory.getItem(self.party.inventory[self.itemID]).mpGain == 0:
+                writeOrientation(self.game, 16,self.right-10, 360, "Restores "+str(self.game.directory.getItem(self.party.inventory[self.itemID]).hpGain)+" HP","R")
+            elif self.game.directory.getItem(self.party.inventory[self.itemID]).hpGain == 0 and self.game.directory.getItem(self.party.inventory[self.itemID]).mpGain > 0:
+                writeOrientation(self.game, 16,self.right-10, 360, "Restores "+str(self.game.directory.getItem(self.party.inventory[self.itemID]).mpGain)+" MP","R")
+            write(self.game, 16, self.left+15, 380, self.game.directory.getItem(self.party.inventory[self.itemID]).description)
             write(self.game, 20,150,425,"A) CONFIRM")
             write(self.game, 20,385,425,"B) BACK")
 
@@ -375,9 +375,15 @@ class Combat():
                 else:
                     combatStr = self.party.members[self.actions[self.exTurn-1].source[1]].name + " attacks " + self.encounter[self.actions[self.exTurn-1].target].name + " for " + str(self.dmg) + " damage!"
             elif self.actions[self.exTurn-1].action == -2:
-                combatStr = self.encounter[self.actions[self.exTurn-1].source[1]].name + " is paralyzed, and cannot move!"
+                if self.actions[self.exTurn-1].source[0] == "Encounter":
+                    combatStr = self.encounter[self.actions[self.exTurn-1].source[1]].name + " is paralyzed, and cannot move!"
+                else:
+                    combatStr = self.party.members[self.actions[self.exTurn-1].source[1]].name + " is paralyzed, and cannot move!"
             elif self.actions[self.exTurn-1].action == -3:
-                combatStr = self.encounter[self.actions[self.exTurn-1].source[1]].name + " is freezing, and cannot move!"
+                if self.actions[self.exTurn-1].source[0] == "Encounter":
+                    combatStr = self.encounter[self.actions[self.exTurn-1].source[1]].name + " is freezing, and cannot move!"
+                else:
+                    combatStr = self.party.members[self.actions[self.exTurn-1].source[1]].name + " is freezing, and cannot move!"
             elif self.actions[self.exTurn-1].action >= 200 and self.actions[self.exTurn-1].action < 300:
                 combatStr = self.party.members[self.actions[self.exTurn-1].source[1]].name + " used " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + " on " + self.party.members[self.actions[self.exTurn-1].target].name + "!"
             elif self.actions[self.exTurn-1].action >= 300 and self.actions[self.exTurn-1].action < 400:
@@ -422,12 +428,15 @@ class Combat():
                 for monster in self.encounter:
                     difficulty += monster.level
                 for member in self.party.members:
-                    member.gainXP((difficulty * 3) + (round(difficulty/2) * random.randint(2,4)))
+                    if member.hp > 0:
+                        member.gainXP((difficulty * 3) + (round(difficulty/2) * random.randint(2,4)))
+                self.combatTeardown()
                 self.inCombat = False
 
         if self.state == "lose":
             pygame.draw.line(self.game.screen,self.game.white,(self.left,350),(self.right+9,350),2)
             write(self.game, 20, self.left+15, 325, "You have fallen...")
+            self.combatTeardown()
             if pygame.time.get_ticks() - self.timeStart >= 3000:
                 self.inCombat = False
                 pygame.quit()
