@@ -45,20 +45,9 @@ class Character():
         self.manaregen = 0
         self.buffs = [0,0,0,0,0,0,0]
         self.activeBuffs = []
-        self.status = "None"
+        self.status = Status.NoStatus
         self.statusCount = 0
-        if p == 0:
-            self.personality = "Brave"
-        elif p == 1:
-            self.personality = "Angry"
-        elif p == 2:
-            self.personality = "Friendly"
-        elif p == 3:
-            self.personality = "Cowardly"
-        elif p == 4:
-            self.personality = "Headstrong"
-        elif p == 5:
-            self.personality = "Lazy"
+        self.personality = p
     def getAttack(self):
         return self.eqpWpn.attack + self.attack + self.getBuff("ATK")
     def getDefense(self):
@@ -116,9 +105,9 @@ class Character():
         if self.statusCount > 0:
             self.statusCount -= 1
             if self.statusCount == 0:
-                self.status = "None"
+                self.status = Status.NoStatus
     def resetStatus(self):
-        self.status = "None"
+        self.status = Status.NoStatus
         self.statusCount = 0
     def gainHP(self,val):
         self.hp += val
@@ -199,6 +188,9 @@ class Character():
     def checkSptSpellProficiency(self,id,dir):
         idRarity = dir.getItemRarity(id)
         return self.type.supportMagicLevel[self.level] >= idRarity
+    def fullRestore(self):
+        self.hp = self.hpMax
+        self.mp = self.mpMax
 
 
 class ClassType():
@@ -271,11 +263,14 @@ class Party():
         self.inventory = []         # List of int : Contains id of all items in inventory
         self.equipment = []         # List of int : Contains id of all equipment in inventory
     def initializeMembers(self,dir):
-        for i in range(0,random.randint(3,4)):
-            lvl = 2
-            self.members.append(Character(dir.getCharacterName(self.members),lvl,dir.classDirectory[random.randint(0,11)],random.randint(0,5))) #random.randint(0,11)
-            self.members[i].eqpWpn = dir.getWeapon(dir.getItemByRarities(Type.Weapon,lvl-1,lvl))
-            self.members[i].eqpAmr = dir.getArmor(dir.getItemByRarities(Type.Armor,lvl-1,lvl))
+        self.members.append(Character(dir.getCharacterName(self.members),1,dir.classDirectory[0],dir.getRandomPersonality()))
+        self.members[0].eqpWpn = dir.getWeapon(dir.getItemByRarity(Type.Weapon,1))
+        self.members[0].eqpAmr = dir.getArmor(dir.getItemByRarity(Type.Armor,1))
+        #for i in range(0,random.randint(3,4)):
+        #    lvl = 2
+        #   self.members.append(Character(dir.getCharacterName(self.members),lvl,dir.classDirectory[random.randint(0,11)],random.randint(0,5))) #random.randint(0,11)
+        #    self.members[i].eqpWpn = dir.getWeapon(dir.getItemByRarities(Type.Weapon,lvl-1,lvl))
+        #    self.members[i].eqpAmr = dir.getArmor(dir.getItemByRarities(Type.Armor,lvl-1,lvl))
     def debug_RandomInventory(self,dir):
         while len(self.inventory) < MAX_INVENTORY_SIZE:
             self.addItem(dir.getItemByRarities(Type.Potion,1,5))
@@ -289,11 +284,13 @@ class Party():
         if len(self.inventory) <= MAX_INVENTORY_SIZE:
             self.inventory.append(item)
             return True
+        print("Item inventory is full")
         return False
     def addEquipment(self,item):
         if len(self.equipment) <= MAX_INVENTORY_SIZE:
             self.equipment.append(item)
             return True
+        print("Equipment inventory is full")
         return False
     def learnSpell(self,member,index):
         self.members[member].addSpell(self.inventory[index])
@@ -311,6 +308,9 @@ class Party():
         self.equipment.pop(index)
     def dropItem(self,index):
         self.inventory.pop(index)
+    def fullRestore(self):
+        for member in self.members:
+            member.fullRestore()
 
 class Creature():
     def __init__(self,nm,lv,idIN,hpIN,at,ac,df,dg,sd,res,type,spells):

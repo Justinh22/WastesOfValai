@@ -1,6 +1,7 @@
 import pygame
 from room import * # Includes feature.py, directory.py, and constants.py
 from writing import *
+from utility import *
 
 class RoomHandler():
     def __init__(self,game,room):
@@ -52,8 +53,18 @@ class RoomHandler():
                 self.state = "featureCheck"
             elif self.state == "featureCheck":
                 self.delay = 5
-                if self.room.features[self.cursorPos].lootStatus != LootStatus.Taken:
-                    self.takeItem(self.cursorPos)
+                if self.room.type == "room" or (self.room.type == "haven" and (self.room.features[self.cursorPos].name != "Beds" and self.room.features[self.cursorPos].name != "Wanderer")):
+                    if self.room.features[self.cursorPos].lootStatus != LootStatus.Taken:
+                        self.takeItem(self.cursorPos)
+                if self.room.type == "haven" and self.room.features[self.cursorPos].name == "Beds":
+                    self.game.party.fullRestore()
+                if self.room.type == "haven" and self.room.features[self.cursorPos].name == "Wanderer":
+                    if len(self.game.party.members) < 4:
+                        self.game.party.members.append(self.game.directory.buildCharacter(difficultyToLevel(self.room.difficulty),self.game.party.members))
+                        self.room.features[self.cursorPos].lootStatus = LootStatus.Taken
+                        self.room.features.pop(self.cursorPos)
+                        self.state = "lookList"
+                        self.cursorPos = 0
             print("A")
         if self.game.B:
             if self.state == "main":
@@ -108,6 +119,10 @@ class RoomHandler():
                 write(self.game, 25,self.right-150,self.top+340,"A) Take")
                 text += " You see a " + self.game.directory.getItemName(self.room.features[self.cursorPos].loot,True) + "."
                 self.room.features[self.cursorPos].lootStatus = LootStatus.Discovered
+            if self.room.features[self.cursorPos].name == "Beds" and self.room.type == "haven":
+                write(self.game, 25,self.right-150,self.top+340,"A) Sleep")
+            if self.room.features[self.cursorPos].name == "Wanderer" and self.room.type == "haven":
+                write(self.game, 25,self.right-150,self.top+340,"A) Speak")
             write(self.game, 25,self.right-150,self.top+390,"B) Back")
             wrapWrite(self.game, 15,text,self.right-self.left-200,self.left+10,self.top+310)
 

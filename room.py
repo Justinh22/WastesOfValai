@@ -9,9 +9,9 @@ class RoomDatabase():
     def addRoom(self,coords,room):
         self.rooms[coords] = room
 
-    def getRoom(self,coords,difficulty):
+    def getRoom(self,coords,difficulty,type="room"):
         if coords not in self.rooms.keys(): # If the requested room has not yet been implemented, implement it and store in dictionary
-            newRoom = Room(coords,difficulty)
+            newRoom = Room(coords,difficulty,type)
             self.addRoom(coords,newRoom)
         return self.rooms[coords]
         
@@ -20,18 +20,33 @@ class RoomDatabase():
 
 
 class Room():
-    def __init__(self,coords,difficulty,id=-1):
+    def __init__(self,coords,difficulty,type="room",id=-1):
         self.coords = coords            # (int, int) : Contains row and column coordinates of this room
         self.id = id                    # int : Numeric id of this room
         self.description = ""           # String : Contains written description of the room
+        self.difficulty = difficulty    # int : Difficulty of the biome this room is in
         self.features = []              # List of Feature : Contains all Features in the room
-        self.implementRoomTemplate(self.id,difficulty)
+        self.type = type
+        if self.type == "room":
+            self.implementRoomTemplate(self.id,difficulty)
+        elif self.type == "haven":
+            self.implementHaven(self.id,difficulty)
 
     def implementRoomTemplate(self,id,difficulty):
         if id == -1:
             id = templateList.randomId()
         template = templateList.getRoomTemplate(id)
         templateList.markAsSeen(id)
+        self.description = template.description
+        for featID in template.features:
+            feat = featureList.getFeature(featID)
+            feat.rollForLoot(difficulty)
+            self.features.append(feat)
+
+    def implementHaven(self,id,difficulty):
+        if id == -1:
+            id = templateList.randomHavenId()
+        template = templateList.getHavenTemplate(id)
         self.description = template.description
         for featID in template.features:
             feat = featureList.getFeature(featID)
@@ -48,11 +63,16 @@ class RoomTemplate():
 class RoomTemplateList():
     def __init__(self):
         self.roomTemplateList = []      # List of RoomTemplate : Complete directory of all RoomTemplates
+        self.havenTemplateList = []
         self.initRoomTemplateList()
+        self.initHavenTemplateList()
         self.roomSeenList = [False for i in range(len(self.roomTemplateList))]
 
     def getRoomTemplate(self,id):
         return self.roomTemplateList[id] # This will only work as long as the ids in the roomTemplateList align with their index.
+    
+    def getHavenTemplate(self,id):
+        return self.havenTemplateList[id]
     
     def randomId(self):
         good = False
@@ -69,6 +89,9 @@ class RoomTemplateList():
                     roomOptions.append(idOption)
             id = roomOptions[random.randint(0,len(roomOptions)-1)]
         return id
+    
+    def randomHavenId(self):
+        return random.randint(0,len(self.havenTemplateList)-1)
     
     def markAsSeen(self,id):
         self.roomSeenList[id] = True # This will only work as long as the ids in the roomTemplateList align with their index.
@@ -92,6 +115,13 @@ class RoomTemplateList():
         R4 = RoomTemplate(4,"You enter an empty room with a stone altar at its center. The walls are impossibly smooth, contrasting the cobblestone floor. An ancient scroll sits atop the altar.",[5,13,21,22])
         self.roomTemplateList.append(R4)
 ############################################################################################################################################################################
+
+    def initHavenTemplateList(self):
+        R0 = RoomTemplate(0,"You enter a cozy wooden shack. The roaring fire in the hearth warms your bones, and beds along the wall offer you a quiet place to rest.",[14,23])
+        self.havenTemplateList.append(R0)
+
+        R1 = RoomTemplate(1,"You enter a cozy wooden shack. The roaring fire in the hearth warms your bones, and beds along the wall offer you a quiet place to rest. A wanderer sits by the fire.",[14,23,24])
+        self.havenTemplateList.append(R1)
 
 featureList = FeatureList()
 templateList = RoomTemplateList()

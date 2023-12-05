@@ -62,6 +62,11 @@ class Map():
         self.border()
 
         self.startingPos = (round(self.sizeR/2),round(self.sizeC/2))
+        while self.map[self.startingPos[0]][self.startingPos[1]] == ' ':
+            if self.startingPos[0] > round(self.sizeR/3):
+                self.startingPos = (self.startingPos[0]-1, self.startingPos[1])
+            else:
+                self.startingPos = (self.startingPos[0], self.startingPos[1]+1)
 
         endSet = random.randint(1,8)
         if endSet == 1:
@@ -124,6 +129,7 @@ class Map():
 
         print("Generating landmarks...")
         self.placeLandmarks(LANDMARK_COUNT)
+        self.setFirstHaven()
 
         with open("generated_map.txt","w") as file:
             for row in self.map:
@@ -220,11 +226,13 @@ class Map():
 
 
     def placeLandmarks(self,num):
-        landmarks = num
-        for i in range(0,landmarks):
+        landmarks = math.ceil(num * (.9))
+        havens = math.ceil(num * (.1))
+        count = 0
+        while count < landmarks:
             r = random.randint(1,self.sizeR-1)
             c = random.randint(1,self.sizeC-1)
-            sel = random.randint(1,6)
+            sel = random.randint(1,7)
             if self.map[r][c] == '.':
                 if sel == 1:
                     self.map[r][c] = 'W' # Well
@@ -232,32 +240,36 @@ class Map():
                     self.map[r][c] = 'P' # Pyramid
                 elif sel == 3:
                     self.map[r][c] = 'A' # Abandoned Camp
-                elif sel == 4:
-                    self.map[r][c] = 'H' # Haven
                 else:
                     self.map[r][c] = 'S' # Shack
-            if self.map[r][c] == ';':
+            elif self.map[r][c] == ';':
                 if sel == 1:
                     self.map[r][c] = 'B' # Bandit Camp
                 elif sel == 2:
                     self.map[r][c] = 'C' # Cave
                 elif sel == 3:
                     self.map[r][c] = 'A' # Abandoned Camp
-                elif sel == 4:
-                    self.map[r][c] = 'H' # Haven
                 else:
                     self.map[r][c] = 'S' # Shack
-            if self.map[r][c] == '#':
+            elif self.map[r][c] == '#':
                 if sel == 1:
                     self.map[r][c] = 'R' # Ruins
                 elif sel == 2:
                     self.map[r][c] = 'T' # Treehouse
                 elif sel == 3:
                     self.map[r][c] = 'A' # Abandoned Camp
-                elif sel == 4:
-                    self.map[r][c] = 'H' # Haven
                 else:
                     self.map[r][c] = 'S' # Shack
+            else:
+                continue
+            count += 1
+        count = 0
+        while count < havens:
+            r = random.randint(1,self.sizeR-1)
+            c = random.randint(1,self.sizeC-1)
+            if self.map[r][c] != ' ':
+                self.map[r][c] = 'H' # Haven
+                count += 1
 
 
     def saveRevealed(self):
@@ -266,6 +278,16 @@ class Map():
                 for element in row:
                     file.write(element)
                 file.write("\n")
+
+    
+    def setFirstHaven(self):
+        good = False
+        while not good:
+            rowMod = random.choice([-2,-1,1,2])
+            colMod = random.choice([-2,-1,1,2])
+            if self.map[self.startingPos[0]+rowMod][self.startingPos[1]+colMod] != ' ':
+                self.map[self.startingPos[0]+rowMod][self.startingPos[1]+colMod] = 'H'
+                good = True
 
 
     def genDifficultyMapBiomes(self):

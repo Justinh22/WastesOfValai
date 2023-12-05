@@ -5,6 +5,7 @@ from directory import *
 from roomhandler import *
 from writing import *
 from dungeoncrawler import *
+from utility import *
 
 class Overworld():
     def __init__(self,game):
@@ -77,6 +78,9 @@ class Overworld():
             print("X")
             #self.inWorld = False
             #self.game.inGame = False
+        if self.game.Y:
+            if len(self.game.party.members) < 4:
+                self.game.party.members.append(self.game.directory.buildCharacter(difficultyToLevel(self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[self.game.currentPos[0]][self.game.currentPos[1]])),self.game.party.members))
         if self.game.START:
             self.pausemenu.pause(self.game.currentPos)
 
@@ -148,7 +152,12 @@ class Overworld():
         self.steps += 1
         if self.game.WorldMap.map[r][c] != '#' and self.game.WorldMap.map[r][c] != ';' and self.game.WorldMap.map[r][c] != '.':
             if self.game.WorldMap.map[r][c] == 'A' or self.game.WorldMap.map[r][c] == 'H' or self.game.WorldMap.map[r][c] == 'S':
-                newRoom = RoomHandler(self.game, self.game.roomDB.getRoom((r,c),self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c])))
+                if self.game.WorldMap.map[r][c] == 'H':
+                    typ = "haven"
+                else:
+                    typ = "room"
+                print(f'Type: {typ}')
+                newRoom = RoomHandler(self.game, self.game.roomDB.getRoom((r,c),self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]),typ))
                 newRoom.enter()
             else:
                 newDungeon = DungeonMap(self.game.directory,self.game.currentPos,self.getDungeonType(r,c),self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]))

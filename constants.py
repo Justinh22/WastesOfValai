@@ -1,6 +1,7 @@
 from enum import Enum
 
 MAX_DIFFICULTY = 25
+MAX_LEVEL = 10
 MAX_WEAPON_RARITY = 10
 MAX_ARMOR_RARITY = 10
 MAX_POTION_RARITY = 5
@@ -8,7 +9,7 @@ MAX_ATKSPELL_RARITY = 5
 MAX_SPTSPELL_RARITY = 5
 MAX_INVENTORY_SIZE = 10
 
-LANDMARK_COUNT = 500
+LANDMARK_COUNT = 300
 MAP_WIDTH = 200
 MAP_HEIGHT = 200
 DUNGEON_DIM = 40
@@ -85,6 +86,7 @@ class Status(Enum):
     Paralyzed = 0
     Burned = 1
     Freezing = 2
+    NoStatus = 3
 
 class DungeonType(Enum):
     Well = 0
@@ -93,3 +95,11 @@ class DungeonType(Enum):
     Cave = 3
     Ruins = 4
     Treehouse = 5
+
+class Personality(Enum):
+    Brave = 0
+    Angry = 1
+    Friendly = 2
+    Cowardly = 3
+    Headstrong = 4
+    Lazy = 5

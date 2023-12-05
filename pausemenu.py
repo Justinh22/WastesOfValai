@@ -128,7 +128,7 @@ class PauseMenu():
             pygame.draw.rect(self.game.screen,self.game.white,summaryOutline,2)
             if self.substate == "spellbook":
                 tgt = self.game.directory.getItem(self.game.party.members[self.targetPartyMember].spells[self.targetElement])
-                self.itemName = self.game.directory.getItemName(tgt.id,True)
+                self.itemName = self.game.directory.getItemName(tgt.id)
                 write(self.game, 20, 60, 220, self.itemName)
                 writeOrientation(self.game, 20, self.right-90, 220, str(tgt.manacost) + " MP", "L")
                 if tgt.type == SpellType.Attack:
@@ -227,7 +227,7 @@ class PauseMenu():
             wrapWrite(self.game, 15, tgt.description, self.right-85, 60, 290)
         
         if self.state == "confirmAction":
-            write(self.game, 15, 55, 360, "Are you sure you want to "+self.action+" the "+self.itemName+"? (Press A to Confirm)")
+            write(self.game, 15, 35, 360, "Are you sure you want to "+self.action+" the "+self.itemName+"? (Press A to Confirm)")
 
         if self.state == "map":
             screenOutline = pygame.Rect(self.left,self.top,self.right,self.bottom)

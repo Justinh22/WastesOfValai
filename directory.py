@@ -2,6 +2,7 @@ from items import *
 from characters import *
 from encounterbuilder import *
 from constants import *
+from utility import *
 from enum import Enum
 import copy
 
@@ -128,6 +129,7 @@ class Directory():
         return self.copy(self.sptSpellDirectory[id-400])
 
     def getItemByRarity(self,type,rarity):
+        print(f'Fetching {type} of rarity {rarity}...')
         options = []
         if type == Type.Weapon:
             for item in self.weaponDirectory:
@@ -160,6 +162,36 @@ class Directory():
         else:
             return -1
         return options[random.randint(0,len(options)-1)]
+    
+    def getWeaponByRarity(self,types,rarity):
+        print(f'WeaponByRarity: {types}')
+        options = []
+        correctOptions = []
+        for item in self.weaponDirectory:
+            if item.rarity == rarity:
+                options.append(item.id)
+        for type in types:
+            for item in options:
+                if type == self.getItem(item).type:
+                    correctOptions.append(item)
+        choice = random.choice(correctOptions)
+        print(f'Chose {self.getItemName(choice)}')
+        return choice
+    
+    def getArmorByRarity(self,types,rarity):
+        print(f'ArmorByRarity: {types}')
+        options = []
+        correctOptions = []
+        for item in self.armorDirectory:
+            if item.rarity == rarity:
+                options.append(item.id)
+        for type in types:
+            for item in options:
+                if type == self.getItem(item).type:
+                    correctOptions.append(item)
+        choice = random.choice(correctOptions)
+        print(f'Chose {self.getItemName(choice)}')
+        return choice
 
     def getItemByRarities(self,type,rarityA,rarityB):
         options = []
@@ -220,6 +252,24 @@ class Directory():
             lootRarity = math.ceil(rarity / divVal)
         return lootRarity
     
+    def getLootRarityForCharacter(self,level,type):
+        if type == Type.Weapon:
+            divVal = MAX_LEVEL / MAX_WEAPON_RARITY
+            lootRarity = math.ceil(level / divVal)
+        if type == Type.Armor:
+            divVal = MAX_LEVEL / MAX_ARMOR_RARITY
+            lootRarity = math.ceil(level / divVal)
+        if type == Type.Potion:
+            divVal = MAX_LEVEL / MAX_POTION_RARITY
+            lootRarity = math.ceil(level / divVal)
+        if type == Type.AtkSpell:
+            divVal = MAX_LEVEL / MAX_ATKSPELL_RARITY
+            lootRarity = math.ceil(level / divVal)
+        if type == Type.SptSpell:
+            divVal = MAX_LEVEL / MAX_SPTSPELL_RARITY
+            lootRarity = math.ceil(level / divVal)
+        return lootRarity
+    
     def rollForLoot(self,difficulty,itemRarity,types):
         chosenType = types[random.randint(0,len(types)-1)]
         itemRarity = difficulty + itemRarity.value
@@ -239,6 +289,18 @@ class Directory():
                 if candidate == member.name:
                     good = False
         return candidate
+    
+    def getRandomClass(self):
+        return self.classDirectory[random.randint(0,len(self.classDirectory)-1)]
+    
+    def getRandomPersonality(self):
+        return random.choice(list(Personality))
+    
+    def buildCharacter(self,level,members):
+        newChar = Character(self.getCharacterName(members),level,self.getRandomClass(),self.getRandomPersonality())
+        newChar.eqpWpn = self.getWeapon(self.getWeaponByRarity(weaponProfArrayToList(newChar.type.weaponProficiency),self.getLootRarityForCharacter(level,Type.Weapon)))
+        newChar.eqpAmr = self.getArmor(self.getArmorByRarity(armorProfArrayToList(newChar.type.armorProficiency),self.getLootRarityForCharacter(level,Type.Armor)))
+        return newChar
 
     def buildEncounter(self,level,biome):
         biomeCreatures = []

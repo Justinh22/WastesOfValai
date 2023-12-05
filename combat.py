@@ -40,6 +40,7 @@ class Combat():
 
     def initialize(self,party,encounter):
         self.party = party
+        self.currentTurn = 0
         for i in range(0,len(self.party.members)):
             print(f'{self.party.members[i].name}, {self.party.members[i].type.name}, {self.party.members[i].level} (ID {self.party.members[i].id}) - WPN: {self.party.members[i].eqpWpn.name}, AMR: {self.party.members[i].eqpAmr.name}, HP: {self.party.members[i].hpMax}, MP: {self.party.members[i].mpMax}, ATK: {self.party.members[i].attack}, CRT: {self.party.members[i].critrate}, DEF: {self.party.members[i].defense}, DDG: {self.party.members[i].dodge}, LCK: {self.party.members[i].luck}, SPD: {self.party.members[i].speed}, PRS: {self.party.members[i].personality}, SPELLS: {self.party.members[i].spells}')
         self.encounter = encounter
@@ -81,6 +82,10 @@ class Combat():
         self.inCombat = True
         self.state = "mainWindow"
         self.delay = 5
+
+    def combatTeardown(self):
+        for member in self.party.members:
+            member.resetBuffs()
 
     def blitScreen(self):
         self.game.screen.blit(self.game.screen, (0,0))
@@ -451,7 +456,7 @@ class Combat():
             pygame.draw.rect(self.game.screen,self.game.white,enemyRect)
             pygame.draw.rect(self.game.screen,self.game.white,outlineRect,1)
             write(self.game, 20, 180+maxEncWidth, 30+offset, str(self.encounter[i].hp)+"/"+str(self.encounter[i].hpMax))
-            if self.encounter[i].status != "None":
+            if self.encounter[i].status != Status.NoStatus:
                 if self.encounter[i].status == Status.Paralyzed:
                     write(self.game, 20, 280+maxEncWidth, 30+offset, "<P"+str(self.encounter[i].statusCount)+">")
                 elif self.encounter[i].status == Status.Burned:
@@ -469,7 +474,7 @@ class Combat():
             pygame.draw.rect(self.game.screen,self.game.white,partyMPRect)
             pygame.draw.rect(self.game.screen,self.game.white,outlineRect,1)
             write(self.game, 20, self.right-maxPtyWidth-220, 170+offset, str(self.party.members[i].hp)+"/"+str(self.party.members[i].hpMax))
-            if self.party.members[i].status != "None":
+            if self.party.members[i].status != Status.NoStatus:
                 if self.party.members[i].status == Status.Paralyzed:
                     write(self.game, 20, self.right-maxPtyWidth-290, 170+offset, "<P>")
                 elif self.party.members[i].status == Status.Burned:
@@ -498,8 +503,8 @@ class Combat():
         for i in range(len(self.party.members[self.combatOrder[self.currentTurn][1]].activeBuffs)):
             writeOrientation(self.game, 11, self.right, 330+(i*15), self.party.members[self.combatOrder[self.currentTurn][1]].activeBuffs[i][0]+" ("+str(self.party.members[self.combatOrder[self.currentTurn][1]].activeBuffs[i][1])+")","R")
             iNext += 1
-        if self.party.members[self.combatOrder[self.currentTurn][1]].status != "None":
-            writeOrientation(self.game, 11, self.right, 330+(iNext*15), self.party.members[self.combatOrder[self.currentTurn][1]].status+" ("+str(self.party.members[self.combatOrder[self.currentTurn][1]].statusCount)+")","R")
+        if self.party.members[self.combatOrder[self.currentTurn][1]].status != Status.NoStatus:
+            writeOrientation(self.game, 11, self.right, 330+(iNext*15), self.party.members[self.combatOrder[self.currentTurn][1]].status.name+" ("+str(self.party.members[self.combatOrder[self.currentTurn][1]].statusCount)+")","R")
 
     def next(self):
         self.currentTurn += 1
