@@ -7,13 +7,6 @@ from directory import *
 from writing import *
 from dungeonmapgenerator import *
 
-ENEMY_VISION_KERNAL = []
-ENEMY_VISION_KERNAL.append( [ 0 , 0 , 40, 0 , 0 ] )
-ENEMY_VISION_KERNAL.append( [ 0 , 2 , 25, 2 , 0 ] )
-ENEMY_VISION_KERNAL.append( [ 0 , 3 , 15, 3 , 0 ] )
-ENEMY_VISION_KERNAL.append( [ 1 , 2 , 10, 2 , 1 ] )
-ENEMY_VISION_KERNAL.append( [ 1 , 2 , 5 , 2 , 1 ] )
-
 class Crawler():
     def __init__(self,game,dungeonMap):
         self.game = game

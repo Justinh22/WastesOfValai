@@ -5,8 +5,8 @@ from directory import *
 
 WELL_WALL = '='
 PYRAMID_WALL = '+'
-BANDIT_WALL = '-'
-CAVE_WALL = '|'
+BANDIT_WALL = 'X'
+CAVE_WALL = '&'
 RUINS_WALL = '%'
 TREEHOUSE_WALL = '~'
 FLOOR_CHAR = ' '

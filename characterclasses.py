@@ -69,6 +69,9 @@ class Character():
         return self.manaregen + self.eqpAmr.manaregen
     def getSpeed(self):
         return self.speed
+    def amplify(self,val):
+        val = math.ceil(val + (val * self.getAmplifier()))
+        return val
     def takeDamage(self,val):
         print(f'{self.name} took {val} damage!')
         if val > self.hp:
@@ -338,6 +341,10 @@ class Creature():
         self.spellCooldown = 0
         self.status = "None"
         self.statusCount = 0
+    def getAccuracy(self):
+        return self.accuracy
+    def getDodge(self):
+        return self.dodge
     def takeDamage(self,val):
         print(f'{self.name} took {val} damage!')
         if val > self.hp:
@@ -360,6 +367,8 @@ class Action():
         self.source = src
         self.target = tgt
         self.action = act # 0 = ATTACK, 1 = GUARD, ID = SPELL, ID = ART, ID = ITEM
+    def print(self):
+        return str(self.source) + " -> " + str(self.target) + ": " + str(self.action)
 
 class Buff():
     def __init__(self,nme,buf,dur,tgt):

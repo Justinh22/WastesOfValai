@@ -172,7 +172,7 @@ class PauseMenu():
                     write(self.game, 15, 60, 245, buffText)
                 elif tgt.type == SpellType.Heal:
                     write(self.game, 15, 60, 245, "Heals for " + str(tgt.potency[6]) + " HP.")
-                if self.state == "itemSummary":
+                if self.state == "itemSummary" and self.game.directory.getItem(self.game.party.members[self.targetPartyMember].spells[self.targetElement]).type == SpellType.Heal: # Cast:
                     write(self.game, 22, 540, 420, "Cast")
                     write(self.game, 22, 510 + (self.cursorPos*100), 417, "->")
             elif self.substate == "equipment":
@@ -361,7 +361,7 @@ class PauseMenu():
                 if self.substate == "inventory" and self.cursorPos == 0: # Use
                     self.action = "use"
                     self.state = "confirmAction"
-                if self.substate == "spellbook" and self.cursorPos == 0: # Cast
+                if self.substate == "spellbook" and self.cursorPos == 0 and self.game.directory.getItem(self.game.party.members[self.targetPartyMember].spells[self.targetElement]).type == SpellType.Heal: # Cast
                     self.action = "cast"
                     self.state = "targetSelect"
                     self.cursorPos = 0
@@ -516,11 +516,11 @@ class PauseMenu():
         elif self.mapZoomSize == 10:
             return 8
         elif self.mapZoomSize == 8:
-            return 9
+            return 10
         elif self.mapZoomSize == 6:
-            return 10
+            return 12
         elif self.mapZoomSize == 4:
-            return 10
+            return 20
         
     def printInventory(self, type):
         scroll = False

@@ -20,6 +20,7 @@ class Overworld():
         self.combat = Combat(self.game)
         self.party = self.game.party
         self.steps = 0
+        self.lastDiff = 0
 
     def blitScreen(self):
         self.game.screen.blit(self.game.screen, (0,0))
@@ -88,7 +89,12 @@ class Overworld():
         blockSize = 30 #Set the size of the grid block
         self.game.screen.fill((0,0,0))
         diffText = self.getBiome(self.game.currentPos[0],self.game.currentPos[1]).name + ": Difficulty " + str(self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[self.game.currentPos[0]][self.game.currentPos[1]]))
-        write(self.game, 20,30,self.height+10,diffText)
+        if self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[self.game.currentPos[0]][self.game.currentPos[1]]) > self.game.party.getPower()+1:
+            text = self.font.render(diffText,True,self.game.red)
+        else:
+            text = self.font.render(diffText,True,self.game.white)
+        self.game.screen.blit(text,(30,self.height+10))
+        #write(self.game, 20,30,self.height+10,diffText)
         write(self.game, 20,self.width-80,self.height+10,"ST) Pause")
         for x in range(30, self.width, blockSize):
             for y in range(30, self.height, blockSize):
@@ -174,8 +180,9 @@ class Overworld():
                 odds = 10
             else:
                 odds = 20
-            if random.randint(odds,30) == 29:
+            if random.randint(odds,30) == 29 and self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]) == self.lastDiff:
                 self.steps = 0
                 encounter = []
                 encounter = self.game.directory.buildEncounter(self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]),self.getBiome(self.game.currentPos[0],self.game.currentPos[1]))
                 self.combat.initialize(self.party,encounter)
+        self.lastDiff = self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c])

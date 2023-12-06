@@ -15,6 +15,7 @@ class RoomHandler():
         self.font = pygame.font.Font('freesansbold.ttf',20)
         self.cursorPos = 0
         self.state = "main"
+        self.slept = False
         self.delay = 5
 
     def enter(self):
@@ -58,6 +59,7 @@ class RoomHandler():
                         self.takeItem(self.cursorPos)
                 if self.room.type == "haven" and self.room.features[self.cursorPos].name == "Beds":
                     self.game.party.fullRestore()
+                    self.slept = True
                 if self.room.type == "haven" and self.room.features[self.cursorPos].name == "Wanderer":
                     if len(self.game.party.members) < 4:
                         self.game.party.members.append(self.game.directory.buildCharacter(difficultyToLevel(self.room.difficulty),self.game.party.members))
@@ -119,7 +121,7 @@ class RoomHandler():
                 write(self.game, 25,self.right-150,self.top+340,"A) Take")
                 text += " You see a " + self.game.directory.getItemName(self.room.features[self.cursorPos].loot,True) + "."
                 self.room.features[self.cursorPos].lootStatus = LootStatus.Discovered
-            if self.room.features[self.cursorPos].name == "Beds" and self.room.type == "haven":
+            if self.room.features[self.cursorPos].name == "Beds" and self.room.type == "haven" and self.slept == False:
                 write(self.game, 25,self.right-150,self.top+340,"A) Sleep")
             if self.room.features[self.cursorPos].name == "Wanderer" and self.room.type == "haven":
                 write(self.game, 25,self.right-150,self.top+340,"A) Speak")
