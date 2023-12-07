@@ -49,6 +49,7 @@ class Combat():
             print(f'{self.encounter[i].name}, {self.encounter[i].level} - SPD: {self.encounter[i].speed}')
 
         self.combatOrder = []
+        self.actions = []
         members = self.party.members + self.encounter
         members.sort(key=lambda x: x.speed)
         members.reverse()
@@ -102,6 +103,7 @@ class Combat():
             self.getInput()
             if self.inCombat == False:
                 break
+            self.gameStatus()
             self.execute()
             self.gameStatus()
             self.drawScreen()
@@ -118,6 +120,7 @@ class Combat():
                 self.cursorPos = 0
                 self.actionVal = 0
                 self.state = "targetSelect"
+                self.enterTargetSelect()
                 print("ATTACK")
             elif self.state == "useMenu":
                 if self.cursorPos == 0:
@@ -142,10 +145,8 @@ class Combat():
                     self.actionVal = -2
                 if self.party.members[self.combatOrder[self.currentTurn][1]].status == Status.Freezing and random.randint(0,2)==0:
                     self.actionVal = -3
-                print(f'Action writing for {self.combatOrder[self.currentTurn]}')
-                for action in self.actions:
-                    print(action.print())
                 self.actions.append(Action(self.combatOrder[self.currentTurn],self.cursorPos,self.actionVal))
+                print(f'Action writing for {self.combatOrder[self.currentTurn]}, length {len(self.actions)}')
                 self.next()
                 self.cursorPos = -1
                 print("TARGET")
@@ -166,14 +167,13 @@ class Combat():
                     if self.game.directory.getSpellTarget(self.actionVal) == Target.Single:
                         self.state = "targetSelect"
                         self.cursorPos = 0
+                        self.enterTargetSelect()
                     else:
                         self.state = "mainWindow"
                         if self.party.members[self.combatOrder[self.currentTurn][1]].status == Status.Paralyzed or (self.party.members[self.combatOrder[self.currentTurn][1]].status == Status.Freezing and random.randint(0,2)==0):
                             self.actionVal = -1
-                        print(f'Action writing for {self.combatOrder[self.currentTurn]}')
-                        for action in self.actions:
-                            print(action.print())
                         self.actions.append(Action(self.combatOrder[self.currentTurn],0,self.actionVal))
+                        print(f'Action writing for {self.combatOrder[self.currentTurn]}, length {len(self.actions)}')
                         self.next()
                         self.cursorPos = -1
                     print("SPELL")
@@ -183,6 +183,7 @@ class Combat():
                 self.actionVal = self.party.inventory[self.itemID].id
                 self.state = "targetSelect"
                 self.cursorPos = 0
+                self.enterTargetSelect()
                 print("ITEM")
         if self.game.B:
             if self.state == "mainWindow":
@@ -220,7 +221,10 @@ class Combat():
                 self.inCombat = False
         if self.game.UP:
             if self.state == "targetSelect" and self.cursorPos > 0:
-                self.cursorPos -= 1
+                tgtList = self.encounter if self.actionVal < 200 else self.party.members
+                for i in range(0,self.cursorPos):
+                    if tgtList[i].hp > 0:
+                        self.cursorPos = i
             elif self.state == "useMenu":
                 if self.cursorPos == 2 or self.cursorPos == 3:
                     self.cursorPos -= 2
@@ -232,8 +236,11 @@ class Combat():
                     self.cursorPos -= 2
         if self.game.DOWN:
             if self.state == "targetSelect":
-                if (self.actionVal < 200 and self.cursorPos < len(self.encounter)-1) or (self.actionVal >= 200 and self.cursorPos < len(self.party.members)-1):
-                    self.cursorPos += 1
+                tgtList = self.encounter if self.actionVal < 200 else self.party.members
+                for i in range(self.cursorPos+1,len(tgtList)):
+                    if tgtList[i].hp > 0:
+                        self.cursorPos = i
+                        break
             elif self.state == "useMenu":
                 if self.cursorPos == 0 or self.cursorPos == 1:
                     self.cursorPos += 2
@@ -263,6 +270,14 @@ class Combat():
             elif self.state == "useMenu":
                 if self.cursorPos < 3:
                     self.cursorPos += 1
+
+    def enterTargetSelect(self):
+        self.cursorPos = 0
+        tgtList = self.encounter if self.actionVal < 200 else self.party.members
+        for i in range(0,len(tgtList)):
+            if tgtList[i].hp > 0:
+                self.cursorPos = i
+                break
 
     def drawScreen(self):
         screenOutline = pygame.Rect(self.left,self.top,self.right,self.bottom)
@@ -566,19 +581,20 @@ class Combat():
 
 
     def enemyAction(self,source):
-        print(f'Action writing for {source}')
-        for action in self.actions:
-            print(action.print())
         if not self.isAlive(source):
             self.actions.append(Action(source,0,-1))
+            print(f'Action writing for {source}, length {len(self.actions)}')
             return
         elif self.encounter[self.combatOrder[self.currentTurn][1]].status == Status.Paralyzed:
             self.actions.append(Action(source,0,-2))
+            print(f'Action writing for {source}, length {len(self.actions)}')
             return
         elif self.encounter[self.combatOrder[self.currentTurn][1]].status == Status.Freezing and random.randint(0,2)==0:
             self.actions.append(Action(source,0,-3))
+            print(f'Action writing for {source}, length {len(self.actions)}')
             return
         target = random.randint(0,len(self.party.members)-1)
+        target = self.checkRecalculateTarget(source[0],target,"Party")
         timeout = 0
         while self.party.members[target].hp <= 0 and timeout < 20:
             target = random.randint(0,len(self.party.members)-1)
@@ -592,9 +608,11 @@ class Combat():
             self.encounter[self.combatOrder[self.currentTurn][1]].spellCooldown = 2
             act = Action(source, target, self.encounter[self.combatOrder[self.currentTurn][1]].knownSpells[move-1])
         self.actions.append(act)
+        print(f'Action writing for {source}, length {len(self.actions)}')
 
     def attack(self,source,target):
         if source[0] == "Encounter":
+            target = self.checkRecalculateTarget(source[0],target,"Party")
             if self.encounter[source[1]].attack - self.party.members[target].getDefense() < 0:
                 self.dmg = 0
             else:
@@ -605,6 +623,7 @@ class Combat():
             else:
                 self.miss = True
         if source[0] == "Party":
+            target = self.checkRecalculateTarget(source[0],target,"Encounter")
             if self.party.members[source[1]].getAttack() - self.encounter[target].defense < 0:
                 self.dmg = 0
             else:
@@ -616,12 +635,26 @@ class Combat():
             else:
                 self.miss = True
 
+    def checkRecalculateTarget(self,source,target,tgtGroup):
+        if source == "Encounter":
+            while not self.isAlive((tgtGroup,target)):
+                target += 1
+                if target >= len(self.party.members):
+                    target = 0
+        elif source == "Party":
+            while not self.isAlive((tgtGroup,target)):
+                target += 1
+                if target >= len(self.encounter):
+                    target = 0
+        return target
+
     def calculateHit(self,attacker,defender):
         randA = random.randint(0,99)
         randB = random.randint(0,99)
         return (randA+randB) + (defender.getDodge()*2) < (attacker.getAccuracy()*2)
 
     def usePotion(self,target,itemID):
+        target = self.checkRecalculateTarget("Party",target,"Encounter")
         for i in range(len(self.party.inventory)):
             if self.party.inventory[i].id == itemID:
                 index = i
@@ -633,6 +666,7 @@ class Combat():
             spell = self.game.directory.getAtkSpell(spellID)
             if spell.target == Target.Single:
                 if source[0] == "Encounter":
+                    target = self.checkRecalculateTarget(source[0],target,"Party")
                     if spell.type == SpellType.Attack:
                         self.dmg = self.party.members[target].takeDamage(spell.attack)
                     elif spell.type == SpellType.Debuff:
@@ -647,6 +681,7 @@ class Combat():
                                 self.party.members[target].status = Status.Freezing
                                 self.party.members[target].statusCount = -1
                 else:
+                    target = self.checkRecalculateTarget(source[0],target,"Encounter")
                     if spell.type == SpellType.Attack:
                         self.dmg = spell.attack
                         if spell.element == self.encounter[target].resistance:
@@ -707,6 +742,7 @@ class Combat():
         elif spellID < 500:
             spell = self.game.directory.getSptSpell(spellID)
             if spell.target == Target.Single:
+                target = self.checkRecalculateTarget(source[0],target,"Party")
                 if spell.type == SpellType.Heal:
                     if self.party.members[target].hp > 0:
                         self.party.members[target].hp += spell.getHeal()
@@ -829,10 +865,8 @@ class Combat():
             if self.combatOrder[self.currentTurn][0] == "Encounter":
                 self.enemyAction(self.combatOrder[self.currentTurn])
             else:
-                print(f'Action writing for {self.combatOrder[self.currentTurn]}')
-                for action in self.actions:
-                    print(action.print())
                 self.actions.append(Action(self.combatOrder[self.currentTurn],0,-1))
+                print(f'Action writing for {self.combatOrder[self.currentTurn]}, length {len(self.actions)}')
             self.currentTurn += 1
             if self.currentTurn >= len(self.combatOrder):
                 return
@@ -844,15 +878,26 @@ class Combat():
         ptyFlag = False
         for member in self.combatOrder:
             if member[0] == "Encounter":
-                encFlag = True
-            else:
-                ptyFlag = True
+                if self.encounter[member[1]].hp > 0:
+                    encFlag = True
+            elif member[0] == "Party":
+                if self.party.members[member[1]].hp > 0:
+                    ptyFlag = True
         if ptyFlag == False:
             self.state = "lose"
             self.timeStart = pygame.time.get_ticks()
+            print("Lose!")
+            self.exTurn = 10
+            self.timeStart -= 1000
+            return True
         if encFlag == False:
             self.state = "win"
             self.timeStart = pygame.time.get_ticks()
+            print("Win!")
+            self.exTurn = 10
+            self.timeStart -= 1000
+            return True
+        return False
 
     def applyBuff(self,buff,target):
         newBuff = Buff(buff.name,buff.potency,5,target)
