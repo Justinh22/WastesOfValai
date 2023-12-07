@@ -18,7 +18,7 @@ class Overworld():
         self.font = pygame.font.Font('freesansbold.ttf',20)
         self.pausemenu = PauseMenu(self.game)
         self.combat = Combat(self.game)
-        self.party = self.game.party
+        self.party = self.game.player.party
         self.steps = 0
         self.lastDiff = 0
 
@@ -30,7 +30,7 @@ class Overworld():
     def display(self):
         self.inWorld = True
         self.game.screen.fill((0,0,0))
-        self.game.currentPos = list(self.game.WorldMap.startingPos)
+        self.game.player.currentPos = list(self.game.WorldMap.startingPos)
         self.drawScreen()
         while self.inWorld and self.game.inGame:
             self.game.eventHandler()
@@ -50,46 +50,46 @@ class Overworld():
 
     def getInput(self):
         if self.game.UP:
-            if self.game.WorldMap.map[self.game.currentPos[0]-1][self.game.currentPos[1]] != ' ' and self.game.WorldMap.map[self.game.currentPos[0]-1][self.game.currentPos[1]] != 'X':
-                self.game.currentPos[0] -= 1
-                self.stepTo(self.game.currentPos[0],self.game.currentPos[1])
+            if self.game.WorldMap.map[self.game.player.currentPos[0]-1][self.game.player.currentPos[1]] != ' ' and self.game.WorldMap.map[self.game.player.currentPos[0]-1][self.game.player.currentPos[1]] != 'X':
+                self.game.player.currentPos[0] -= 1
+                self.stepTo(self.game.player.currentPos[0],self.game.player.currentPos[1])
             self.drawScreen()
         if self.game.RIGHT:
-            if self.game.WorldMap.map[self.game.currentPos[0]][self.game.currentPos[1]+1] != ' ' and self.game.WorldMap.map[self.game.currentPos[0]][self.game.currentPos[1]+1] != 'X':
-                self.game.currentPos[1] += 1
-                self.stepTo(self.game.currentPos[0],self.game.currentPos[1])
+            if self.game.WorldMap.map[self.game.player.currentPos[0]][self.game.player.currentPos[1]+1] != ' ' and self.game.WorldMap.map[self.game.player.currentPos[0]][self.game.player.currentPos[1]+1] != 'X':
+                self.game.player.currentPos[1] += 1
+                self.stepTo(self.game.player.currentPos[0],self.game.player.currentPos[1])
             self.drawScreen()
         if self.game.DOWN:
-            if self.game.WorldMap.map[self.game.currentPos[0]+1][self.game.currentPos[1]] != ' ' and self.game.WorldMap.map[self.game.currentPos[0]+1][self.game.currentPos[1]] != 'X':
-                self.game.currentPos[0] += 1
-                self.stepTo(self.game.currentPos[0],self.game.currentPos[1])
+            if self.game.WorldMap.map[self.game.player.currentPos[0]+1][self.game.player.currentPos[1]] != ' ' and self.game.WorldMap.map[self.game.player.currentPos[0]+1][self.game.player.currentPos[1]] != 'X':
+                self.game.player.currentPos[0] += 1
+                self.stepTo(self.game.player.currentPos[0],self.game.player.currentPos[1])
             self.drawScreen()
         if self.game.LEFT:
-            if self.game.WorldMap.map[self.game.currentPos[0]][self.game.currentPos[1]-1] != ' ' and self.game.WorldMap.map[self.game.currentPos[0]][self.game.currentPos[1]-1] != 'X':
-                self.game.currentPos[1] -= 1
-                self.stepTo(self.game.currentPos[0],self.game.currentPos[1])
+            if self.game.WorldMap.map[self.game.player.currentPos[0]][self.game.player.currentPos[1]-1] != ' ' and self.game.WorldMap.map[self.game.player.currentPos[0]][self.game.player.currentPos[1]-1] != 'X':
+                self.game.player.currentPos[1] -= 1
+                self.stepTo(self.game.player.currentPos[0],self.game.player.currentPos[1])
             self.drawScreen()
         if self.game.A:
             print("A")
         if self.game.B:
             encounter = []
-            encounter = self.game.directory.buildEncounter(self.party.getPower(),self.getBiome(self.game.currentPos[0],self.game.currentPos[1]))
+            encounter = self.game.directory.buildEncounter(self.party.getPower(),self.getBiome(self.game.player.currentPos[0],self.game.player.currentPos[1]))
             self.combat.initialize(self.party,encounter)
         if self.game.X:
             print("X")
             #self.inWorld = False
             #self.game.inGame = False
         if self.game.Y:
-            if len(self.game.party.members) < 4:
-                self.game.party.members.append(self.game.directory.buildCharacter(difficultyToLevel(self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[self.game.currentPos[0]][self.game.currentPos[1]])),self.game.party.members))
+            if len(self.game.player.party.members) < 4:
+                self.game.player.party.members.append(self.game.directory.buildCharacter(difficultyToLevel(self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[self.game.player.currentPos[0]][self.game.player.currentPos[1]])),self.game.player.party.members))
         if self.game.START:
-            self.pausemenu.pause(self.game.currentPos)
+            self.pausemenu.pause(self.game.player.currentPos)
 
     def drawScreen(self):
         blockSize = 30 #Set the size of the grid block
         self.game.screen.fill((0,0,0))
-        diffText = self.getBiome(self.game.currentPos[0],self.game.currentPos[1]).name + ": Difficulty " + str(self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[self.game.currentPos[0]][self.game.currentPos[1]]))
-        if self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[self.game.currentPos[0]][self.game.currentPos[1]]) > self.game.party.getPower()+1:
+        diffText = self.getBiome(self.game.player.currentPos[0],self.game.player.currentPos[1]).name + ": Difficulty " + str(self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[self.game.player.currentPos[0]][self.game.player.currentPos[1]]))
+        if self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[self.game.player.currentPos[0]][self.game.player.currentPos[1]]) > self.game.player.party.getPower()+1:
             text = self.font.render(diffText,True,self.game.red)
         else:
             text = self.font.render(diffText,True,self.game.white)
@@ -103,14 +103,14 @@ class Overworld():
                 gridHeight = self.height / blockSize
                 rect = pygame.Rect(x, y, blockSize, blockSize)
                 pygame.draw.rect(self.game.screen, (255,255,255), rect, 1)
-                r = int(((y / blockSize)-(gridHeight/2))+self.game.currentPos[0])
-                c = int(((x / blockSize)-(gridWidth/2))+self.game.currentPos[1])
+                r = int(((y / blockSize)-(gridHeight/2))+self.game.player.currentPos[0])
+                c = int(((x / blockSize)-(gridWidth/2))+self.game.player.currentPos[1])
                 mapChar = '_'
                 if r < 0 or r >= self.game.WorldMap.sizeR:
                     mapChar = ' '
                 if c < 0 or c >= self.game.WorldMap.sizeC:
                     mapChar = ' '
-                if r == self.game.currentPos[0] and c == self.game.currentPos[1]:
+                if r == self.game.player.currentPos[0] and c == self.game.player.currentPos[1]:
                     mapChar = '@'
                 if mapChar == '_':
                     revMapList = list(self.game.WorldMap.revealedMap[r])
@@ -166,9 +166,7 @@ class Overworld():
                 newRoom = RoomHandler(self.game, self.game.roomDB.getRoom((r,c),self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]),typ))
                 newRoom.enter()
             else:
-                newDungeon = DungeonMap(self.game.directory,self.game.currentPos,self.getDungeonType(r,c),self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]))
-                newDungeon.generate()
-                self.currentDungeon = Crawler(self.game,newDungeon)
+                self.currentDungeon = Crawler(self.game,self.game.dungeonDB.getDungeon((r,c),self.getDungeonType(r,c),self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c])))
                 self.currentDungeon.inDungeon = True
                 self.inDungeon = True
         else: # Roll for random encounter
@@ -183,6 +181,6 @@ class Overworld():
             if random.randint(odds,30) == 29 and self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]) == self.lastDiff:
                 self.steps = 0
                 encounter = []
-                encounter = self.game.directory.buildEncounter(self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]),self.getBiome(self.game.currentPos[0],self.game.currentPos[1]))
+                encounter = self.game.directory.buildEncounter(self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]),self.getBiome(self.game.player.currentPos[0],self.game.player.currentPos[1]))
                 self.combat.initialize(self.party,encounter)
         self.lastDiff = self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c])

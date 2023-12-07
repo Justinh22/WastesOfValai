@@ -58,11 +58,11 @@ class RoomHandler():
                     if self.room.features[self.cursorPos].lootStatus != LootStatus.Taken:
                         self.takeItem(self.cursorPos)
                 if self.room.type == "haven" and self.room.features[self.cursorPos].name == "Beds":
-                    self.game.party.fullRestore()
+                    self.game.player.party.fullRestore()
                     self.slept = True
                 if self.room.type == "haven" and self.room.features[self.cursorPos].name == "Wanderer":
-                    if len(self.game.party.members) < 4:
-                        self.game.party.members.append(self.game.directory.buildCharacter(difficultyToLevel(self.room.difficulty),self.game.party.members))
+                    if len(self.game.player.party.members) < 4:
+                        self.game.player.party.members.append(self.game.directory.buildCharacter(difficultyToLevel(self.room.difficulty),self.game.player.party.members))
                         self.room.features[self.cursorPos].lootStatus = LootStatus.Taken
                         self.room.features.pop(self.cursorPos)
                         self.state = "lookList"
@@ -133,17 +133,17 @@ class RoomHandler():
         id = self.room.features[index].loot
         type = self.game.directory.getItemType(id)
         if type == Type.Weapon or type == Type.Armor:
-            if self.game.party.addEquipment(id):
+            if self.game.player.party.addEquipment(id):
                 self.room.features[index].lootStatus = LootStatus.Taken
             else:
                 return False
         elif type == Type.Potion:
-            if self.game.party.addItem(id):
+            if self.game.player.party.addItem(id):
                 self.room.features[index].lootStatus = LootStatus.Taken
             else:
                 return False
         elif type == Type.AtkSpell or type == Type.SptSpell:
-            if self.game.party.addItem(id):
+            if self.game.player.party.addItem(id):
                 self.room.features[index].lootStatus = LootStatus.Taken
             else:
                 return False

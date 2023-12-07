@@ -15,8 +15,9 @@ class RoomDatabase():
             self.addRoom(coords,newRoom)
         return self.rooms[coords]
         
-#   def save(self):
-#       pickle it!
+    def printContents(self):
+        for entry in self.rooms:
+            print(f'{entry}: {self.rooms[entry].type}')
 
 
 class Room():

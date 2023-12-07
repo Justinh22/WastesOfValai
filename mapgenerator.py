@@ -15,7 +15,7 @@ class Map():
         self.finishPos = (0,0)
 
 
-    def loadMap(self):
+    def loadMap(self,startR=-1,startC=-1):
         with open("generated_map.txt","r") as file:
             for row in file:
                 self.map.append(row)
@@ -26,12 +26,15 @@ class Map():
             for row in file:
                 self.difficultyMap.append(row)
                 
-        self.startingPos = (round(self.sizeR/2),round(self.sizeC/2))
-        while self.map[self.startingPos[0]][self.startingPos[1]] == ' ':
-            if self.startingPos[0] > round(self.sizeR/3):
-                self.startingPos = (self.startingPos[0]-1, self.startingPos[1])
-            else:
-                self.startingPos = (self.startingPos[0], self.startingPos[1]+1)
+        if startR == -1 and startC == -1:
+            self.startingPos = (round(self.sizeR/2),round(self.sizeC/2))
+            while self.map[self.startingPos[0]][self.startingPos[1]] == ' ':
+                if self.startingPos[0] > round(self.sizeR/3):
+                    self.startingPos = (self.startingPos[0]-1, self.startingPos[1])
+                else:
+                    self.startingPos = (self.startingPos[0], self.startingPos[1]+1)
+        else:
+            self.startingPos = (startR,startC)
 
 
     def generateMap(self):

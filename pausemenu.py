@@ -71,54 +71,54 @@ class PauseMenu():
                 write(self.game, 20, 30, 87 + (self.cursorPos*25), "->")
             if self.state == "partySelect":
                 write(self.game, 30, 210, 75 + (self.cursorPos*100), "->")
-            for i in range(0,len(self.game.party.members)):
-                self.drawMinStatBlock(250, 45 + (i*100), self.game.party.members[i])
+            for i in range(0,len(self.game.player.party.members)):
+                self.drawMinStatBlock(250, 45 + (i*100), self.game.player.party.members[i])
 
         if self.state == "targetSelect":
             screenOutline = pygame.Rect(self.left,self.top,self.right,self.bottom)
             pygame.draw.rect(self.game.screen,self.game.white,screenOutline,2)
-            write(self.game, 40, 30, 40, self.game.party.members[self.targetPartyMember].name)
+            write(self.game, 40, 30, 40, self.game.player.party.members[self.targetPartyMember].name)
             write(self.game, 20, 60, 90, "Return")
             write(self.game, 20, 60, 115, "Equipment")
             write(self.game, 20, 60, 140, "Inventory")
             write(self.game, 20, 60, 165, "Spells")
             write(self.game, 30, 210, 75 + (self.cursorPos*100), "->")
-            for i in range(0,len(self.game.party.members)):
-                self.drawMinStatBlock(250, 45 + (i*100), self.game.party.members[i])
+            for i in range(0,len(self.game.player.party.members)):
+                self.drawMinStatBlock(250, 45 + (i*100), self.game.player.party.members[i])
 
         if self.state == "partyMember" or self.state == "equipment" or self.state == "inventory" or self.state == "spellbook" or self.state == "itemSummary" or self.state == "confirmAction":
             screenOutline = pygame.Rect(self.left,self.top,self.right,self.bottom)
             pygame.draw.rect(self.game.screen,self.game.white,screenOutline,2)
-            write(self.game, 40, 30, 40, self.game.party.members[self.targetPartyMember].name)
+            write(self.game, 40, 30, 40, self.game.player.party.members[self.targetPartyMember].name)
             write(self.game, 20, 60, 90, "Return")
             write(self.game, 20, 60, 115, "Equipment")
             write(self.game, 20, 60, 140, "Inventory")
             write(self.game, 20, 60, 165, "Spells")
-            self.drawMinStatBlock(250, 45, self.game.party.members[self.targetPartyMember])
-            weapon = self.game.party.members[self.targetPartyMember].eqpWpn
+            self.drawMinStatBlock(250, 45, self.game.player.party.members[self.targetPartyMember])
+            weapon = self.game.player.party.members[self.targetPartyMember].eqpWpn
             write(self.game, 12, 250, 150, "Weapon: " + weapon.name + " (" + str(weapon.attack) + " ATK, " + str(weapon.accuracy) + " ACC, " + str(weapon.critrate) + " CRT, " + str(weapon.amplifier) + " AMP)")
-            armor = self.game.party.members[self.targetPartyMember].eqpAmr
+            armor = self.game.player.party.members[self.targetPartyMember].eqpAmr
             write(self.game, 12, 250, 170, "Armor: " + armor.name + " (" + str(armor.defense) + " DEF, " + str(armor.dodge) + " DDG, " + str(armor.manaregen) + " MPG)")
 
             if self.state == "partyMember":
                 classOutline = pygame.Rect(250,200,350,240)
                 pygame.draw.rect(self.game.screen,self.game.white,classOutline,2)
-                write(self.game, 20, 260, 215, self.game.party.members[self.targetPartyMember].type.name)
-                write(self.game, 12, 260, 242, "Weapon Prf: "+self.game.party.members[self.targetPartyMember].type.wpnProfToString())
-                write(self.game, 12, 260, 262, "Armor Prf: "+self.game.party.members[self.targetPartyMember].type.amrProfToString())
+                write(self.game, 20, 260, 215, self.game.player.party.members[self.targetPartyMember].type.name)
+                write(self.game, 12, 260, 242, "Weapon Prf: "+self.game.player.party.members[self.targetPartyMember].type.wpnProfToString())
+                write(self.game, 12, 260, 262, "Armor Prf: "+self.game.player.party.members[self.targetPartyMember].type.amrProfToString())
                 write(self.game, 12, 300, 295, "POWER: ")
-                write(self.game, 12, 390, 293, self.intToRating(self.game.party.members[self.targetPartyMember].type.rating[0]))
+                write(self.game, 12, 390, 293, self.intToRating(self.game.player.party.members[self.targetPartyMember].type.rating[0]))
                 write(self.game, 12, 300, 310, "STURDINESS: ")
-                write(self.game, 12, 390, 308, self.intToRating(self.game.party.members[self.targetPartyMember].type.rating[1]))
+                write(self.game, 12, 390, 308, self.intToRating(self.game.player.party.members[self.targetPartyMember].type.rating[1]))
                 write(self.game, 12, 300, 325, "NIMBLENESS: ")
-                write(self.game, 12, 390, 323, self.intToRating(self.game.party.members[self.targetPartyMember].type.rating[2]))
+                write(self.game, 12, 390, 323, self.intToRating(self.game.player.party.members[self.targetPartyMember].type.rating[2]))
                 write(self.game, 12, 450, 295, "ARCANA: ")
-                write(self.game, 12, 514, 293, self.intToRating(self.game.party.members[self.targetPartyMember].type.rating[3]))
+                write(self.game, 12, 514, 293, self.intToRating(self.game.player.party.members[self.targetPartyMember].type.rating[3]))
                 write(self.game, 12, 450, 310, "FAITH: ")
-                write(self.game, 12, 514, 308, self.intToRating(self.game.party.members[self.targetPartyMember].type.rating[4]))
+                write(self.game, 12, 514, 308, self.intToRating(self.game.player.party.members[self.targetPartyMember].type.rating[4]))
                 write(self.game, 12, 450, 325, "LUCK: ")
-                write(self.game, 12, 514, 323, self.intToRating(self.game.party.members[self.targetPartyMember].type.rating[5]))
-                wrapWrite(self.game, 12, self.game.party.members[self.targetPartyMember].type.description, 340, 260, 355)
+                write(self.game, 12, 514, 323, self.intToRating(self.game.player.party.members[self.targetPartyMember].type.rating[5]))
+                wrapWrite(self.game, 12, self.game.player.party.members[self.targetPartyMember].type.description, 340, 260, 355)
 
 
         if self.state == "partyMember":
@@ -140,7 +140,7 @@ class PauseMenu():
             summaryOutline = pygame.Rect(40,200,self.right-60,self.bottom-310)
             pygame.draw.rect(self.game.screen,self.game.white,summaryOutline,2)
             if self.substate == "spellbook":
-                tgt = self.game.directory.getItem(self.game.party.members[self.targetPartyMember].spells[self.targetElement])
+                tgt = self.game.directory.getItem(self.game.player.party.members[self.targetPartyMember].spells[self.targetElement])
                 self.itemName = self.game.directory.getItemName(tgt.id)
                 write(self.game, 20, 60, 220, self.itemName)
                 writeOrientation(self.game, 20, self.right-90, 220, str(tgt.manacost) + " MP", "L")
@@ -172,11 +172,11 @@ class PauseMenu():
                     write(self.game, 15, 60, 245, buffText)
                 elif tgt.type == SpellType.Heal:
                     write(self.game, 15, 60, 245, "Heals for " + str(tgt.potency[6]) + " HP.")
-                if self.state == "itemSummary" and self.game.directory.getItem(self.game.party.members[self.targetPartyMember].spells[self.targetElement]).type == SpellType.Heal: # Cast:
+                if self.state == "itemSummary" and self.game.directory.getItem(self.game.player.party.members[self.targetPartyMember].spells[self.targetElement]).type == SpellType.Heal: # Cast:
                     write(self.game, 22, 540, 420, "Cast")
                     write(self.game, 22, 510 + (self.cursorPos*100), 417, "->")
             elif self.substate == "equipment":
-                tgt = self.game.directory.getItem(self.game.party.equipment[self.targetElement])
+                tgt = self.game.directory.getItem(self.game.player.party.equipment[self.targetElement])
                 statText = ""
                 itemType = self.game.directory.getItemType(tgt.id)
                 self.itemName = self.game.directory.getItemName(tgt.id,True)
@@ -191,7 +191,7 @@ class PauseMenu():
                     write(self.game, 22, 540, 420, "Drop")
                     write(self.game, 22, 410 + (self.cursorPos*100), 417, "->")
             elif self.substate == "inventory":
-                tgt = self.game.directory.getItem(self.game.party.inventory[self.targetElement])
+                tgt = self.game.directory.getItem(self.game.player.party.inventory[self.targetElement])
                 statText = ""
                 commaSeparator = ""
                 itemType = self.game.directory.getItemType(tgt.id)
@@ -315,10 +315,11 @@ class PauseMenu():
                 if self.cursorPos == 4:
                     print("QUIT")
                     self.paused = False
+                    self.game.save()
                     self.game.inGame = False
                     self.game.running = False
             elif self.state == "partySelect":
-                print(self.game.party.members[self.cursorPos].name)
+                print(self.game.player.party.members[self.cursorPos].name)
                 self.state = "partyMember"
                 self.targetPartyMember = self.cursorPos
                 self.cursorPos = 0
@@ -344,9 +345,9 @@ class PauseMenu():
                     self.menuSelection = self.cursorPos
                     self.cursorPos = 0
             elif self.state == "equipment" or self.state == "inventory" or self.state == "spellbook":
-                if (self.state == "equipment" and self.cursorPos < len(self.game.party.equipment)) or \
-                    (self.state == "inventory" and self.cursorPos < len(self.game.party.inventory)) or \
-                    (self.state == "spellbook" and self.cursorPos < len(self.game.party.members[self.targetPartyMember].spells)):
+                if (self.state == "equipment" and self.cursorPos < len(self.game.player.party.equipment)) or \
+                    (self.state == "inventory" and self.cursorPos < len(self.game.player.party.inventory)) or \
+                    (self.state == "spellbook" and self.cursorPos < len(self.game.player.party.members[self.targetPartyMember].spells)):
                     self.targetElement = self.cursorPos
                     self.cursorPos = 0
                     self.substate = self.state
@@ -361,7 +362,7 @@ class PauseMenu():
                 if self.substate == "inventory" and self.cursorPos == 0: # Use
                     self.action = "use"
                     self.state = "confirmAction"
-                if self.substate == "spellbook" and self.cursorPos == 0 and self.game.directory.getItem(self.game.party.members[self.targetPartyMember].spells[self.targetElement]).type == SpellType.Heal: # Cast
+                if self.substate == "spellbook" and self.cursorPos == 0 and self.game.directory.getItem(self.game.player.party.members[self.targetPartyMember].spells[self.targetElement]).type == SpellType.Heal: # Cast
                     self.action = "cast"
                     self.state = "targetSelect"
                     self.cursorPos = 0
@@ -421,7 +422,7 @@ class PauseMenu():
             if self.state == "partySelect" or self.state == "targetSelect":
                 self.cursorPos -= 1
                 if self.cursorPos < 0:
-                    self.cursorPos = len(self.game.party.members)-1
+                    self.cursorPos = len(self.game.player.party.members)-1
             if self.state == "map":
                 self.mapPos[0] -= self.panMap()
             if self.state == "partyMember":
@@ -440,7 +441,7 @@ class PauseMenu():
                     self.cursorPos = 0
             elif self.state == "partySelect" or self.state == "targetSelect":
                 self.cursorPos += 1
-                if self.cursorPos > len(self.game.party.members)-1:
+                if self.cursorPos > len(self.game.player.party.members)-1:
                     self.cursorPos = 0
             elif self.state == "map":
                 self.mapPos[0] += self.panMap()
@@ -525,12 +526,12 @@ class PauseMenu():
     def printInventory(self, type):
         scroll = False
         if type == "equipment":
-            list = self.game.party.equipment
+            list = self.game.player.party.equipment
         elif type == "inventory":
-            list = self.game.party.inventory
+            list = self.game.player.party.inventory
             scroll = True
         elif type == "spellbook":
-            list = self.game.party.members[self.targetPartyMember].spells
+            list = self.game.player.party.members[self.targetPartyMember].spells
 
         for i in range(math.ceil(MAX_INVENTORY_SIZE/2)): # FIX: Allow for no capacity on spellbook
             if i*2 < len(list):
@@ -545,23 +546,23 @@ class PauseMenu():
 
     def actionHandler(self,tgtList,action,targetPartyMember,targetElement,spellTarget=-1):
         if action == "equip":
-            if self.game.party.members[targetPartyMember].checkProficiency(self.game.party.equipment[targetElement],self.game.directory):
-                self.game.party.equipment[targetElement] = self.game.party.members[targetPartyMember].equip(self.game.party.equipment[targetElement],self.game.directory)
+            if self.game.player.party.members[targetPartyMember].checkProficiency(self.game.player.party.equipment[targetElement],self.game.directory):
+                self.game.player.party.equipment[targetElement] = self.game.player.party.members[targetPartyMember].equip(self.game.player.party.equipment[targetElement],self.game.directory)
         elif action == "drop":
             if tgtList == "inventory":
-                self.game.party.dropItem(targetElement)
+                self.game.player.party.dropItem(targetElement)
             elif tgtList == "equipment":
-                self.game.party.dropEquipment(targetElement)
+                self.game.player.party.dropEquipment(targetElement)
         elif action == "use":
-            if self.game.directory.getItemType(self.game.party.inventory[targetElement]) == Type.Potion:
-                self.game.party.usePotion(targetPartyMember,targetElement,self.game.directory)
-            elif self.game.directory.getItemType(self.game.party.inventory[targetElement]) == Type.AtkSpell or self.game.directory.getItemType(self.game.party.inventory[targetElement]) == Type.SptSpell:
-                if self.game.party.members[targetPartyMember].checkProficiency(self.game.party.inventory[targetElement],self.game.directory):
-                    self.game.party.learnSpell(targetPartyMember, targetElement)
+            if self.game.directory.getItemType(self.game.player.party.inventory[targetElement]) == Type.Potion:
+                self.game.player.party.usePotion(targetPartyMember,targetElement,self.game.directory)
+            elif self.game.directory.getItemType(self.game.player.party.inventory[targetElement]) == Type.AtkSpell or self.game.directory.getItemType(self.game.player.party.inventory[targetElement]) == Type.SptSpell:
+                if self.game.player.party.members[targetPartyMember].checkProficiency(self.game.player.party.inventory[targetElement],self.game.directory):
+                    self.game.player.party.learnSpell(targetPartyMember, targetElement)
         elif action == "cast":
-            if self.game.party.members[targetPartyMember].canCast(targetElement,self.game.directory):
-                self.game.party.members[targetPartyMember].expendMana(targetElement,self.game.directory)
-                self.game.party.members[spellTarget].gainHP(self.game.directory.getItem(self.game.party.members[targetPartyMember].spells[targetElement]).getHeal())
+            if self.game.player.party.members[targetPartyMember].canCast(targetElement,self.game.directory):
+                self.game.player.party.members[targetPartyMember].expendMana(targetElement,self.game.directory)
+                self.game.player.party.members[spellTarget].gainHP(self.game.directory.getItem(self.game.player.party.members[targetPartyMember].spells[targetElement]).getHeal())
 
     def intToRating(self,val):
         ret = ""

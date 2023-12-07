@@ -13,10 +13,30 @@ FLOOR_CHAR = ' '
 ENTRANCE_CHAR = 'O'
 LOOT_CHAR = 'L'
 
+directory = Directory()
+
+
+class DungeonDatabase():
+    def __init__(self):
+        self.dungeons = {}
+
+    def addDungeon(self,coords,dungeon):
+        self.dungeons[coords] = dungeon
+
+    def getDungeon(self,coords,type,level=0,hallFreq=2):
+        if coords not in self.dungeons.keys():
+            newDungeon = DungeonMap(coords,type,level,hallFreq)
+            newDungeon.generate()
+            self.addDungeon(coords,newDungeon)
+        return self.dungeons[coords]
+    
+    def printContents(self):
+        for entry in self.dungeons:
+            print(f'{entry}: {self.dungeons[entry].dungeonType.name}')
+
 
 class DungeonMap():
-    def __init__(self,dir,coords,type=DungeonType.Well,level=0,hallFreq=2):
-        self.dir = dir
+    def __init__(self,coords,type=DungeonType.Well,level=0,hallFreq=2):
         self.map = []
         self.coords = coords        # Coords         : Duple containing (row,col) of where the dungeon is located in the world
         self.rooms = []             # Rooms          : List of DungeonRooms
@@ -239,7 +259,7 @@ class DungeonMap():
             if lootRooms[i].getCoords() == self.entranceRoom:
                 continue
             types = self.getLootTypesFromDungeonType()
-            self.loot.append(DungeonLoot(lootRooms[i].setLoot(self.map),self.dungeonLevel,types,self.dir))
+            self.loot.append(DungeonLoot(lootRooms[i].setLoot(self.map),self.dungeonLevel,types))
             #print(f'Loot in room {i}')
 
     def removeLoot(self,loot):
@@ -301,12 +321,12 @@ class DungeonRoom():
     
 
 class DungeonLoot():
-    def __init__(self,coords,level,types,dir):
+    def __init__(self,coords,level,types):
         self.coords = coords
         self.level = level
         self.types = types
         self.rarity = LootRarity.Uncommon
-        self.loot = self.rollItem(dir)
+        self.loot = self.rollItem(directory)
 
     def setLootRarity(self,rarity):
         self.rarity = rarity

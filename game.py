@@ -1,10 +1,13 @@
 import pygame
+import pickle
 from mainmenu import *
 from mapgenerator import *
 from directory import *
 from overworld import *
 from writing import *
 from room import *
+from dungeonmapgenerator import *
+from playerdata import *
 
 class Game():
     def __init__(self):
@@ -29,15 +32,13 @@ class Game():
         pygame.time.set_timer(self.REFRESH, 1000//self.FPS)
 
         self.directory = Directory()
-
-        self.party = Party()
-        self.party.initializeMembers(self.directory)
         
         self.mainmenu = MainMenu(self)
         self.WorldMap = Map()
-        self.currentPos = list(self.WorldMap.startingPos)
+        self.player = PlayerData(list(self.WorldMap.startingPos),self.directory)
         self.overworld = Overworld(self)
         self.roomDB = RoomDatabase()
+        self.dungeonDB = DungeonDatabase()
 
         self.steps = 0
         self.stepsThreshold = 100
@@ -100,3 +101,27 @@ class Game():
             if self.difficulty < MAX_DIFFICULTY:
                 self.difficulty += 1
             self.steps = 0
+
+    def save(self):
+        roomdb = open('databases/roomDatabase.db','wb')
+        dungeondb = open('databases/dungeonDatabase.db','wb')
+        playerdb = open('databases/playerDatabase.db','wb')
+        pickle.dump(self.roomDB, roomdb)
+        pickle.dump(self.dungeonDB, dungeondb)
+        pickle.dump(self.player,playerdb)
+        roomdb.close()
+        dungeondb.close()
+        playerdb.close()
+
+    def load(self):
+        roomdb = open('databases/roomDatabase.db','rb')
+        dungeondb = open('databases/dungeonDatabase.db','rb')
+        playerdb = open('databases/playerDatabase.db','rb')
+        self.roomDB = pickle.load(roomdb)
+        self.dungeonDB = pickle.load(dungeondb)
+        self.player = pickle.load(playerdb)
+        self.roomDB.printContents()
+        self.dungeonDB.printContents()
+        roomdb.close()
+        dungeondb.close()
+        playerdb.close()

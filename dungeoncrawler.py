@@ -19,7 +19,7 @@ class Crawler():
         self.font = pygame.font.Font('freesansbold.ttf',20)
         self.pausemenu = PauseMenu(self.game)
         self.combat = Combat(self.game)
-        self.party = self.game.party
+        self.party = self.game.player.party
         self.enemyList = []
         self.message = ""
         self.messageTimer = 0
@@ -80,7 +80,7 @@ class Crawler():
         if self.game.A:
             print("A")
             if self.state == "lootSummary":
-                if self.game.party.add(self.lootLookup().loot,self.game.directory):
+                if self.game.player.party.add(self.lootLookup().loot,self.game.directory):
                     self.message = "You picked up the " + self.game.directory.getItemName(self.lootLookup().loot,True)
                     self.dungeonMap.removeLoot(self.lootLookup())
                     self.state = "main"
@@ -94,7 +94,7 @@ class Crawler():
             #self.inDungeon = False
             #self.game.inGame = False
         if self.game.START:
-            self.pausemenu.pause(self.game.currentPos)
+            self.pausemenu.pause(self.game.player.currentPos)
 
     def drawScreen(self):
         blockSize = 30 #Set the size of the grid block
