@@ -142,7 +142,8 @@ class Character():
         self.dodge += growth[5]
         self.luck += growth[6]
         self.speed += growth[7]
-        self.spells.append(self.type.knownSpells[self.level-1])
+        if self.type.knownSpells[self.level-1] != -11 and self.type.knownSpells[self.level-1] not in self.spells:
+            self.spells.append(self.type.knownSpells[self.level-1])
         return growth
     def equip(self,item,dir):
         if dir.getItemType(item) == Type.Weapon:
@@ -195,7 +196,7 @@ class Character():
     def fullRestore(self):
         self.hp = self.hpMax
         self.mp = self.mpMax
-        self.resetBuffs()
+        self.resetStatus()
     def canCast(self,spellbookIndex,dir):
         return dir.getManaCost(self.spells[spellbookIndex]) <= self.mp
     def expendMana(self,spellbookIndex,dir):
@@ -273,6 +274,9 @@ class Party():
         self.members = []
         self.inventory = []         # List of int : Contains id of all items in inventory
         self.equipment = []         # List of int : Contains id of all equipment in inventory
+    def printContents(self):
+        for member in self.members:
+            print(member.name)
     def initializeMembers(self,dir):
         self.members.append(Character(dir.getCharacterName(self.members),1,dir.classDirectory[0],dir.getRandomPersonality()))
         self.members[0].eqpWpn = dir.getWeapon(dir.getItemByRarity(Type.Weapon,1))

@@ -2,6 +2,7 @@ import pygame
 from room import * # Includes feature.py, directory.py, and constants.py
 from writing import *
 from utility import *
+from characterpopups import *
 
 class RoomHandler():
     def __init__(self,game,room):
@@ -31,7 +32,7 @@ class RoomHandler():
         self.game.screen.fill(self.game.black)
         self.state = "main"
         self.drawScreen()
-        while self.inRoom:
+        while self.inRoom and self.game.inGame:
             self.game.eventHandler()
             self.getInput()
             if self.inRoom == False:
@@ -59,14 +60,17 @@ class RoomHandler():
                         self.takeItem(self.cursorPos)
                 if self.room.type == "haven" and self.room.features[self.cursorPos].name == "Beds":
                     self.game.player.party.fullRestore()
+                    self.game.save()
                     self.slept = True
                 if self.room.type == "haven" and self.room.features[self.cursorPos].name == "Wanderer":
                     if len(self.game.player.party.members) < 4:
                         self.game.player.party.members.append(self.game.directory.buildCharacter(difficultyToLevel(self.room.difficulty),self.game.player.party.members))
-                        self.room.features[self.cursorPos].lootStatus = LootStatus.Taken
-                        self.room.features.pop(self.cursorPos)
-                        self.state = "lookList"
-                        self.cursorPos = 0
+                    else:
+                        CharacterSwap(self.game,self.game.directory.buildCharacter(difficultyToLevel(self.room.difficulty),self.game.player.party.members))
+                    self.room.features[self.cursorPos].lootStatus = LootStatus.Taken
+                    self.room.features.pop(self.cursorPos)
+                    self.state = "lookList"
+                    self.cursorPos = 0
             print("A")
         if self.game.B:
             if self.state == "main":
@@ -109,6 +113,8 @@ class RoomHandler():
         if self.state == "main":
             write(self.game, 25,self.right-150,self.top+340,"A) Look")
             write(self.game, 25,self.right-150,self.top+390,"B) Leave")
+            if self.room.type == "haven":
+                write(self.game, 15, self.left+10, self.top+310, "Press (X) to access hostel.")
         if self.state == "lookList":
             write(self.game, 25,self.right-150,self.top+340,"A) Check")
             write(self.game, 25,self.right-150,self.top+390,"B) Back")

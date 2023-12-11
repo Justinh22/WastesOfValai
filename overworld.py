@@ -18,7 +18,6 @@ class Overworld():
         self.font = pygame.font.Font('freesansbold.ttf',20)
         self.pausemenu = PauseMenu(self.game)
         self.combat = Combat(self.game)
-        self.party = self.game.player.party
         self.steps = 0
         self.lastDiff = 0
 
@@ -73,12 +72,10 @@ class Overworld():
             print("A")
         if self.game.B:
             encounter = []
-            encounter = self.game.directory.buildEncounter(self.party.getPower(),self.getBiome(self.game.player.currentPos[0],self.game.player.currentPos[1]))
-            self.combat.initialize(self.party,encounter)
+            encounter = self.game.directory.buildEncounter(self.game.player.party.getPower(),self.getBiome(self.game.player.currentPos[0],self.game.player.currentPos[1]))
+            self.combat.initialize(encounter)
         if self.game.X:
             print("X")
-            #self.inWorld = False
-            #self.game.inGame = False
         if self.game.Y:
             if len(self.game.player.party.members) < 4:
                 self.game.player.party.members.append(self.game.directory.buildCharacter(difficultyToLevel(self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[self.game.player.currentPos[0]][self.game.player.currentPos[1]])),self.game.player.party.members))
@@ -182,5 +179,5 @@ class Overworld():
                 self.steps = 0
                 encounter = []
                 encounter = self.game.directory.buildEncounter(self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]),self.getBiome(self.game.player.currentPos[0],self.game.player.currentPos[1]))
-                self.combat.initialize(self.party,encounter)
+                self.combat.initialize(encounter)
         self.lastDiff = self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c])

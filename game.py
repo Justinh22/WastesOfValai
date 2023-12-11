@@ -35,7 +35,7 @@ class Game():
         
         self.mainmenu = MainMenu(self)
         self.WorldMap = Map()
-        self.player = PlayerData(list(self.WorldMap.startingPos),self.directory)
+        self.player = PlayerData(list(self.WorldMap.startingPos),self.directory,[])
         self.overworld = Overworld(self)
         self.roomDB = RoomDatabase()
         self.dungeonDB = DungeonDatabase()
@@ -122,6 +122,7 @@ class Game():
         self.player = pickle.load(playerdb)
         self.roomDB.printContents()
         self.dungeonDB.printContents()
+        self.player.party.printContents()
         roomdb.close()
         dungeondb.close()
         playerdb.close()

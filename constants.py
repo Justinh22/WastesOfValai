@@ -72,9 +72,15 @@ class SpellType(Enum):
     Raise = 4
     Cleanse = 5
 
+class SkillType(Enum):
+    Attack = 0
+    Support = 1
+
 class Target(Enum):
     Single = 0
-    All = 0
+    All = 1
+    Self = 2
+    Ally = 3
 
 class Biome(Enum):
     Forest = 0
