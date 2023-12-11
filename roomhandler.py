@@ -84,6 +84,9 @@ class RoomHandler():
             print("B")
         if self.game.X:
             print("X")
+            if self.state == "main" and self.room.type == "haven" and len(self.game.player.hostel) > 0:
+                print("Hostel")
+                Hostel(self.game)
         if self.game.Y:
             print("Y")
         if self.game.UP:
@@ -113,7 +116,7 @@ class RoomHandler():
         if self.state == "main":
             write(self.game, 25,self.right-150,self.top+340,"A) Look")
             write(self.game, 25,self.right-150,self.top+390,"B) Leave")
-            if self.room.type == "haven":
+            if self.room.type == "haven" and len(self.game.player.hostel) > 0:
                 write(self.game, 15, self.left+10, self.top+310, "Press (X) to access hostel.")
         if self.state == "lookList":
             write(self.game, 25,self.right-150,self.top+340,"A) Check")

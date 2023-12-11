@@ -79,6 +79,8 @@ class Overworld():
         if self.game.Y:
             if len(self.game.player.party.members) < 4:
                 self.game.player.party.members.append(self.game.directory.buildCharacter(difficultyToLevel(self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[self.game.player.currentPos[0]][self.game.player.currentPos[1]])),self.game.player.party.members))
+            else:
+                CharacterSwap(self.game,self.game.directory.buildCharacter(difficultyToLevel(self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[self.game.player.currentPos[0]][self.game.player.currentPos[1]])),self.game.player.party.members))
         if self.game.START:
             self.pausemenu.pause(self.game.player.currentPos)
 
