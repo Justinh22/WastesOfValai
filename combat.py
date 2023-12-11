@@ -38,6 +38,7 @@ class Combat():
         self.lowMana = False
         self.buffs = []
         self.combatDialogue = ""
+        self.defeat = False
 
     def initialize(self,encounter):
         self.currentTurn = 0
@@ -473,7 +474,8 @@ class Combat():
                 print("We out")
                 self.combatTeardown()
                 self.inCombat = False
-                pygame.quit()
+                self.defeat = True
+                self.game.load()
 
     def combatInfo(self):
         self.game.screen.fill(self.game.black)

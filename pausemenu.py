@@ -315,7 +315,6 @@ class PauseMenu():
                 if self.cursorPos == 4:
                     print("QUIT")
                     self.paused = False
-                    self.game.save()
                     self.game.inGame = False
                     self.game.running = False
             elif self.state == "partySelect":
@@ -379,7 +378,15 @@ class PauseMenu():
                 print(f'STATE HERE IS {self.state}')
             elif self.state == "targetSelect":
                 self.spellTarget = self.cursorPos
-                self.state = "confirmAction"
+                self.actionHandler(self.substate, self.action, self.targetPartyMember, self.targetElement, self.spellTarget)
+                if self.substate == "equipment":
+                    self.state = "equipment"
+                elif self.substate == "inventory":
+                    self.state = "inventory"
+                elif self.substate == "spellbook":
+                    self.state = "spellbook"
+                self.substate = "none"
+                self.spellTarget = -1
         if self.game.B:
             if self.state == "partySelect":
                 self.state = "main"

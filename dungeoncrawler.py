@@ -184,6 +184,8 @@ class Crawler():
                     defeatedEnemy = i
         if defeatedEnemy != -1:
             self.enemyList.pop(defeatedEnemy)
+        if self.combat.defeat:
+            self.inDungeon = False
 
     def stepTo(self,r,c):
         #print(f'({r}, {c})')

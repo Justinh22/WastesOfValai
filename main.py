@@ -8,4 +8,4 @@ pygame.display.set_caption('Wastes of Valai')
 
 while WoV.running:
     WoV.mainmenu.display()
-    WoV.run();
+    WoV.run()
