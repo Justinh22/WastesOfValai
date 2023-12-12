@@ -224,12 +224,9 @@ class Hostel():
         for i in range(val):
             ret += "+"
         return ret
-    
 
 #class LevelUp():
 
 #class ItemReplace():
-
-#class SpellReplace():
 
 #class Message():

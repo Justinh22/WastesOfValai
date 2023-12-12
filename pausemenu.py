@@ -21,6 +21,7 @@ class PauseMenu():
         self.spellTarget = -1
         self.targetElement = 0
         self.menuSelection = 0
+        self.spellPageMod = 0
         self.delay = 0
         self.left = 10
         self.top = 10
@@ -329,6 +330,7 @@ class PauseMenu():
                 elif self.mapZoomSize < 40 and self.mapZoomSize >= 4:
                     self.mapZoomSize += 2
             elif self.state == "partyMember":
+                self.spellPageMod = 0
                 if self.cursorPos == 0:
                     self.state = "main"
                 elif self.cursorPos == 1:
@@ -347,7 +349,7 @@ class PauseMenu():
                 if (self.state == "equipment" and self.cursorPos < len(self.game.player.party.equipment)) or \
                     (self.state == "inventory" and self.cursorPos < len(self.game.player.party.inventory)) or \
                     (self.state == "spellbook" and self.cursorPos < len(self.game.player.party.members[self.targetPartyMember].spells)):
-                    self.targetElement = self.cursorPos
+                    self.targetElement = self.cursorPos + (2*self.spellPageMod)
                     self.cursorPos = 0
                     self.substate = self.state
                     self.state = "itemSummary"
@@ -361,10 +363,12 @@ class PauseMenu():
                 if self.substate == "inventory" and self.cursorPos == 0: # Use
                     self.action = "use"
                     self.state = "confirmAction"
-                if self.substate == "spellbook" and self.cursorPos == 0 and (self.game.directory.getItem(self.game.player.party.members[self.targetPartyMember].spells[self.targetElement]).type == SpellType.Heal or self.game.directory.getItem(self.game.player.party.members[self.targetPartyMember].spells[self.targetElement]).type == SpellType.Cleanse): # Cast
+                if self.substate == "spellbook" and self.cursorPos == 0 and self.game.directory.getItem(self.game.player.party.members[self.targetPartyMember].spells[self.targetElement]).target == Target.Single and (self.game.directory.getItem(self.game.player.party.members[self.targetPartyMember].spells[self.targetElement]).type == SpellType.Heal or self.game.directory.getItem(self.game.player.party.members[self.targetPartyMember].spells[self.targetElement]).type == SpellType.Cleanse): # Cast
                     self.action = "cast"
                     self.state = "targetSelect"
-                    self.cursorPos = 0
+                if self.substate == "spellbook" and self.cursorPos == 0 and self.game.directory.getItem(self.game.player.party.members[self.targetPartyMember].spells[self.targetElement]).target == Target.All:
+                    self.action = "cast"
+                    self.state = "confirmAction"
             elif self.state == "confirmAction":
                 self.actionHandler(self.substate, self.action, self.targetPartyMember, self.targetElement, self.spellTarget)
                 if self.substate == "equipment":
@@ -373,6 +377,7 @@ class PauseMenu():
                     self.state = "inventory"
                 elif self.substate == "spellbook":
                     self.state = "spellbook"
+                    self.spellPageMod = 0
                 self.substate = "none"
                 self.spellTarget = -1
                 print(f'STATE HERE IS {self.state}')
@@ -387,6 +392,7 @@ class PauseMenu():
                     self.state = "spellbook"
                 self.substate = "none"
                 self.spellTarget = -1
+                self.cursorPos = 0
         if self.game.B:
             if self.state == "partySelect":
                 self.state = "main"
@@ -404,11 +410,15 @@ class PauseMenu():
                 self.state = "partyMember"
                 self.cursorPos = self.menuSelection
             if self.state == "itemSummary":
-                self.cursorPos = 0
+                self.cursorPos = self.targetElement - (self.spellPageMod*2)
                 self.state = self.substate
                 self.substate = "none"
             if self.state == "confirmAction":
-                self.cursorPos = 0
+                self.cursorPos = self.targetElement - (self.spellPageMod*2)
+                self.state = self.substate
+                self.substate = "none"
+            if self.state == "targetSelect":
+                self.cursorPos = self.targetElement - (self.spellPageMod*2)
                 self.state = self.substate
                 self.substate = "none"
         if self.game.X:
@@ -440,9 +450,15 @@ class PauseMenu():
                 self.cursorPos -= 1
                 if self.cursorPos < 0:
                     self.cursorPos = 3
-            elif self.state == "equipment" or self.state == "inventory" or self.state == "spellbook":
+            elif self.state == "equipment" or self.state == "inventory":
                 if self.cursorPos <= 1:
                     self.cursorPos += 8
+                else:
+                    self.cursorPos -= 2
+            elif self.state == "spellbook":
+                if self.cursorPos <= 1:
+                    if self.spellPageMod > 0:
+                        self.spellPageMod -= 1
                 else:
                     self.cursorPos -= 2
         if self.game.DOWN:
@@ -460,9 +476,15 @@ class PauseMenu():
                 self.cursorPos += 1
                 if self.cursorPos > 3:
                     self.cursorPos = 0
-            elif self.state == "equipment" or self.state == "inventory" or self.state == "spellbook":
+            elif self.state == "equipment" or self.state == "inventory":
                 if self.cursorPos >= 8:
                     self.cursorPos -= 8
+                else:
+                    self.cursorPos += 2
+            elif self.state == "spellbook":
+                if self.cursorPos >= 8:
+                    if 10+(self.spellPageMod*2) < len(self.game.player.party.members[self.targetPartyMember].spells):
+                        self.spellPageMod += 1
                 else:
                     self.cursorPos += 2
         if self.game.LEFT:
@@ -475,7 +497,7 @@ class PauseMenu():
                     self.cursorPos -= 1
             elif self.state == "itemSummary":
                 self.cursorPos -= 1
-                if self.substate == "equipment" or self.substate == "inventory":
+                if self.substate == "equipment" or self.substate == "inventory" or (self.substate == "spellbook" and self.game.directory.getItem(self.game.player.party.members[self.targetPartyMember].spells[self.targetElement]).target == Target.All):
                     if self.cursorPos < 0:
                         self.cursorPos = 1
         if self.game.RIGHT:
@@ -543,16 +565,16 @@ class PauseMenu():
             scroll = True
         elif type == "spellbook":
             list = self.game.player.party.members[self.targetPartyMember].spells
-
-        for i in range(math.ceil(MAX_INVENTORY_SIZE/2)): # FIX: Allow for no capacity on spellbook
+            
+        for i in range(5): # FIX: Allow for no capacity on spellbook
             if i*2 < len(list):
-                write(self.game, 15, 100, 275 + (25*i), str((i*2)+1) + ") " + self.game.directory.getItemName(list[i*2],scroll))
+                write(self.game, 15, 100, 275 + (25*i), str(((i+self.spellPageMod)*2)+1) + ") " + self.game.directory.getItemName(list[(i+self.spellPageMod)*2],scroll))
             else:
-                write(self.game, 15, 100, 275 + (25*i), str((i*2)+1) + ") ")
+                write(self.game, 15, 100, 275 + (25*i), str(((i+self.spellPageMod)*2)+1) + ") ")
             if (i*2)+1 < len(list):
-                write(self.game, 15, 350, 275 + (25*i), str((i*2)+2) + ") " + self.game.directory.getItemName(list[(i*2)+1],scroll))
+                write(self.game, 15, 350, 275 + (25*i), str(((i+self.spellPageMod)*2)+2) + ") " + self.game.directory.getItemName(list[((i+self.spellPageMod)*2)+1],scroll))
             else:
-                write(self.game, 15, 350, 275 + (25*i), str((i*2)+2) + ") ")
+                write(self.game, 15, 350, 275 + (25*i), str(((i+self.spellPageMod)*2)+2) + ") ")
         write(self.game, 15, 85 + ((self.cursorPos%2)*250), 272 + (25*(math.floor(self.cursorPos/2))), ">")
 
     def actionHandler(self,tgtList,action,targetPartyMember,targetElement,spellTarget=-1):
@@ -574,10 +596,18 @@ class PauseMenu():
             if self.game.player.party.members[targetPartyMember].canCast(targetElement,self.game.directory):
                 self.game.player.party.members[targetPartyMember].expendMana(targetElement,self.game.directory)
                 if self.game.directory.getItem(self.game.player.party.members[targetPartyMember].spells[targetElement]).type == SpellType.Heal:
-                    self.game.player.party.members[spellTarget].gainHP(self.game.player.party.members[targetPartyMember].amplify(self.game.directory.getItem(self.game.player.party.members[targetPartyMember].spells[targetElement]).getHeal()))
+                    if spellTarget != -1:
+                        self.game.player.party.members[spellTarget].gainHP(self.game.player.party.members[targetPartyMember].amplify(self.game.directory.getItem(self.game.player.party.members[targetPartyMember].spells[targetElement]).getHeal()))
+                    else:
+                        for member in self.game.player.party.members:
+                            member.gainHP(self.game.player.party.members[targetPartyMember].amplify(self.game.directory.getItem(self.game.player.party.members[targetPartyMember].spells[targetElement]).getHeal()))
                 if self.game.directory.getItem(self.game.player.party.members[targetPartyMember].spells[targetElement]).type == SpellType.Cleanse:
-                    self.game.player.party.members[spellTarget].resetStatus()
-
+                    if spellTarget != -1:
+                        self.game.player.party.members[spellTarget].resetStatus()
+                    else:
+                        for member in self.game.player.party.members:
+                            member.resetStatus()
+    
     def intToRating(self,val):
         ret = ""
         for i in range(val):
