@@ -145,33 +145,33 @@ class PauseMenu():
                 write(self.game, 20, 60, 220, self.itemName)
                 writeOrientation(self.game, 20, self.right-90, 220, str(tgt.manacost) + " MP", "L")
                 if tgt.type == SpellType.Attack:
-                    write(self.game, 15, 60, 245, "Deals " + str(tgt.attack) + " damage.")
+                    write(self.game, 15, 60, 245, "Deals " + str(self.game.player.party.members[self.targetPartyMember].amplify(tgt.attack)) + " damage.")
                 elif tgt.type == SpellType.Buff:
                     buffText = ""
                     commaSeparator = ""
                     if tgt.potency[0] > 0:
-                        buffText += commaSeparator + "ATK +" + str(tgt.potency[0])
+                        buffText += commaSeparator + "ATK +" + str(self.game.player.party.members[self.targetPartyMember].amplify(tgt.potency[0]))
                         commaSeparator = ", "
                     if tgt.potency[1] > 0:
-                        buffText += commaSeparator + "ACC +" + str(tgt.potency[1])
+                        buffText += commaSeparator + "ACC +" + str(self.game.player.party.members[self.targetPartyMember].amplify(tgt.potency[1]))
                         commaSeparator = ", "
                     if tgt.potency[2] > 0:
-                        buffText += commaSeparator + "CRT +" + str(tgt.potency[2])
+                        buffText += commaSeparator + "CRT +" + str(self.game.player.party.members[self.targetPartyMember].amplify(tgt.potency[2]))
                         commaSeparator = ", "
                     if tgt.potency[3] > 0:
-                        buffText += commaSeparator + "DEF +" + str(tgt.potency[3])
+                        buffText += commaSeparator + "DEF +" + str(self.game.player.party.members[self.targetPartyMember].amplify(tgt.potency[3]))
                         commaSeparator = ", "
                     if tgt.potency[4] > 0:
-                        buffText += commaSeparator + "DDG +" + str(tgt.potency[4])
+                        buffText += commaSeparator + "DDG +" + str(self.game.player.party.members[self.targetPartyMember].amplify(tgt.potency[4]))
                         commaSeparator = ", "
                     if tgt.potency[5] > 0:
-                        buffText += commaSeparator + "LCK +" + str(tgt.potency[5])
+                        buffText += commaSeparator + "LCK +" + str(self.game.player.party.members[self.targetPartyMember].amplify(tgt.potency[5]))
                         commaSeparator = ", "
                     if tgt.potency[6] > 0:
-                        buffText += commaSeparator + "Regenerates " + str(tgt.potency[6]) + " HP each turn."
+                        buffText += commaSeparator + "Regenerates " + str(self.game.player.party.members[self.targetPartyMember].amplify(tgt.potency[6])) + " HP each turn."
                     write(self.game, 15, 60, 245, buffText)
                 elif tgt.type == SpellType.Heal:
-                    write(self.game, 15, 60, 245, "Heals for " + str(tgt.potency[6]) + " HP.")
+                    write(self.game, 15, 60, 245, "Heals for " + str(self.game.player.party.members[self.targetPartyMember].amplify(tgt.potency[6])) + " HP.")
                 if self.state == "itemSummary" and self.game.directory.getItem(self.game.player.party.members[self.targetPartyMember].spells[self.targetElement]).type == SpellType.Heal: # Cast:
                     write(self.game, 22, 540, 420, "Cast")
                     write(self.game, 22, 510 + (self.cursorPos*100), 417, "->")
@@ -208,33 +208,33 @@ class PauseMenu():
                     writeOrientation(self.game, 20, self.right-40, 220, str(tgt.manacost) + " MP", "R")
                     writeOrientation(self.game, 15, self.right-40, 245, "Use to learn spell.", "R")
                     if tgt.type == SpellType.Attack:
-                        write(self.game, 15, 60, 245, "Deals " + str(tgt.attack) + " damage.")
+                        write(self.game, 15, 60, 245, "Deals " + str(self.game.player.party.members[self.targetPartyMember].amplify(tgt.attack)) + " damage.")
                     elif tgt.type == SpellType.Buff:
                         buffText = ""
                         commaSeparator = ""
                         if tgt.potency[0] > 0:
-                            buffText += commaSeparator + "ATK +" + str(tgt.potency[0])
+                            buffText += commaSeparator + "ATK +" + str(self.game.player.party.members[self.targetPartyMember].amplify(tgt.potency[0]))
                             commaSeparator = ", "
                         if tgt.potency[1] > 0:
-                            buffText += commaSeparator + "ACC +" + str(tgt.potency[1])
+                            buffText += commaSeparator + "ACC +" + str(self.game.player.party.members[self.targetPartyMember].amplify(tgt.potency[1]))
                             commaSeparator = ", "
                         if tgt.potency[2] > 0:
-                            buffText += commaSeparator + "CRT +" + str(tgt.potency[2])
+                            buffText += commaSeparator + "CRT +" + str(self.game.player.party.members[self.targetPartyMember].amplify(tgt.potency[2]))
                             commaSeparator = ", "
                         if tgt.potency[3] > 0:
-                            buffText += commaSeparator + "DEF +" + str(tgt.potency[3])
+                            buffText += commaSeparator + "DEF +" + str(self.game.player.party.members[self.targetPartyMember].amplify(tgt.potency[3]))
                             commaSeparator = ", "
                         if tgt.potency[4] > 0:
-                            buffText += commaSeparator + "DDG +" + str(tgt.potency[4])
+                            buffText += commaSeparator + "DDG +" + str(self.game.player.party.members[self.targetPartyMember].amplify(tgt.potency[4]))
                             commaSeparator = ", "
                         if tgt.potency[5] > 0:
-                            buffText += commaSeparator + "LCK +" + str(tgt.potency[5])
+                            buffText += commaSeparator + "LCK +" + str(self.game.player.party.members[self.targetPartyMember].amplify(tgt.potency[5]))
                             commaSeparator = ", "
                         if tgt.potency[6] > 0:
-                            buffText += commaSeparator + "Regenerates " + str(tgt.potency[6]) + " HP each turn."
+                            buffText += commaSeparator + "Regenerates " + str(self.game.player.party.members[self.targetPartyMember].amplify(tgt.potency[6])) + " HP each turn."
                         write(self.game, 15, 60, 245, buffText)
                     elif tgt.type == SpellType.Heal:
-                        write(self.game, 15, 60, 245, "Heals for " + str(tgt.potency[6]) + " HP.")
+                        write(self.game, 15, 60, 245, "Heals for " + str(self.game.player.party.members[self.targetPartyMember].amplify(tgt.potency[6])) + " HP.")
                 if self.state == "itemSummary":
                     write(self.game, 22, 440, 420, "Use")
                     write(self.game, 22, 540, 420, "Drop")
@@ -361,7 +361,7 @@ class PauseMenu():
                 if self.substate == "inventory" and self.cursorPos == 0: # Use
                     self.action = "use"
                     self.state = "confirmAction"
-                if self.substate == "spellbook" and self.cursorPos == 0 and self.game.directory.getItem(self.game.player.party.members[self.targetPartyMember].spells[self.targetElement]).type == SpellType.Heal: # Cast
+                if self.substate == "spellbook" and self.cursorPos == 0 and (self.game.directory.getItem(self.game.player.party.members[self.targetPartyMember].spells[self.targetElement]).type == SpellType.Heal or self.game.directory.getItem(self.game.player.party.members[self.targetPartyMember].spells[self.targetElement]).type == SpellType.Cleanse): # Cast
                     self.action = "cast"
                     self.state = "targetSelect"
                     self.cursorPos = 0
@@ -404,6 +404,10 @@ class PauseMenu():
                 self.state = "partyMember"
                 self.cursorPos = self.menuSelection
             if self.state == "itemSummary":
+                self.cursorPos = 0
+                self.state = self.substate
+                self.substate = "none"
+            if self.state == "confirmAction":
                 self.cursorPos = 0
                 self.state = self.substate
                 self.substate = "none"
@@ -569,7 +573,10 @@ class PauseMenu():
         elif action == "cast":
             if self.game.player.party.members[targetPartyMember].canCast(targetElement,self.game.directory):
                 self.game.player.party.members[targetPartyMember].expendMana(targetElement,self.game.directory)
-                self.game.player.party.members[spellTarget].gainHP(self.game.directory.getItem(self.game.player.party.members[targetPartyMember].spells[targetElement]).getHeal())
+                if self.game.directory.getItem(self.game.player.party.members[targetPartyMember].spells[targetElement]).type == SpellType.Heal:
+                    self.game.player.party.members[spellTarget].gainHP(self.game.player.party.members[targetPartyMember].amplify(self.game.directory.getItem(self.game.player.party.members[targetPartyMember].spells[targetElement]).getHeal()))
+                if self.game.directory.getItem(self.game.player.party.members[targetPartyMember].spells[targetElement]).type == SpellType.Cleanse:
+                    self.game.player.party.members[spellTarget].resetStatus()
 
     def intToRating(self,val):
         ret = ""

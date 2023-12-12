@@ -118,10 +118,10 @@ class RoomTemplateList():
 ############################################################################################################################################################################
 
     def initHavenTemplateList(self):
-        R0 = RoomTemplate(0,"You enter a cozy wooden shack. The roaring fire in the hearth warms your bones, and beds along the wall offer you a quiet place to rest.",[14,23])
+        R0 = RoomTemplate(0,"You enter a cozy wooden shack. The roaring fire in the hearth warms your bones, and beds along the wall offer you a quiet place to rest.",[23,14])
         self.havenTemplateList.append(R0)
 
-        R1 = RoomTemplate(1,"You enter a cozy wooden shack. The roaring fire in the hearth warms your bones, and beds along the wall offer you a quiet place to rest. A wanderer sits by the fire.",[14,23,24])
+        R1 = RoomTemplate(1,"You enter a cozy wooden shack. The roaring fire in the hearth warms your bones, and beds along the wall offer you a quiet place to rest. A wanderer sits by the fire.",[23,14,24])
         self.havenTemplateList.append(R1)
 
 featureList = FeatureList()

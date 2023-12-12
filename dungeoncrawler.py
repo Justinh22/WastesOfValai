@@ -6,6 +6,7 @@ from pausemenu import *
 from directory import *
 from writing import *
 from dungeonmapgenerator import *
+from characterpopups import *
 
 class Crawler():
     def __init__(self,game,dungeonMap):
@@ -23,6 +24,7 @@ class Crawler():
         self.enemyList = []
         self.message = ""
         self.messageTimer = 0
+        self.wanderer = -1
         for loot in self.dungeonMap.loot:
             print(self.game.directory.getItemName(loot.loot))
 
@@ -87,6 +89,15 @@ class Crawler():
                 else:
                     self.message = "Your inventory is full"
                 self.messageTimer = 1000
+            if self.state == "wandererSummary":
+                newChar = self.game.directory.buildCharacter(difficultyToLevel(self.dungeonMap.dungeonLevel),self.game.player.party.members)
+                if len(self.game.player.party.members) < 4:
+                    self.game.player.party.members.append(newChar)
+                    self.message = "You awaken " + newChar.name + ", the Level " + str(newChar.level) + " " + newChar.type.name
+                else:
+                    CharacterSwap(self.game,newChar)
+                self.dungeonMap.map[self.dungeonPos[0]][self.dungeonPos[1]] = FLOOR_CHAR
+                self.messageTimer = 1000
         if self.game.B:
             print("B")
         if self.game.X:
@@ -130,6 +141,10 @@ class Crawler():
                 self.game.screen.blit(text,(x+offset,y+5))
         if self.state == "lootSummary":
             text = "Inside the chest is a " + self.game.directory.getItemName(self.lootLookup().loot,True)
+            if self.messageTimer == 0:
+                write(self.game, 20, 30,self.height+10,text)
+        if self.state == "wandererSummary":
+            text = "A wanderer lies on the ground, unconscious."
             if self.messageTimer == 0:
                 write(self.game, 20, 30,self.height+10,text)
         if self.messageTimer > 0:
@@ -189,10 +204,12 @@ class Crawler():
 
     def stepTo(self,r,c):
         #print(f'({r}, {c})')
-        if self.dungeonMap.map[r][c] == 'O':
+        if self.dungeonMap.map[r][c] == ENTRANCE_CHAR:
             self.inDungeon = False
-        elif self.dungeonMap.map[r][c] == 'L':
+        elif self.dungeonMap.map[r][c] == LOOT_CHAR:
             self.state = "lootSummary"
+        elif self.dungeonMap.map[r][c] == WANDERER_CHAR:
+            self.state = "wandererSummary"
         else:
             self.state = "main"
 

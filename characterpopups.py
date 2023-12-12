@@ -230,4 +230,6 @@ class Hostel():
 
 #class ItemReplace():
 
+#class SpellReplace():
+
 #class Message():

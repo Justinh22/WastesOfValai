@@ -169,7 +169,7 @@ def initArmorDirectory():
     armorDirectory.append(Steel_Armor)
     Heavy_Steel_Armor = Armor("Heavy Steel Armor","A suit of heavy steel armor.",4,114,7,0,0,ArmorType.Heavy)
     armorDirectory.append(Heavy_Steel_Armor)
-    Enchanted_Robe = Armor("Enchanted Robe","An enchanted robe, which glows magically.",4,115,4,10,2)
+    Enchanted_Robe = Armor("Enchanted Robe","An enchanted robe, which glows magically.",4,115,4,10,2,ArmorType.Robe)
     armorDirectory.append(Enchanted_Robe)
     #5
     Light_Ebonite_Armor = Armor("Light Ebonite Armor","A suit of lightweight ebonite armor.",5,116,7,15,0,ArmorType.Light)

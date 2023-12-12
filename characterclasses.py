@@ -12,7 +12,7 @@ class Character():
         Character.charNum += 1
         self.id = Character.charNum
         self.xp = 0
-        self.nextLevel = 100*lv
+        self.nextLevel = 200*lv
         self.type = tp # Class; Type is used to avoid defined 'class' name
         self.spells = []
         for i in range(self.level):
@@ -70,7 +70,7 @@ class Character():
     def getSpeed(self):
         return self.speed
     def amplify(self,val):
-        val = math.ceil(val + (val * self.getAmplifier()))
+        val = math.ceil(val + (val * (self.getAmplifier()/100)))
         return val
     def takeDamage(self,val):
         print(f'{self.name} took {val} damage!')
@@ -124,7 +124,7 @@ class Character():
         self.xp += val
         if self.xp > self.nextLevel and self.level < 10:
             self.xp -= self.nextLevel
-            self.nextLevel += 100
+            self.nextLevel += 200
             self.levelUp()
     def addSpell(self,spellID):
         if spellID not in self.spells:

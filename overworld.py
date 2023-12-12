@@ -90,6 +90,8 @@ class Overworld():
         diffText = self.getBiome(self.game.player.currentPos[0],self.game.player.currentPos[1]).name + ": Difficulty " + str(self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[self.game.player.currentPos[0]][self.game.player.currentPos[1]]))
         if self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[self.game.player.currentPos[0]][self.game.player.currentPos[1]]) > self.game.player.party.getPower()+1:
             text = self.font.render(diffText,True,self.game.red)
+        elif self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[self.game.player.currentPos[0]][self.game.player.currentPos[1]]) < self.game.player.party.getPower()-10:
+            text = self.font.render(diffText,True,self.game.green)
         else:
             text = self.font.render(diffText,True,self.game.white)
         self.game.screen.blit(text,(30,self.height+10))
@@ -177,7 +179,7 @@ class Overworld():
                 odds = 10
             else:
                 odds = 20
-            if random.randint(odds,30) == 29 and self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]) == self.lastDiff:
+            if random.randint(odds,30) == 29 and self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]) == self.lastDiff and not (self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]) < self.game.player.party.getPower()-10):
                 self.steps = 0
                 encounter = []
                 encounter = self.game.directory.buildEncounter(self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]),self.getBiome(self.game.player.currentPos[0],self.game.player.currentPos[1]))

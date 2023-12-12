@@ -360,15 +360,15 @@ class Combat():
             write(self.game, 20, self.left+15, 325, "Do you want to cast this spell?")
             write(self.game, 16, self.left+15, 360, self.game.directory.getItemName(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID])+": Costs "+str(self.game.directory.getManaCost(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID]))+" MP")
             if self.game.player.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID] < 400:
-                writeOrientation(self.game, 16,self.right-10, 360, str(self.game.directory.getAtkSpell(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID]).attack)+" Damage","R")
+                writeOrientation(self.game, 16,self.right-10, 360, str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].amplify(self.game.directory.getAtkSpell(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID]).attack))+" Damage","R")
             else:
                 if self.game.directory.getSptSpell(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID]).type == SpellType.Heal:
-                    writeOrientation(self.game, 16,self.right-10, 360, "Restores "+str(self.game.directory.getSptSpell(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID]).getHeal())+" HP","R")
+                    writeOrientation(self.game, 16,self.right-10, 360, "Restores "+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].amplify(self.game.directory.getSptSpell(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID]).getHeal()))+" HP","R")
                 if self.game.directory.getSptSpell(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID]).type == SpellType.Buff:
                     i = 0
                     for id, buff in enumerate(self.game.directory.getSptSpell(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID]).potency):
                         if buff > 0:
-                            writeOrientation(self.game, 16,self.right-10, 360+(i*20), self.lookupBuffName(id)+" "+str(buff),"R")
+                            writeOrientation(self.game, 16,self.right-10, 360+(i*20), self.lookupBuffName(id)+" "+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].amplify(buff)),"R")
                             i += 1
             write(self.game, 16, self.left+15, 380, self.game.directory.getItemDesc(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID]))
             write(self.game, 20,150,425,"A) CONFIRM")
@@ -685,7 +685,7 @@ class Combat():
                     if spell.type == SpellType.Attack:
                         self.dmg = self.game.player.party.members[target].takeDamage(spell.attack)
                     elif spell.type == SpellType.Debuff:
-                        if (spell.id > 326) or random.randint(0,1) == 1: # 50% Chance for 324, 325, 326
+                        if (spell.id > 326) or random.randint(0,2) != 2: # 67% Chance for 324, 325, 326
                             if spell.element == Element.Lightning:
                                 self.game.player.party.members[target].status = Status.Paralyzed
                                 self.game.player.party.members[target].statusCount = 3
@@ -698,13 +698,13 @@ class Combat():
                 else:
                     target = self.checkRecalculateTarget(source[0],target,"Encounter")
                     if spell.type == SpellType.Attack:
-                        self.dmg = spell.attack
+                        self.dmg = self.game.player.party.members[target].amplify(spell.attack)
                         if spell.element == self.encounter[target].resistance:
                             self.dmg = int(self.dmg/2)
                         self.encounter[target].takeDamage(self.dmg)
                         self.game.player.party.members[source[1]].mp -= spell.manacost
                     elif spell.type == SpellType.Debuff:
-                        if spell.id > 326 or random.randint(0,1) == 1: # 50% Chance for 324, 325, 326
+                        if spell.id > 326 or random.randint(0,2) == 2: # 67% Chance for 324, 325, 326
                             if spell.element == Element.Lightning:
                                 self.encounter[target].status = Status.Paralyzed
                                 self.encounter[target].statusCount = 3
@@ -735,11 +735,11 @@ class Combat():
                 else:
                     if spell.type == SpellType.Attack:
                         for member in self.encounter:
-                            self.dmg = spell.attack
+                            self.dmg = self.game.player.party.members[target].amplify(spell.attack)
                             if spell.element == member.resistance:
                                 self.dmg = int(self.dmg/2)
                             member.takeDamage(self.dmg)
-                        self.dmg = spell.attack
+                        self.dmg = self.game.player.party.members[target].amplify(spell.attack)
                         self.game.player.party.members[source[1]].mp -= spell.manacost
                     elif spell.type == SpellType.Debuff:
                         for member in self.encounter:
@@ -760,11 +760,11 @@ class Combat():
                 target = self.checkRecalculateTarget(source[0],target,"Party")
                 if spell.type == SpellType.Heal:
                     if self.game.player.party.members[target].hp > 0:
-                        self.game.player.party.members[target].hp += spell.getHeal()
+                        self.game.player.party.members[target].hp += self.game.player.party.members[target].amplify(spell.getHeal())
                     if self.game.player.party.members[target].hp > self.game.player.party.members[target].hpMax:
                         self.game.player.party.members[target].hp = self.game.player.party.members[target].hpMax
                 elif spell.type == SpellType.Buff:
-                    self.applyBuff(spell,target)
+                    self.applyBuff(spell,target,source)
                 elif spell.type == SpellType.Raise:
                     if self.game.player.party.members[target].hp <= 0:
                         self.game.player.party.members[target].hp += spell.getHeal()
@@ -778,11 +778,11 @@ class Combat():
                 if spell.type == SpellType.Heal:
                     for member in self.game.player.party.members:
                         if member.hp > 0:
-                            member.hp += spell.getHeal()
+                            member.hp += self.game.player.party.members[target].amplify(spell.getHeal())
                         if member.hp > member.hpMax:
                             member.hp = member.hpMax
                 elif spell.type == SpellType.Buff:
-                    self.applyBuff(spell,-1)
+                    self.applyBuff(spell,-1,source)
                 elif spell.type == SpellType.Raise:
                     for member in self.game.player.party.members:
                         if member.hp <= 0:
@@ -841,6 +841,7 @@ class Combat():
 
     def startExecute(self):
         print("Execute!")
+        print(f'Combat order: {self.combatOrder}')
         self.ex = True
         self.exTurn = 0
         self.timeStart = pygame.time.get_ticks()-2001
@@ -914,7 +915,9 @@ class Combat():
             return True
         return False
 
-    def applyBuff(self,buff,target):
+    def applyBuff(self,buff,target,source):
+        for i in range(len(buff.potency)):
+            buff.potency[i] = self.game.player.party.members[source[1]].amplify(buff.potency[i])
         newBuff = Buff(buff.name,buff.potency,5,target)
         self.buffs.append(newBuff)
         if newBuff.target == -1:

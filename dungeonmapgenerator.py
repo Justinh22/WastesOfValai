@@ -12,6 +12,7 @@ TREEHOUSE_WALL = '~'
 FLOOR_CHAR = ' '
 ENTRANCE_CHAR = 'O'
 LOOT_CHAR = 'L'
+WANDERER_CHAR = 'W'
 
 directory = Directory()
 
@@ -102,6 +103,8 @@ class DungeonMap():
         self.addEntrance()
         numLoot = math.ceil(numRooms/3) + random.choice([-1,0,0,0,1,1])
         self.addLoot(numLoot)
+        if True: #random.randint(0,3) == 3:
+            self.addWanderer()
         self.writeMap()
 
     def writeMap(self):
@@ -262,6 +265,16 @@ class DungeonMap():
             self.loot.append(DungeonLoot(lootRooms[i].setLoot(self.map),self.dungeonLevel,types))
             #print(f'Loot in room {i}')
 
+    def addWanderer(self):
+        possRooms = self.rooms
+        random.shuffle(possRooms)
+        for i in range(len(possRooms)):
+            if possRooms[i].getCoords() == self.entranceRoom:
+                continue
+            possRooms[i].setWanderer(self.map)
+            break
+            #print(f'Loot in room {i}')
+
     def removeLoot(self,loot):
         for i in range(len(self.loot)):
             if loot.coords == self.loot[i].coords:
@@ -317,6 +330,11 @@ class DungeonRoom():
     def setLoot(self,map):
         coords = self.getRandomPoint()
         map[coords[0]][coords[1]] = LOOT_CHAR
+        return coords
+    
+    def setWanderer(self,map):
+        coords = self.getRandomPoint()
+        map[coords[0]][coords[1]] = WANDERER_CHAR
         return coords
     
 
