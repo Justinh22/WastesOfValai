@@ -103,7 +103,7 @@ class DungeonMap():
         self.addEntrance()
         numLoot = math.ceil(numRooms/3) + random.choice([-1,0,0,0,1,1])
         self.addLoot(numLoot)
-        if True: #random.randint(0,3) == 3:
+        if random.randint(0,2) == 2:
             self.addWanderer()
         self.writeMap()
 

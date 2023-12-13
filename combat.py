@@ -181,11 +181,12 @@ class Combat():
                 else:
                     self.lowMana = True
             elif self.state =="itemSummary":
-                self.actionVal = self.game.player.party.inventory[self.itemID].id
-                self.state = "targetSelect"
-                self.cursorPos = 0
-                self.enterTargetSelect()
-                print("ITEM")
+                if self.game.player.party.inventory[self.itemID].id >= 200 and self.game.player.party.inventory[self.itemID].id < 300:
+                    self.actionVal = self.game.player.party.inventory[self.itemID].id
+                    self.state = "targetSelect"
+                    self.cursorPos = 0
+                    self.enterTargetSelect()
+                    print("ITEM")
             elif self.state == "execute":
                 self.timeStart -= 2000
         if self.game.B:

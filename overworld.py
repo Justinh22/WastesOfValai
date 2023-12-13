@@ -172,14 +172,14 @@ class Overworld():
                 self.inDungeon = True
         else: # Roll for random encounter
             if self.steps < 5:
-                odds = 30
+                odds = 50
             elif self.steps < 10:
                 odds = 1
             elif self.steps < 15:
                 odds = 10
             else:
-                odds = 20
-            if random.randint(odds,30) == 29 and self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]) == self.lastDiff and not (self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]) < self.game.player.party.getPower()-10):
+                odds = 25
+            if random.randint(odds,50) == 49 and self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]) == self.lastDiff and not (self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]) < self.game.player.party.getPower()-10):
                 self.steps = 0
                 encounter = []
                 encounter = self.game.directory.buildEncounter(self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]),self.getBiome(self.game.player.currentPos[0],self.game.player.currentPos[1]))
