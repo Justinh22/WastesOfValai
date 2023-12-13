@@ -21,8 +21,8 @@ class Feature():
             itemRarity = rarity + self.lootRarity.value
             if itemRarity < 1:
                 itemRarity = 1
-            if itemRarity > 10:
-                itemRarity = 10
+            if itemRarity > MAX_DIFFICULTY:
+                itemRarity = MAX_DIFFICULTY
             itemRarity = self.getLootRarity(itemRarity, chosenType)
             print(f'type: {chosenType}, rarity: {itemRarity}')
             item = dir.getItemByRarity(chosenType,itemRarity)
@@ -153,6 +153,14 @@ class FeatureList():
         StoneWalls_Smooth = Feature(22,"Stone Walls","Flat stone walls that are incredibly smooth. They have an otherworldly quality to them.",
                              [Type.Empty], LootOdds.Impossible, LootRarity.Common)
         self.featureList.append(StoneWalls_Smooth)
+
+        HavenBeds = Feature(23,"Beds","A comfortable row of beds lay in a line at the side of the cabin. They look like they could provide a good night's rest.",
+                            [Type.Empty], LootOdds.Impossible, LootRarity.Common)
+        self.featureList.append(HavenBeds)
+
+        HavenWanderer = Feature(24,"Wanderer","A figure sits by the hearth, resting.",
+                                [Type.Empty], LootOdds.Impossible, LootRarity.Common)
+        self.featureList.append(HavenWanderer)
 ##################################################################################################################################################################################
 
 dir = Directory()

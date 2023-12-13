@@ -1,4 +1,5 @@
 import pygame;
+from constants import *
 
 class Item():
     def __init__(self,nm="NULLITEM",desc="NULLITEM",rar=-1,i=-1):
@@ -8,7 +9,7 @@ class Item():
         self.id = i
 
 class Weapon(Item):
-    def __init__(self,nm="NULL",desc="NULL",rar=-1,i=-1,atk=0,acc=0,crt=0,amp=0,typ=0):
+    def __init__(self,nm="NULL",desc="NULL",rar=-1,i=-1,atk=0,acc=0,crt=0,amp=0,typ=WeaponType.Sword):
         Item.__init__(self,nm,desc,rar,i)
         self.attack = atk
         self.accuracy = acc
@@ -17,7 +18,7 @@ class Weapon(Item):
         self.type = typ
 
 class Armor(Item):
-    def __init__(self,nm="NULL",desc="NULL",rar=-1,i=-1,df=0,ddg=0,mpr=0,typ=0):
+    def __init__(self,nm="NULL",desc="NULL",rar=-1,i=-1,df=0,ddg=0,mpr=0,typ=ArmorType.Medium):
         Item.__init__(self,nm,desc,rar,i)
         self.defense = df
         self.dodge = ddg

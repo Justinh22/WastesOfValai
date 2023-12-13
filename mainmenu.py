@@ -1,6 +1,8 @@
 import sys
 import pygame
 from writing import *
+import os
+import glob
 
 class MainMenu():
     def __init__(self,game):
@@ -42,6 +44,7 @@ class MainMenu():
                 self.game.screen.fill(self.game.black)
                 self.game.write(20, self.startPos[0], self.startPos[1], "Loading...")
                 self.blitScreen()
+                self.wipeDungeonDir()
                 self.game.WorldMap.generateMap()
                 print("Start!")
                 print(self.game.WorldMap.startingPos)
@@ -49,9 +52,10 @@ class MainMenu():
                 self.game.inGame = True
                 self.displayRunning = False
                 self.game.screen.fill(self.game.black)
+                self.game.load()
                 self.game.write(20, self.startPos[0], self.startPos[1], "Loading...")
                 self.blitScreen()
-                self.game.WorldMap.loadMap()
+                self.game.WorldMap.loadMap(self.game.player.currentPos[0],self.game.player.currentPos[1])
                 print("Load!")
             if self.cursorState == "Quit":
                 print("Quit!")
@@ -79,3 +83,9 @@ class MainMenu():
             elif self.cursorState == "Quit":
                 self.cursor.midtop = (self.loadPos[0]-100, self.loadPos[1])
                 self.cursorState = "Load"
+
+    def wipeDungeonDir(self):
+        folder = 'dungeons/'
+        for filename in os.listdir(folder):
+            if filename.endswith('.txt'):
+                os.remove(os.path.join(folder,filename))

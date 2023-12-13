@@ -12,7 +12,7 @@ class Character():
         Character.charNum += 1
         self.id = Character.charNum
         self.xp = 0
-        self.nextLevel = 100*lv
+        self.nextLevel = 200*lv
         self.type = tp # Class; Type is used to avoid defined 'class' name
         self.spells = []
         for i in range(self.level):
@@ -22,12 +22,12 @@ class Character():
         self.eqpAmr = Armor()
         self.hpMax = 20
         self.mpMax = 20
-        self.attack = 0
+        self.attack = 3
         self.critrate = 0
-        self.defense = 0
+        self.defense = 1
         self.dodge = 0
         self.luck = 0
-        self.speed = 0
+        self.speed = 1
         for i in range(0,lv):
             growth = tp.getGrowths()
             self.hpMax += growth[0]
@@ -45,20 +45,9 @@ class Character():
         self.manaregen = 0
         self.buffs = [0,0,0,0,0,0,0]
         self.activeBuffs = []
-        self.status = "None"
+        self.status = Status.NoStatus
         self.statusCount = 0
-        if p == 0:
-            self.personality = "Brave"
-        elif p == 1:
-            self.personality = "Angry"
-        elif p == 2:
-            self.personality = "Friendly"
-        elif p == 3:
-            self.personality = "Cowardly"
-        elif p == 4:
-            self.personality = "Headstrong"
-        elif p == 5:
-            self.personality = "Lazy"
+        self.personality = p
     def getAttack(self):
         return self.eqpWpn.attack + self.attack + self.getBuff("ATK")
     def getDefense(self):
@@ -80,6 +69,9 @@ class Character():
         return self.manaregen + self.eqpAmr.manaregen
     def getSpeed(self):
         return self.speed
+    def amplify(self,val):
+        val = math.ceil(val + (val * (self.getAmplifier()/100)))
+        return val
     def takeDamage(self,val):
         print(f'{self.name} took {val} damage!')
         if val > self.hp:
@@ -116,9 +108,9 @@ class Character():
         if self.statusCount > 0:
             self.statusCount -= 1
             if self.statusCount == 0:
-                self.status = "None"
+                self.status = Status.NoStatus
     def resetStatus(self):
-        self.status = "None"
+        self.status = Status.NoStatus
         self.statusCount = 0
     def gainHP(self,val):
         self.hp += val
@@ -132,8 +124,9 @@ class Character():
         self.xp += val
         if self.xp > self.nextLevel and self.level < 10:
             self.xp -= self.nextLevel
-            self.nextLevel += 100
-            self.levelUp()
+            self.nextLevel += 200
+            return True
+        return False
     def addSpell(self,spellID):
         if spellID not in self.spells:
             self.spells.append(spellID)
@@ -141,6 +134,7 @@ class Character():
         return False
     def levelUp(self):
         self.level += 1
+        self.xp = 0
         growth = self.type.getGrowths()
         self.hpMax += growth[0]
         self.mpMax += growth[1]
@@ -150,7 +144,9 @@ class Character():
         self.dodge += growth[5]
         self.luck += growth[6]
         self.speed += growth[7]
-        self.spells.append(self.type.knownSpells[self.level-1])
+        if self.type.knownSpells[self.level-1] != -11 and self.type.knownSpells[self.level-1] not in self.spells:
+            self.spells.append(self.type.knownSpells[self.level-1])
+        return growth
     def equip(self,item,dir):
         if dir.getItemType(item) == Type.Weapon:
             returner = self.eqpWpn.id
@@ -199,6 +195,16 @@ class Character():
     def checkSptSpellProficiency(self,id,dir):
         idRarity = dir.getItemRarity(id)
         return self.type.supportMagicLevel[self.level] >= idRarity
+    def fullRestore(self):
+        self.hp = self.hpMax
+        self.mp = self.mpMax
+        self.resetStatus()
+    def canCast(self,spellbookIndex,dir):
+        return dir.getManaCost(self.spells[spellbookIndex]) <= self.mp
+    def expendMana(self,spellbookIndex,dir):
+        self.mp -= dir.getManaCost(self.spells[spellbookIndex])
+        if self.mp < 0:
+            self.mp = 0
 
 
 class ClassType():
@@ -218,32 +224,90 @@ class ClassType():
         self.spdGrowth = sdg
         self.knownSpells = splsLrn
         self.id = idIN
+        self.description = ""
+        self.rating = []
+    def setAdditionalInfo(self,rating,desc):
+        self.description = desc
+        self.rating = rating
     def getGrowths(self):
         return [self.hpGrowth[random.randint(0,2)], self.mpGrowth[random.randint(0,2)], self.atkGrowth[random.randint(0,2)], self.crtGrowth[random.randint(0,2)], self.defGrowth[random.randint(0,2)], self.ddgGrowth[random.randint(0,2)], self.lckGrowth[random.randint(0,2)], self.spdGrowth[random.randint(0,2)]]
+    def wpnProfToString(self):
+        ret = ""
+        comma = ""
+        if self.weaponProficiency[0] == 1:
+            ret += "Axe"
+            comma = ", "
+        if self.weaponProficiency[1] == 1:
+            ret += comma + "Sword"
+            comma = ", "
+        if self.weaponProficiency[2] == 1:
+            ret += comma + "Spear"
+            comma = ", "
+        if self.weaponProficiency[3] == 1:
+            ret += comma + "Dagger"
+            comma = ", "
+        if self.weaponProficiency[4] == 1:
+            ret += comma + "Staff"
+            comma = ", "
+        return ret
+    def amrProfToString(self):
+        ret = ""
+        comma = ""
+        if self.armorProficiency[0] == 1:
+            ret += "Light"
+            comma = ", "
+        if self.armorProficiency[1] == 1:
+            ret += comma + "Medium"
+            comma = ", "
+        if self.armorProficiency[2] == 1:
+            ret += comma + "Heavy"
+            comma = ", "
+        if self.armorProficiency[3] == 1:
+            ret += comma + "Robe"
+            comma = ", "
+        if self.armorProficiency[4] == 1:
+            ret += comma + "Arcanist"
+            comma = ", "
+        return ret
+
 
 class Party():
     def __init__(self):
         self.members = []
         self.inventory = []         # List of int : Contains id of all items in inventory
         self.equipment = []         # List of int : Contains id of all equipment in inventory
+    def printContents(self):
+        for member in self.members:
+            print(member.name)
     def initializeMembers(self,dir):
-        for i in range(0,random.randint(3,4)):
-            lvl = 2
-            self.members.append(Character(dir.getCharacterName(self.members),lvl,dir.classDirectory[random.randint(0,11)],random.randint(0,5))) #random.randint(0,11)
-            self.members[i].eqpWpn = dir.getWeapon(dir.getItemByRarities(Type.Weapon,lvl-1,lvl))
-            self.members[i].eqpAmr = dir.getArmor(dir.getItemByRarities(Type.Armor,lvl-1,lvl))
+        self.members.append(Character(dir.getCharacterName(self.members),1,dir.classDirectory[0],dir.getRandomPersonality()))
+        self.members[0].eqpWpn = dir.getWeapon(dir.getItemByRarity(Type.Weapon,1))
+        self.members[0].eqpAmr = dir.getArmor(dir.getItemByRarity(Type.Armor,1))
+        #for i in range(0,random.randint(3,4)):
+        #    lvl = 2
+        #   self.members.append(Character(dir.getCharacterName(self.members),lvl,dir.classDirectory[random.randint(0,11)],random.randint(0,5))) #random.randint(0,11)
+        #    self.members[i].eqpWpn = dir.getWeapon(dir.getItemByRarities(Type.Weapon,lvl-1,lvl))
+        #    self.members[i].eqpAmr = dir.getArmor(dir.getItemByRarities(Type.Armor,lvl-1,lvl))
     def debug_RandomInventory(self,dir):
         while len(self.inventory) < MAX_INVENTORY_SIZE:
             self.addItem(dir.getItemByRarities(Type.Potion,1,5))
+    def add(self,item,dir):
+        print(dir.getItemType(item))
+        if dir.getItemType(item) == Type.Weapon or dir.getItemType(item) == Type.Armor:
+            return self.addEquipment(item)
+        else:
+            return self.addItem(item)
     def addItem(self,item):
-        if len(self.inventory) <= MAX_INVENTORY_SIZE:
+        if len(self.inventory) < MAX_INVENTORY_SIZE:
             self.inventory.append(item)
             return True
+        print("Item inventory is full")
         return False
     def addEquipment(self,item):
-        if len(self.equipment) <= MAX_INVENTORY_SIZE:
+        if len(self.equipment) < MAX_INVENTORY_SIZE:
             self.equipment.append(item)
             return True
+        print("Equipment inventory is full")
         return False
     def learnSpell(self,member,index):
         self.members[member].addSpell(self.inventory[index])
@@ -261,6 +325,9 @@ class Party():
         self.equipment.pop(index)
     def dropItem(self,index):
         self.inventory.pop(index)
+    def fullRestore(self):
+        for member in self.members:
+            member.fullRestore()
 
 class Creature():
     def __init__(self,nm,lv,idIN,hpIN,at,ac,df,dg,sd,res,type,spells):
@@ -280,6 +347,10 @@ class Creature():
         self.spellCooldown = 0
         self.status = "None"
         self.statusCount = 0
+    def getAccuracy(self):
+        return self.accuracy
+    def getDodge(self):
+        return self.dodge
     def takeDamage(self,val):
         print(f'{self.name} took {val} damage!')
         if val > self.hp:
@@ -302,6 +373,8 @@ class Action():
         self.source = src
         self.target = tgt
         self.action = act # 0 = ATTACK, 1 = GUARD, ID = SPELL, ID = ART, ID = ITEM
+    def print(self):
+        return str(self.source) + " -> " + str(self.target) + ": " + str(self.action)
 
 class Buff():
     def __init__(self,nme,buf,dur,tgt):

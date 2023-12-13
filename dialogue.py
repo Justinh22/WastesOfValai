@@ -6,7 +6,7 @@ def getCombatDialogue(character):
     dialogue = ""
     hpPercentage = (character.hp / character.hpMax) * 100
     choice = random.randint(0,2)
-    if character.personality == "Brave":
+    if character.personality == Personality.Brave:
         if hpPercentage >= 90:
             if choice == 0:
                 dialogue = "Let's do this!"
@@ -35,7 +35,7 @@ def getCombatDialogue(character):
                 dialogue = "Damn... this is it, then."
             else:
                 dialogue = "Thanks for everything, friends..."
-    elif character.personality == "Angry":
+    elif character.personality == Personality.Angry:
         if hpPercentage >= 90:
             if choice == 0:
                 dialogue = "Let me at them!"
@@ -64,7 +64,7 @@ def getCombatDialogue(character):
                 dialogue = "I'm taking you with me!"
             else:
                 dialogue = "No! You're going down, fiend!"
-    elif character.personality == "Friendly":
+    elif character.personality == Personality.Friendly:
         if hpPercentage >= 90:
             if choice == 0:
                 dialogue = "Let's do this!"
@@ -93,7 +93,7 @@ def getCombatDialogue(character):
                 dialogue = "You're going down with me!"
             else:
                 dialogue = "Goodbye, everyone..."
-    elif character.personality == "Cowardly":
+    elif character.personality == Personality.Cowardly:
         if hpPercentage >= 90:
             if choice == 0:
                 dialogue = "Do we have to?"
@@ -122,7 +122,7 @@ def getCombatDialogue(character):
                 dialogue = "Alright, I'm out of here..."
             else:
                 dialogue = "So this is it..."
-    elif character.personality == "Headstrong":
+    elif character.personality == Personality.Headstrong:
         if hpPercentage >= 90:
             if choice == 0:
                 dialogue = "Ha! Bring it on!"
@@ -151,7 +151,7 @@ def getCombatDialogue(character):
                 dialogue = "I could use a hand here!"
             else:
                 dialogue = "Not today!"
-    elif character.personality == "Lazy":
+    elif character.personality == Personality.Lazy:
         if hpPercentage >= 90:
             if choice == 0:
                 dialogue = "Do we have to?"

@@ -1,12 +1,19 @@
 from enum import Enum
 
 MAX_DIFFICULTY = 25
+MAX_LEVEL = 10
 MAX_WEAPON_RARITY = 10
 MAX_ARMOR_RARITY = 10
 MAX_POTION_RARITY = 5
 MAX_ATKSPELL_RARITY = 5
 MAX_SPTSPELL_RARITY = 5
 MAX_INVENTORY_SIZE = 10
+
+LANDMARK_COUNT = 400
+MAP_WIDTH = 250
+MAP_HEIGHT = 250
+DUNGEON_DIM = 40
+MAP_GROWTH_CYCLES = 20
 
 class Type(Enum):
     Empty = 0
@@ -65,9 +72,15 @@ class SpellType(Enum):
     Raise = 4
     Cleanse = 5
 
+class SkillType(Enum):
+    Attack = 0
+    Support = 1
+
 class Target(Enum):
     Single = 0
-    All = 0
+    All = 1
+    Self = 2
+    Ally = 3
 
 class Biome(Enum):
     Forest = 0
@@ -79,3 +92,20 @@ class Status(Enum):
     Paralyzed = 0
     Burned = 1
     Freezing = 2
+    NoStatus = 3
+
+class DungeonType(Enum):
+    Well = 0
+    Pyramid = 1
+    BanditCamp = 2
+    Cave = 3
+    Ruins = 4
+    Treehouse = 5
+
+class Personality(Enum):
+    Brave = 0
+    Angry = 1
+    Friendly = 2
+    Cowardly = 3
+    Headstrong = 4
+    Lazy = 5

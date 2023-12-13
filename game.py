@@ -1,10 +1,13 @@
 import pygame
+import pickle
 from mainmenu import *
 from mapgenerator import *
 from directory import *
 from overworld import *
 from writing import *
 from room import *
+from dungeonmapgenerator import *
+from playerdata import *
 
 class Game():
     def __init__(self):
@@ -17,6 +20,7 @@ class Game():
         self.SELECT, self.START = False, False
         self.white, self.gray, self.black = (255,255,255), (150,150,150), (0,0,0)
         self.tan, self.lightgreen, self.green = (232, 235, 96), (181, 247, 94), (90, 176, 72)
+        self.brown, self.maroon = (173, 84, 0), (173, 0, 0)
         self.red, self.blue = (255,0,0), (0,0,255)
 
         self.width, self.height = 640, 480
@@ -28,15 +32,13 @@ class Game():
         pygame.time.set_timer(self.REFRESH, 1000//self.FPS)
 
         self.directory = Directory()
-
-        self.party = Party()
-        self.party.initializeMembers(self.directory)
         
         self.mainmenu = MainMenu(self)
         self.WorldMap = Map()
-        self.currentPos = list(self.WorldMap.startingPos)
+        self.player = PlayerData(list(self.WorldMap.startingPos),self.directory,[])
         self.overworld = Overworld(self)
         self.roomDB = RoomDatabase()
+        self.dungeonDB = DungeonDatabase()
 
         self.steps = 0
         self.stepsThreshold = 100
@@ -99,3 +101,28 @@ class Game():
             if self.difficulty < MAX_DIFFICULTY:
                 self.difficulty += 1
             self.steps = 0
+
+    def save(self):
+        roomdb = open('databases/roomDatabase.db','wb')
+        dungeondb = open('databases/dungeonDatabase.db','wb')
+        playerdb = open('databases/playerDatabase.db','wb')
+        pickle.dump(self.roomDB, roomdb)
+        pickle.dump(self.dungeonDB, dungeondb)
+        pickle.dump(self.player,playerdb)
+        roomdb.close()
+        dungeondb.close()
+        playerdb.close()
+
+    def load(self):
+        roomdb = open('databases/roomDatabase.db','rb')
+        dungeondb = open('databases/dungeonDatabase.db','rb')
+        playerdb = open('databases/playerDatabase.db','rb')
+        self.roomDB = pickle.load(roomdb)
+        self.dungeonDB = pickle.load(dungeondb)
+        self.player = pickle.load(playerdb)
+        self.roomDB.printContents()
+        self.dungeonDB.printContents()
+        self.player.party.printContents()
+        roomdb.close()
+        dungeondb.close()
+        playerdb.close()
