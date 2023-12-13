@@ -4,6 +4,7 @@ import math
 from constants import *
 from writing import *
 from dungeonmapgenerator import *
+import characterpopups
 
 class PauseMenu():
     def __init__(self,game):
@@ -107,19 +108,19 @@ class PauseMenu():
                 write(self.game, 20, 260, 215, self.game.player.party.members[self.targetPartyMember].type.name)
                 write(self.game, 12, 260, 242, "Weapon Prf: "+self.game.player.party.members[self.targetPartyMember].type.wpnProfToString())
                 write(self.game, 12, 260, 262, "Armor Prf: "+self.game.player.party.members[self.targetPartyMember].type.amrProfToString())
-                write(self.game, 12, 300, 315, "POWER: ")
-                write(self.game, 12, 390, 313, self.intToRating(self.game.player.party.members[self.targetPartyMember].type.rating[0]))
-                write(self.game, 12, 300, 330, "STURDINESS: ")
-                write(self.game, 12, 390, 328, self.intToRating(self.game.player.party.members[self.targetPartyMember].type.rating[1]))
-                write(self.game, 12, 300, 345, "NIMBLENESS: ")
-                write(self.game, 12, 390, 343, self.intToRating(self.game.player.party.members[self.targetPartyMember].type.rating[2]))
-                write(self.game, 12, 450, 315, "ARCANA: ")
-                write(self.game, 12, 514, 313, self.intToRating(self.game.player.party.members[self.targetPartyMember].type.rating[3]))
-                write(self.game, 12, 450, 330, "FAITH: ")
-                write(self.game, 12, 514, 328, self.intToRating(self.game.player.party.members[self.targetPartyMember].type.rating[4]))
-                write(self.game, 12, 450, 345, "LUCK: ")
-                write(self.game, 12, 514, 343, self.intToRating(self.game.player.party.members[self.targetPartyMember].type.rating[5]))
-                wrapWrite(self.game, 12, self.game.player.party.members[self.targetPartyMember].type.description, 340, 260, 375)
+                write(self.game, 12, 300, 295, "POWER: ")
+                write(self.game, 12, 390, 293, self.intToRating(self.game.player.party.members[self.targetPartyMember].type.rating[0]))
+                write(self.game, 12, 300, 310, "STURDINESS: ")
+                write(self.game, 12, 390, 308, self.intToRating(self.game.player.party.members[self.targetPartyMember].type.rating[1]))
+                write(self.game, 12, 300, 325, "NIMBLENESS: ")
+                write(self.game, 12, 390, 323, self.intToRating(self.game.player.party.members[self.targetPartyMember].type.rating[2]))
+                write(self.game, 12, 450, 295, "ARCANA: ")
+                write(self.game, 12, 514, 293, self.intToRating(self.game.player.party.members[self.targetPartyMember].type.rating[3]))
+                write(self.game, 12, 450, 310, "FAITH: ")
+                write(self.game, 12, 514, 308, self.intToRating(self.game.player.party.members[self.targetPartyMember].type.rating[4]))
+                write(self.game, 12, 450, 325, "LUCK: ")
+                write(self.game, 12, 514, 323, self.intToRating(self.game.player.party.members[self.targetPartyMember].type.rating[5]))
+                wrapWrite(self.game, 12, self.game.player.party.members[self.targetPartyMember].type.description, 340, 260, 358)
 
 
         if self.state == "partyMember":
@@ -144,7 +145,8 @@ class PauseMenu():
                 tgt = self.game.directory.getItem(self.game.player.party.members[self.targetPartyMember].spells[self.targetElement])
                 self.itemName = self.game.directory.getItemName(tgt.id)
                 write(self.game, 20, 60, 220, self.itemName)
-                writeOrientation(self.game, 20, self.right-90, 220, str(tgt.manacost) + " MP", "L")
+                spelltype = "Attack" if tgt.type == SpellType.Attack or tgt.type == SpellType.Debuff else "Support"
+                writeOrientation(self.game, 20, self.right-40, 220, "Level "+str(tgt.rarity)+" "+spelltype+" Spell | "+str(tgt.manacost) + " MP", "R")
                 if tgt.type == SpellType.Attack:
                     write(self.game, 15, 60, 245, "Deals " + str(self.game.player.party.members[self.targetPartyMember].amplify(tgt.attack)) + " damage.")
                 elif tgt.type == SpellType.Buff:
@@ -435,6 +437,8 @@ class PauseMenu():
             elif self.state == "main":
                 newDgn = DungeonMap(self.game.directory,(0,0),DungeonType.Ruins)
                 newDgn.generate()
+            elif self.state == "partyMember":
+                characterpopups.LevelUp(self.game,self.game.player.party.members[self.targetPartyMember])
         if self.game.UP:
             if self.state == "main":
                 self.cursorPos -= 1
@@ -525,6 +529,8 @@ class PauseMenu():
         write(self.game, 14, xPos+10, yPos+30, "HP " + str(character.hp) + "/" + str(character.hpMax))
         write(self.game, 14, xPos+10, yPos+50, "MP " + str(character.mp) + "/" + str(character.mpMax))
         write(self.game, 14, xPos+10, yPos+70, "XP " + str(character.xp) + "/" + str(character.nextLevel))
+        write(self.game, 12, xPos+120, yPos+30, "ATK Spl: " + str(character.type.attackMagicLevel[character.level]))
+        write(self.game, 12, xPos+120, yPos+50, "SPT Spl: " + str(character.type.supportMagicLevel[character.level]))
         write(self.game, 14, xPos+218, yPos+10, "ATK " + str(character.getAttack()))
         write(self.game, 14, xPos+283, yPos+10, "DEF " + str(character.getDefense()))
         write(self.game, 14, xPos+218, yPos+28, "ACC " + str(character.getAccuracy()))

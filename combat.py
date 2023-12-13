@@ -5,6 +5,7 @@ from characters import Action
 from characters import Buff
 from dialogue import *
 from writing import *
+from characterpopups import *
 
 class Combat():
     def __init__(self,game):
@@ -462,7 +463,8 @@ class Combat():
                     difficulty += monster.level
                 for member in self.game.player.party.members:
                     if member.hp > 0:
-                        member.gainXP((difficulty * 3) + (round(difficulty/2) * random.randint(2,4)))
+                        if member.gainXP((difficulty * 3) + (round(difficulty/2) * random.randint(2,4))):
+                            LevelUp(self.game,member)
                 self.combatTeardown()
                 self.inCombat = False
 

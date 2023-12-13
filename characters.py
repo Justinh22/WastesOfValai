@@ -86,14 +86,14 @@ def initCreatureDirectory():
     creatureDirectory.append(Earth_Elemental)
     Fire_Elemental = Creature("Fire Elemental",8,15,63,33,75,9,15,16,Element.Fire,Biome.Dungeon,[313])
     creatureDirectory.append(Fire_Elemental)
-    #10 -- REBALANCE ALL CREATURES BENEATH THIS POINT, AS THEY ARE TOO POWERFUL
-    Ogre = Creature("Ogre",10,16,87,37,75,13,5,15,Element.Lightning,Biome.Forest,[])
+    #10 -- REBALANCE ALL CREATURES BENEATH THIS POINT
+    Ogre = Creature("Ogre",10,16,87,37,75,16,5,15,Element.Lightning,Biome.Forest,[])
     creatureDirectory.append(Ogre)
-    Wyvern = Creature("Wyvern",10,17,81,34,100,11,30,23,Element.Lightning,Biome.Plains,[316,325])
+    Wyvern = Creature("Wyvern",10,17,81,34,100,14,30,23,Element.Lightning,Biome.Plains,[316,325])
     creatureDirectory.append(Wyvern)
-    Giant = Creature("Giant",10,18,89,40,70,13,0,17,Element.Fire,Biome.Desert,[])
+    Giant = Creature("Giant",10,18,89,40,70,16,0,17,Element.Fire,Biome.Desert,[])
     creatureDirectory.append(Giant)
-    Basilisk = Creature("Basilisk",10,19,93,35,85,15,0,21,Element.Ice,Biome.Dungeon,[327])
+    Basilisk = Creature("Basilisk",10,19,93,35,85,18,0,21,Element.Ice,Biome.Dungeon,[327])
     creatureDirectory.append(Basilisk)
     #12
     Chimera = Creature("Chimera",12,20,100,44,110,24,15,27,Element.Ice,Biome.Forest,[312])

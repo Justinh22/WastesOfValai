@@ -90,6 +90,8 @@ class CharacterSwap():
         write(self.game, 14, xPos+10, yPos+30, "HP " + str(character.hp) + "/" + str(character.hpMax))
         write(self.game, 14, xPos+10, yPos+50, "MP " + str(character.mp) + "/" + str(character.mpMax))
         write(self.game, 14, xPos+10, yPos+70, "XP " + str(character.xp) + "/" + str(character.nextLevel))
+        write(self.game, 12, xPos+120, yPos+30, "ATK Spl: " + str(character.type.attackMagicLevel[character.level]))
+        write(self.game, 12, xPos+120, yPos+50, "SPT Spl: " + str(character.type.supportMagicLevel[character.level]))
         write(self.game, 14, xPos+218, yPos+10, "ATK " + str(character.getAttack()))
         write(self.game, 14, xPos+283, yPos+10, "DEF " + str(character.getDefense()))
         write(self.game, 14, xPos+218, yPos+28, "ACC " + str(character.getAccuracy()))
@@ -205,6 +207,8 @@ class Hostel():
         write(self.game, 14, xPos+10, yPos+30, "HP " + str(character.hp) + "/" + str(character.hpMax))
         write(self.game, 14, xPos+10, yPos+50, "MP " + str(character.mp) + "/" + str(character.mpMax))
         write(self.game, 14, xPos+10, yPos+70, "XP " + str(character.xp) + "/" + str(character.nextLevel))
+        write(self.game, 12, xPos+120, yPos+30, "ATK Spl: " + str(character.type.attackMagicLevel[character.level]))
+        write(self.game, 12, xPos+120, yPos+50, "SPT Spl: " + str(character.type.supportMagicLevel[character.level]))
         write(self.game, 14, xPos+218, yPos+10, "ATK " + str(character.getAttack()))
         write(self.game, 14, xPos+283, yPos+10, "DEF " + str(character.getDefense()))
         write(self.game, 14, xPos+218, yPos+28, "ACC " + str(character.getAccuracy()))
@@ -225,7 +229,75 @@ class Hostel():
             ret += "+"
         return ret
 
-#class LevelUp():
+
+class LevelUp():
+    def __init__(self,game,character):
+        self.game = game
+        self.character = character
+        self.growths = self.character.levelUp()
+        self.inMenu = True
+        self.left = 10
+        self.top = 10
+        self.right = self.game.width - 20
+        self.bottom = self.game.height - 20
+        self.delay = 5
+        self.display()
+
+    def blitScreen(self):
+        self.game.screen.blit(self.game.screen, (0,0))
+        pygame.display.update()
+        self.game.buttonReset()
+
+    def display(self):
+        self.inMenu = True
+        self.game.screen.fill(self.game.black)
+        self.drawScreen()
+        while self.inMenu and self.game.inGame:
+            self.game.eventHandler()
+            self.getInput()
+            if not self.inMenu:
+                break
+            self.drawScreen()
+            self.blitScreen()
+        self.game.screen.fill(self.game.black)
+        self.blitScreen()
+
+    def getInput(self):
+        if self.delay > 0:
+            self.delay -= 1
+            return
+        if self.game.A:
+            print("A")
+            self.inMenu = False
+        if self.game.B:
+            print("B")
+            self.inMenu = False
+        if self.game.X:
+            print("X")
+        if self.game.Y:
+            print("Y")
+
+    def drawScreen(self):
+        self.game.screen.fill((0,0,0))
+        screenOutline = pygame.Rect(self.left,self.top,self.right,self.bottom)
+        pygame.draw.rect(self.game.screen,self.game.white,screenOutline,2)
+
+        write(self.game, 40, 30, 40, "Level Up!")
+        outlineRect = pygame.Rect(self.right-300,40,280,33)
+        pygame.draw.rect(self.game.screen,self.game.white,outlineRect,2)
+        write(self.game, 14, self.right-290, 50, self.character.name + ", Level " + str(self.character.level-1) + " -> " + str(self.character.level) + " " + self.character.type.name)
+        write(self.game, 25, 40, 130, f'HP: {self.character.hpMax-self.growths[0]} -> {self.character.hpMax}')
+        write(self.game, 25, 40, 160, f'MP: {self.character.mpMax-self.growths[1]} -> {self.character.mpMax}')
+        write(self.game, 25, 40, 190, f'ATK: {self.character.attack-self.growths[2]} -> {self.character.attack}')
+        write(self.game, 25, 40, 220, f'CRT: {self.character.critrate-self.growths[3]} -> {self.character.critrate}')
+        write(self.game, 25, 40, 250, f'DEF: {self.character.defense-self.growths[4]} -> {self.character.defense}')
+        write(self.game, 25, 40, 280, f'DDG: {self.character.dodge-self.growths[5]} -> {self.character.dodge}')
+        write(self.game, 25, 40, 310, f'LCK: {self.character.luck-self.growths[6]} -> {self.character.luck}')
+        write(self.game, 25, 40, 340, f'SPD: {self.character.speed-self.growths[7]} -> {self.character.speed}')
+        write(self.game, 25, 40, 370, f'ATK SP: Level {self.character.type.attackMagicLevel[self.character.level-1]} -> {self.character.type.attackMagicLevel[self.character.level]}')
+        write(self.game, 25, 40, 400, f'SPT SP: Level {self.character.type.supportMagicLevel[self.character.level-1]} -> {self.character.type.supportMagicLevel[self.character.level]}')
+        write(self.game, 20, 310, 240, f'{self.character.name} grew to level {self.character.level}!')
+        write(self.game, 18, 310, 265, f'Press any button to continue.')
 
 #class ItemReplace():
 

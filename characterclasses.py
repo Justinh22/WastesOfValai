@@ -125,7 +125,8 @@ class Character():
         if self.xp > self.nextLevel and self.level < 10:
             self.xp -= self.nextLevel
             self.nextLevel += 200
-            self.levelUp()
+            return True
+        return False
     def addSpell(self,spellID):
         if spellID not in self.spells:
             self.spells.append(spellID)
@@ -133,6 +134,7 @@ class Character():
         return False
     def levelUp(self):
         self.level += 1
+        self.xp = 0
         growth = self.type.getGrowths()
         self.hpMax += growth[0]
         self.mpMax += growth[1]
