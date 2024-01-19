@@ -159,8 +159,9 @@ class Combat():
             elif self.state == "itemList":
                 if self.cursorPos+self.menuTop < len(self.game.player.party.inventory):
                     self.itemID = self.menuTop + self.cursorPos
-                    self.state = "itemSummary"
-                    print("ITEMSUMMARY")
+                    if self.game.player.party.inventory[self.itemID] >= 200 and self.game.player.party.inventory[self.itemID] < 300:
+                        self.state = "itemSummary"
+                        print("ITEMSUMMARY")
             elif self.state =="spellSummary":
                 if self.validManaCost(self.game.player.party.members[self.combatOrder[self.currentTurn][1]],self.game.player.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID]):
                     self.lowMana = False
@@ -342,19 +343,19 @@ class Combat():
             write(self.game, 20, self.left+15, 325, "Select an item: (B to cancel)")
             write(self.game, 20, 40+((self.cursorPos%2)*300), 380+((int(self.cursorPos/2))*40), ">")
             if self.menuTop < len(self.game.player.party.inventory):
-                write(self.game, 18,60,380,str(self.menuTop+1)+") "+self.game.directory.getItemName(self.game.player.party.inventory[self.menuTop]))
+                write(self.game, 18,60,380,str(self.menuTop+1)+") "+self.game.directory.getItemName(self.game.player.party.inventory[self.menuTop],True))
             else:
                 write(self.game, 18,60,380,str(self.menuTop+1)+")")
             if self.menuTop+1 < len(self.game.player.party.inventory):
-                write(self.game, 18,360,380,str(self.menuTop+2)+") "+self.game.directory.getItemName(self.game.player.party.inventory[self.menuTop+1]))
+                write(self.game, 18,360,380,str(self.menuTop+2)+") "+self.game.directory.getItemName(self.game.player.party.inventory[self.menuTop+1],True))
             else:
                 write(self.game, 18,360,380,str(self.menuTop+2)+")")
             if self.menuTop+2 < len(self.game.player.party.inventory):
-                write(self.game, 18,60,420,str(self.menuTop+3)+") "+self.game.directory.getItemName(self.game.player.party.inventory[self.menuTop+2]))
+                write(self.game, 18,60,420,str(self.menuTop+3)+") "+self.game.directory.getItemName(self.game.player.party.inventory[self.menuTop+2],True))
             else:
                 write(self.game, 18,60,420,str(self.menuTop+3)+")")
             if self.menuTop+3 < len(self.game.player.party.inventory):
-                write(self.game, 18,360,420,str(self.menuTop+4)+") "+self.game.directory.getItemName(self.game.player.party.inventory[self.menuTop+3]))
+                write(self.game, 18,360,420,str(self.menuTop+4)+") "+self.game.directory.getItemName(self.game.player.party.inventory[self.menuTop+3],True))
             else:
                 write(self.game, 18,360,420,str(self.menuTop+4)+")")
         if self.state == "spellSummary":
@@ -701,7 +702,7 @@ class Combat():
                 else:
                     target = self.checkRecalculateTarget(source[0],target,"Encounter")
                     if spell.type == SpellType.Attack:
-                        self.dmg = self.game.player.party.members[target].amplify(spell.attack)
+                        self.dmg = self.game.player.party.members[source[1]].amplify(spell.attack)
                         if spell.element == self.encounter[target].resistance:
                             self.dmg = int(self.dmg/2)
                         self.encounter[target].takeDamage(self.dmg)
@@ -738,11 +739,11 @@ class Combat():
                 else:
                     if spell.type == SpellType.Attack:
                         for member in self.encounter:
-                            self.dmg = self.game.player.party.members[target].amplify(spell.attack)
+                            self.dmg = self.game.player.party.members[source[1]].amplify(spell.attack)
                             if spell.element == member.resistance:
                                 self.dmg = int(self.dmg/2)
                             member.takeDamage(self.dmg)
-                        self.dmg = self.game.player.party.members[target].amplify(spell.attack)
+                        self.dmg = self.game.player.party.members[source[1]].amplify(spell.attack)
                         self.game.player.party.members[source[1]].mp -= spell.manacost
                     elif spell.type == SpellType.Debuff:
                         for member in self.encounter:

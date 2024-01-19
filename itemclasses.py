@@ -56,8 +56,8 @@ class SupportMagic(Item):
         return self.potency[6]
 
 class Skill(Item):
-    def __init__(self,nm,desc,rar,i,hpc,tgt,tp):
+    def __init__(self,nm,desc,rar,i,mpc,tgt,tp):
         Item.__init__(self,nm,desc,rar,i)
-        self.hpcost = hpc
+        self.mpcost = mpc
         self.type = tp # ATTACK, SUPPORT
         self.target = tgt # SELF, ALLY, SINGLE, ALL

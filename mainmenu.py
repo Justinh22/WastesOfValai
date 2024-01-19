@@ -1,6 +1,7 @@
 import sys
 import pygame
 from writing import *
+from debug import *
 import os
 import glob
 
@@ -10,6 +11,7 @@ class MainMenu():
         self.displayRunning = True
         self.cursor = pygame.Rect(0,0,20,20)
         self.cursorState = "Start"
+        self.debugOps = []
         self.startPos = (self.game.width/2,self.game.height/2+30)
         self.loadPos = (self.game.width/2,self.game.height/2+50)
         self.quitPos = (self.game.width/2,self.game.height/2+70)
@@ -46,6 +48,8 @@ class MainMenu():
                 self.blitScreen()
                 self.wipeDungeonDir()
                 self.game.WorldMap.generateMap()
+                for op in self.debugOps:
+                    self.setDebug(op)
                 print("Start!")
                 print(self.game.WorldMap.startingPos)
             if self.cursorState == "Load":
@@ -61,6 +65,10 @@ class MainMenu():
                 print("Quit!")
                 pygame.quit()
                 sys.exit()
+        if self.game.Y:
+            if "StartLevel" not in self.debugOps:
+                print("StartLevel")
+                self.debugOps.append("StartLevel")
 
     def cursorHandler(self):
         if self.game.DOWN:
@@ -89,3 +97,8 @@ class MainMenu():
         for filename in os.listdir(folder):
             if filename.endswith('.txt'):
                 os.remove(os.path.join(folder,filename))
+
+    def setDebug(self,typ):
+        if typ == "StartLevel":
+            lv = getDebug(0)
+            self.game.player.party.debug_setToLevel(self.game.directory,lv)

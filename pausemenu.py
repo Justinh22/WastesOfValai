@@ -66,9 +66,8 @@ class PauseMenu():
             write(self.game, 40, 30, 40, "Paused")
             write(self.game, 20, 60, 90, "Resume")
             write(self.game, 20, 60, 115, "Party")
-            write(self.game, 20, 60, 140, "Inventory")
-            write(self.game, 20, 60, 165, "Map")
-            write(self.game, 20, 60, 190, "Quit")
+            write(self.game, 20, 60, 140, "Map")
+            write(self.game, 20, 60, 165, "Quit")
             if self.state == "main":
                 write(self.game, 20, 30, 87 + (self.cursorPos*25), "->")
             if self.state == "partySelect":
@@ -208,7 +207,8 @@ class PauseMenu():
                         statText += commaSeparator + "+" + str(tgt.mpGain) + " MP"
                     write(self.game, 15, 60, 245, statText)
                 if itemType == Type.AtkSpell or itemType == Type.SptSpell:
-                    writeOrientation(self.game, 20, self.right-40, 220, str(tgt.manacost) + " MP", "R")
+                    spelltype = "Attack" if itemType == Type.AtkSpell else "Support"
+                    writeOrientation(self.game, 20, self.right-40, 220, "Level "+str(tgt.rarity)+" "+spelltype+" Spell | "+str(tgt.manacost) + " MP", "R")
                     writeOrientation(self.game, 15, self.right-40, 245, "Use to learn spell.", "R")
                     if tgt.type == SpellType.Attack:
                         write(self.game, 15, 60, 245, "Deals " + str(self.game.player.party.members[self.targetPartyMember].amplify(tgt.attack)) + " damage.")
@@ -311,11 +311,9 @@ class PauseMenu():
                     self.cursorPos = 0
                     return
                 if self.cursorPos == 2:
-                    print("INVENTORY")
-                if self.cursorPos == 3:
                     print("MAP")
                     self.state = "map"
-                if self.cursorPos == 4:
+                if self.cursorPos == 3:
                     print("QUIT")
                     self.paused = False
                     self.game.inGame = False
@@ -443,7 +441,7 @@ class PauseMenu():
             if self.state == "main":
                 self.cursorPos -= 1
                 if self.cursorPos < 0:
-                    self.cursorPos = 4
+                    self.cursorPos = 3
             if self.state == "partySelect" or self.state == "targetSelect":
                 self.cursorPos -= 1
                 if self.cursorPos < 0:
@@ -468,7 +466,7 @@ class PauseMenu():
         if self.game.DOWN:
             if self.state == "main":
                 self.cursorPos += 1
-                if self.cursorPos > 4:
+                if self.cursorPos > 3:
                     self.cursorPos = 0
             elif self.state == "partySelect" or self.state == "targetSelect":
                 self.cursorPos += 1
@@ -529,8 +527,8 @@ class PauseMenu():
         write(self.game, 14, xPos+10, yPos+30, "HP " + str(character.hp) + "/" + str(character.hpMax))
         write(self.game, 14, xPos+10, yPos+50, "MP " + str(character.mp) + "/" + str(character.mpMax))
         write(self.game, 14, xPos+10, yPos+70, "XP " + str(character.xp) + "/" + str(character.nextLevel))
-        write(self.game, 12, xPos+120, yPos+30, "ATK Spl: " + str(character.type.attackMagicLevel[character.level]))
-        write(self.game, 12, xPos+120, yPos+50, "SPT Spl: " + str(character.type.supportMagicLevel[character.level]))
+        write(self.game, 12, xPos+120, yPos+30, "ATK Spl: " + str(character.type.attackMagicLevel[character.level-1]))
+        write(self.game, 12, xPos+120, yPos+50, "SPT Spl: " + str(character.type.supportMagicLevel[character.level-1]))
         write(self.game, 14, xPos+218, yPos+10, "ATK " + str(character.getAttack()))
         write(self.game, 14, xPos+283, yPos+10, "DEF " + str(character.getDefense()))
         write(self.game, 14, xPos+218, yPos+28, "ACC " + str(character.getAccuracy()))

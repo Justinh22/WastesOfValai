@@ -81,6 +81,7 @@ class Target(Enum):
     All = 1
     Self = 2
     Ally = 3
+    Party = 4
 
 class Biome(Enum):
     Forest = 0

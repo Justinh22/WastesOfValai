@@ -184,6 +184,7 @@ class Character():
         elif idType == ArmorType.Medium:
             return self.type.armorProficiency[1]==1
         elif idType == ArmorType.Heavy:
+
             return self.type.armorProficiency[2]==1
         elif idType == ArmorType.Robe:
             return self.type.armorProficiency[3]==1
@@ -191,10 +192,10 @@ class Character():
             return self.type.armorProficiency[4]==1
     def checkAtkSpellProficiency(self,id,dir):
         idRarity = dir.getItemRarity(id)
-        return self.type.attackMagicLevel[self.level] >= idRarity
+        return self.type.attackMagicLevel[self.level-1] >= idRarity
     def checkSptSpellProficiency(self,id,dir):
         idRarity = dir.getItemRarity(id)
-        return self.type.supportMagicLevel[self.level] >= idRarity
+        return self.type.supportMagicLevel[self.level-1] >= idRarity
     def fullRestore(self):
         self.hp = self.hpMax
         self.mp = self.mpMax
@@ -288,6 +289,12 @@ class Party():
         #   self.members.append(Character(dir.getCharacterName(self.members),lvl,dir.classDirectory[random.randint(0,11)],random.randint(0,5))) #random.randint(0,11)
         #    self.members[i].eqpWpn = dir.getWeapon(dir.getItemByRarities(Type.Weapon,lvl-1,lvl))
         #    self.members[i].eqpAmr = dir.getArmor(dir.getItemByRarities(Type.Armor,lvl-1,lvl))
+    def debug_setToLevel(self,dir,lv):
+        self.members = []
+        for i in range(0,4):
+            self.members.append(Character(dir.getCharacterName(self.members),lv,dir.classDirectory[random.randint(0,11)],random.randint(0,5))) #random.randint(0,11)
+            self.members[i].eqpWpn = dir.getWeapon(dir.getItemByRarities(Type.Weapon,lv-1,lv))
+            self.members[i].eqpAmr = dir.getArmor(dir.getItemByRarities(Type.Armor,lv-1,lv))
     def debug_RandomInventory(self,dir):
         while len(self.inventory) < MAX_INVENTORY_SIZE:
             self.addItem(dir.getItemByRarities(Type.Potion,1,5))
