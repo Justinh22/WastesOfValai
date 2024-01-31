@@ -538,7 +538,9 @@ def initSkillDirectory():
     skillDirectory.append(Hide)
     Pray = Skill("Pray","Avoid status effects on your party this turn. Always goes first.",1,519,8,SkillType.Support,Target.Party)
     skillDirectory.append(Pray)
-    Ward = Skill("Ward","Ward an ally against half of all damage taken for the next 3 turns.",1,520,8,SkillType.Support,Target.Ally)
-    skillDirectory.append(Ward)
+    Curse = Skill("Curse","Put a curse on an enemy, reducing their defense by 30% until the end of the next turn.",1,520,12,SkillType.Attack,Target.Single)
+    skillDirectory.append(Curse)
+    DeathWish = Skill("Death Wish","Call upon a vile evil, causing target enemy to lose 10% of its health each turn for the remainder of combat.",1,521,12,SkillType.Attack,Target.Single)
+    skillDirectory.append(DeathWish)
 
     return skillDirectory

@@ -69,6 +69,9 @@ class Character():
         return self.manaregen + self.eqpAmr.manaregen
     def getSpeed(self):
         return self.speed
+    def getCumulativeXP(self):
+        cumulativeXPTable = [200, 600, 1200, 2000, 3000, 4200, 5600, 7200, 9000, 11000]
+        return cumulativeXPTable[self.level-1] + self.xp
     def amplify(self,val):
         val = math.ceil(val + (val * (self.getAmplifier()/100)))
         return val
@@ -209,7 +212,7 @@ class Character():
 
 
 class ClassType():
-    def __init__(self,nm,wpnPrf,amrPrf,atkLv,sptLv,hpg,mpg,atg,ctg,dfg,dgg,lkg,sdg,splsLrn,idIN):
+    def __init__(self,nm,wpnPrf,amrPrf,atkLv,sptLv,hpg,mpg,atg,ctg,dfg,dgg,lkg,sdg,splsLrn,sklsLrn,idIN):
         self.name = nm
         self.weaponProficiency = wpnPrf # [AXE,SWORD,SPEAR,DAGGER,STAFF]
         self.armorProficiency = amrPrf # [LIGHT,MEDIUIM,HEAVY,ROBE,ARCANIST]
@@ -224,6 +227,7 @@ class ClassType():
         self.lckGrowth = lkg
         self.spdGrowth = sdg
         self.knownSpells = splsLrn
+        self.knownSkills = sklsLrn
         self.id = idIN
         self.description = ""
         self.rating = []
@@ -335,6 +339,20 @@ class Party():
     def fullRestore(self):
         for member in self.members:
             member.fullRestore()
+    def awardXP(self,diff):
+        underdogFactor = 0
+        levelups = [0,0,0,0]
+        for member in self.members:
+            if member.getCumulativeXP() > underdogFactor:
+                underdogFactor = member.getCumulativeXP()
+        underdogMultiplier = 0
+        for i in range(len(self.members)): #member in self.members:
+            if self.members[i].hp > 0:
+                # R
+                underdogMultiplier = .5 * round(( (underdogFactor - self.members[i].getCumulativeXP()) / 50)/.5)
+                if self.members[i].gainXP((diff * 3) + (round(diff/2) * random.randint(2,4)) + round((diff*3)*underdogMultiplier)):
+                    levelups[i] = 1
+        return levelups
 
 class Creature():
     def __init__(self,nm,lv,idIN,hpIN,at,ac,df,dg,sd,res,type,spells):

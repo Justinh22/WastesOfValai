@@ -463,10 +463,10 @@ class Combat():
                 difficulty = 0
                 for monster in self.encounter:
                     difficulty += monster.level
-                for member in self.game.player.party.members:
-                    if member.hp > 0:
-                        if member.gainXP((difficulty * 3) + (round(difficulty/2) * random.randint(2,4))):
-                            LevelUp(self.game,member)
+                levelups = self.game.player.party.awardXP(difficulty)
+                for i in range(len(levelups)):
+                    if levelups[i] == 1:
+                        LevelUp(self.game, self.game.player.party.members[i])
                 self.combatTeardown()
                 self.inCombat = False
 

@@ -492,6 +492,10 @@ class PauseMenu():
         if self.game.LEFT:
             if self.state == "map":
                 self.mapPos[1] -= self.panMap()
+            elif self.state == "partyMember":
+                self.targetPartyMember -= 1
+                if self.targetPartyMember < 0:
+                    self.targetPartyMember = len(self.game.player.party.members) - 1
             elif self.state == "equipment" or self.state == "inventory" or self.state == "spellbook":
                 if self.cursorPos % 2 == 0:
                     self.cursorPos += 1
@@ -505,6 +509,10 @@ class PauseMenu():
         if self.game.RIGHT:
             if self.state == "map":
                 self.mapPos[1] += self.panMap()
+            elif self.state == "partyMember":
+                self.targetPartyMember += 1
+                if self.targetPartyMember > len(self.game.player.party.members)-1:
+                    self.targetPartyMember = 0
             elif self.state == "equipment" or self.state == "inventory" or self.state == "spellbook":
                 if self.cursorPos % 2 == 0:
                     self.cursorPos += 1

@@ -5,43 +5,43 @@ def initClassDirectory():
     classDirectory = []
     # Weapon Prof: [AXE, SWORD, SPEAR, DAGGER, STAFF]
     # Armor Prof:  [LIGHT, MEDIUM, HEAVY, ROBE, ARCANIST]
-    #                         NAME          Wpn Prof      Amr Prof      Atk Spell Proficiency   Spt Spell Proficiency   HP            MP        ATK       CRT       DEF       DDG       LCK       SPD        Learned Spells                             ID
+    #                         NAME          Wpn Prof      Amr Prof      Atk Spell Proficiency   Spt Spell Proficiency   HP            MP        ATK       CRT       DEF       DDG       LCK       SPD        Learned Spells                             Learned Skills                             ID
     #                                       Rating          Description                           Rating Order: [Power,Sturdiness,Nimbleness,Arcana,Faith,Luck]
 
-    Explorer =      ClassType("Explorer",   [1,1,1,1,1] , [1,1,1,1,1] , [1,1,1,2,2,2,3,3,3,3] , [1,1,1,2,2,2,3,3,3,3] , [8,10,10]  , [3,4,5] , [3,4,5] , [1,1,2] , [2,2,3] , [1,1,2] , [1,1,2] , [4,5,6] , [406,301,403,305,408,306,427,310,313,428] , 0)
+    Explorer =      ClassType("Explorer",   [1,1,1,1,1] , [1,1,1,1,1] , [1,1,1,2,2,2,3,3,3,3] , [1,1,1,2,2,2,3,3,3,3] , [8,10,10]  , [3,4,5] , [3,4,5] , [1,1,2] , [2,2,3] , [1,1,2] , [1,1,2] , [4,5,6] , [406,301,403,305,408,306,427,310,313,428] , [-11,-11,-11,-11,-11,-11,-11,-11,-11,-11] , 0) # Explorer
     Explorer.setAdditionalInfo(             [3,3,3,3,3,3] , "A versatile adventurer able to handle any situation. A true jack-of-all-trades.")
     classDirectory.append(Explorer)
-    Warrior =       ClassType("Warrior",    [1,1,1,0,0] , [0,1,1,0,0] , [0,0,1,1,1,1,1,1,1,1] , [0,1,1,1,2,2,2,2,2,2] , [8,10,12]  , [0,1,2] , [4,5,6] , [0,1,2] , [2,3,3] , [0,1,2] , [1,1,2] , [3,4,5] , [-11,400,300,-11,409,-11,411,407,-11,408] , 1)
+    Warrior =       ClassType("Warrior",    [1,1,1,0,0] , [0,1,1,0,0] , [0,0,1,1,1,1,1,1,1,1] , [0,1,1,1,2,2,2,2,2,2] , [8,10,12]  , [0,1,2] , [4,5,6] , [0,1,2] , [2,3,3] , [0,1,2] , [1,1,2] , [3,4,5] , [-11,400,300,-11,409,-11,411,407,-11,408] , [508,-11,-11,-11,513,-11,-11,-11,-11,-11] , 1) # Warrior
     Warrior.setAdditionalInfo(              [4,4,2,1,1,3] , "A burly adventurer who handles physical threats with ease. Excels in ATK and DEF.")
     classDirectory.append(Warrior)
-    Thief =         ClassType("Thief",      [0,1,0,1,0] , [1,1,0,0,1] , [0,0,0,1,1,1,1,1,1,1] , [0,0,0,1,1,1,1,2,2,2] , [6,6,8]    , [2,3,4] , [3,5,5] , [2,3,4] , [2,2,3] , [2,3,3] , [2,2,3] , [6,7,8] , [-11,-11,-11,404,302,-11,405,410,-11,412] , 2)
+    Thief =         ClassType("Thief",      [0,1,0,1,0] , [1,1,0,0,1] , [0,0,0,1,1,1,1,1,1,1] , [0,0,0,1,1,1,1,2,2,2] , [6,6,8]    , [2,3,4] , [3,5,5] , [2,3,4] , [2,2,3] , [2,3,3] , [2,2,3] , [6,7,8] , [-11,-11,-11,404,302,-11,405,410,-11,412] , [505,-11,-11,-11,515,-11,-11,-11,-11,-11] , 2) # Thief
     Thief.setAdditionalInfo(                [3,2,5,1,2,4] , "A nimble adventurer who weaves around incoming attacks. Excels in CRT, DDG, SPD.")
     classDirectory.append(Thief)
-    Knight =        ClassType("Knight",     [1,1,1,1,0] , [0,1,1,0,0] , [0,0,0,0,0,0,0,0,0,0] , [0,0,0,0,0,1,1,1,1,1] , [10,12,14] , [0,1,2] , [3,4,4] , [0,1,2] , [3,3,4] , [0,0,1] , [0,1,2] , [2,3,3] , [-11,-11,-11,-11,-11,401,400,-11,-11,404] , 3)
+    Knight =        ClassType("Knight",     [1,1,1,1,0] , [0,1,1,0,0] , [0,0,0,0,0,0,0,0,0,0] , [0,0,0,0,0,1,1,1,1,1] , [10,12,14] , [0,1,2] , [3,4,4] , [0,1,2] , [3,3,4] , [0,0,1] , [0,1,2] , [2,3,3] , [-11,-11,-11,-11,-11,401,400,-11,-11,404] , [504,-11,-11,-11,506,-11,-11,-11,-11,-11] , 3) # Knight
     Knight.setAdditionalInfo(               [3,5,1,0,1,2] , "A sturdy adventurer that deflects blows easily. Excels in HP and DEF.")
     classDirectory.append(Knight)
-    Vanguard =      ClassType("Vanguard",   [1,1,0,0,0] , [1,1,1,0,0] , [0,0,0,0,0,0,0,0,0,0] , [0,0,0,0,0,0,0,0,0,0] , [8,10,12]  , [0,1,2] , [5,6,7] , [1,2,3] , [2,3,3] , [1,1,2] , [1,1,2] , [3,4,5] , [-11,-11,-11,-11,-11,-11,-11,-11,-11,-11] , 4)
+    Vanguard =      ClassType("Vanguard",   [1,1,0,0,0] , [1,1,1,0,0] , [0,0,0,0,0,0,0,0,0,0] , [0,0,0,0,0,0,0,0,0,0] , [8,10,12]  , [0,1,2] , [5,6,7] , [1,2,3] , [2,3,3] , [1,1,2] , [1,1,2] , [3,4,5] , [-11,-11,-11,-11,-11,-11,-11,-11,-11,-11] , [510,-11,-11,-11,512,-11,-11,-11,-11,-11] , 4) # Vanguard
     Vanguard.setAdditionalInfo(             [5,4,3,0,0,3] , "A powerful adventurer that is unparalleled in physical combat. Excels in ATK and DEF.")
     classDirectory.append(Vanguard)
-    Mercenary =     ClassType("Mercenary",  [1,1,1,1,0] , [1,1,1,0,1] , [0,0,0,1,1,1,2,2,2,2] , [0,1,1,1,2,2,2,2,2,2] , [8,10,10]  , [2,3,4] , [5,5,5] , [1,2,3] , [2,2,3] , [1,2,2] , [2,3,4] , [4,5,6] , [-11,402,405,-11,409,412,-11,308,-11,408] , 5)
+    Mercenary =     ClassType("Mercenary",  [1,1,1,1,0] , [1,1,1,0,1] , [0,0,0,1,1,1,2,2,2,2] , [0,1,1,1,2,2,2,2,2,2] , [8,10,10]  , [2,3,4] , [5,5,5] , [1,2,3] , [2,2,3] , [1,2,2] , [2,3,4] , [4,5,6] , [-11,402,405,-11,409,412,-11,308,-11,408] , [502,-11,-11,-11,516,-11,-11,-11,-11,-11] , 5) # Mercenary
     Mercenary.setAdditionalInfo(            [4,2,3,2,2,5] , "A lucky adventurer who often finds themselves in fortunate situations. Excels in ATK and LCK.")
     classDirectory.append(Mercenary)
-    Mage =          ClassType("Mage",       [0,0,1,1,1] , [1,0,0,1,1] , [2,2,3,3,3,4,4,4,5,5] , [1,1,2,2,2,3,3,3,3,3] , [6,6,8]    , [4,5,6] , [2,3,3] , [0,1,2] , [1,2,2] , [1,2,2] , [0,1,2] , [4,5,6] , [304,302,312,411,310,316,421,318,418,322] , 6)
-    Mage.setAdditionalInfo(                 [2,1,3,5,3,2] , "An intelligent adventurer who can cast a wide range of attack spells. Excels in ATK Magic.")
+    Mage =          ClassType("Mage",       [0,0,1,1,1] , [1,0,0,1,1] , [2,2,3,3,3,4,4,4,5,5] , [1,1,2,2,2,3,3,3,3,3] , [6,6,8]    , [4,5,6] , [2,3,3] , [0,1,2] , [1,2,2] , [1,2,2] , [0,1,2] , [4,5,6] , [304,302,312,411,310,316,421,318,418,322] , [501,-11,-11,-11,514,-11,-11,-11,-11,-11] , 6) # Mage
+    Mage.setAdditionalInfo(                 [2,1,3,5,3,2] , "An gifted adventurer who can cast a wide range of attack spells. Excels in ATK Magic.")
     classDirectory.append(Mage)
-    Cleric =        ClassType("Cleric",     [1,0,0,1,1] , [1,0,1,1,1] , [1,1,2,2,2,3,3,3,3,3] , [2,2,3,3,3,3,4,4,5,5] , [6,6,8]    , [4,5,6] , [3,3,4] , [0,1,2] , [1,2,2] , [1,1,2] , [0,1,2] , [3,4,5] , [406,407,413,427,428,456,445,442,454,453] , 7)
+    Cleric =        ClassType("Cleric",     [1,0,0,1,1] , [1,0,1,1,1] , [1,1,2,2,2,3,3,3,3,3] , [2,2,3,3,3,3,4,4,5,5] , [6,6,8]    , [4,5,6] , [3,3,4] , [0,1,2] , [1,2,2] , [1,1,2] , [0,1,2] , [3,4,5] , [406,407,413,427,428,456,445,442,454,453] , [500,-11,-11,-11,519,-11,-11,-11,-11,-11] , 7) # Cleric
     Cleric.setAdditionalInfo(               [2,2,2,3,5,2] , "A devout adventurer who relies on higher powers to keep their allies alive. Excels in SPT Magic.")
     classDirectory.append(Cleric)
-    Paladin =       ClassType("Paladin",    [1,1,1,0,0] , [0,1,1,0,1] , [1,1,1,1,2,2,2,2,2,3] , [1,2,2,2,3,3,3,4,4,4] , [8,10,12]  , [3,4,4] , [4,5,6] , [0,1,1] , [2,3,4] , [0,1,1] , [0,1,2] , [2,3,4] , [406,408,414,407,424,427,325,435,457,441] , 8)
+    Paladin =       ClassType("Paladin",    [1,1,1,0,0] , [0,1,1,0,1] , [1,1,1,1,2,2,2,2,2,3] , [1,2,2,2,3,3,3,4,4,4] , [8,10,12]  , [3,4,4] , [4,5,6] , [0,1,1] , [2,3,4] , [0,1,1] , [0,1,2] , [2,3,4] , [406,408,414,407,424,427,325,435,457,441] , [507,-11,-11,-11,517,-11,-11,-11,-11,-11] , 8) # Paladin
     Paladin.setAdditionalInfo(              [3,4,2,3,4,1] , "A courageous adventurer who calls on those above to smite their enemies. Excels in DEF and SPT Magic.")
     classDirectory.append(Paladin)
-    Warlock =       ClassType("Warlock",    [0,0,0,0,1] , [0,0,0,1,1] , [2,2,3,3,3,4,4,4,4,4] , [2,2,3,3,3,4,4,4,4,4] , [4,6,8]    , [5,6,7] , [1,2,3] , [0,0,1] , [1,1,2] , [1,2,2] , [2,2,3] , [4,5,6] , [305,411,312,329,311,315,439,442,319,330] , 9)
-    Warlock.setAdditionalInfo(              [1,1,3,4,4,3] , "A gifted adventurer who achieved incredible spellcasting prowess through questionable means. Excels in Atk Magic and Spt Magic.")
+    Warlock =       ClassType("Warlock",    [0,0,0,0,1] , [0,0,0,1,1] , [2,2,3,3,3,4,4,4,4,4] , [2,2,3,3,3,4,4,4,4,4] , [4,6,8]    , [5,6,7] , [1,2,3] , [0,0,1] , [1,1,2] , [1,2,2] , [2,2,3] , [4,5,6] , [305,411,312,329,311,315,439,442,319,330] , [503,-11,-11,-11,521,-11,-11,-11,-11,-11] , 9) # Warlock
+    Warlock.setAdditionalInfo(              [1,1,3,4,4,3] , "A cursed adventurer who achieved incredible spellcasting prowess through questionable means. Excels in Atk Magic and Spt Magic.")
     classDirectory.append(Warlock)
-    Assassin =      ClassType("Assassin",   [0,1,1,1,0] , [1,0,0,0,1] , [0,0,1,1,1,2,2,2,2,2] , [0,0,0,1,1,1,2,2,2,2] , [6,8,10]   , [2,3,4] , [4,5,7] , [2,2,3] , [2,2,2] , [2,2,3] , [1,2,3] , [6,7,8] , [-11,-11,302,402,301,303,410,-11,-11,405] , 10)
+    Assassin =      ClassType("Assassin",   [0,1,1,1,0] , [1,0,0,0,1] , [0,0,1,1,1,2,2,2,2,2] , [0,0,0,1,1,1,2,2,2,2] , [6,8,10]   , [2,3,4] , [4,5,7] , [2,2,3] , [2,2,2] , [2,2,3] , [1,2,3] , [6,7,8] , [-11,-11,302,402,301,303,410,-11,-11,405] , [509,-11,-11,-11,511,-11,-11,-11,-11,-11] , 10) # Assassin
     Assassin.setAdditionalInfo(             [5,2,4,2,2,4] , "A deadly adventurer whom killing comes as second nature to. Excels in ATK, SPD, and LCK.")
     classDirectory.append(Assassin)
-    Witch =         ClassType("Witch",      [1,0,1,0,1] , [1,1,0,1,0] , [1,2,2,2,3,3,3,4,4,4] , [0,0,1,1,1,2,2,2,2,2] , [6,8,8]    , [4,5,6] , [2,2,3] , [1,2,3] , [2,2,3] , [2,3,4] , [1,2,3] , [5,6,7] , [302,325,406,308,311,414,329,320,327,413] , 11)
+    Witch =         ClassType("Witch",      [1,0,1,0,1] , [1,1,0,1,0] , [1,2,2,2,3,3,3,4,4,4] , [0,0,1,1,1,2,2,2,2,2] , [6,8,8]    , [4,5,6] , [2,2,3] , [1,2,3] , [2,2,3] , [2,3,4] , [1,2,3] , [5,6,7] , [302,325,406,308,311,414,329,320,327,413] , [518,-11,-11,-11,520,-11,-11,-11,-11,-11] , 11) # Witch
     Witch.setAdditionalInfo(                [1,2,4,4,2,3] , "An unholy adventurer who can cast powerful spells while staying out of harm's way. Excels in DDG and ATK Magic.")
     classDirectory.append(Witch)
 
