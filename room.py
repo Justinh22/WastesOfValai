@@ -14,6 +14,9 @@ class RoomDatabase():
             newRoom = Room(coords,difficulty,type)
             self.addRoom(coords,newRoom)
         return self.rooms[coords]
+    
+    def doesExist(self,coords):
+        return (coords in self.rooms.keys())
         
     def printContents(self):
         for entry in self.rooms:

@@ -90,7 +90,7 @@ class Overworld():
         diffText = self.getBiome(self.game.player.currentPos[0],self.game.player.currentPos[1]).name + ": Difficulty " + str(self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[self.game.player.currentPos[0]][self.game.player.currentPos[1]]))
         if self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[self.game.player.currentPos[0]][self.game.player.currentPos[1]]) > self.game.player.party.getPower()+1:
             text = self.font.render(diffText,True,self.game.red)
-        elif self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[self.game.player.currentPos[0]][self.game.player.currentPos[1]]) < self.game.player.party.getPower()-10:
+        elif self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[self.game.player.currentPos[0]][self.game.player.currentPos[1]]) < round(self.game.player.party.getPower()/2)-5:
             text = self.font.render(diffText,True,self.game.green)
         else:
             text = self.font.render(diffText,True,self.game.white)
@@ -124,6 +124,8 @@ class Overworld():
                         color = self.game.lightgreen
                     elif mapChar == '.': # Desert
                         color = self.game.tan
+                    elif self.game.roomDB.doesExist((r,c)) or self.game.dungeonDB.doesExist((r,c)):
+                        color = self.game.gray
                 text = self.font.render(mapChar,True,color)
                 textWidth, textHeight = self.font.size(mapChar)
                 offset = (blockSize-textWidth)/2
@@ -179,7 +181,7 @@ class Overworld():
                 odds = 10
             else:
                 odds = 25
-            if random.randint(odds,50) == 49 and self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]) == self.lastDiff and not (self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]) < self.game.player.party.getPower()-10):
+            if random.randint(odds,50) == 49 and self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]) == self.lastDiff and not (self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]) < round(self.game.player.party.getPower()/2)-5):
                 self.steps = 0
                 encounter = []
                 encounter = self.game.directory.buildEncounter(self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]),self.getBiome(self.game.player.currentPos[0],self.game.player.currentPos[1]))

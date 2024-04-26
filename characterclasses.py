@@ -15,9 +15,12 @@ class Character():
         self.nextLevel = 200*lv
         self.type = tp # Class; Type is used to avoid defined 'class' name
         self.spells = []
+        self.talents = []
         for i in range(self.level):
             if self.type.knownSpells[i] >= 0:
                 self.spells.append(self.type.knownSpells[i])
+            if self.type.knownTalents[i] >= 0:
+                self.talents.append(self.type.knownTalents[i])
         self.eqpWpn = Weapon()
         self.eqpAmr = Armor()
         self.hpMax = 20
@@ -187,7 +190,6 @@ class Character():
         elif idType == ArmorType.Medium:
             return self.type.armorProficiency[1]==1
         elif idType == ArmorType.Heavy:
-
             return self.type.armorProficiency[2]==1
         elif idType == ArmorType.Robe:
             return self.type.armorProficiency[3]==1
@@ -209,10 +211,12 @@ class Character():
         self.mp -= dir.getManaCost(self.spells[spellbookIndex])
         if self.mp < 0:
             self.mp = 0
+    def canPerform(self,talentID,dir):
+        return dir.getManaCost(talentID) <= self.mp
 
 
 class ClassType():
-    def __init__(self,nm,wpnPrf,amrPrf,atkLv,sptLv,hpg,mpg,atg,ctg,dfg,dgg,lkg,sdg,splsLrn,sklsLrn,idIN):
+    def __init__(self,nm,wpnPrf,amrPrf,atkLv,sptLv,hpg,mpg,atg,ctg,dfg,dgg,lkg,sdg,splsLrn,tlntsLrn,idIN):
         self.name = nm
         self.weaponProficiency = wpnPrf # [AXE,SWORD,SPEAR,DAGGER,STAFF]
         self.armorProficiency = amrPrf # [LIGHT,MEDIUIM,HEAVY,ROBE,ARCANIST]
@@ -227,7 +231,7 @@ class ClassType():
         self.lckGrowth = lkg
         self.spdGrowth = sdg
         self.knownSpells = splsLrn
-        self.knownSkills = sklsLrn
+        self.knownTalents = tlntsLrn
         self.id = idIN
         self.description = ""
         self.rating = []
@@ -293,12 +297,10 @@ class Party():
         #   self.members.append(Character(dir.getCharacterName(self.members),lvl,dir.classDirectory[random.randint(0,11)],random.randint(0,5))) #random.randint(0,11)
         #    self.members[i].eqpWpn = dir.getWeapon(dir.getItemByRarities(Type.Weapon,lvl-1,lvl))
         #    self.members[i].eqpAmr = dir.getArmor(dir.getItemByRarities(Type.Armor,lvl-1,lvl))
-    def debug_setToLevel(self,dir,lv):
+    def debug_setToLevel(self,dir,lv,cls):
         self.members = []
         for i in range(0,4):
-            self.members.append(Character(dir.getCharacterName(self.members),lv,dir.classDirectory[random.randint(0,11)],random.randint(0,5))) #random.randint(0,11)
-            self.members[i].eqpWpn = dir.getWeapon(dir.getItemByRarities(Type.Weapon,lv-1,lv))
-            self.members[i].eqpAmr = dir.getArmor(dir.getItemByRarities(Type.Armor,lv-1,lv))
+            self.members.append(dir.buildCharacter(lv,self.members,cls))
     def debug_RandomInventory(self,dir):
         while len(self.inventory) < MAX_INVENTORY_SIZE:
             self.addItem(dir.getItemByRarities(Type.Potion,1,5))
@@ -397,9 +399,22 @@ class Action():
     def __init__(self,src,tgt,act):
         self.source = src
         self.target = tgt
-        self.action = act # 0 = ATTACK, 1 = GUARD, ID = SPELL, ID = ART, ID = ITEM
+        self.action = act # 0 = ATTACK, 1 = GUARD, ID = SPELL, ID = TALENT, ID = ITEM
     def print(self):
         return str(self.source) + " -> " + str(self.target) + ": " + str(self.action)
+    
+class ActiveEffect():
+    def __init__(self,id_IN,source_IN,target_IN,duration_IN=1):
+        self.id = id_IN             # int ; id of corresponding talent/skill
+        self.source = source_IN     # duple (string, int) ; index of party member who activated effect
+        self.target = target_IN     # duple (string, int) ; index of corresponding party member/enemy who effect is targeted at
+        self.duration = duration_IN # int ; number of rounds the effect will be active
+    def tick(self):
+        self.duration -= 1
+        return self.checkExpiry()
+    def checkExpiry(self):
+        if self.duration <= 0:
+            return True
 
 class Buff():
     def __init__(self,nme,buf,dur,tgt):
@@ -409,7 +424,7 @@ class Buff():
         self.target = tgt
     def tick(self):
         self.duration -= 1
-        self.checkExpiry()
+        return self.checkExpiry()
     def checkExpiry(self):
         if self.duration <= 0:
             return True

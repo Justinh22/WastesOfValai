@@ -119,7 +119,7 @@ class PauseMenu():
                 write(self.game, 12, 514, 308, self.intToRating(self.game.player.party.members[self.targetPartyMember].type.rating[4]))
                 write(self.game, 12, 450, 325, "LUCK: ")
                 write(self.game, 12, 514, 323, self.intToRating(self.game.player.party.members[self.targetPartyMember].type.rating[5]))
-                wrapWrite(self.game, 12, self.game.player.party.members[self.targetPartyMember].type.description, 340, 260, 358)
+                wrapWrite(self.game, 12, self.game.player.party.members[self.targetPartyMember].type.description, 338, 260, 358)
 
 
         if self.state == "partyMember":
@@ -432,11 +432,8 @@ class PauseMenu():
                     self.mapMode = "difficulty"
                 else:
                     self.mapMode = "biome"
-            elif self.state == "main":
-                newDgn = DungeonMap(self.game.directory,(0,0),DungeonType.Ruins)
-                newDgn.generate()
-            elif self.state == "partyMember":
-                characterpopups.LevelUp(self.game,self.game.player.party.members[self.targetPartyMember])
+            #elif self.state == "partyMember":
+            #    characterpopups.LevelUp(self.game,self.game.player.party.members[self.targetPartyMember])
         if self.game.UP:
             if self.state == "main":
                 self.cursorPos -= 1

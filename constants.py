@@ -1,6 +1,6 @@
 from enum import Enum
 
-MAX_DIFFICULTY = 25
+MAX_DIFFICULTY = 20
 MAX_LEVEL = 10
 MAX_WEAPON_RARITY = 10
 MAX_ARMOR_RARITY = 10
@@ -22,7 +22,7 @@ class Type(Enum):
     Potion = 3
     AtkSpell = 4
     SptSpell = 5
-    Skill = 6
+    Talent = 6
     Accessory = 7
     Creature = 8
     Class = 9
@@ -72,9 +72,16 @@ class SpellType(Enum):
     Raise = 4
     Cleanse = 5
 
-class SkillType(Enum):
-    Attack = 0
-    Support = 1
+class TalentType(Enum):
+    PartyEffect = 0
+    EncounterEffect = 1
+    Action = 2
+
+class TalentTiming(Enum):
+    InTurn = 0
+    Targeting = 1
+    Damage = 2
+    Ordering = 3
 
 class Target(Enum):
     Single = 0

@@ -5,7 +5,7 @@ def initClassDirectory():
     classDirectory = []
     # Weapon Prof: [AXE, SWORD, SPEAR, DAGGER, STAFF]
     # Armor Prof:  [LIGHT, MEDIUM, HEAVY, ROBE, ARCANIST]
-    #                         NAME          Wpn Prof      Amr Prof      Atk Spell Proficiency   Spt Spell Proficiency   HP            MP        ATK       CRT       DEF       DDG       LCK       SPD        Learned Spells                             Learned Skills                             ID
+    #                         NAME          Wpn Prof      Amr Prof      Atk Spell Proficiency   Spt Spell Proficiency   HP            MP        ATK       CRT       DEF       DDG       LCK       SPD        Learned Spells                             Learned Talents                            ID
     #                                       Rating          Description                           Rating Order: [Power,Sturdiness,Nimbleness,Arcana,Faith,Luck]
 
     Explorer =      ClassType("Explorer",   [1,1,1,1,1] , [1,1,1,1,1] , [1,1,1,2,2,2,3,3,3,3] , [1,1,1,2,2,2,3,3,3,3] , [8,10,10]  , [3,4,5] , [3,4,5] , [1,1,2] , [2,2,3] , [1,1,2] , [1,1,2] , [4,5,6] , [406,301,403,305,408,306,427,310,313,428] , [-11,-11,-11,-11,-11,-11,-11,-11,-11,-11] , 0) # Explorer
@@ -27,7 +27,7 @@ def initClassDirectory():
     Mercenary.setAdditionalInfo(            [4,2,3,2,2,5] , "A lucky adventurer who often finds themselves in fortunate situations. Excels in ATK and LCK.")
     classDirectory.append(Mercenary)
     Mage =          ClassType("Mage",       [0,0,1,1,1] , [1,0,0,1,1] , [2,2,3,3,3,4,4,4,5,5] , [1,1,2,2,2,3,3,3,3,3] , [6,6,8]    , [4,5,6] , [2,3,3] , [0,1,2] , [1,2,2] , [1,2,2] , [0,1,2] , [4,5,6] , [304,302,312,411,310,316,421,318,418,322] , [501,-11,-11,-11,514,-11,-11,-11,-11,-11] , 6) # Mage
-    Mage.setAdditionalInfo(                 [2,1,3,5,3,2] , "An gifted adventurer who can cast a wide range of attack spells. Excels in ATK Magic.")
+    Mage.setAdditionalInfo(                 [2,1,3,5,3,2] , "A gifted adventurer who can cast a wide range of attack spells. Excels in ATK Magic.")
     classDirectory.append(Mage)
     Cleric =        ClassType("Cleric",     [1,0,0,1,1] , [1,0,1,1,1] , [1,1,2,2,2,3,3,3,3,3] , [2,2,3,3,3,3,4,4,5,5] , [6,6,8]    , [4,5,6] , [3,3,4] , [0,1,2] , [1,2,2] , [1,1,2] , [0,1,2] , [3,4,5] , [406,407,413,427,428,456,445,442,454,453] , [500,-11,-11,-11,519,-11,-11,-11,-11,-11] , 7) # Cleric
     Cleric.setAdditionalInfo(               [2,2,2,3,5,2] , "A devout adventurer who relies on higher powers to keep their allies alive. Excels in SPT Magic.")

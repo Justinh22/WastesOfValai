@@ -11,6 +11,8 @@ class MainMenu():
         self.displayRunning = True
         self.cursor = pygame.Rect(0,0,20,20)
         self.cursorState = "Start"
+        self.debug_lv = 1
+        self.debug_cls = -1
         self.debugOps = []
         self.startPos = (self.game.width/2,self.game.height/2+30)
         self.loadPos = (self.game.width/2,self.game.height/2+50)
@@ -50,6 +52,7 @@ class MainMenu():
                 self.game.WorldMap.generateMap()
                 for op in self.debugOps:
                     self.setDebug(op)
+                self.executeDebug()
                 print("Start!")
                 print(self.game.WorldMap.startingPos)
             if self.cursorState == "Load":
@@ -65,6 +68,10 @@ class MainMenu():
                 print("Quit!")
                 pygame.quit()
                 sys.exit()
+        if self.game.X:
+            if "StartClass" not in self.debugOps:
+                print("StartClass")
+                self.debugOps.append("StartClass")
         if self.game.Y:
             if "StartLevel" not in self.debugOps:
                 print("StartLevel")
@@ -100,5 +107,12 @@ class MainMenu():
 
     def setDebug(self,typ):
         if typ == "StartLevel":
-            lv = getDebug(0)
-            self.game.player.party.debug_setToLevel(self.game.directory,lv)
+            self.debug_lv = getDebug(0)
+        if typ == "StartClass":
+            self.debug_cls = getDebug(1)
+        if typ == "StartClass" or "StartLevel":
+            self.game.player.party.debug_setToLevel(self.game.directory,self.debug_lv,self.debug_cls)
+    
+    def executeDebug(self):
+        if "StartLevel" in self.debugOps or "StartClass" in self.debugOps:
+            self.game.player.party.debug_setToLevel(self.game.directory,self.debug_lv,self.debug_cls)

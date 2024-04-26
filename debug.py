@@ -5,4 +5,6 @@ def getDebug(typ):
         debugdata = json.load(readfile)
         if typ == 0:
             return debugdata['StartLevel']
+        if typ == 1:
+            return debugdata['StartClass']
 

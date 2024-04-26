@@ -11,83 +11,93 @@ def pickLevels(level):
         else:
             encounterLevels = [1,1]
     elif level == 3:
-        encounterLevels = [2,1]
+        if picker == 0:
+            encounterLevels = [2,1]
+        else:
+            encounterLevels = [1,1,1,1]
     elif level == 4:
         if picker == 0:
             encounterLevels = [2,2]
         else:
-            encounterLevels = [2,1,1]
+            encounterLevels = [2,1,1,1]
     elif level == 5:
         if picker == 0:
             encounterLevels = [5]
         else:
-            encounterLevels = [2,2,1]
-    elif level == 6:
-        if picker == 0:
-            encounterLevels = [5,1]
-        else:
             encounterLevels = [2,2,2]
-    elif level == 7:
+    elif level == 6:
         if picker == 0:
             encounterLevels = [5,2]
         else:
-            encounterLevels = [2,2,2,1]
+            encounterLevels = [2,2,2,2]
+    elif level == 7:
+        encounterLevels = [5,2,2]
     elif level == 8:
         if picker == 0:
             encounterLevels = [8]
         else:
-            encounterLevels = [2,2,2,2]
+            encounterLevels = [5,5]
     elif level == 9:
         if picker == 0:
-            encounterLevels = [5,2,2]
+            encounterLevels = [8,2,2]
         else:
-            encounterLevels = [5,2,1,1]
+            encounterLevels = [5,5,2,2]
     elif level == 10:
         if picker == 0:
-            encounterLevels = [5,5]
+            encounterLevels = [8,5]
         else:
             encounterLevels = [10]
     elif level == 11:
-        encounterLevels = [5,2,2,2]
+        if picker == 0:
+            encounterLevels = [8,5,5]
+        else:
+            encounterLevels = [10,5]
     elif level == 12:
         if picker == 0:
             encounterLevels = [12]
         else:
-            encounterLevels = [8,2,2]
+            encounterLevels = [8,8]
     elif level == 13:
-        encounterLevels = [8,5]
+        if picker == 0:
+            encounterLevels = [12,5,5]
+        else:
+            encounterLevels = [10,8]
     elif level == 14:
         if picker == 0:
-            encounterLevels = [10,2,2]
+            encounterLevels = [10,10]
         else:
-            encounterLevels = [12,2]
+            encounterLevels = [12,5,5,5]
     elif level == 15:
         if picker == 0:
-            encounterLevels = [10,5]
+            encounterLevels = [10,8,8]
         else:
             encounterLevels = [15]
     elif level == 16:
         if picker == 0:
-            encounterLevels = [12,2,2]
+            encounterLevels = [12,8,8]
         else:
-            encounterLevels = [8,8]
+            encounterLevels = [15,5,5,5]
     elif level == 17:
-        encounterLevels = [12,5]
+        if picker == 0:
+            encounterLevels = [15,10]
+        else:
+            encounterLevels = [12,12]
     elif level == 18:
         if picker == 0:
-            encounterLevels = [10,8]
+            encounterLevels = [12,12,12]
         else:
             encounterLevels = [18]
     elif level == 19:
         if picker == 0:
-            encounterLevels = [15,2,2]
+            encounterLevels = [18,8,8,8]
         else:
-            encounterLevels = [12,5,2]
+            encounterLevels = [15,15]
     elif level == 20:
         if picker == 0:
-            encounterLevels = [10,10]
+            encounterLevels = [18,10,10,10]
         else:
             encounterLevels = [20]
+    # BENEATH THIS POINT, THESE ENCOUNTERS ARE UNUSED NOW
     elif level == 21:
         encounterLevels = [15,2,2,2]
     elif level == 22:

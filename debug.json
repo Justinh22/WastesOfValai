@@ -1,3 +1,4 @@
 {
-    "StartLevel": 10
+    "StartLevel": 5,
+    "StartClass": 10
 }
