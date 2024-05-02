@@ -1,4 +1,5 @@
 {
     "StartLevel": 5,
-    "StartClass": 10
+    "StartClass": 10,
+    "ManualEncounters": 0
 }

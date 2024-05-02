@@ -44,6 +44,8 @@ class Game():
         self.stepsThreshold = 100
         self.difficulty = 1
 
+        self.debug_manualEncounters = False
+
     def run(self):
         while self.inGame:
             self.buttonReset()

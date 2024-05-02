@@ -72,7 +72,7 @@ class Overworld():
             print("A")
         if self.game.B:
             encounter = []
-            encounter = self.game.directory.buildEncounter(self.game.player.party.getPower(),self.getBiome(self.game.player.currentPos[0],self.game.player.currentPos[1]))
+            encounter = self.game.directory.buildEncounter(self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[self.game.player.currentPos[0]][self.game.player.currentPos[1]]),self.getBiome(self.game.player.currentPos[0],self.game.player.currentPos[1]))
             self.combat.initialize(encounter)
         if self.game.X:
             print("X")
@@ -182,7 +182,7 @@ class Overworld():
                 self.currentDungeon = Crawler(self.game,self.game.dungeonDB.getDungeon((r,c),self.getDungeonType(r,c),self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c])))
                 self.currentDungeon.inDungeon = True
                 self.inDungeon = True
-        else: # Roll for random encounter
+        elif self.game.debug_manualEncounters is False: # Roll for random encounter
             difficultyDiffBias = self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]) - math.ceil(self.game.player.party.getPower()/2)
             if difficultyDiffBias > 3:
                 difficultyDiffBias = 3

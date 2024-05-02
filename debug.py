@@ -7,4 +7,6 @@ def getDebug(typ):
             return debugdata['StartLevel']
         if typ == 1:
             return debugdata['StartClass']
+        if typ == 2:
+            return debugdata['ManualEncounters']
 

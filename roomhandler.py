@@ -63,8 +63,11 @@ class RoomHandler():
                     self.game.save()
                     self.slept = True
                 if self.room.type == "haven" and self.room.features[self.cursorPos].name == "Wanderer":
+                    lvl = difficultyToLevel(self.room.difficulty)
+                    if difficultyToLevel(self.room.difficulty) > self.game.player.party.getHighestLevel():
+                        lvl = self.game.player.party.getHighestLevel()
                     if len(self.game.player.party.members) < 4:
-                        self.game.player.party.members.append(self.game.directory.buildCharacter(difficultyToLevel(self.room.difficulty),self.game.player.party.members))
+                        self.game.player.party.members.append(self.game.directory.buildCharacter(lvl,self.game.player.party.members))
                     else:
                         CharacterSwap(self.game,self.game.directory.buildCharacter(difficultyToLevel(self.room.difficulty),self.game.player.party.members))
                     self.room.features[self.cursorPos].lootStatus = LootStatus.Taken

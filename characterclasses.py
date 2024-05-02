@@ -334,6 +334,12 @@ class Party():
         for member in self.members:
             power += member.level
         return power
+    def getHighestLevel(self):
+        high = 0
+        for member in self.members:
+            if member.level > high:
+                high = member.level
+        return high
     def dropEquipment(self,index):
         self.equipment.pop(index)
     def dropItem(self,index):
