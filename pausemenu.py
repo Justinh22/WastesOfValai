@@ -282,12 +282,24 @@ class PauseMenu():
                                     color = self.game.tan
                             elif self.mapMode == "difficulty" and mapChar != ' ' and mapChar != 'X':
                                 diff = self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c])
-                                color = (255,225-(9*diff),225-(9*diff))
+                                power = math.ceil(self.game.player.party.getPower()/2)
+                                difficultyDiff = abs(diff-power)
+                                if difficultyDiff > 3:
+                                    difficultyDiff = 3
+                                if diff > power:
+                                    color = (255, 255 - (difficultyDiff * 85), 255 - (difficultyDiff * 85))
+                                elif diff < power:
+                                    color = (255 - (difficultyDiff * 85), 255, 255 - (difficultyDiff * 85))
+                                else:
+                                    color = self.game.white
                         else:
                             if self.game.WorldMap.map[r][c] == 'X':
                                 mapChar = self.game.WorldMap.map[r][c]
-                            else:
+                            elif r > MAP_HEIGHT or c > MAP_WIDTH:
                                 mapChar = ' '
+                            else:
+                                mapChar = 'x'
+                                color = self.game.darkgrey
 
                     text = mapFont.render(mapChar,True,color)
                     textWidth, textHeight = mapFont.size(mapChar)

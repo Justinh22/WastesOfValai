@@ -270,6 +270,8 @@ class Combat():
         if self.game.UP:
             if self.state == "targetSelect" and self.cursorPos > 0:
                 tgtList = self.encounter if self.actionVal < 200 else self.game.player.party.members
+                if self.actionVal >= 500:
+                    tgtList = self.encounter if self.game.directory.getItem(self.actionVal).target == Target.Single else self.game.player.party.members
                 for i in range(0,self.cursorPos):
                     if tgtList[i].hp > 0:
                         self.cursorPos = i
@@ -285,6 +287,8 @@ class Combat():
         if self.game.DOWN:
             if self.state == "targetSelect":
                 tgtList = self.encounter if self.actionVal < 200 or (self.actionVal >= 300 and self.actionVal < 400) else self.game.player.party.members
+                if self.actionVal >= 500:
+                    tgtList = self.encounter if self.game.directory.getItem(self.actionVal).target == Target.Single else self.game.player.party.members
                 for i in range(self.cursorPos+1,len(tgtList)):
                     if tgtList[i].hp > 0:
                         self.cursorPos = i
@@ -328,6 +332,8 @@ class Combat():
     def enterTargetSelect(self):
         self.cursorPos = 0
         tgtList = self.encounter if self.actionVal < 200 else self.game.player.party.members
+        if self.actionVal >= 500:
+            tgtList = self.encounter if self.game.directory.getItem(self.actionVal).target == Target.Single else self.game.player.party.members
         for i in range(0,len(tgtList)):
             if tgtList[i].hp > 0:
                 self.cursorPos = i
@@ -566,9 +572,7 @@ class Combat():
         if self.state == "lose":
             pygame.draw.line(self.game.screen,self.game.white,(self.left,350),(self.right+9,350),2)
             write(self.game, 20, self.left+15, 325, "You have fallen...")
-            print(f'Lose: {pygame.time.get_ticks() - self.timeStart} > 3000 to get out')
             if pygame.time.get_ticks() - self.timeStart >= 2000:
-                print("We out")
                 self.combatTeardown()
                 self.inCombat = False
                 self.defeat = True

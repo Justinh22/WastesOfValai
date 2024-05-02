@@ -87,13 +87,23 @@ class Overworld():
     def drawScreen(self):
         blockSize = 30 #Set the size of the grid block
         self.game.screen.fill((0,0,0))
+        power = math.ceil(self.game.player.party.getPower()/2)
         diffText = self.getBiome(self.game.player.currentPos[0],self.game.player.currentPos[1]).name + ": Difficulty " + str(self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[self.game.player.currentPos[0]][self.game.player.currentPos[1]]))
-        if self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[self.game.player.currentPos[0]][self.game.player.currentPos[1]]) > self.game.player.party.getPower()+1:
-            text = self.font.render(diffText,True,self.game.red)
-        elif self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[self.game.player.currentPos[0]][self.game.player.currentPos[1]]) < round(self.game.player.party.getPower()/2)-5:
-            text = self.font.render(diffText,True,self.game.green)
+        areaDifficulty = self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[self.game.player.currentPos[0]][self.game.player.currentPos[1]])
+        difficultyDiff = abs(areaDifficulty-power)
+        if difficultyDiff > 3:
+            difficultyDiff = 3
+        
+        if areaDifficulty > power:
+            color = (255, 255 - (difficultyDiff * 85), 255 - (difficultyDiff * 85))
+            text = self.font.render(diffText,True,color)
+        elif areaDifficulty < power:
+            color = (255 - (difficultyDiff * 85), 255, 255 - (difficultyDiff * 85))
+            text = self.font.render(diffText,True,color)
         else:
             text = self.font.render(diffText,True,self.game.white)
+        
+        
         self.game.screen.blit(text,(30,self.height+10))
         #write(self.game, 20,30,self.height+10,diffText)
         write(self.game, 20,self.width-80,self.height+10,"ST) Pause")
@@ -173,15 +183,24 @@ class Overworld():
                 self.currentDungeon.inDungeon = True
                 self.inDungeon = True
         else: # Roll for random encounter
+            difficultyDiffBias = self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]) - math.ceil(self.game.player.party.getPower()/2)
+            if difficultyDiffBias > 3:
+                difficultyDiffBias = 3
+            elif difficultyDiffBias < -3:
+                difficultyDiffBias = -3
+            difficultyDiffBias *= 5
+
             if self.steps < 5:
-                odds = 50
-            elif self.steps < 10:
-                odds = 1
-            elif self.steps < 15:
                 odds = 10
+            elif self.steps < 10:
+                odds = 15
             else:
-                odds = 25
-            if random.randint(odds,50) == 49 and self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]) == self.lastDiff and not (self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]) < round(self.game.player.party.getPower()/2)-5):
+                odds = 20
+
+            odds += difficultyDiffBias
+            roll = random.randint(1,100)
+
+            if roll <= odds and self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]) == self.lastDiff:
                 self.steps = 0
                 encounter = []
                 encounter = self.game.directory.buildEncounter(self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]),self.getBiome(self.game.player.currentPos[0],self.game.player.currentPos[1]))
