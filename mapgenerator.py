@@ -145,7 +145,7 @@ class Map():
 
         print("Generating landmarks...")
         self.placeLandmarks(LANDMARK_COUNT)
-        self.setFirstHaven()
+        #self.setFirstHaven()
 
         with open("generated_map.txt","w") as file:
             for row in self.map:
@@ -242,50 +242,83 @@ class Map():
 
 
     def placeLandmarks(self,num):
-        landmarks = math.ceil(num * (.9))
-        havens = math.ceil(num * (.1))
-        count = 0
-        while count < landmarks:
-            r = random.randint(1,self.sizeR-1)
-            c = random.randint(1,self.sizeC-1)
-            sel = random.randint(1,7)
-            if self.map[r][c] == '.':
-                if sel == 1:
-                    self.map[r][c] = 'W' # Well
-                elif sel == 2:
-                    self.map[r][c] = 'P' # Pyramid
-                elif sel == 3:
-                    self.map[r][c] = 'A' # Abandoned Camp
-                else:
-                    self.map[r][c] = 'S' # Shack
-            elif self.map[r][c] == ';':
-                if sel == 1:
-                    self.map[r][c] = 'B' # Bandit Camp
-                elif sel == 2:
-                    self.map[r][c] = 'C' # Cave
-                elif sel == 3:
-                    self.map[r][c] = 'A' # Abandoned Camp
-                else:
-                    self.map[r][c] = 'S' # Shack
-            elif self.map[r][c] == '#':
-                if sel == 1:
-                    self.map[r][c] = 'R' # Ruins
-                elif sel == 2:
-                    self.map[r][c] = 'T' # Treehouse
-                elif sel == 3:
-                    self.map[r][c] = 'A' # Abandoned Camp
-                else:
-                    self.map[r][c] = 'S' # Shack
+        rooms = math.ceil(num * (.5))
+        dungeons = math.ceil(num * (.2))
+        havens = math.ceil(num * (.3))
+        
+        roomList = self.pseudoRandomPlacement(rooms)
+        for room in roomList:
+            randomVal = random.randint(1,3)
+            if randomVal == 1:
+                self.map[room[0]][room[1]] = 'A' # Abandoned Camp
             else:
-                continue
-            count += 1
+                self.map[room[0]][room[1]] = 'S' # Shack
+
+        dungeonList = self.pseudoRandomPlacement(dungeons)
+        for dungeon in dungeonList:
+            randomVal = random.randint(1,2)
+            if self.map[dungeon[0]][dungeon[1]] == '.':
+                if randomVal == 1:
+                    self.map[dungeon[0]][dungeon[1]] = 'W' # Well
+                elif randomVal == 2:
+                    self.map[dungeon[0]][dungeon[1]] = 'P' # Pyramid
+            elif self.map[dungeon[0]][dungeon[1]] == ';':
+                if randomVal == 1:
+                    self.map[dungeon[0]][dungeon[1]] = 'B' # Bandit Camp
+                elif randomVal == 2:
+                    self.map[dungeon[0]][dungeon[1]] = 'C' # Cave
+            elif self.map[dungeon[0]][dungeon[1]] == '#':
+                if randomVal == 1:
+                    self.map[dungeon[0]][dungeon[1]] = 'R' # Ruins
+                elif randomVal == 2:
+                    self.map[dungeon[0]][dungeon[1]] = 'T' # Treehouse
+
+        havenList = self.pseudoRandomPlacement(havens)
+        for haven in havenList:
+            self.map[haven[0]][haven[1]] = 'H' # Haven
+
+
+    def pseudoRandomPlacement(self,num):
+        rows = cols = math.floor(math.sqrt(num))
+        quadrantSizeR = math.ceil(MAP_HEIGHT / math.ceil(math.sqrt(num)))
+        quadrantSizeC = math.ceil(MAP_WIDTH / math.ceil(math.sqrt(num)))
+        print(f'Quadrant Sizes: {quadrantSizeR}x{quadrantSizeC}')
+        print(f'Rows: {rows}, Cols: {cols}')
+        r = 0
+        c = 0
         count = 0
-        while count < havens:
-            r = random.randint(1,self.sizeR-1)
-            c = random.randint(1,self.sizeC-1)
-            if self.map[r][c] != ' ':
-                self.map[r][c] = 'H' # Haven
-                count += 1
+        coordsList = []
+        randomQuadOn = False
+        while count < num:
+            upperBoundR = quadrantSizeR*(r+1)
+            if upperBoundR >= MAP_HEIGHT:
+                upperBoundR = MAP_HEIGHT-1
+            upperBoundC = quadrantSizeC*(c+1)
+            if upperBoundC >= MAP_WIDTH:
+                upperBoundC = MAP_WIDTH-1
+
+            targetR = random.randint(quadrantSizeR*r, upperBoundR)
+            targetC = random.randint(quadrantSizeC*c, upperBoundC)
+            if self.map[targetR][targetC] == ' ':
+                continue
+            print(f'Structure placed in quadrant: {quadrantSizeR*r},{quadrantSizeC*c} ; {upperBoundR},{upperBoundC}')
+            coordsList.append((targetR,targetC))
+
+            if not randomQuadOn:
+                c += 1
+                if c >= cols:
+                    c = 0
+                    r += 1
+                    if r >= rows:
+                        randomQuadOn = True
+            else:
+                r = random.randint(0,rows-1)
+                c = random.randint(0,cols-1)
+            count += 1
+        
+        return coordsList
+
+
 
 
     def saveRevealed(self):
