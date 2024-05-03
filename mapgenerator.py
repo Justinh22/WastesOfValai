@@ -65,16 +65,21 @@ class Map():
         self.border()
 
         # Setting starting point...
+        good = True
         for r in range(self.sizeR):
             for c in range(self.sizeC):
                 if self.difficultyMap[r][c] != 'A' and self.difficultyMap[r][c] != 'B':
+                    good = False
                     continue
                 good = True
                 for coords in [(-1,0), (0,-1), (1,0), (0,1)]:
                     if self.map[r+coords[0]][c+coords[1]] == ' ' or (self.difficultyMap[r+coords[0]][c+coords[1]] != 'A' and self.difficultyMap[r+coords[0]][c+coords[1]] != 'B'):
                         good = False
                 if good:
-                    self.startingPos = (r+coords[0], c+coords[1])
+                    self.startingPos = (r,c)
+                    break
+            if good:
+                break
 
         if not good:
             self.startingPos = (round(self.sizeR/2),round(self.sizeC/2))
@@ -282,8 +287,6 @@ class Map():
         rows = cols = math.floor(math.sqrt(num))
         quadrantSizeR = math.ceil(MAP_HEIGHT / math.ceil(math.sqrt(num)))
         quadrantSizeC = math.ceil(MAP_WIDTH / math.ceil(math.sqrt(num)))
-        print(f'Quadrant Sizes: {quadrantSizeR}x{quadrantSizeC}')
-        print(f'Rows: {rows}, Cols: {cols}')
         r = 0
         c = 0
         count = 0
@@ -301,7 +304,6 @@ class Map():
             targetC = random.randint(quadrantSizeC*c, upperBoundC)
             if self.map[targetR][targetC] == ' ':
                 continue
-            print(f'Structure placed in quadrant: {quadrantSizeR*r},{quadrantSizeC*c} ; {upperBoundR},{upperBoundC}')
             coordsList.append((targetR,targetC))
 
             if not randomQuadOn:
