@@ -254,15 +254,48 @@ class PauseMenu():
             blockSize = self.mapZoomSize # Set the size of the grid block
             self.game.screen.fill((0,0,0))
             mapFont = pygame.font.Font('freesansbold.ttf',round(blockSize/1.5))
-            for x in range(30, self.right, blockSize):
-                for y in range(30, self.bottom, blockSize):
+            mapOutline = pygame.Rect(self.left+10,self.top+10,self.right-20,self.bottom-70)
+            pygame.draw.rect(self.game.screen,self.game.white,mapOutline,2)
+            write(self.game, 15, 40, 435,"L) Zoom Out")
+            write(self.game, 15, 200, 435,"R) Zoom In")
+            write(self.game, 15, 360, 435,"A) Toggle View")
+            write(self.game, 15, 520, 435,"B) Back")
+
+            mapLeft = 40
+            mapRight = self.right-20
+            mapTop = 30
+            mapBottom = self.bottom-60
+            width = mapRight - mapLeft
+            height = mapBottom - mapTop
+            blockNum = [0,0]
+            blockOffset = [0,0]
+
+            blockFit = width / blockSize
+            roundedBlockFit = math.floor(blockFit)
+            blockNum[0] = roundedBlockFit if roundedBlockFit % 2 == 1 else roundedBlockFit - 1
+            blockOffset[0] = math.ceil(((blockFit - blockNum[0]) / 2) * blockSize)
+
+            blockFit = height / blockSize
+            roundedBlockFit = math.floor(blockFit)
+            blockNum[1] = roundedBlockFit if roundedBlockFit % 2 == 1 else roundedBlockFit - 1
+            blockOffset[1] = math.ceil(((blockFit - blockNum[1]) / 2) * blockSize)
+
+            countX = 0
+            countY = 0
+            for x in range(mapLeft + blockOffset[0], mapRight - blockOffset[0], blockSize):
+                countY = 0
+                countX += 1
+                for y in range(mapTop + blockOffset[1], mapBottom - blockOffset[1], blockSize):
+                    countY += 1
                     color = self.game.white
-                    gridWidth = self.right / blockSize
-                    gridHeight = self.bottom / blockSize
+                    gridWidth = width / blockSize
+                    gridHeight = height / blockSize
                     rect = pygame.Rect(x, y, blockSize, blockSize)
                     pygame.draw.rect(self.game.screen, (0,0,0), rect)
-                    r = int(((y / blockSize)-(gridHeight/2))+self.mapPos[0])
-                    c = int(((x / blockSize)-(gridWidth/2))+self.mapPos[1])
+                    r = int(self.mapPos[0]-math.ceil(blockNum[1]/2) + countY)
+                    c = int(self.mapPos[1]-math.ceil(blockNum[0]/2) + countX)
+                    #r = int(((y / blockSize)-math.ceil(gridHeight/2))+self.mapPos[0])
+                    #c = int(((x / blockSize)-math.ceil(gridWidth/2))+self.mapPos[1])
                     mapChar = '_'
                     if r < 0 or r >= self.game.WorldMap.sizeR:
                         mapChar = ' '
@@ -300,11 +333,13 @@ class PauseMenu():
                             else:
                                 mapChar = 'x'
                                 color = self.game.darkgrey
+                    
+                    if r == (self.mapPos[0]) and c == (self.mapPos[1]):
+                        color = self.game.yellow
 
                     text = mapFont.render(mapChar,True,color)
                     textWidth, textHeight = mapFont.size(mapChar)
                     offset = (blockSize-textWidth)/2
-
                     self.game.screen.blit(text,(x+offset,y+(round(blockSize/6))))
 
 
@@ -336,11 +371,11 @@ class PauseMenu():
                 self.targetPartyMember = self.cursorPos
                 self.cursorPos = 0
             elif self.state == "map":
-                print("ZOOMIN")
-                if self.mapZoomSize < 40 and self.mapZoomSize >= 10:
-                    self.mapZoomSize += 5
-                elif self.mapZoomSize < 40 and self.mapZoomSize >= 4:
-                    self.mapZoomSize += 2
+                if self.state == "map":
+                    if self.mapMode == "biome":
+                        self.mapMode = "difficulty"
+                    else:
+                        self.mapMode = "biome"
             elif self.state == "partyMember":
                 self.spellPageMod = 0
                 if self.cursorPos == 0:
@@ -410,11 +445,10 @@ class PauseMenu():
                 self.state = "main"
                 self.cursorPos = 1
             if self.state == "map":
-                print("ZOOMOUT")
-                if self.mapZoomSize > 10:
-                    self.mapZoomSize -= 5
-                elif self.mapZoomSize > 4:
-                    self.mapZoomSize -= 2
+                if self.state == "map":
+                    self.state = "main"
+                else:
+                    self.paused = False
             if self.state == "partyMember":
                 self.state = "partySelect"
                 self.cursorPos = self.targetPartyMember
@@ -433,19 +467,6 @@ class PauseMenu():
                 self.cursorPos = self.targetElement - (self.spellPageMod*2)
                 self.state = self.substate
                 self.substate = "none"
-        if self.game.X:
-            if self.state == "map":
-                self.state = "main"
-            else:
-                self.paused = False
-        if self.game.Y:
-            if self.state == "map":
-                if self.mapMode == "biome":
-                    self.mapMode = "difficulty"
-                else:
-                    self.mapMode = "biome"
-            #elif self.state == "partyMember":
-            #    characterpopups.LevelUp(self.game,self.game.player.party.members[self.targetPartyMember])
         if self.game.UP:
             if self.state == "main":
                 self.cursorPos -= 1
@@ -536,7 +557,19 @@ class PauseMenu():
                     self.cursorPos = 0
         if self.game.START:
             self.paused = False
-    
+        if self.game.L:
+            print("ZOOMOUT")
+            if self.mapZoomSize > 10:
+                self.mapZoomSize -= 5
+            elif self.mapZoomSize > 4:
+                self.mapZoomSize -= 2
+        if self.game.R:
+            print("ZOOMIN")
+            if self.mapZoomSize < 40 and self.mapZoomSize >= 10:
+                self.mapZoomSize += 5
+            elif self.mapZoomSize < 40 and self.mapZoomSize >= 4:
+                self.mapZoomSize += 2
+
     def drawMinStatBlock(self,xPos,yPos,character):
         outlineRect = pygame.Rect(xPos,yPos,350,90)
         pygame.draw.rect(self.game.screen,self.game.white,outlineRect,2)
@@ -557,15 +590,15 @@ class PauseMenu():
 
     def panMap(self):
         if self.mapZoomSize == 40:
-            return 2
+            return 1
         elif self.mapZoomSize == 35:
-            return 3
+            return 1
         elif self.mapZoomSize == 30:
-            return 4
+            return 1
         elif self.mapZoomSize == 25:
-            return 5
+            return 2
         elif self.mapZoomSize == 20:
-            return 6
+            return 4
         elif self.mapZoomSize == 15:
             return 7
         elif self.mapZoomSize == 10:
