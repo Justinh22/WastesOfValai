@@ -302,7 +302,7 @@ class Map():
 
             targetR = random.randint(quadrantSizeR*r, upperBoundR)
             targetC = random.randint(quadrantSizeC*c, upperBoundC)
-            if self.map[targetR][targetC] == ' ':
+            if self.map[targetR][targetC] == ' ' or self.map[targetR][targetC] == 'X':
                 continue
             coordsList.append((targetR,targetC))
 
