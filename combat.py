@@ -23,6 +23,7 @@ class Combat():
         self.currentTurn = 0
         self.actions = []
         self.activeEffects = []
+        self.scheduledManaCosts = []
         self.actionVal = -1
         self.state = "mainWindow"
         self.delay = 0
@@ -791,7 +792,7 @@ class Combat():
         talent = self.game.directory.getTalent(id)
         if talent.type == TalentType.PartyEffect or talent.type == TalentType.EncounterEffect:
             effect = ActiveEffect(talent.id, source, target)
-            self.game.player.party.members[source[1]].mp -= talent.mpcost
+            self.scheduledManaCosts.append((source[1],talent.mpcost))
             self.activeEffects.append(effect)
             self.writeAction(source,target,-1)
         elif talent.type == TalentType.Action and talent.timing == TalentTiming.Ordering:
@@ -985,6 +986,9 @@ class Combat():
     def startExecute(self):
         print("Execute!")
         self.checkTalentEffectTiming(None,TalentTiming.Ordering)
+        for cost in self.scheduledManaCosts:
+            self.game.player.party.members[cost[0]].mp -= cost[1]
+        self.scheduledManaCosts = []
         print(f'Combat order: {self.combatOrder}')
         self.ex = True
         self.exTurn = 0
