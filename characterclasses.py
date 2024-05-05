@@ -6,11 +6,10 @@ from constants import *
 
 class Character():
     charNum = 100
-    def __init__(self,nm,lv,tp,p):
+    def __init__(self,nm,lv,tp,p,id):
         self.name = nm
         self.level = lv
-        Character.charNum += 1
-        self.id = Character.charNum
+        self.id = id
         self.xp = 0
         self.nextLevel = 200*lv
         self.type = tp # Class; Type is used to avoid defined 'class' name
@@ -288,19 +287,14 @@ class Party():
     def printContents(self):
         for member in self.members:
             print(member.name)
-    def initializeMembers(self,dir):
-        self.members.append(Character(dir.getCharacterName(self.members),1,dir.classDirectory[0],dir.getRandomPersonality()))
+    def initializeMembers(self,dir,id):
+        self.members.append(dir.buildCharacter(1,self.members,id,1))
         self.members[0].eqpWpn = dir.getWeapon(dir.getItemByRarity(Type.Weapon,1))
         self.members[0].eqpAmr = dir.getArmor(dir.getItemByRarity(Type.Armor,1))
-        #for i in range(0,random.randint(3,4)):
-        #    lvl = 2
-        #   self.members.append(Character(dir.getCharacterName(self.members),lvl,dir.classDirectory[random.randint(0,11)],random.randint(0,5))) #random.randint(0,11)
-        #    self.members[i].eqpWpn = dir.getWeapon(dir.getItemByRarities(Type.Weapon,lvl-1,lvl))
-        #    self.members[i].eqpAmr = dir.getArmor(dir.getItemByRarities(Type.Armor,lvl-1,lvl))
-    def debug_setToLevel(self,dir,lv,cls):
+    def debug_setToLevel(self,dir,lv,cls,id):
         self.members = []
         for i in range(0,4):
-            self.members.append(dir.buildCharacter(lv,self.members,cls))
+            self.members.append(dir.buildCharacter(lv,self.members,id,cls))
     def debug_RandomInventory(self,dir):
         while len(self.inventory) < MAX_INVENTORY_SIZE:
             self.addItem(dir.getItemByRarities(Type.Potion,1,5))

@@ -67,9 +67,9 @@ class RoomHandler():
                     if difficultyToLevel(self.room.difficulty) > self.game.player.party.getHighestLevel():
                         lvl = self.game.player.party.getHighestLevel()
                     if len(self.game.player.party.members) < 4:
-                        self.game.player.party.members.append(self.game.directory.buildCharacter(lvl,self.game.player.party.members))
+                        self.game.player.party.members.append(self.game.directory.buildCharacter(lvl,self.game.player.party.members,self.game.player.getNewCharID()))
                     else:
-                        CharacterSwap(self.game,self.game.directory.buildCharacter(difficultyToLevel(self.room.difficulty),self.game.player.party.members))
+                        CharacterSwap(self.game,self.game.directory.buildCharacter(difficultyToLevel(self.room.difficulty),self.game.player.party.members,self.game.player.getNewCharID()))
                     self.room.features[self.cursorPos].lootStatus = LootStatus.Taken
                     self.room.features.pop(self.cursorPos)
                     self.state = "lookList"

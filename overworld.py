@@ -195,9 +195,10 @@ class Overworld():
                 odds = 20
 
             odds += difficultyDiffBias
-            roll = random.randint(1,100)
+            rollA = random.randint(1,100)
+            rollB = random.randint(1,100)
 
-            if roll <= odds and self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]) == self.lastDiff:
+            if (rollA+rollB) <= (odds*2) and self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]) == self.lastDiff:
                 self.steps = 0
                 encounter = []
                 encounter = self.game.directory.buildEncounter(self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]),self.getBiome(self.game.player.currentPos[0],self.game.player.currentPos[1]))

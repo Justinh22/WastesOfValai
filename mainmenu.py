@@ -115,14 +115,14 @@ class MainMenu():
             self.debug_lv = getDebug(0)
         if typ == "StartClass":
             self.debug_cls = getDebug(1)
-        if typ == "StartClass" or typ == "StartLevel":
-            self.game.player.party.debug_setToLevel(self.game.directory,self.debug_lv,self.debug_cls)
+        #if typ == "StartClass" or typ == "StartLevel":
+        #    self.game.player.party.debug_setToLevel(self.game.directory,self.debug_lv,self.debug_cls)
         if typ == "ManualEncounters":
             self.game.debug_manualEncounters = True
     
     def executeDebug(self):
         print(self.debugOps)
         if "StartLevel" in self.debugOps or "StartClass" in self.debugOps:
-            self.game.player.party.debug_setToLevel(self.game.directory,self.debug_lv,self.debug_cls)
+            self.game.player.party.debug_setToLevel(self.game.directory,self.debug_lv,self.debug_cls,self.game.player.getNewCharID())
         if "ManualEncounters" not in self.debugOps:
             self.game.debug_manualEncounters = bool(getDebug(2))

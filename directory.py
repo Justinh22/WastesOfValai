@@ -324,10 +324,10 @@ class Directory():
     def getRandomPersonality(self):
         return random.choice(list(Personality))
     
-    def buildCharacter(self,level,members,cls=-1):
+    def buildCharacter(self,level,members,id,cls=-1):
         if cls == -1:
             cls = random.randint(1,12)
-        newChar = Character(self.getCharacterName(members),level,self.classDirectory[cls],self.getRandomPersonality())
+        newChar = Character(self.getCharacterName(members),level,self.classDirectory[cls],self.getRandomPersonality(),id)
         newChar.eqpWpn = self.getWeapon(self.getWeaponByRarity(weaponProfArrayToList(newChar.type.weaponProficiency),self.getLootRarityForCharacter(level,Type.Weapon)))
         newChar.eqpAmr = self.getArmor(self.getArmorByRarity(armorProfArrayToList(newChar.type.armorProficiency),self.getLootRarityForCharacter(level,Type.Armor)))
         return newChar
