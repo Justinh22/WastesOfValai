@@ -558,17 +558,19 @@ class PauseMenu():
         if self.game.START:
             self.paused = False
         if self.game.L:
-            print("ZOOMOUT")
-            if self.mapZoomSize > 10:
-                self.mapZoomSize -= 5
-            elif self.mapZoomSize > 4:
-                self.mapZoomSize -= 2
+            if self.state == "map":
+                print("ZOOMOUT")
+                if self.mapZoomSize > 10:
+                    self.mapZoomSize -= 5
+                elif self.mapZoomSize > 4:
+                    self.mapZoomSize -= 2
         if self.game.R:
-            print("ZOOMIN")
-            if self.mapZoomSize < 40 and self.mapZoomSize >= 10:
-                self.mapZoomSize += 5
-            elif self.mapZoomSize < 40 and self.mapZoomSize >= 4:
-                self.mapZoomSize += 2
+            if self.state == "map":
+                print("ZOOMIN")
+                if self.mapZoomSize < 40 and self.mapZoomSize >= 10:
+                    self.mapZoomSize += 5
+                elif self.mapZoomSize < 40 and self.mapZoomSize >= 4:
+                    self.mapZoomSize += 2
 
     def drawMinStatBlock(self,xPos,yPos,character):
         outlineRect = pygame.Rect(xPos,yPos,350,90)

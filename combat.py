@@ -1185,7 +1185,7 @@ class Combat():
         source = action.source
         target = action.target
         
-        self.game.player.party.members[target].mp -= talent.mpcost
+        self.game.player.party.members[source[1]].mp -= talent.mpcost
 
         if talent.name == "Strike True":
             target = self.checkRecalculateTarget(source[0],target,"Encounter")
