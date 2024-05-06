@@ -80,6 +80,10 @@ class MainMenu():
             if "ManualEncounters" not in self.debugOps:
                 print("ManualEncounters")
                 self.debugOps.append("ManualEncounters")
+        if self.game.R:
+            if "ManualLevelUp" not in self.debugOps:
+                print("ManualLevelUp")
+                self.debugOps.append("ManualLevelUp")
 
 
     def cursorHandler(self):
@@ -119,6 +123,8 @@ class MainMenu():
         #    self.game.player.party.debug_setToLevel(self.game.directory,self.debug_lv,self.debug_cls)
         if typ == "ManualEncounters":
             self.game.debug_manualEncounters = True
+        if typ == "ManualLevelUp":
+            self.game.debug_manualLevelUp = True
     
     def executeDebug(self):
         print(self.debugOps)
@@ -126,3 +132,5 @@ class MainMenu():
             self.game.player.party.debug_setToLevel(self.game.directory,self.debug_lv,self.debug_cls,self.game.player.getNewCharID())
         if "ManualEncounters" not in self.debugOps:
             self.game.debug_manualEncounters = bool(getDebug(2))
+        if "ManualLevelUp" not in self.debugOps:
+            self.game.debug_manualLevelUp = bool(getDebug(3))

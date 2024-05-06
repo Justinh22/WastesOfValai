@@ -564,6 +564,8 @@ class PauseMenu():
                     self.mapZoomSize -= 5
                 elif self.mapZoomSize > 4:
                     self.mapZoomSize -= 2
+            if self.state == "partyMember":
+                characterpopups.LevelUp(self.game, self.game.player.party.members[self.targetPartyMember])
         if self.game.R:
             if self.state == "map":
                 print("ZOOMIN")

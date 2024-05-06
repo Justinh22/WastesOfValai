@@ -71,9 +71,10 @@ class Overworld():
         if self.game.A:
             print("A")
         if self.game.B:
-            encounter = []
-            encounter = self.game.directory.buildEncounter(self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[self.game.player.currentPos[0]][self.game.player.currentPos[1]]),self.getBiome(self.game.player.currentPos[0],self.game.player.currentPos[1]))
-            self.combat.initialize(encounter)
+            if self.game.debug_manualEncounters:
+                encounter = []
+                encounter = self.game.directory.buildEncounter(self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[self.game.player.currentPos[0]][self.game.player.currentPos[1]]),self.getBiome(self.game.player.currentPos[0],self.game.player.currentPos[1]))
+                self.combat.initialize(encounter)
         if self.game.X:
             print("X")
         if self.game.Y:
