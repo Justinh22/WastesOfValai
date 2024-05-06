@@ -97,7 +97,7 @@ class Biome(Enum):
     Dungeon = 3
 
 class Status(Enum):
-    Paralyzed = 0
+    Shocked = 0
     Burned = 1
     Freezing = 2
     NoStatus = 3

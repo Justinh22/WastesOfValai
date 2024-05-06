@@ -174,7 +174,8 @@ class PauseMenu():
                     write(self.game, 15, 60, 245, buffText)
                 elif tgt.type == SpellType.Heal:
                     write(self.game, 15, 60, 245, "Heals for " + str(self.game.player.party.members[self.targetPartyMember].amplify(tgt.potency[6])) + " HP.")
-                if self.state == "itemSummary" and self.game.directory.getItem(self.game.player.party.members[self.targetPartyMember].spells[self.targetElement]).type == SpellType.Heal: # Cast:
+                if self.state == "itemSummary" and (self.game.directory.getItem(self.game.player.party.members[self.targetPartyMember].spells[self.targetElement]).type == SpellType.Heal or \
+                                                    self.game.directory.getItem(self.game.player.party.members[self.targetPartyMember].spells[self.targetElement]).type == SpellType.Cleanse): # Cast:
                     write(self.game, 22, 540, 420, "Cast")
                     write(self.game, 22, 510 + (self.cursorPos*100), 417, "->")
             elif self.substate == "equipment":
@@ -535,9 +536,11 @@ class PauseMenu():
                     self.cursorPos -= 1
             elif self.state == "itemSummary":
                 self.cursorPos -= 1
-                if self.substate == "equipment" or self.substate == "inventory" or (self.substate == "spellbook" and self.game.directory.getItem(self.game.player.party.members[self.targetPartyMember].spells[self.targetElement]).target == Target.All):
+                if self.substate == "equipment" or self.substate == "inventory":
                     if self.cursorPos < 0:
                         self.cursorPos = 1
+                elif self.substate == "spellbook":
+                    self.cursorPos = 0
         if self.game.RIGHT:
             if self.state == "map":
                 self.mapPos[1] += self.panMap()
@@ -585,6 +588,12 @@ class PauseMenu():
         write(self.game, 14, xPos+10, yPos+70, "XP " + str(character.xp) + "/" + str(character.nextLevel))
         write(self.game, 12, xPos+120, yPos+30, "ATK Spl: " + str(character.type.attackMagicLevel[character.level-1]))
         write(self.game, 12, xPos+120, yPos+50, "SPT Spl: " + str(character.type.supportMagicLevel[character.level-1]))
+        if character.status == Status.Burned:
+            writeColor(self.game, 12, xPos+120, yPos+70, "Burned", self.game.red)
+        if character.status == Status.Shocked:
+            writeColor(self.game, 12, xPos+120, yPos+70, "Shocked", self.game.yellow)
+        if character.status == Status.Freezing:
+            writeColor(self.game, 12, xPos+120, yPos+70, "Freezing", self.game.lightblue)
         write(self.game, 14, xPos+218, yPos+10, "ATK " + str(character.getAttack()))
         write(self.game, 14, xPos+283, yPos+10, "DEF " + str(character.getDefense()))
         write(self.game, 14, xPos+218, yPos+28, "ACC " + str(character.getAccuracy()))

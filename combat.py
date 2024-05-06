@@ -152,7 +152,7 @@ class Combat():
             elif self.state == "targetSelect":
                 self.state = "mainWindow"
                 self.showElementalEffectivenessColorsTo = None
-                if self.game.player.party.members[self.combatOrder[self.currentTurn][1]].status == Status.Paralyzed:
+                if self.game.player.party.members[self.combatOrder[self.currentTurn][1]].status == Status.Shocked:
                     self.actionVal = -2
                 if self.game.player.party.members[self.combatOrder[self.currentTurn][1]].status == Status.Freezing and random.randint(0,2)==0:
                     self.actionVal = -3
@@ -192,7 +192,7 @@ class Combat():
                     else:
                         self.state = "mainWindow"
                         self.showElementalEffectivenessColorsTo = None
-                        if self.game.player.party.members[self.combatOrder[self.currentTurn][1]].status == Status.Paralyzed or (self.game.player.party.members[self.combatOrder[self.currentTurn][1]].status == Status.Freezing and random.randint(0,2)==0):
+                        if self.game.player.party.members[self.combatOrder[self.currentTurn][1]].status == Status.Shocked or (self.game.player.party.members[self.combatOrder[self.currentTurn][1]].status == Status.Freezing and random.randint(0,2)==0):
                             self.actionVal = -1
                         self.writeAction(self.combatOrder[self.currentTurn],0,self.actionVal)
                         print(f'Action writing for {self.combatOrder[self.currentTurn]}, length {len(self.actions)}')
@@ -219,7 +219,7 @@ class Combat():
                         self.enterTargetSelect()
                     else:
                         self.state = "mainWindow"
-                        if self.game.player.party.members[self.combatOrder[self.currentTurn][1]].status == Status.Paralyzed:
+                        if self.game.player.party.members[self.combatOrder[self.currentTurn][1]].status == Status.Shocked:
                             self.actionVal = -2
                         if self.game.player.party.members[self.combatOrder[self.currentTurn][1]].status == Status.Freezing and random.randint(0,2)==0:
                             self.actionVal = -3
@@ -508,9 +508,9 @@ class Combat():
                         combatStr = self.game.player.party.members[self.actions[self.exTurn-1].source[1]].name + " attacks " + self.encounter[self.actions[self.exTurn-1].target].name + " for " + str(self.dmg) + " damage! Critical hit!"
             elif self.actions[self.exTurn-1].action == -2:
                 if self.actions[self.exTurn-1].source[0] == "Encounter":
-                    combatStr = self.encounter[self.actions[self.exTurn-1].source[1]].name + " is paralyzed, and cannot move!"
+                    combatStr = self.encounter[self.actions[self.exTurn-1].source[1]].name + " is shocked, and cannot move!"
                 else:
-                    combatStr = self.game.player.party.members[self.actions[self.exTurn-1].source[1]].name + " is paralyzed, and cannot move!"
+                    combatStr = self.game.player.party.members[self.actions[self.exTurn-1].source[1]].name + " is shocked, and cannot move!"
             elif self.actions[self.exTurn-1].action == -3:
                 if self.actions[self.exTurn-1].source[0] == "Encounter":
                     combatStr = self.encounter[self.actions[self.exTurn-1].source[1]].name + " is freezing, and cannot move!"
@@ -616,7 +616,7 @@ class Combat():
             pygame.draw.rect(self.game.screen,self.game.white,outlineRect,1)
             write(self.game, 20, 180+maxEncWidth, 30+offset, str(self.encounter[i].hp)+"/"+str(self.encounter[i].hpMax))
             if self.encounter[i].status != Status.NoStatus:
-                if self.encounter[i].status == Status.Paralyzed:
+                if self.encounter[i].status == Status.Shocked:
                     write(self.game, 20, 280+maxEncWidth, 30+offset, "<P"+str(self.encounter[i].statusCount)+">")
                 elif self.encounter[i].status == Status.Burned:
                     write(self.game, 20, 280+maxEncWidth, 30+offset, "<B>")
@@ -634,7 +634,7 @@ class Combat():
             pygame.draw.rect(self.game.screen,self.game.white,outlineRect,1)
             write(self.game, 20, self.right-maxPtyWidth-220, 170+offset, str(self.game.player.party.members[i].hp)+"/"+str(self.game.player.party.members[i].hpMax))
             if self.game.player.party.members[i].status != Status.NoStatus:
-                if self.game.player.party.members[i].status == Status.Paralyzed:
+                if self.game.player.party.members[i].status == Status.Shocked:
                     write(self.game, 20, self.right-maxPtyWidth-280, 170+offset, "<P>")
                 elif self.game.player.party.members[i].status == Status.Burned:
                     write(self.game, 20, self.right-maxPtyWidth-280, 170+offset, "<B>")
@@ -662,7 +662,7 @@ class Combat():
         for i in range(len(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].activeBuffs)):
             writeOrientation(self.game, 11, self.right, 330+(i*15), self.game.player.party.members[self.combatOrder[self.currentTurn][1]].activeBuffs[i][0]+" ("+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].activeBuffs[i][1])+")","R")
             iNext += 1
-        if self.game.player.party.members[self.combatOrder[self.currentTurn][1]].status == Status.Paralyzed:
+        if self.game.player.party.members[self.combatOrder[self.currentTurn][1]].status == Status.Shocked:
             writeOrientation(self.game, 11, self.right, 330+(iNext*15), self.game.player.party.members[self.combatOrder[self.currentTurn][1]].status.name+" ("+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].statusCount)+")","R")
         elif self.game.player.party.members[self.combatOrder[self.currentTurn][1]].status != Status.NoStatus:
             writeOrientation(self.game, 11, self.right, 330+(iNext*15), self.game.player.party.members[self.combatOrder[self.currentTurn][1]].status.name,"R")
@@ -706,7 +706,7 @@ class Combat():
             self.writeAction(source,0,-1)
             print(f'Action writing for {source}, length {len(self.actions)}')
             return
-        elif self.encounter[self.combatOrder[self.currentTurn][1]].status == Status.Paralyzed:
+        elif self.encounter[self.combatOrder[self.currentTurn][1]].status == Status.Shocked:
             self.writeAction(source,0,-2)
             print(f'Action writing for {source}, length {len(self.actions)}')
             return
@@ -830,7 +830,7 @@ class Combat():
                         if not self.prayActive:
                             if (spell.id > 326) or random.randint(0,1) == 1: # 50% Chance for 324, 325, 326
                                 if spell.element == Element.Lightning:
-                                    self.game.player.party.members[action.target].status = Status.Paralyzed
+                                    self.game.player.party.members[action.target].status = Status.Shocked
                                     self.game.player.party.members[action.target].statusCount = 3
                                 elif spell.element == Element.Fire:
                                     self.game.player.party.members[action.target].status = Status.Burned
@@ -857,7 +857,7 @@ class Combat():
                     elif spell.type == SpellType.Debuff:
                         if spell.id > 326 or random.randint(0,1) == 1: # 50% Chance for 324, 325, 326
                             if spell.element == Element.Lightning:
-                                self.encounter[action.target].status = Status.Paralyzed
+                                self.encounter[action.target].status = Status.Shocked
                                 self.encounter[action.target].statusCount = 3
                             elif spell.element == Element.Fire:
                                 self.encounter[action.target].status = Status.Burned
@@ -879,7 +879,7 @@ class Combat():
                             for member in self.game.player.party.members:
                                 if random.randint(0,1) == 1:
                                     if spell.element == Element.Lightning:
-                                        member.status = Status.Paralyzed
+                                        member.status = Status.Shocked
                                         member.statusCount = 3
                                     elif spell.element == Element.Fire:
                                         member.status = Status.Burned
@@ -902,7 +902,7 @@ class Combat():
                         for member in self.encounter:
                             if random.randint(0,1) == 1:
                                 if spell.element == Element.Lightning:
-                                    member.status = Status.Paralyzed
+                                    member.status = Status.Shocked
                                     member.statusCount = 3
                                 elif spell.element == Element.Fire:
                                     member.status = Status.Burned

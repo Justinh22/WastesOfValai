@@ -337,22 +337,22 @@ def initAtkSpellDirectory():
     attackSpellDirectory.append(Blizzard)
 
     #DEBUFFS
-    Paralyze = AttackMagic("Paralyze","Has a chance to inflict Paralysis on a target.",2,324,10,0,SpellType.Debuff,Element.Lightning,Target.Single)
-    attackSpellDirectory.append(Paralyze)
+    Shock = AttackMagic("Shock","Has a chance to inflict Shock on a target.",2,324,10,0,SpellType.Debuff,Element.Lightning,Target.Single)
+    attackSpellDirectory.append(Shock)
     Burn = AttackMagic("Burn","Has a chance to inflict Burned on a target.",2,325,10,0,SpellType.Debuff,Element.Fire,Target.Single)
     attackSpellDirectory.append(Burn)
     Freeze = AttackMagic("Freeze","Has a chance to inflict Freezing on a target.",2,326,10,0,SpellType.Debuff,Element.Ice,Target.Single)
     attackSpellDirectory.append(Freeze)
 
-    Paralyze_II = AttackMagic("Paralyze II","Inflicts Paralysis on a target.",3,327,16,0,SpellType.Debuff,Element.Lightning,Target.Single)
-    attackSpellDirectory.append(Paralyze_II)
+    Shock_II = AttackMagic("Shock II","Inflicts Shock on a target.",3,327,16,0,SpellType.Debuff,Element.Lightning,Target.Single)
+    attackSpellDirectory.append(Shock_II)
     Burn_II = AttackMagic("Burn II","Inflicts Burned on a target.",3,328,16,0,SpellType.Debuff,Element.Fire,Target.Single)
     attackSpellDirectory.append(Burn_II)
     Freeze_II = AttackMagic("Freeze II","Inflicts Freezing on a target.",3,329,16,0,SpellType.Debuff,Element.Ice,Target.Single)
     attackSpellDirectory.append(Freeze_II)
 
-    Paralyze_Wave = AttackMagic("Paralyze Wave","Has a chance to inflict Paralysis on all targets.",4,330,30,0,SpellType.Debuff,Element.Lightning,Target.All)
-    attackSpellDirectory.append(Paralyze_Wave)
+    Shock_Wave = AttackMagic("Shock Wave","Has a chance to inflict Shock on all targets.",4,330,30,0,SpellType.Debuff,Element.Lightning,Target.All)
+    attackSpellDirectory.append(Shock_Wave)
     Burn_Wave = AttackMagic("Burn Wave","Has a chance to inflict Burned on all targets.",4,331,30,0,SpellType.Debuff,Element.Fire,Target.All)
     attackSpellDirectory.append(Burn_Wave)
     Freeze_Wave = AttackMagic("Freeze Wave","Has a chance to inflict Freezing on all targets.",4,332,30,0,SpellType.Debuff,Element.Ice,Target.All)
