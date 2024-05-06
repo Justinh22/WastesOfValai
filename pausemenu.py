@@ -66,9 +66,8 @@ class PauseMenu():
             write(self.game, 40, 30, 40, "Paused")
             write(self.game, 20, 60, 90, "Resume")
             write(self.game, 20, 60, 115, "Party")
-            write(self.game, 20, 60, 140, "Inventory")
-            write(self.game, 20, 60, 165, "Map")
-            write(self.game, 20, 60, 190, "Quit")
+            write(self.game, 20, 60, 140, "Map")
+            write(self.game, 20, 60, 165, "Quit")
             if self.state == "main":
                 write(self.game, 20, 30, 87 + (self.cursorPos*25), "->")
             if self.state == "partySelect":
@@ -120,7 +119,7 @@ class PauseMenu():
                 write(self.game, 12, 514, 308, self.intToRating(self.game.player.party.members[self.targetPartyMember].type.rating[4]))
                 write(self.game, 12, 450, 325, "LUCK: ")
                 write(self.game, 12, 514, 323, self.intToRating(self.game.player.party.members[self.targetPartyMember].type.rating[5]))
-                wrapWrite(self.game, 12, self.game.player.party.members[self.targetPartyMember].type.description, 340, 260, 358)
+                wrapWrite(self.game, 12, self.game.player.party.members[self.targetPartyMember].type.description, 338, 260, 358)
 
 
         if self.state == "partyMember":
@@ -175,7 +174,8 @@ class PauseMenu():
                     write(self.game, 15, 60, 245, buffText)
                 elif tgt.type == SpellType.Heal:
                     write(self.game, 15, 60, 245, "Heals for " + str(self.game.player.party.members[self.targetPartyMember].amplify(tgt.potency[6])) + " HP.")
-                if self.state == "itemSummary" and self.game.directory.getItem(self.game.player.party.members[self.targetPartyMember].spells[self.targetElement]).type == SpellType.Heal: # Cast:
+                if self.state == "itemSummary" and (self.game.directory.getItem(self.game.player.party.members[self.targetPartyMember].spells[self.targetElement]).type == SpellType.Heal or \
+                                                    self.game.directory.getItem(self.game.player.party.members[self.targetPartyMember].spells[self.targetElement]).type == SpellType.Cleanse): # Cast:
                     write(self.game, 22, 540, 420, "Cast")
                     write(self.game, 22, 510 + (self.cursorPos*100), 417, "->")
             elif self.substate == "equipment":
@@ -185,8 +185,10 @@ class PauseMenu():
                 self.itemName = self.game.directory.getItemName(tgt.id,True)
                 write(self.game, 20, 60, 220, self.itemName)
                 if itemType == Type.Weapon:
+                    writeOrientation(self.game, 20, self.right-40, 220, "Level "+str(tgt.rarity)+" "+tgt.type.name, "R")
                     statText = "ATK " + str(tgt.attack) + " | ACC " + str(tgt.accuracy) + " | CRT " + str(tgt.critrate) + " | AMP " + str(tgt.amplifier)
                 elif itemType == Type.Armor:
+                    writeOrientation(self.game, 20, self.right-40, 220, "Level "+str(tgt.rarity)+" "+tgt.type.name+" Armor", "R")
                     statText = "DEF " + str(tgt.defense) + " | DDG " + str(tgt.dodge) + " | MPG " + str(tgt.manaregen)
                 write(self.game, 15, 60, 245, statText)
                 if self.state == "itemSummary":
@@ -208,7 +210,8 @@ class PauseMenu():
                         statText += commaSeparator + "+" + str(tgt.mpGain) + " MP"
                     write(self.game, 15, 60, 245, statText)
                 if itemType == Type.AtkSpell or itemType == Type.SptSpell:
-                    writeOrientation(self.game, 20, self.right-40, 220, str(tgt.manacost) + " MP", "R")
+                    spelltype = "Attack" if itemType == Type.AtkSpell else "Support"
+                    writeOrientation(self.game, 20, self.right-40, 220, "Level "+str(tgt.rarity)+" "+spelltype+" Spell | "+str(tgt.manacost) + " MP", "R")
                     writeOrientation(self.game, 15, self.right-40, 245, "Use to learn spell.", "R")
                     if tgt.type == SpellType.Attack:
                         write(self.game, 15, 60, 245, "Deals " + str(self.game.player.party.members[self.targetPartyMember].amplify(tgt.attack)) + " damage.")
@@ -254,15 +257,48 @@ class PauseMenu():
             blockSize = self.mapZoomSize # Set the size of the grid block
             self.game.screen.fill((0,0,0))
             mapFont = pygame.font.Font('freesansbold.ttf',round(blockSize/1.5))
-            for x in range(30, self.right, blockSize):
-                for y in range(30, self.bottom, blockSize):
+            mapOutline = pygame.Rect(self.left+10,self.top+10,self.right-20,self.bottom-70)
+            pygame.draw.rect(self.game.screen,self.game.white,mapOutline,2)
+            write(self.game, 15, 40, 435,"L) Zoom Out")
+            write(self.game, 15, 200, 435,"R) Zoom In")
+            write(self.game, 15, 360, 435,"A) Toggle View")
+            write(self.game, 15, 520, 435,"B) Back")
+
+            mapLeft = 40
+            mapRight = self.right-20
+            mapTop = 30
+            mapBottom = self.bottom-60
+            width = mapRight - mapLeft
+            height = mapBottom - mapTop
+            blockNum = [0,0]
+            blockOffset = [0,0]
+
+            blockFit = width / blockSize
+            roundedBlockFit = math.floor(blockFit)
+            blockNum[0] = roundedBlockFit if roundedBlockFit % 2 == 1 else roundedBlockFit - 1
+            blockOffset[0] = math.ceil(((blockFit - blockNum[0]) / 2) * blockSize)
+
+            blockFit = height / blockSize
+            roundedBlockFit = math.floor(blockFit)
+            blockNum[1] = roundedBlockFit if roundedBlockFit % 2 == 1 else roundedBlockFit - 1
+            blockOffset[1] = math.ceil(((blockFit - blockNum[1]) / 2) * blockSize)
+
+            countX = 0
+            countY = 0
+            for x in range(mapLeft + blockOffset[0], mapRight - blockOffset[0], blockSize):
+                countY = 0
+                countX += 1
+                for y in range(mapTop + blockOffset[1], mapBottom - blockOffset[1], blockSize):
+                    countY += 1
                     color = self.game.white
-                    gridWidth = self.right / blockSize
-                    gridHeight = self.bottom / blockSize
+                    gridWidth = width / blockSize
+                    gridHeight = height / blockSize
                     rect = pygame.Rect(x, y, blockSize, blockSize)
                     pygame.draw.rect(self.game.screen, (0,0,0), rect)
-                    r = int(((y / blockSize)-(gridHeight/2))+self.mapPos[0])
-                    c = int(((x / blockSize)-(gridWidth/2))+self.mapPos[1])
+                    r = int(self.mapPos[0]-math.ceil(blockNum[1]/2) + countY)
+                    c = int(self.mapPos[1]-math.ceil(blockNum[0]/2) + countX)
+                    #r = int(((y / blockSize)-math.ceil(gridHeight/2))+self.mapPos[0])
+                    #c = int(((x / blockSize)-math.ceil(gridWidth/2))+self.mapPos[1])
                     mapChar = '_'
                     if r < 0 or r >= self.game.WorldMap.sizeR:
                         mapChar = ' '
@@ -282,17 +318,31 @@ class PauseMenu():
                                     color = self.game.tan
                             elif self.mapMode == "difficulty" and mapChar != ' ' and mapChar != 'X':
                                 diff = self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c])
-                                color = (255,225-(9*diff),225-(9*diff))
+                                power = math.ceil(self.game.player.party.getPower()/2)
+                                difficultyDiff = abs(diff-power)
+                                if difficultyDiff > 3:
+                                    difficultyDiff = 3
+                                if diff > power:
+                                    color = (255, 255 - (difficultyDiff * 85), 255 - (difficultyDiff * 85))
+                                elif diff < power:
+                                    color = (255 - (difficultyDiff * 85), 255, 255 - (difficultyDiff * 85))
+                                else:
+                                    color = self.game.white
                         else:
                             if self.game.WorldMap.map[r][c] == 'X':
                                 mapChar = self.game.WorldMap.map[r][c]
-                            else:
+                            elif r > MAP_HEIGHT or c > MAP_WIDTH:
                                 mapChar = ' '
+                            else:
+                                mapChar = 'x'
+                                color = self.game.darkgrey
+                    
+                    if r == (self.mapPos[0]) and c == (self.mapPos[1]):
+                        color = self.game.yellow
 
                     text = mapFont.render(mapChar,True,color)
                     textWidth, textHeight = mapFont.size(mapChar)
                     offset = (blockSize-textWidth)/2
-
                     self.game.screen.blit(text,(x+offset,y+(round(blockSize/6))))
 
 
@@ -311,11 +361,9 @@ class PauseMenu():
                     self.cursorPos = 0
                     return
                 if self.cursorPos == 2:
-                    print("INVENTORY")
-                if self.cursorPos == 3:
                     print("MAP")
                     self.state = "map"
-                if self.cursorPos == 4:
+                if self.cursorPos == 3:
                     print("QUIT")
                     self.paused = False
                     self.game.inGame = False
@@ -326,11 +374,11 @@ class PauseMenu():
                 self.targetPartyMember = self.cursorPos
                 self.cursorPos = 0
             elif self.state == "map":
-                print("ZOOMIN")
-                if self.mapZoomSize < 40 and self.mapZoomSize >= 10:
-                    self.mapZoomSize += 5
-                elif self.mapZoomSize < 40 and self.mapZoomSize >= 4:
-                    self.mapZoomSize += 2
+                if self.state == "map":
+                    if self.mapMode == "biome":
+                        self.mapMode = "difficulty"
+                    else:
+                        self.mapMode = "biome"
             elif self.state == "partyMember":
                 self.spellPageMod = 0
                 if self.cursorPos == 0:
@@ -400,11 +448,10 @@ class PauseMenu():
                 self.state = "main"
                 self.cursorPos = 1
             if self.state == "map":
-                print("ZOOMOUT")
-                if self.mapZoomSize > 10:
-                    self.mapZoomSize -= 5
-                elif self.mapZoomSize > 4:
-                    self.mapZoomSize -= 2
+                if self.state == "map":
+                    self.state = "main"
+                else:
+                    self.paused = False
             if self.state == "partyMember":
                 self.state = "partySelect"
                 self.cursorPos = self.targetPartyMember
@@ -423,27 +470,11 @@ class PauseMenu():
                 self.cursorPos = self.targetElement - (self.spellPageMod*2)
                 self.state = self.substate
                 self.substate = "none"
-        if self.game.X:
-            if self.state == "map":
-                self.state = "main"
-            else:
-                self.paused = False
-        if self.game.Y:
-            if self.state == "map":
-                if self.mapMode == "biome":
-                    self.mapMode = "difficulty"
-                else:
-                    self.mapMode = "biome"
-            elif self.state == "main":
-                newDgn = DungeonMap(self.game.directory,(0,0),DungeonType.Ruins)
-                newDgn.generate()
-            elif self.state == "partyMember":
-                characterpopups.LevelUp(self.game,self.game.player.party.members[self.targetPartyMember])
         if self.game.UP:
             if self.state == "main":
                 self.cursorPos -= 1
                 if self.cursorPos < 0:
-                    self.cursorPos = 4
+                    self.cursorPos = 3
             if self.state == "partySelect" or self.state == "targetSelect":
                 self.cursorPos -= 1
                 if self.cursorPos < 0:
@@ -468,7 +499,7 @@ class PauseMenu():
         if self.game.DOWN:
             if self.state == "main":
                 self.cursorPos += 1
-                if self.cursorPos > 4:
+                if self.cursorPos > 3:
                     self.cursorPos = 0
             elif self.state == "partySelect" or self.state == "targetSelect":
                 self.cursorPos += 1
@@ -494,6 +525,10 @@ class PauseMenu():
         if self.game.LEFT:
             if self.state == "map":
                 self.mapPos[1] -= self.panMap()
+            elif self.state == "partyMember":
+                self.targetPartyMember -= 1
+                if self.targetPartyMember < 0:
+                    self.targetPartyMember = len(self.game.player.party.members) - 1
             elif self.state == "equipment" or self.state == "inventory" or self.state == "spellbook":
                 if self.cursorPos % 2 == 0:
                     self.cursorPos += 1
@@ -501,12 +536,18 @@ class PauseMenu():
                     self.cursorPos -= 1
             elif self.state == "itemSummary":
                 self.cursorPos -= 1
-                if self.substate == "equipment" or self.substate == "inventory" or (self.substate == "spellbook" and self.game.directory.getItem(self.game.player.party.members[self.targetPartyMember].spells[self.targetElement]).target == Target.All):
+                if self.substate == "equipment" or self.substate == "inventory":
                     if self.cursorPos < 0:
                         self.cursorPos = 1
+                elif self.substate == "spellbook":
+                    self.cursorPos = 0
         if self.game.RIGHT:
             if self.state == "map":
                 self.mapPos[1] += self.panMap()
+            elif self.state == "partyMember":
+                self.targetPartyMember += 1
+                if self.targetPartyMember > len(self.game.player.party.members)-1:
+                    self.targetPartyMember = 0
             elif self.state == "equipment" or self.state == "inventory" or self.state == "spellbook":
                 if self.cursorPos % 2 == 0:
                     self.cursorPos += 1
@@ -521,7 +562,23 @@ class PauseMenu():
                     self.cursorPos = 0
         if self.game.START:
             self.paused = False
-    
+        if self.game.L:
+            if self.state == "map":
+                print("ZOOMOUT")
+                if self.mapZoomSize > 10:
+                    self.mapZoomSize -= 5
+                elif self.mapZoomSize > 4:
+                    self.mapZoomSize -= 2
+            if self.state == "partyMember":
+                characterpopups.LevelUp(self.game, self.game.player.party.members[self.targetPartyMember])
+        if self.game.R:
+            if self.state == "map":
+                print("ZOOMIN")
+                if self.mapZoomSize < 40 and self.mapZoomSize >= 10:
+                    self.mapZoomSize += 5
+                elif self.mapZoomSize < 40 and self.mapZoomSize >= 4:
+                    self.mapZoomSize += 2
+
     def drawMinStatBlock(self,xPos,yPos,character):
         outlineRect = pygame.Rect(xPos,yPos,350,90)
         pygame.draw.rect(self.game.screen,self.game.white,outlineRect,2)
@@ -529,8 +586,14 @@ class PauseMenu():
         write(self.game, 14, xPos+10, yPos+30, "HP " + str(character.hp) + "/" + str(character.hpMax))
         write(self.game, 14, xPos+10, yPos+50, "MP " + str(character.mp) + "/" + str(character.mpMax))
         write(self.game, 14, xPos+10, yPos+70, "XP " + str(character.xp) + "/" + str(character.nextLevel))
-        write(self.game, 12, xPos+120, yPos+30, "ATK Spl: " + str(character.type.attackMagicLevel[character.level]))
-        write(self.game, 12, xPos+120, yPos+50, "SPT Spl: " + str(character.type.supportMagicLevel[character.level]))
+        write(self.game, 12, xPos+120, yPos+30, "ATK Spl: " + str(character.type.attackMagicLevel[character.level-1]))
+        write(self.game, 12, xPos+120, yPos+50, "SPT Spl: " + str(character.type.supportMagicLevel[character.level-1]))
+        if character.status == Status.Burned:
+            writeColor(self.game, 12, xPos+120, yPos+70, "Burned", self.game.red)
+        if character.status == Status.Shocked:
+            writeColor(self.game, 12, xPos+120, yPos+70, "Shocked", self.game.yellow)
+        if character.status == Status.Freezing:
+            writeColor(self.game, 12, xPos+120, yPos+70, "Freezing", self.game.lightblue)
         write(self.game, 14, xPos+218, yPos+10, "ATK " + str(character.getAttack()))
         write(self.game, 14, xPos+283, yPos+10, "DEF " + str(character.getDefense()))
         write(self.game, 14, xPos+218, yPos+28, "ACC " + str(character.getAccuracy()))
@@ -542,15 +605,15 @@ class PauseMenu():
 
     def panMap(self):
         if self.mapZoomSize == 40:
-            return 2
+            return 1
         elif self.mapZoomSize == 35:
-            return 3
+            return 1
         elif self.mapZoomSize == 30:
-            return 4
+            return 1
         elif self.mapZoomSize == 25:
-            return 5
+            return 2
         elif self.mapZoomSize == 20:
-            return 6
+            return 4
         elif self.mapZoomSize == 15:
             return 7
         elif self.mapZoomSize == 10:

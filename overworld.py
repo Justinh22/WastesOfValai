@@ -71,29 +71,37 @@ class Overworld():
         if self.game.A:
             print("A")
         if self.game.B:
-            encounter = []
-            encounter = self.game.directory.buildEncounter(self.game.player.party.getPower(),self.getBiome(self.game.player.currentPos[0],self.game.player.currentPos[1]))
-            self.combat.initialize(encounter)
+            if self.game.debug_manualEncounters:
+                encounter = []
+                encounter = self.game.directory.buildEncounter(self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[self.game.player.currentPos[0]][self.game.player.currentPos[1]]),self.getBiome(self.game.player.currentPos[0],self.game.player.currentPos[1]))
+                self.combat.initialize(encounter)
         if self.game.X:
             print("X")
         if self.game.Y:
-            if len(self.game.player.party.members) < 4:
-                self.game.player.party.members.append(self.game.directory.buildCharacter(difficultyToLevel(self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[self.game.player.currentPos[0]][self.game.player.currentPos[1]])),self.game.player.party.members))
-            else:
-                CharacterSwap(self.game,self.game.directory.buildCharacter(difficultyToLevel(self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[self.game.player.currentPos[0]][self.game.player.currentPos[1]])),self.game.player.party.members))
+            print("Y")
         if self.game.START:
             self.pausemenu.pause(self.game.player.currentPos)
 
     def drawScreen(self):
         blockSize = 30 #Set the size of the grid block
         self.game.screen.fill((0,0,0))
+        power = math.ceil(self.game.player.party.getPower()/2)
         diffText = self.getBiome(self.game.player.currentPos[0],self.game.player.currentPos[1]).name + ": Difficulty " + str(self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[self.game.player.currentPos[0]][self.game.player.currentPos[1]]))
-        if self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[self.game.player.currentPos[0]][self.game.player.currentPos[1]]) > self.game.player.party.getPower()+1:
-            text = self.font.render(diffText,True,self.game.red)
-        elif self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[self.game.player.currentPos[0]][self.game.player.currentPos[1]]) < self.game.player.party.getPower()-10:
-            text = self.font.render(diffText,True,self.game.green)
+        areaDifficulty = self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[self.game.player.currentPos[0]][self.game.player.currentPos[1]])
+        difficultyDiff = abs(areaDifficulty-power)
+        if difficultyDiff > 3:
+            difficultyDiff = 3
+        
+        if areaDifficulty > power:
+            color = (255, 255 - (difficultyDiff * 85), 255 - (difficultyDiff * 85))
+            text = self.font.render(diffText,True,color)
+        elif areaDifficulty < power:
+            color = (255 - (difficultyDiff * 85), 255, 255 - (difficultyDiff * 85))
+            text = self.font.render(diffText,True,color)
         else:
             text = self.font.render(diffText,True,self.game.white)
+        
+        
         self.game.screen.blit(text,(30,self.height+10))
         #write(self.game, 20,30,self.height+10,diffText)
         write(self.game, 20,self.width-80,self.height+10,"ST) Pause")
@@ -124,6 +132,8 @@ class Overworld():
                         color = self.game.lightgreen
                     elif mapChar == '.': # Desert
                         color = self.game.tan
+                    elif self.game.roomDB.doesExist((r,c)) or self.game.dungeonDB.doesExist((r,c)):
+                        color = self.game.gray
                 text = self.font.render(mapChar,True,color)
                 textWidth, textHeight = self.font.size(mapChar)
                 offset = (blockSize-textWidth)/2
@@ -138,7 +148,7 @@ class Overworld():
         elif self.game.WorldMap.map[r][c] == '.':
             return Biome.Desert
         else:
-            return Biome.Dungeon
+            return Biome.Other
         
     def getDungeonType(self,r,c):
         if self.game.WorldMap.map[r][c] == 'W':
@@ -170,16 +180,26 @@ class Overworld():
                 self.currentDungeon = Crawler(self.game,self.game.dungeonDB.getDungeon((r,c),self.getDungeonType(r,c),self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c])))
                 self.currentDungeon.inDungeon = True
                 self.inDungeon = True
-        else: # Roll for random encounter
+        elif self.game.debug_manualEncounters is False: # Roll for random encounter
+            difficultyDiffBias = self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]) - math.ceil(self.game.player.party.getPower()/2)
+            if difficultyDiffBias > 3:
+                difficultyDiffBias = 3
+            elif difficultyDiffBias < -3:
+                difficultyDiffBias = -3
+            difficultyDiffBias *= 5
+
             if self.steps < 5:
-                odds = 50
-            elif self.steps < 10:
-                odds = 1
-            elif self.steps < 15:
                 odds = 10
+            elif self.steps < 10:
+                odds = 15
             else:
-                odds = 25
-            if random.randint(odds,50) == 49 and self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]) == self.lastDiff and not (self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]) < self.game.player.party.getPower()-10):
+                odds = 20
+
+            odds += difficultyDiffBias
+            rollA = random.randint(1,100)
+            rollB = random.randint(1,100)
+
+            if (rollA+rollB) <= (odds*2) and self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]) == self.lastDiff:
                 self.steps = 0
                 encounter = []
                 encounter = self.game.directory.buildEncounter(self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]),self.getBiome(self.game.player.currentPos[0],self.game.player.currentPos[1]))

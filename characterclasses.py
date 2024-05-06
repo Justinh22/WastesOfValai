@@ -6,18 +6,21 @@ from constants import *
 
 class Character():
     charNum = 100
-    def __init__(self,nm,lv,tp,p):
+    def __init__(self,nm,lv,tp,p,id):
         self.name = nm
         self.level = lv
-        Character.charNum += 1
-        self.id = Character.charNum
+        self.id = id
         self.xp = 0
         self.nextLevel = 200*lv
         self.type = tp # Class; Type is used to avoid defined 'class' name
         self.spells = []
+        self.talents = []
+        self.talents.append(522) # Give character the Guard talent
         for i in range(self.level):
             if self.type.knownSpells[i] >= 0:
                 self.spells.append(self.type.knownSpells[i])
+            if self.type.knownTalents[i] >= 0:
+                self.talents.append(self.type.knownTalents[i])
         self.eqpWpn = Weapon()
         self.eqpAmr = Armor()
         self.hpMax = 20
@@ -38,6 +41,7 @@ class Character():
             self.dodge += growth[5]
             self.luck += growth[6]
             self.speed += growth[7]
+        self.lastLearned = []
         self.hp = self.hpMax
         self.mp = self.mpMax
         self.accuracy = 70
@@ -69,6 +73,9 @@ class Character():
         return self.manaregen + self.eqpAmr.manaregen
     def getSpeed(self):
         return self.speed
+    def getCumulativeXP(self):
+        cumulativeXPTable = [200, 600, 1200, 2000, 3000, 4200, 5600, 7200, 9000, 11000]
+        return cumulativeXPTable[self.level-1] + self.xp
     def amplify(self,val):
         val = math.ceil(val + (val * (self.getAmplifier()/100)))
         return val
@@ -123,8 +130,6 @@ class Character():
     def gainXP(self,val):
         self.xp += val
         if self.xp > self.nextLevel and self.level < 10:
-            self.xp -= self.nextLevel
-            self.nextLevel += 200
             return True
         return False
     def addSpell(self,spellID):
@@ -133,8 +138,10 @@ class Character():
             return True 
         return False
     def levelUp(self):
-        self.level += 1
+        if self.level != 10:
+            self.level += 1
         self.xp = 0
+        self.nextLevel += 200
         growth = self.type.getGrowths()
         self.hpMax += growth[0]
         self.mpMax += growth[1]
@@ -144,8 +151,13 @@ class Character():
         self.dodge += growth[5]
         self.luck += growth[6]
         self.speed += growth[7]
+        self.lastLearned = []
         if self.type.knownSpells[self.level-1] != -11 and self.type.knownSpells[self.level-1] not in self.spells:
             self.spells.append(self.type.knownSpells[self.level-1])
+            self.lastLearned.append(self.type.knownSpells[self.level-1])
+        if self.type.knownTalents[self.level-1] != -11:
+            self.talents.append(self.type.knownTalents[self.level-1])
+            self.lastLearned.append(self.type.knownTalents[self.level-1])
         return growth
     def equip(self,item,dir):
         if dir.getItemType(item) == Type.Weapon:
@@ -191,10 +203,10 @@ class Character():
             return self.type.armorProficiency[4]==1
     def checkAtkSpellProficiency(self,id,dir):
         idRarity = dir.getItemRarity(id)
-        return self.type.attackMagicLevel[self.level] >= idRarity
+        return self.type.attackMagicLevel[self.level-1] >= idRarity
     def checkSptSpellProficiency(self,id,dir):
         idRarity = dir.getItemRarity(id)
-        return self.type.supportMagicLevel[self.level] >= idRarity
+        return self.type.supportMagicLevel[self.level-1] >= idRarity
     def fullRestore(self):
         self.hp = self.hpMax
         self.mp = self.mpMax
@@ -205,10 +217,12 @@ class Character():
         self.mp -= dir.getManaCost(self.spells[spellbookIndex])
         if self.mp < 0:
             self.mp = 0
+    def canPerform(self,talentID,dir):
+        return dir.getManaCost(talentID) <= self.mp
 
 
 class ClassType():
-    def __init__(self,nm,wpnPrf,amrPrf,atkLv,sptLv,hpg,mpg,atg,ctg,dfg,dgg,lkg,sdg,splsLrn,idIN):
+    def __init__(self,nm,wpnPrf,amrPrf,atkLv,sptLv,hpg,mpg,atg,ctg,dfg,dgg,lkg,sdg,splsLrn,tlntsLrn,idIN):
         self.name = nm
         self.weaponProficiency = wpnPrf # [AXE,SWORD,SPEAR,DAGGER,STAFF]
         self.armorProficiency = amrPrf # [LIGHT,MEDIUIM,HEAVY,ROBE,ARCANIST]
@@ -223,6 +237,7 @@ class ClassType():
         self.lckGrowth = lkg
         self.spdGrowth = sdg
         self.knownSpells = splsLrn
+        self.knownTalents = tlntsLrn
         self.id = idIN
         self.description = ""
         self.rating = []
@@ -279,15 +294,14 @@ class Party():
     def printContents(self):
         for member in self.members:
             print(member.name)
-    def initializeMembers(self,dir):
-        self.members.append(Character(dir.getCharacterName(self.members),1,dir.classDirectory[0],dir.getRandomPersonality()))
+    def initializeMembers(self,dir,id):
+        self.members.append(dir.buildCharacter(1,self.members,id,0))
         self.members[0].eqpWpn = dir.getWeapon(dir.getItemByRarity(Type.Weapon,1))
         self.members[0].eqpAmr = dir.getArmor(dir.getItemByRarity(Type.Armor,1))
-        #for i in range(0,random.randint(3,4)):
-        #    lvl = 2
-        #   self.members.append(Character(dir.getCharacterName(self.members),lvl,dir.classDirectory[random.randint(0,11)],random.randint(0,5))) #random.randint(0,11)
-        #    self.members[i].eqpWpn = dir.getWeapon(dir.getItemByRarities(Type.Weapon,lvl-1,lvl))
-        #    self.members[i].eqpAmr = dir.getArmor(dir.getItemByRarities(Type.Armor,lvl-1,lvl))
+    def debug_setToLevel(self,dir,lv,cls,id):
+        self.members = []
+        for i in range(0,4):
+            self.members.append(dir.buildCharacter(lv,self.members,id,cls))
     def debug_RandomInventory(self,dir):
         while len(self.inventory) < MAX_INVENTORY_SIZE:
             self.addItem(dir.getItemByRarities(Type.Potion,1,5))
@@ -321,6 +335,12 @@ class Party():
         for member in self.members:
             power += member.level
         return power
+    def getHighestLevel(self):
+        high = 0
+        for member in self.members:
+            if member.level > high:
+                high = member.level
+        return high
     def dropEquipment(self,index):
         self.equipment.pop(index)
     def dropItem(self,index):
@@ -328,9 +348,23 @@ class Party():
     def fullRestore(self):
         for member in self.members:
             member.fullRestore()
+    def awardXP(self,diff):
+        underdogFactor = 0
+        levelups = [0,0,0,0]
+        for member in self.members:
+            if member.getCumulativeXP() > underdogFactor:
+                underdogFactor = member.getCumulativeXP()
+        underdogMultiplier = 0
+        for i in range(len(self.members)): #member in self.members:
+            if self.members[i].hp > 0:
+                # R
+                underdogMultiplier = .5 * round(( (underdogFactor - self.members[i].getCumulativeXP()) / 50)/.5)
+                if self.members[i].gainXP((diff * 3) + (round(diff/2) * random.randint(2,4)) + round((diff*3)*underdogMultiplier)):
+                    levelups[i] = 1
+        return levelups
 
 class Creature():
-    def __init__(self,nm,lv,idIN,hpIN,at,ac,df,dg,sd,res,type,spells):
+    def __init__(self,nm,lv,idIN,hpIN,at,ac,df,dg,sd,elm,type,spells):
         self.name = nm
         self.level = lv
         self.id = idIN
@@ -341,7 +375,7 @@ class Creature():
         self.defense = df
         self.dodge = dg
         self.speed = sd
-        self.resistance = res
+        self.element = elm
         self.biomeType = type
         self.knownSpells = spells
         self.spellCooldown = 0
@@ -372,9 +406,22 @@ class Action():
     def __init__(self,src,tgt,act):
         self.source = src
         self.target = tgt
-        self.action = act # 0 = ATTACK, 1 = GUARD, ID = SPELL, ID = ART, ID = ITEM
+        self.action = act # 0 = ATTACK, 1 = GUARD, ID = SPELL, ID = TALENT, ID = ITEM
     def print(self):
         return str(self.source) + " -> " + str(self.target) + ": " + str(self.action)
+    
+class ActiveEffect():
+    def __init__(self,id_IN,source_IN,target_IN,duration_IN=1):
+        self.id = id_IN             # int ; id of corresponding talent/skill
+        self.source = source_IN     # duple (string, int) ; index of party member who activated effect
+        self.target = target_IN     # duple (string, int) ; index of corresponding party member/enemy who effect is targeted at
+        self.duration = duration_IN # int ; number of rounds the effect will be active
+    def tick(self):
+        self.duration -= 1
+        return self.checkExpiry()
+    def checkExpiry(self):
+        if self.duration <= 0:
+            return True
 
 class Buff():
     def __init__(self,nme,buf,dur,tgt):
@@ -384,7 +431,7 @@ class Buff():
         self.target = tgt
     def tick(self):
         self.duration -= 1
-        self.checkExpiry()
+        return self.checkExpiry()
     def checkExpiry(self):
         if self.duration <= 0:
             return True

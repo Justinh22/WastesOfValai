@@ -65,24 +65,25 @@ class Map():
         self.border()
 
         # Setting starting point...
+        potentialStartPoints = []
         for r in range(self.sizeR):
             for c in range(self.sizeC):
                 if self.difficultyMap[r][c] != 'A' and self.difficultyMap[r][c] != 'B':
                     continue
-                good = True
                 for coords in [(-1,0), (0,-1), (1,0), (0,1)]:
                     if self.map[r+coords[0]][c+coords[1]] == ' ' or (self.difficultyMap[r+coords[0]][c+coords[1]] != 'A' and self.difficultyMap[r+coords[0]][c+coords[1]] != 'B'):
-                        good = False
-                if good:
-                    self.startingPos = (r+coords[0], c+coords[1])
+                        continue
+                potentialStartPoints.append((r,c))
 
-        if not good:
+        if len(potentialStartPoints) is 0:
             self.startingPos = (round(self.sizeR/2),round(self.sizeC/2))
             while self.map[self.startingPos[0]][self.startingPos[1]] == ' ':
                 if self.startingPos[0] > round(self.sizeR/3):
                     self.startingPos = (self.startingPos[0]-1, self.startingPos[1])
                 else:
                     self.startingPos = (self.startingPos[0], self.startingPos[1]+1)
+        else:
+            self.startingPos = random.choice(potentialStartPoints)
 
         endSet = random.randint(1,8)
         if endSet == 1:
@@ -145,7 +146,7 @@ class Map():
 
         print("Generating landmarks...")
         self.placeLandmarks(LANDMARK_COUNT)
-        self.setFirstHaven()
+        #self.setFirstHaven()
 
         with open("generated_map.txt","w") as file:
             for row in self.map:
@@ -242,50 +243,82 @@ class Map():
 
 
     def placeLandmarks(self,num):
-        landmarks = math.ceil(num * (.9))
-        havens = math.ceil(num * (.1))
-        count = 0
-        while count < landmarks:
-            r = random.randint(1,self.sizeR-1)
-            c = random.randint(1,self.sizeC-1)
-            sel = random.randint(1,7)
-            if self.map[r][c] == '.':
-                if sel == 1:
-                    self.map[r][c] = 'W' # Well
-                elif sel == 2:
-                    self.map[r][c] = 'P' # Pyramid
-                elif sel == 3:
-                    self.map[r][c] = 'A' # Abandoned Camp
-                else:
-                    self.map[r][c] = 'S' # Shack
-            elif self.map[r][c] == ';':
-                if sel == 1:
-                    self.map[r][c] = 'B' # Bandit Camp
-                elif sel == 2:
-                    self.map[r][c] = 'C' # Cave
-                elif sel == 3:
-                    self.map[r][c] = 'A' # Abandoned Camp
-                else:
-                    self.map[r][c] = 'S' # Shack
-            elif self.map[r][c] == '#':
-                if sel == 1:
-                    self.map[r][c] = 'R' # Ruins
-                elif sel == 2:
-                    self.map[r][c] = 'T' # Treehouse
-                elif sel == 3:
-                    self.map[r][c] = 'A' # Abandoned Camp
-                else:
-                    self.map[r][c] = 'S' # Shack
+        rooms = math.ceil(num * (.5))
+        dungeons = math.ceil(num * (.2))
+        havens = math.ceil(num * (.3))
+        
+        roomList = self.pseudoRandomPlacement(rooms)
+        for room in roomList:
+            randomVal = random.randint(1,3)
+            if randomVal == 1:
+                self.map[room[0]][room[1]] = 'A' # Abandoned Camp
             else:
-                continue
-            count += 1
+                self.map[room[0]][room[1]] = 'S' # Shack
+
+        dungeonList = self.pseudoRandomPlacement(dungeons)
+        for dungeon in dungeonList:
+            randomVal = random.randint(1,2)
+            if self.map[dungeon[0]][dungeon[1]] == '.':
+                if randomVal == 1:
+                    self.map[dungeon[0]][dungeon[1]] = 'W' # Well
+                elif randomVal == 2:
+                    self.map[dungeon[0]][dungeon[1]] = 'P' # Pyramid
+            elif self.map[dungeon[0]][dungeon[1]] == ';':
+                if randomVal == 1:
+                    self.map[dungeon[0]][dungeon[1]] = 'B' # Bandit Camp
+                elif randomVal == 2:
+                    self.map[dungeon[0]][dungeon[1]] = 'C' # Cave
+            elif self.map[dungeon[0]][dungeon[1]] == '#':
+                if randomVal == 1:
+                    self.map[dungeon[0]][dungeon[1]] = 'R' # Ruins
+                elif randomVal == 2:
+                    self.map[dungeon[0]][dungeon[1]] = 'T' # Treehouse
+
+        havenList = self.pseudoRandomPlacement(havens)
+        for haven in havenList:
+            self.map[haven[0]][haven[1]] = 'H' # Haven
+
+
+    def pseudoRandomPlacement(self,num):
+        rows = cols = math.floor(math.sqrt(num))
+        quadrantSizeR = math.ceil(MAP_HEIGHT / math.ceil(math.sqrt(num)))
+        quadrantSizeC = math.ceil(MAP_WIDTH / math.ceil(math.sqrt(num)))
+        r = 0
+        c = 0
         count = 0
-        while count < havens:
-            r = random.randint(1,self.sizeR-1)
-            c = random.randint(1,self.sizeC-1)
-            if self.map[r][c] != ' ':
-                self.map[r][c] = 'H' # Haven
-                count += 1
+        coordsList = []
+        randomQuadOn = False
+        burnout = 500
+        while count < num or burnout <= 0:
+            upperBoundR = quadrantSizeR*(r+1)
+            if upperBoundR >= MAP_HEIGHT:
+                upperBoundR = MAP_HEIGHT-1
+            upperBoundC = quadrantSizeC*(c+1)
+            if upperBoundC >= MAP_WIDTH:
+                upperBoundC = MAP_WIDTH-1
+
+            targetR = random.randint(quadrantSizeR*r, upperBoundR)
+            targetC = random.randint(quadrantSizeC*c, upperBoundC)
+            if self.map[targetR][targetC] == ' ' or self.map[targetR][targetC] == 'X':
+                burnout -= 1
+                continue
+            coordsList.append((targetR,targetC))
+
+            if not randomQuadOn:
+                c += 1
+                if c >= cols:
+                    c = 0
+                    r += 1
+                    if r >= rows:
+                        randomQuadOn = True
+            else:
+                r = random.randint(0,rows-1)
+                c = random.randint(0,cols-1)
+            count += 1
+        
+        return coordsList
+
+
 
 
     def saveRevealed(self):

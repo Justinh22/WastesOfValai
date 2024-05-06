@@ -63,14 +63,19 @@ class RoomHandler():
                     self.game.save()
                     self.slept = True
                 if self.room.type == "haven" and self.room.features[self.cursorPos].name == "Wanderer":
+                    lvl = difficultyToLevel(self.room.difficulty)
+                    if difficultyToLevel(self.room.difficulty) > self.game.player.party.getHighestLevel():
+                        lvl = self.game.player.party.getHighestLevel()
                     if len(self.game.player.party.members) < 4:
-                        self.game.player.party.members.append(self.game.directory.buildCharacter(difficultyToLevel(self.room.difficulty),self.game.player.party.members))
+                        self.game.player.party.members.append(self.game.directory.buildCharacter(lvl,self.game.player.party.members,self.game.player.getNewCharID()))
                     else:
-                        CharacterSwap(self.game,self.game.directory.buildCharacter(difficultyToLevel(self.room.difficulty),self.game.player.party.members))
+                        CharacterSwap(self.game,self.game.directory.buildCharacter(difficultyToLevel(self.room.difficulty),self.game.player.party.members,self.game.player.getNewCharID()))
                     self.room.features[self.cursorPos].lootStatus = LootStatus.Taken
                     self.room.features.pop(self.cursorPos)
                     self.state = "lookList"
                     self.cursorPos = 0
+                    self.room.featureLen -= 1
+                    self.room.wanderer = False
             print("A")
         if self.game.B:
             if self.state == "main":
@@ -93,12 +98,12 @@ class RoomHandler():
             if self.state == "lookList":
                 self.cursorPos -= 1
                 if self.cursorPos < 0:
-                    self.cursorPos = len(self.room.features)-1
+                    self.cursorPos = self.room.featureLen-1
             print("UP")
         if self.game.DOWN:
             if self.state == "lookList":
                 self.cursorPos += 1
-                if self.cursorPos > len(self.room.features)-1:
+                if self.cursorPos > self.room.featureLen-1:
                        self.cursorPos = 0
             print("DOWN")
         if self.game.LEFT:
@@ -112,7 +117,10 @@ class RoomHandler():
         pygame.draw.rect(self.game.screen,self.game.white,screenOutline,2)
         pygame.draw.line(self.game.screen,self.game.white,(self.left,300),(self.right+9,300),2)
         pygame.draw.line(self.game.screen,self.game.white,(self.right-self.left-180,300),(self.right-self.left-180,self.bottom+8),2)
-        wrapWrite(self.game, 20,self.room.description,self.right-self.left-15)
+        description = self.room.description
+        if self.room.wanderer:
+            description += " A figure sits by the hearth, warming by the flames."
+        wrapWrite(self.game, 20,description,self.right-self.left-15)
         if self.state == "main":
             write(self.game, 25,self.right-150,self.top+340,"A) Look")
             write(self.game, 25,self.right-150,self.top+390,"B) Leave")
@@ -122,7 +130,7 @@ class RoomHandler():
             write(self.game, 25,self.right-150,self.top+340,"A) Check")
             write(self.game, 25,self.right-150,self.top+390,"B) Back")
             write(self.game, 20,self.left+20,(self.top+310)+(25*self.cursorPos),">")
-            for i in range(len(self.room.features)):
+            for i in range(self.room.featureLen):
                 write(self.game, 20,self.left+35,(self.top+310)+(25*i),str(i+1)+") "+self.room.features[i].name)
         if self.state == "featureCheck":
             text = self.room.features[self.cursorPos].description

@@ -31,6 +31,9 @@ class DungeonDatabase():
             self.addDungeon(coords,newDungeon)
         return self.dungeons[coords]
     
+    def doesExist(self,coords):
+        return coords in self.dungeons.keys()
+    
     def printContents(self):
         for entry in self.dungeons:
             print(f'{entry}: {self.dungeons[entry].dungeonType.name}')
@@ -300,7 +303,7 @@ class DungeonMap():
 
     def getLootTypesFromDungeonType(self):
         # As of now, all dungeons are capable of containing the same loot
-        return [Type.Weapon, Type.Armor, Type.Potion, Type.AtkSpell, Type.SptSpell]
+        return [Type.Weapon, Type.Weapon, Type.Armor, Type.Armor, Type.Potion, Type.AtkSpell, Type.SptSpell]
 
 
 class DungeonRoom():

@@ -55,9 +55,10 @@ class SupportMagic(Item):
     def getHeal(self):
         return self.potency[6]
 
-class Skill(Item):
-    def __init__(self,nm,desc,rar,i,hpc,tgt,tp):
+class Talent(Item):
+    def __init__(self,nm,desc,rar,i,mpc,tp,tgt,tmg):
         Item.__init__(self,nm,desc,rar,i)
-        self.hpcost = hpc
+        self.mpcost = mpc
         self.type = tp # ATTACK, SUPPORT
         self.target = tgt # SELF, ALLY, SINGLE, ALL
+        self.timing = tmg # INSTANT, INTURN

@@ -1,6 +1,7 @@
 import sys
 import pygame
 from writing import *
+from debug import *
 import os
 import glob
 
@@ -10,6 +11,9 @@ class MainMenu():
         self.displayRunning = True
         self.cursor = pygame.Rect(0,0,20,20)
         self.cursorState = "Start"
+        self.debug_lv = 1
+        self.debug_cls = -1
+        self.debugOps = []
         self.startPos = (self.game.width/2,self.game.height/2+30)
         self.loadPos = (self.game.width/2,self.game.height/2+50)
         self.quitPos = (self.game.width/2,self.game.height/2+70)
@@ -46,6 +50,9 @@ class MainMenu():
                 self.blitScreen()
                 self.wipeDungeonDir()
                 self.game.WorldMap.generateMap()
+                for op in self.debugOps:
+                    self.setDebug(op)
+                self.executeDebug()
                 print("Start!")
                 print(self.game.WorldMap.startingPos)
             if self.cursorState == "Load":
@@ -61,6 +68,23 @@ class MainMenu():
                 print("Quit!")
                 pygame.quit()
                 sys.exit()
+        if self.game.X:
+            if "StartClass" not in self.debugOps:
+                print("StartClass")
+                self.debugOps.append("StartClass")
+        if self.game.Y:
+            if "StartLevel" not in self.debugOps:
+                print("StartLevel")
+                self.debugOps.append("StartLevel")
+        if self.game.L:
+            if "ManualEncounters" not in self.debugOps:
+                print("ManualEncounters")
+                self.debugOps.append("ManualEncounters")
+        if self.game.R:
+            if "ManualLevelUp" not in self.debugOps:
+                print("ManualLevelUp")
+                self.debugOps.append("ManualLevelUp")
+
 
     def cursorHandler(self):
         if self.game.DOWN:
@@ -89,3 +113,24 @@ class MainMenu():
         for filename in os.listdir(folder):
             if filename.endswith('.txt'):
                 os.remove(os.path.join(folder,filename))
+
+    def setDebug(self,typ):
+        if typ == "StartLevel":
+            self.debug_lv = getDebug(0)
+        if typ == "StartClass":
+            self.debug_cls = getDebug(1)
+        #if typ == "StartClass" or typ == "StartLevel":
+        #    self.game.player.party.debug_setToLevel(self.game.directory,self.debug_lv,self.debug_cls)
+        if typ == "ManualEncounters":
+            self.game.debug_manualEncounters = True
+        if typ == "ManualLevelUp":
+            self.game.debug_manualLevelUp = True
+    
+    def executeDebug(self):
+        print(self.debugOps)
+        if "StartLevel" in self.debugOps or "StartClass" in self.debugOps:
+            self.game.player.party.debug_setToLevel(self.game.directory,self.debug_lv,self.debug_cls,self.game.player.getNewCharID())
+        if "ManualEncounters" not in self.debugOps:
+            self.game.debug_manualEncounters = bool(getDebug(2))
+        if "ManualLevelUp" not in self.debugOps:
+            self.game.debug_manualLevelUp = bool(getDebug(3))

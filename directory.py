@@ -18,7 +18,8 @@ class Directory():
         self.potionDirectory = initPotionDirectory()        # 200 - 299
         self.atkSpellDirectory = initAtkSpellDirectory()    # 300 - 399
         self.sptSpellDirectory = initSptSpellDirectory()    # 400 - 499
-        self.customDirectory = []                           # 500 - 599
+        self.talentDirectory = initTalentDirectory()        # 500 - 599
+        self.customDirectory = []                           # 600 - 699
         self.classDirectory = initClassDirectory()          # 0 - 99
         self.creatureDirectory = initCreatureDirectory()    # 0 - 99
         self.nameDirectory = initNameDirectory()            # 0 - 99
@@ -35,6 +36,8 @@ class Directory():
             item = self.getAtkSpell(id)
         elif id < 500:
             item = self.getSptSpell(id)
+        elif id < 600:
+            item = self.getTalent(id)
         return item
 
     def getItemName(self,id,scroll=False):
@@ -53,6 +56,8 @@ class Directory():
             name = self.sptSpellDirectory[id-400].name
             if scroll:
                 name += " Scroll"
+        elif id < 600:
+            name = self.talentDirectory[id-500].name
         return name
 
     def getItemDesc(self,id):
@@ -67,6 +72,8 @@ class Directory():
             desc = self.atkSpellDirectory[id-300].description
         elif id < 500:
             desc = self.sptSpellDirectory[id-400].description
+        elif id < 600:
+            desc = self.talentDirectory[id-500].description
         return desc
 
     def getItemRarity(self,id):
@@ -81,6 +88,8 @@ class Directory():
             rarity = self.atkSpellDirectory[id-300].rarity
         elif id < 500:
             rarity = self.sptSpellDirectory[id-400].rarity
+        elif id < 600:
+            rarity = self.talentDirectory[id-500].rarity
         return rarity
     
     def getItemType(self,id):
@@ -97,6 +106,8 @@ class Directory():
             type = Type.AtkSpell
         elif id < 500:
             type = Type.SptSpell
+        elif id < 600:
+            type = Type.Talent
         return type
 
     def getSpellTarget(self,id):
@@ -105,12 +116,17 @@ class Directory():
         elif id < 500:
             target = self.sptSpellDirectory[id-400].target
         return target
+    
+    def getTalentTarget(self,id):
+        return self.talentDirectory[id-500].target
 
     def getManaCost(self,id):
         if id < 400:
             cost = self.atkSpellDirectory[id-300].manacost
         elif id < 500:
             cost = self.sptSpellDirectory[id-400].manacost
+        elif id < 600:
+            cost = self.talentDirectory[id-500].mpcost
         return cost
 
     def getWeapon(self,id):
@@ -127,6 +143,9 @@ class Directory():
 
     def getSptSpell(self,id):
         return self.copy(self.sptSpellDirectory[id-400])
+    
+    def getTalent(self,id):
+        return self.copy(self.talentDirectory[id-500])
 
     def getItemByRarity(self,type,rarity):
         print(f'Fetching {type} of rarity {rarity}...')
@@ -149,6 +168,10 @@ class Directory():
                     options.append(item.id)
         elif type == Type.SptSpell:
             for item in self.sptSpellDirectory:
+                if item.rarity == rarity:
+                    options.append(item.id)
+        elif type == Type.Talent:
+            for item in self.talentDirectory:
                 if item.rarity == rarity:
                     options.append(item.id)
         elif type == Type.Creature:
@@ -217,6 +240,11 @@ class Directory():
                         options.append(item.id)
         elif type == Type.SptSpell:
             for item in self.sptSpellDirectory:
+                for rarity in range(rarityA,rarityB+1):
+                    if item.rarity == rarity:
+                        options.append(item.id)
+        elif type == Type.Talent:
+            for item in self.talentDirectory:
                 for rarity in range(rarityA,rarityB+1):
                     if item.rarity == rarity:
                         options.append(item.id)
@@ -296,8 +324,10 @@ class Directory():
     def getRandomPersonality(self):
         return random.choice(list(Personality))
     
-    def buildCharacter(self,level,members):
-        newChar = Character(self.getCharacterName(members),level,self.getRandomClass(),self.getRandomPersonality())
+    def buildCharacter(self,level,members,id,cls=-1):
+        if cls == -1:
+            cls = random.randint(0,11)
+        newChar = Character(self.getCharacterName(members),level,self.classDirectory[cls],self.getRandomPersonality(),id)
         newChar.eqpWpn = self.getWeapon(self.getWeaponByRarity(weaponProfArrayToList(newChar.type.weaponProficiency),self.getLootRarityForCharacter(level,Type.Weapon)))
         newChar.eqpAmr = self.getArmor(self.getArmorByRarity(armorProfArrayToList(newChar.type.armorProficiency),self.getLootRarityForCharacter(level,Type.Armor)))
         return newChar
