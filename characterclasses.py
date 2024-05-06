@@ -40,6 +40,7 @@ class Character():
             self.dodge += growth[5]
             self.luck += growth[6]
             self.speed += growth[7]
+        self.lastLearned = []
         self.hp = self.hpMax
         self.mp = self.mpMax
         self.accuracy = 70
@@ -128,8 +129,6 @@ class Character():
     def gainXP(self,val):
         self.xp += val
         if self.xp > self.nextLevel and self.level < 10:
-            self.xp -= self.nextLevel
-            self.nextLevel += 200
             return True
         return False
     def addSpell(self,spellID):
@@ -138,8 +137,10 @@ class Character():
             return True 
         return False
     def levelUp(self):
-        self.level += 1
+        if self.level != 10:
+            self.level += 1
         self.xp = 0
+        self.nextLevel += 200
         growth = self.type.getGrowths()
         self.hpMax += growth[0]
         self.mpMax += growth[1]
@@ -149,8 +150,13 @@ class Character():
         self.dodge += growth[5]
         self.luck += growth[6]
         self.speed += growth[7]
+        self.lastLearned = []
         if self.type.knownSpells[self.level-1] != -11 and self.type.knownSpells[self.level-1] not in self.spells:
             self.spells.append(self.type.knownSpells[self.level-1])
+            self.lastLearned.append(self.type.knownSpells[self.level-1])
+        if self.type.knownTalents[self.level-1] != -11:
+            self.talents.append(self.type.knownTalents[self.level-1])
+            self.lastLearned.append(self.type.knownTalents[self.level-1])
         return growth
     def equip(self,item,dir):
         if dir.getItemType(item) == Type.Weapon:
