@@ -25,16 +25,22 @@ class RoomDatabase():
 
 class Room():
     def __init__(self,coords,difficulty,type="room",id=-1):
-        self.coords = coords            # (int, int) : Contains row and column coordinates of this room
-        self.id = id                    # int : Numeric id of this room
-        self.description = ""           # String : Contains written description of the room
-        self.difficulty = difficulty    # int : Difficulty of the biome this room is in
-        self.features = []              # List of Feature : Contains all Features in the room
+        self.coords = coords                        # (int, int) : Contains row and column coordinates of this room
+        self.id = id                                # int : Numeric id of this room
+        self.description = ""                       # String : Contains written description of the room
+        self.difficulty = difficulty                # int : Difficulty of the biome this room is in
+        self.features = []                          # List of Feature : Contains all Features in the room
         self.type = type
         if self.type == "room":
             self.implementRoomTemplate(self.id,difficulty)
         elif self.type == "haven":
             self.implementHaven(self.id,difficulty)
+        self.wanderer = True                        # bool : Shows whether or not a wanderer is in the room
+        self.featureLen = len(self.features)        # int : Actual length of features, accounting for wanderer
+        chance = random.randint(1,3)
+        if self.type == "haven" and random.randint(1,3) <= 2:
+            self.wanderer = False
+            self.featureLen -= 1
 
     def implementRoomTemplate(self,id,difficulty):
         if id == -1:
@@ -121,11 +127,8 @@ class RoomTemplateList():
 ############################################################################################################################################################################
 
     def initHavenTemplateList(self):
-        R0 = RoomTemplate(0,"You enter a cozy wooden shack. The roaring fire in the hearth warms your bones, and beds along the wall offer you a quiet place to rest.",[23,14])
+        R0 = RoomTemplate(0,"You enter a cozy wooden shack. The roaring fire in the hearth warms your bones, and beds along the wall offer you a quiet place to rest.",[23,14,24])
         self.havenTemplateList.append(R0)
-
-        R1 = RoomTemplate(1,"You enter a cozy wooden shack. The roaring fire in the hearth warms your bones, and beds along the wall offer you a quiet place to rest. A wanderer sits by the fire.",[23,14,24])
-        self.havenTemplateList.append(R1)
 
 featureList = FeatureList()
 templateList = RoomTemplateList()
