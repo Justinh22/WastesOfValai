@@ -357,7 +357,7 @@ class Party():
         return levelups
 
 class Creature():
-    def __init__(self,nm,lv,idIN,hpIN,at,ac,df,dg,sd,res,type,spells):
+    def __init__(self,nm,lv,idIN,hpIN,at,ac,df,dg,sd,elm,type,spells):
         self.name = nm
         self.level = lv
         self.id = idIN
@@ -368,7 +368,7 @@ class Creature():
         self.defense = df
         self.dodge = dg
         self.speed = sd
-        self.resistance = res
+        self.element = elm
         self.biomeType = type
         self.knownSpells = spells
         self.spellCooldown = 0

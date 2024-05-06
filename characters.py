@@ -51,9 +51,9 @@ def initCreatureDirectory():
     creatureDirectory = []
     #                          Name LV ID HP ATK ACC DEF DDG SPD RES BIOME
     #1
-    Slime = Creature("Slime",1,0,16,7,65,2,5,1,Element.Fire,Biome.Forest,[])
+    Slime = Creature("Slime",1,0,16,7,65,2,5,1,Element.Ice,Biome.Forest,[])
     creatureDirectory.append(Slime)
-    Goblin = Creature("Goblin",1,1,10,10,60,2,5,3,Element.Ice,Biome.Plains,[])
+    Goblin = Creature("Goblin",1,1,10,10,60,2,5,3,Element.Fire,Biome.Plains,[])
     creatureDirectory.append(Goblin)
     Bandit = Creature("Bandit",1,2,14,8,70,3,0,3,Element.Lightning,Biome.Desert,[])
     creatureDirectory.append(Bandit)
@@ -78,9 +78,9 @@ def initCreatureDirectory():
     Wight = Creature("Wight",5,11,42,16,85,7,5,11,Element.Ice,Biome.Dungeon,[326])
     creatureDirectory.append(Wight)
     #8
-    Water_Elemental = Creature("Water Elemental",8,12,64,27,85,10,25,18,Element.Fire,Biome.Forest,[314])
+    Water_Elemental = Creature("Water Elemental",8,12,64,27,85,10,25,18,Element.Ice,Biome.Forest,[314])
     creatureDirectory.append(Water_Elemental)
-    Air_Elemental = Creature("Air Elemental",8,13,60,25,95,8,35,19,Element.Ice,Biome.Plains,[312])
+    Air_Elemental = Creature("Air Elemental",8,13,60,25,95,8,35,19,Element.Lightning,Biome.Plains,[312])
     creatureDirectory.append(Air_Elemental)
     Earth_Elemental = Creature("Earth Elemental",8,14,75,29,70,13,5,12,Element.Lightning,Biome.Desert,[312])
     creatureDirectory.append(Earth_Elemental)
@@ -96,18 +96,18 @@ def initCreatureDirectory():
     Basilisk = Creature("Basilisk",10,19,93,35,85,18,0,21,Element.Ice,Biome.Dungeon,[327])
     creatureDirectory.append(Basilisk)
     #12
-    Chimera = Creature("Chimera",12,20,100,44,110,24,15,27,Element.Ice,Biome.Forest,[312])
+    Chimera = Creature("Chimera",12,20,100,44,110,24,15,27,Element.Fire,Biome.Forest,[312])
     creatureDirectory.append(Chimera)
     Demon = Creature("Demon",12,21,96,46,120,20,15,28,Element.Fire,Biome.Plains,[319,328])
     creatureDirectory.append(Demon)
     Dark_Sorcerer = Creature("Dark Sorcerer",12,22,88,50,110,16,30,25,Element.Lightning,Biome.Desert,[315,319,329])
     creatureDirectory.append(Dark_Sorcerer)
-    Vampire = Creature("Vampire",12,23,92,48,115,20,25,28,Element.Fire,Biome.Dungeon,[])
+    Vampire = Creature("Vampire",12,23,92,48,115,20,25,28,Element.Ice,Biome.Dungeon,[])
     creatureDirectory.append(Vampire)
     #15
-    Gorgon = Creature("Gorgon",15,24,129,53,120,28,10,26,Element.Ice,Biome.Forest,[327])
+    Gorgon = Creature("Gorgon",15,24,129,53,120,28,10,26,Element.Fire,Biome.Forest,[327])
     creatureDirectory.append(Gorgon)
-    Iron_Golem = Creature("Iron Golem",15,25,140,51,110,30,5,18,Element.Lightning,Biome.Plains,[])
+    Iron_Golem = Creature("Iron Golem",15,25,140,51,110,30,5,18,Element.Ice,Biome.Plains,[])
     creatureDirectory.append(Iron_Golem)
     Behemoth = Creature("Behemoth",15,26,125,55,120,30,15,20,Element.Ice,Biome.Desert,[])
     creatureDirectory.append(Behemoth)
@@ -123,9 +123,9 @@ def initCreatureDirectory():
     Valentium_Golem = Creature("Valentium Golem",18,31,210,64,120,35,0,18,Element.Fire,Biome.Dungeon,[])
     creatureDirectory.append(Valentium_Golem)
     #20
-    Blue_Dragon = Creature("Blue Dragon",20,32,250,75,150,30,35,45,Element.Fire,Biome.Forest,[323,332])
+    Blue_Dragon = Creature("Blue Dragon",20,32,250,75,150,30,35,45,Element.Ice,Biome.Forest,[323,332])
     creatureDirectory.append(Blue_Dragon)
-    Green_Dragon = Creature("Green Dragon",20,33,250,70,140,30,50,44,Element.Ice,Biome.Plains,[321,330])
+    Green_Dragon = Creature("Green Dragon",20,33,250,70,140,30,50,44,Element.Lightning,Biome.Plains,[321,330])
     creatureDirectory.append(Green_Dragon)
     Bronze_Dragon = Creature("Bronze Dragon",20,34,250,80,130,40,5,41,Element.Lightning,Biome.Desert,[321,330])
     creatureDirectory.append(Bronze_Dragon)
@@ -135,10 +135,54 @@ def initCreatureDirectory():
     return creatureDirectory
 
 def initNameDirectory():
-    names = ["Abrielle", "Adara", "Alissa", "Amara", "Amelia", "Anya", "Aurelia", "Brielle", "Balthus",
-             "Cara", "Cassius", "Cirius", "Corvo", "Darius", "Dagen", "Eira", "Elysia", "Finean", "Gareth",
-             "Guinevere", "Hesperos", "Ignacio", "Isolde", "Jace", "Kara", "Kyra", "Kyrielle", "Leila",
-             "Lilina", "Lucien", "Lucius", "Matthew", "Mathilda", "Natania", "Orion", "Orin", "Perseus", "Pyralia",
-             "Quincy", "Rialda", "Sebastian", "Sirian", "Terra", "Thalia", "Torin", "Ulysses", "Vanora",
-             "Xanthus", "Zeke", "Zorian"]
+    names = ["Abrielle",
+             "Adara",
+             "Alissa",
+             "Amara",
+             "Amelia",
+             "Anya",
+             "Aurelia",
+             "Brielle",
+             "Balthus",
+             "Cara",
+             "Cassius",
+             "Cirius",
+             "Corvo",
+             "Darius",
+             "Dagen",
+             "Eira",
+             "Elysia",
+             "Finean",
+             "Gareth",
+             "Guinevere",
+             "Hesperos",
+             "Ignacio",
+             "Isolde",
+             "Jace",
+             "Kara",
+             "Kyra",
+             "Kyrielle",
+             "Leila",
+             "Lilina",
+             "Lucien",
+             "Lucius",
+             "Matthew",
+             "Mathilda",
+             "Natania",
+             "Orion",
+             "Orin",
+             "Perseus",
+             "Pyralia",
+             "Quincy",
+             "Rialda",
+             "Sebastian",
+             "Sirian",
+             "Terra",
+             "Thalia",
+             "Torin",
+             "Ulysses",
+             "Vanora",
+             "Xanthus",
+             "Zeke",
+             "Zorian"]
     return names

@@ -326,7 +326,7 @@ class Directory():
     
     def buildCharacter(self,level,members,id,cls=-1):
         if cls == -1:
-            cls = random.randint(1,12)
+            cls = random.randint(0,11)
         newChar = Character(self.getCharacterName(members),level,self.classDirectory[cls],self.getRandomPersonality(),id)
         newChar.eqpWpn = self.getWeapon(self.getWeaponByRarity(weaponProfArrayToList(newChar.type.weaponProficiency),self.getLootRarityForCharacter(level,Type.Weapon)))
         newChar.eqpAmr = self.getArmor(self.getArmorByRarity(armorProfArrayToList(newChar.type.armorProficiency),self.getLootRarityForCharacter(level,Type.Armor)))

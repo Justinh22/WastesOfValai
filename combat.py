@@ -46,6 +46,7 @@ class Combat():
         self.buffs = []
         self.combatDialogue = ""
         self.defeat = False
+        self.showElementalEffectivenessColorsTo = None
 
     def initialize(self,encounter):
         self.currentTurn = 0
@@ -150,6 +151,7 @@ class Combat():
                     print("CANCEL")
             elif self.state == "targetSelect":
                 self.state = "mainWindow"
+                self.showElementalEffectivenessColorsTo = None
                 if self.game.player.party.members[self.combatOrder[self.currentTurn][1]].status == Status.Paralyzed:
                     self.actionVal = -2
                 if self.game.player.party.members[self.combatOrder[self.currentTurn][1]].status == Status.Freezing and random.randint(0,2)==0:
@@ -165,6 +167,7 @@ class Combat():
             elif self.state == "spellList":
                 if self.cursorPos+self.menuTop < len(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].spells):
                     self.spellID = self.menuTop + self.cursorPos
+                    self.showElementalEffectivenessColorsTo = self.game.directory.getItem(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID]).element
                     self.state = "spellSummary"
                     print("SPELLSUMMARY")
             elif self.state == "itemList":
@@ -188,6 +191,7 @@ class Combat():
                         self.enterTargetSelect()
                     else:
                         self.state = "mainWindow"
+                        self.showElementalEffectivenessColorsTo = None
                         if self.game.player.party.members[self.combatOrder[self.currentTurn][1]].status == Status.Paralyzed or (self.game.player.party.members[self.combatOrder[self.currentTurn][1]].status == Status.Freezing and random.randint(0,2)==0):
                             self.actionVal = -1
                         self.writeAction(self.combatOrder[self.currentTurn],0,self.actionVal)
@@ -251,6 +255,7 @@ class Combat():
                 print("BACK")
             elif self.state == "spellSummary":
                 self.state = "spellList"
+                self.showElementalEffectivenessColorsTo = None
                 print("BACK")
             elif self.state == "itemSummary":
                 self.state = "itemList"
@@ -597,7 +602,14 @@ class Combat():
         #Writing names and health bars
         for i in range(0,len(self.encounter)):
             offset = 30*i
-            textWidth, textHeight = write(self.game, 20, 30, 30+offset, self.encounter[i].name)
+            color = self.game.white
+            if self.showElementalEffectivenessColorsTo is not None:
+                effectiveness = self.checkElementalEffectiveness(self.showElementalEffectivenessColorsTo, self.encounter[i].element)
+                if effectiveness == "Vulnerability":
+                    color = self.game.green
+                elif effectiveness == "Resistance":
+                    color = self.game.red
+            textWidth, textHeight = writeColor(self.game, 20, 30, 30+offset, self.encounter[i].name,color)
             enemyRect = pygame.Rect(50+maxEncWidth,30+offset,(self.encounter[i].hp/self.encounter[i].hpMax)*100,20)
             outlineRect = pygame.Rect(50+maxEncWidth,30+offset,100,20)
             pygame.draw.rect(self.game.screen,self.game.red,enemyRect)
@@ -832,8 +844,13 @@ class Combat():
                     self.checkTalentEffectTiming(action,TalentTiming.Targeting)
                     if spell.type == SpellType.Attack:
                         self.dmg = self.game.player.party.members[action.source[1]].amplify(spell.attack)
-                        if spell.element == self.encounter[action.target].resistance:
-                            self.dmg = int(self.dmg/2)
+                        effectiveness = self.checkElementalEffectiveness(spell.element, self.encounter[action.target].element)
+                        if effectiveness == "Resistance":
+                            print("Resisted!")
+                            self.dmg = math.ceil(self.dmg/2)
+                        if effectiveness == "Vulnerability":
+                            print("Vulnerable!")
+                            self.dmg = math.ceil(self.dmg*1.5)
                         self.checkTalentEffectTiming(action,TalentTiming.Damage)
                         self.encounter[action.target].takeDamage(self.dmg)
                         self.game.player.party.members[action.source[1]].mp -= spell.manacost
@@ -1113,6 +1130,28 @@ class Combat():
             return "LCK"
         elif i == 6:
             return "HP"
+        
+    def checkElementalEffectiveness(self,source,target):
+        if source == target:
+            return "Neutral"
+        elif source == Element.Lightning:
+            if target == Element.Fire:
+                return "Vulnerability"
+            if target == Element.Ice:
+                return "Resistance"
+        elif source == Element.Fire:
+            if target == Element.Ice:
+                return "Vulnerability"
+            if target == Element.Lightning:
+                return "Resistance"
+        elif source == Element.Ice:
+            if target == Element.Lightning:
+                return "Vulnerability"
+            if target == Element.Fire:
+                return "Resistance"
+        print("ERROR: Elemental Effectiveness Not Found")
+        return "Neutral"
+        
         
     def checkTalentEffectTiming(self,action,timing):
         for effect in self.activeEffects:
