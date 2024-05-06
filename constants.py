@@ -94,7 +94,7 @@ class Biome(Enum):
     Forest = 0
     Plains = 1
     Desert = 2
-    Dungeon = 3
+    Other = 3
 
 class Status(Enum):
     Shocked = 0

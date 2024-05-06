@@ -148,7 +148,7 @@ class Overworld():
         elif self.game.WorldMap.map[r][c] == '.':
             return Biome.Desert
         else:
-            return Biome.Dungeon
+            return Biome.Other
         
     def getDungeonType(self,r,c):
         if self.game.WorldMap.map[r][c] == 'W':
