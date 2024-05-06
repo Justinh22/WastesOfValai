@@ -184,8 +184,10 @@ class PauseMenu():
                 self.itemName = self.game.directory.getItemName(tgt.id,True)
                 write(self.game, 20, 60, 220, self.itemName)
                 if itemType == Type.Weapon:
+                    writeOrientation(self.game, 20, self.right-40, 220, "Level "+str(tgt.rarity)+" "+tgt.type.name, "R")
                     statText = "ATK " + str(tgt.attack) + " | ACC " + str(tgt.accuracy) + " | CRT " + str(tgt.critrate) + " | AMP " + str(tgt.amplifier)
                 elif itemType == Type.Armor:
+                    writeOrientation(self.game, 20, self.right-40, 220, "Level "+str(tgt.rarity)+" "+tgt.type.name+" Armor", "R")
                     statText = "DEF " + str(tgt.defense) + " | DDG " + str(tgt.dodge) + " | MPG " + str(tgt.manaregen)
                 write(self.game, 15, 60, 245, statText)
                 if self.state == "itemSummary":
