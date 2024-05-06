@@ -1210,8 +1210,9 @@ class Combat():
         elif talent.name == "Pray":
             self.prayActive = True
 
-        #elif talent.name == "Guard":
-
+        elif talent.name == "Guard":
+            if action.target == effect.source[1]:
+                self.dmg = round(self.dmg/2)
 
     def talentEncounterTargetEffectHandler(self,effect,action):
         talent = self.game.directory.getTalent(effect.id)

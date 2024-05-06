@@ -15,6 +15,7 @@ class Character():
         self.type = tp # Class; Type is used to avoid defined 'class' name
         self.spells = []
         self.talents = []
+        self.talents.append(522) # Give character the Guard talent
         for i in range(self.level):
             if self.type.knownSpells[i] >= 0:
                 self.spells.append(self.type.knownSpells[i])
@@ -294,7 +295,7 @@ class Party():
         for member in self.members:
             print(member.name)
     def initializeMembers(self,dir,id):
-        self.members.append(dir.buildCharacter(1,self.members,id,1))
+        self.members.append(dir.buildCharacter(1,self.members,id,0))
         self.members[0].eqpWpn = dir.getWeapon(dir.getItemByRarity(Type.Weapon,1))
         self.members[0].eqpAmr = dir.getArmor(dir.getItemByRarity(Type.Armor,1))
     def debug_setToLevel(self,dir,lv,cls,id):

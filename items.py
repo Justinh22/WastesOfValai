@@ -542,5 +542,7 @@ def initTalentDirectory():
     talentDirectory.append(Curse)
     DeathWish = Talent("Death Wish","Call upon a vile evil, causing enemy to lose 10% of hp each turn.",1,521,12,TalentType.Action,Target.Single,TalentTiming.InTurn)
     talentDirectory.append(DeathWish)
+    Guard = Talent("Guard","Take a defensive stance, halving damage taken this turn.",1,522,0,TalentType.PartyEffect,Target.Self,TalentTiming.Damage)
+    talentDirectory.append(Guard)
 
     return talentDirectory
