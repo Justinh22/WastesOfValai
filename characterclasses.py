@@ -23,6 +23,7 @@ class Character():
                 self.talents.append(self.type.knownTalents[i])
         self.eqpWpn = Weapon()
         self.eqpAmr = Armor()
+        self.eqpAcc = Accessory()
         self.hpMax = 20
         self.mpMax = 20
         self.attack = 3

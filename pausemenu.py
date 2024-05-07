@@ -97,9 +97,16 @@ class PauseMenu():
             write(self.game, 20, 60, 165, "Spells")
             self.drawMinStatBlock(250, 45, self.game.player.party.members[self.targetPartyMember])
             weapon = self.game.player.party.members[self.targetPartyMember].eqpWpn
-            write(self.game, 12, 250, 150, "Weapon: " + weapon.name + " (" + str(weapon.attack) + " ATK, " + str(weapon.accuracy) + " ACC, " + str(weapon.critrate) + " CRT, " + str(weapon.amplifier) + " AMP)")
+            write(self.game, 12, 250, 145, "Weapon: " + weapon.name + " (" + str(weapon.attack) + " ATK, " + str(weapon.accuracy) + " ACC, " + str(weapon.critrate) + " CRT, " + str(weapon.amplifier) + " AMP)")
             armor = self.game.player.party.members[self.targetPartyMember].eqpAmr
-            write(self.game, 12, 250, 170, "Armor: " + armor.name + " (" + str(armor.defense) + " DEF, " + str(armor.dodge) + " DDG, " + str(armor.manaregen) + " MPG)")
+            write(self.game, 12, 250, 162, "Armor: " + armor.name + " (" + str(armor.defense) + " DEF, " + str(armor.dodge) + " DDG, " + str(armor.manaregen) + " MPG)")
+            accessory = self.game.player.party.members[self.targetPartyMember].eqpAcc
+            if accessory.id == -1:
+                write(self.game, 12, 250, 179, "Accessory: None")
+            elif accessory.type == AccessoryType.Passive:
+                write(self.game, 12, 250, 179, "Accessory: " + accessory.name)
+            elif accessory.type == AccessoryType.Active:
+                write(self.game, 12, 250, 179, "Accessory: " + accessory.name + " (" + str(accessory.activationRate) + " LCK)")
 
             if self.state == "partyMember":
                 classOutline = pygame.Rect(250,200,350,240)

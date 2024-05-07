@@ -121,3 +121,10 @@ class Personality(Enum):
 class AccessoryType(Enum):
     Passive = 0
     Active = 1
+
+class AccessoryTiming(Enum):
+    InTurn = 0
+    Targeting = 1
+    Damage = 2
+    Support = 3
+    Universal = 4
