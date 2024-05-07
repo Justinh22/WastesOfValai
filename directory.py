@@ -19,7 +19,8 @@ class Directory():
         self.atkSpellDirectory = initAtkSpellDirectory()    # 300 - 399
         self.sptSpellDirectory = initSptSpellDirectory()    # 400 - 499
         self.talentDirectory = initTalentDirectory()        # 500 - 599
-        self.customDirectory = []                           # 600 - 699
+        self.accessoryDirectory = initAccessoryDirectory()  # 600 - 699
+        self.customDirectory = []                           # 700 - 799
         self.classDirectory = initClassDirectory()          # 0 - 99
         self.creatureDirectory = initCreatureDirectory()    # 0 - 99
         self.nameDirectory = initNameDirectory()            # 0 - 99

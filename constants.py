@@ -117,3 +117,7 @@ class Personality(Enum):
     Cowardly = 3
     Headstrong = 4
     Lazy = 5
+
+class AccessoryType(Enum):
+    Passive = 0
+    Active = 1
