@@ -48,7 +48,9 @@ class Character():
         self.accuracy = 70
         self.amplifier = 0
         self.manaregen = 0
+        self.hpregen = 0
         self.buffs = [0,0,0,0,0,0,0]
+        self.universalEffects = UniversalEffects()
         self.activeBuffs = []
         self.status = Status.NoStatus
         self.statusCount = 0
@@ -167,6 +169,9 @@ class Character():
         elif dir.getItemType(item) == Type.Armor:
             returner = self.eqpAmr.id
             self.eqpAmr = dir.getItem(item)
+        elif dir.getItemType(item) == Type.Accessory:
+            returner = self.eqpAcc.id
+            self.eqpAcc = dir.getItem(item)
         return returner
     def checkProficiency(self,id,dir):
         idType = dir.getItemType(id)
@@ -308,7 +313,7 @@ class Party():
             self.addItem(dir.getItemByRarities(Type.Potion,1,5))
     def add(self,item,dir):
         print(dir.getItemType(item))
-        if dir.getItemType(item) == Type.Weapon or dir.getItemType(item) == Type.Armor:
+        if dir.getItemType(item) == Type.Weapon or dir.getItemType(item) == Type.Armor or dir.getItemType(item) == Type.Accessory:
             return self.addEquipment(item)
         else:
             return self.addItem(item)
@@ -451,3 +456,18 @@ class Buff():
             return self.buff[5]
         elif type == "HP":
             return self.buff[6]
+        
+class UniversalEffects():
+    def __init__(self):
+        self.hp = 0
+        self.mp = 0
+        self.attack = 0
+        self.accuracy = 0
+        self.critrate = 0
+        self.defense = 0
+        self.dodge = 0
+        self.speed = 0
+        self.luck = 0
+        self.amplifier = 0
+        self.manaregen = 0
+        self.hpregen = 0
