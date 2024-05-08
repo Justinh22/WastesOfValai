@@ -4,7 +4,7 @@ from characterclasses import *
 
 def getCombatDialogue(character):
     dialogue = ""
-    hpPercentage = (character.hp / character.hpMax) * 100
+    hpPercentage = (character.getHP() / character.getMaxHP()) * 100
     choice = random.randint(0,2)
     if character.personality == Personality.Brave:
         if hpPercentage >= 90:

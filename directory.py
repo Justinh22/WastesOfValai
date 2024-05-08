@@ -62,7 +62,7 @@ class Directory():
         elif id < 600:
             name = self.talentDirectory[id-500].name
         elif id < 700:
-            name = self.accessoryDirectory[id-500].name
+            name = self.accessoryDirectory[id-600].name
         return name
 
     def getItemDesc(self,id):
@@ -80,7 +80,7 @@ class Directory():
         elif id < 600:
             desc = self.talentDirectory[id-500].description
         elif id < 700:
-            desc = self.accessoryDirectory[id-500].description
+            desc = self.accessoryDirectory[id-600].description
         return desc
 
     def getItemRarity(self,id):
@@ -98,7 +98,7 @@ class Directory():
         elif id < 600:
             rarity = self.talentDirectory[id-500].rarity
         elif id < 700:
-            rarity = self.accessoryDirectory[id-500].rarity
+            rarity = self.accessoryDirectory[id-600].rarity
         return rarity
     
     def getItemType(self,id):

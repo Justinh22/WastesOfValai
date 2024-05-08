@@ -55,27 +55,37 @@ class Character():
         self.status = Status.NoStatus
         self.statusCount = 0
         self.personality = p
+    def getHP(self):
+        return self.hp
+    def getMaxHP(self):
+        return self.hpMax + self.universalEffects.hp
+    def getMP(self):
+        return self.mp
+    def getMaxMP(self):
+        return self.mpMax + self.universalEffects.mp
     def getAttack(self):
-        return self.eqpWpn.attack + self.attack + self.getBuff("ATK")
+        return self.eqpWpn.attack + self.attack + self.universalEffects.attack + self.getBuff("ATK")
     def getDefense(self):
-        return self.eqpAmr.defense + self.defense + self.getBuff("DEF")
+        return self.eqpAmr.defense + self.defense + self.universalEffects.defense + self.getBuff("DEF")
     def getCritRate(self):
-        return self.eqpWpn.critrate + self.critrate + self.getBuff("CRT")
+        return self.eqpWpn.critrate + self.critrate + self.universalEffects.critrate + self.getBuff("CRT")
     def getAccuracy(self):
         if self.eqpWpn.accuracy > 0:
-            return self.eqpWpn.accuracy + self.getBuff("ACC")
+            return self.eqpWpn.accuracy + self.universalEffects.accuracy + self.getBuff("ACC")
         else:
-            return self.accuracy + self.getBuff("ACC")
+            return self.accuracy + self.universalEffects.accuracy + self.getBuff("ACC")
     def getDodge(self):
-        return self.eqpAmr.dodge + self.dodge + self.getBuff("DDG")
+        return self.eqpAmr.dodge + self.dodge + self.universalEffects.dodge + self.getBuff("DDG")
     def getLuck(self):
-        return self.luck + self.getBuff("LCK")
+        return self.luck + self.universalEffects.luck + self.getBuff("LCK")
     def getAmplifier(self):
-        return self.amplifier + self.eqpWpn.amplifier
+        return self.amplifier + self.universalEffects.amplifier + self.eqpWpn.amplifier
     def getManaRegen(self):
-        return self.manaregen + self.eqpAmr.manaregen
+        return self.manaregen + self.universalEffects.manaregen + self.eqpAmr.manaregen
+    def getHPRegen(self):
+        return self.hpregen + self.universalEffects.hpregen
     def getSpeed(self):
-        return self.speed
+        return self.speed + self.universalEffects.speed
     def getCumulativeXP(self):
         cumulativeXPTable = [200, 600, 1200, 2000, 3000, 4200, 5600, 7200, 9000, 11000]
         return cumulativeXPTable[self.level-1] + self.xp
@@ -163,6 +173,7 @@ class Character():
             self.lastLearned.append(self.type.knownTalents[self.level-1])
         return growth
     def equip(self,item,dir):
+        print(dir.getItemType(item))
         if dir.getItemType(item) == Type.Weapon:
             returner = self.eqpWpn.id
             self.eqpWpn = dir.getItem(item)
@@ -171,7 +182,14 @@ class Character():
             self.eqpAmr = dir.getItem(item)
         elif dir.getItemType(item) == Type.Accessory:
             returner = self.eqpAcc.id
+            if returner != -1:
+                print("Unequip")
+                if dir.getItem(returner).timing == AccessoryTiming.Universal:
+                    self.universalEffectHandler(self.eqpAcc,"Unequip")
             self.eqpAcc = dir.getItem(item)
+            if self.eqpAcc.timing == AccessoryTiming.Universal:
+                print("Equip")
+                self.universalEffectHandler(self.eqpAcc,"Equip")
         return returner
     def checkProficiency(self,id,dir):
         idType = dir.getItemType(id)
@@ -183,6 +201,8 @@ class Character():
             return self.checkAtkSpellProficiency(id,dir)
         elif idType == Type.SptSpell:
             return self.checkSptSpellProficiency(id,dir)
+        else:
+            return True
     def checkWeaponProficiency(self,id,dir):
         idType = (dir.getItem(id)).type
         if idType == WeaponType.Axe:
@@ -209,10 +229,10 @@ class Character():
             return self.type.armorProficiency[4]==1
     def checkAtkSpellProficiency(self,id,dir):
         idRarity = dir.getItemRarity(id)
-        return self.type.attackMagicLevel[self.level-1] >= idRarity
+        return self.type.attackMagicLevel[self.level-1] + self.universalEffects.atkMagicLevel >= idRarity
     def checkSptSpellProficiency(self,id,dir):
         idRarity = dir.getItemRarity(id)
-        return self.type.supportMagicLevel[self.level-1] >= idRarity
+        return self.type.supportMagicLevel[self.level-1] + self.universalEffects.sptMagicLevel >= idRarity
     def fullRestore(self):
         self.hp = self.hpMax
         self.mp = self.mpMax
@@ -225,6 +245,41 @@ class Character():
             self.mp = 0
     def canPerform(self,talentID,dir):
         return dir.getManaCost(talentID) <= self.mp
+    def universalEffectHandler(self,accessory,mode):
+        mod = 0
+        if mode == "Equip":
+            mod = 1
+        elif mode == "Unequip":
+            mod = -1
+
+        if accessory.id == 600: # Solar Band
+            self.universalEffects.hp += accessory.data * mod
+        elif accessory.id == 601: # Lunar Band
+            self.universalEffects.mp += accessory.data * mod
+        elif accessory.id == 602: # Mercury Band
+            self.universalEffects.accuracy += accessory.data * mod
+        elif accessory.id == 603: # Venus Band
+            self.universalEffects.critrate += accessory.data * mod
+        elif accessory.id == 604: # Earth Band
+            self.universalEffects.defense += accessory.data * mod
+        elif accessory.id == 605: # Mars Band
+            self.universalEffects.attack += accessory.data * mod
+        elif accessory.id == 606: # Jupiter Band
+            self.universalEffects.luck += accessory.data * mod
+        elif accessory.id == 607: # Saturn Band
+            self.universalEffects.manaregen += accessory.data * mod
+        elif accessory.id == 608: # Uranus Band
+            self.universalEffects.amplifier += accessory.data * mod
+        elif accessory.id == 609: # Neptune Band
+            self.universalEffects.dodge += accessory.data * mod
+        elif accessory.id == 610: # Pluto Band
+            self.universalEffects.speed += accessory.data * mod
+        elif accessory.id == 613: # Marble Heart
+            self.universalEffects.hpregen += accessory.data * mod
+        elif accessory.id == 624: # Mystic Journal
+            self.universalEffects.sptMagicLevel += accessory.data * mod
+        elif accessory.id == 625: # Wicked Journal
+            self.universalEffects.atkMagicLevel += accessory.data * mod
 
 
 class ClassType():
@@ -391,6 +446,14 @@ class Creature():
         return self.accuracy
     def getDodge(self):
         return self.dodge
+    def getHP(self):
+        return self.hp
+    def getMaxHP(self):
+        return self.hpMax
+    def getMP(self):
+        return self.mp
+    def getMaxMP(self):
+        return self.mpMax
     def takeDamage(self,val):
         print(f'{self.name} took {val} damage!')
         if val > self.hp:
@@ -471,3 +534,5 @@ class UniversalEffects():
         self.amplifier = 0
         self.manaregen = 0
         self.hpregen = 0
+        self.atkMagicLevel = 0
+        self.sptMagicLevel = 0

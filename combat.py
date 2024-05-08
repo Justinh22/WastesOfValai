@@ -51,7 +51,7 @@ class Combat():
     def initialize(self,encounter):
         self.currentTurn = 0
         for i in range(0,len(self.game.player.party.members)):
-            print(f'{self.game.player.party.members[i].name}, {self.game.player.party.members[i].type.name}, {self.game.player.party.members[i].level} (ID {self.game.player.party.members[i].id}) - WPN: {self.game.player.party.members[i].eqpWpn.name}, AMR: {self.game.player.party.members[i].eqpAmr.name}, HP: {self.game.player.party.members[i].hpMax}, MP: {self.game.player.party.members[i].mpMax}, ATK: {self.game.player.party.members[i].attack}, CRT: {self.game.player.party.members[i].critrate}, DEF: {self.game.player.party.members[i].defense}, DDG: {self.game.player.party.members[i].dodge}, LCK: {self.game.player.party.members[i].luck}, SPD: {self.game.player.party.members[i].speed}, PRS: {self.game.player.party.members[i].personality}, SPELLS: {self.game.player.party.members[i].spells}')
+            print(f'{self.game.player.party.members[i].name}, {self.game.player.party.members[i].type.name}, {self.game.player.party.members[i].level} (ID {self.game.player.party.members[i].id}) - WPN: {self.game.player.party.members[i].eqpWpn.name}, AMR: {self.game.player.party.members[i].eqpAmr.name}, HP: {self.game.player.party.members[i].getMaxHP()}, MP: {self.game.player.party.members[i].getMaxMP()}, ATK: {self.game.player.party.members[i].attack}, CRT: {self.game.player.party.members[i].critrate}, DEF: {self.game.player.party.members[i].defense}, DDG: {self.game.player.party.members[i].dodge}, LCK: {self.game.player.party.members[i].luck}, SPD: {self.game.player.party.members[i].speed}, PRS: {self.game.player.party.members[i].personality}, SPELLS: {self.game.player.party.members[i].spells}')
         self.encounter = encounter
         for i in range(0,len(self.encounter)):
             print(f'{self.encounter[i].name}, {self.encounter[i].level} - SPD: {self.encounter[i].speed}')
@@ -362,7 +362,7 @@ class Combat():
             write(self.game, 20, self.left+15, 325, "Use what?")
             write(self.game, 20, 28+(int(self.cursorPos%2)*165), 373+(int(self.cursorPos/2)*45), ">")
             write(self.game, 20,45,375,"SPELL")
-            write(self.game, 13,45,395,str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].mp)+"/"+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].mpMax))
+            write(self.game, 13,45,395,str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].mp)+"/"+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].getMaxMP()))
             write(self.game, 20,210,375,"ITEM")
             write(self.game, 20,45,420,"TALENT")
             write(self.game, 20,210,420,"CANCEL")
@@ -610,11 +610,11 @@ class Combat():
                 elif effectiveness == "Resistance":
                     color = self.game.red
             textWidth, textHeight = writeColor(self.game, 20, 30, 30+offset, self.encounter[i].name,color)
-            enemyRect = pygame.Rect(50+maxEncWidth,30+offset,(self.encounter[i].hp/self.encounter[i].hpMax)*100,20)
+            enemyRect = pygame.Rect(50+maxEncWidth,30+offset,(self.encounter[i].hp/self.encounter[i].getMaxHP())*100,20)
             outlineRect = pygame.Rect(50+maxEncWidth,30+offset,100,20)
             pygame.draw.rect(self.game.screen,self.game.red,enemyRect)
             pygame.draw.rect(self.game.screen,self.game.white,outlineRect,1)
-            write(self.game, 20, 180+maxEncWidth, 30+offset, str(self.encounter[i].hp)+"/"+str(self.encounter[i].hpMax))
+            write(self.game, 20, 180+maxEncWidth, 30+offset, str(self.encounter[i].hp)+"/"+str(self.encounter[i].getMaxHP()))
             if self.encounter[i].status != Status.NoStatus:
                 if self.encounter[i].status == Status.Shocked:
                     write(self.game, 20, 280+maxEncWidth, 30+offset, "<P"+str(self.encounter[i].statusCount)+">")
@@ -626,13 +626,13 @@ class Combat():
             offset = 30*i
             textWidth, textHeight = self.font.size(self.game.player.party.members[i].name)
             write(self.game, 20, self.right-textWidth-20, 170+offset, self.game.player.party.members[i].name)
-            partyHPRect = pygame.Rect(self.right-maxPtyWidth-140,170+offset,(self.game.player.party.members[i].hp/self.game.player.party.members[i].hpMax)*100,10)
-            partyMPRect = pygame.Rect(self.right-maxPtyWidth-140,180+offset,(self.game.player.party.members[i].mp/self.game.player.party.members[i].mpMax)*100,10)
+            partyHPRect = pygame.Rect(self.right-maxPtyWidth-140,170+offset,(self.game.player.party.members[i].hp/self.game.player.party.members[i].getMaxHP())*100,10)
+            partyMPRect = pygame.Rect(self.right-maxPtyWidth-140,180+offset,(self.game.player.party.members[i].mp/self.game.player.party.members[i].getMaxMP())*100,10)
             outlineRect = pygame.Rect(self.right-maxPtyWidth-140,170+offset,100,20)
             pygame.draw.rect(self.game.screen,self.game.red,partyHPRect)
             pygame.draw.rect(self.game.screen,self.game.blue,partyMPRect)
             pygame.draw.rect(self.game.screen,self.game.white,outlineRect,1)
-            write(self.game, 20, self.right-maxPtyWidth-220, 170+offset, str(self.game.player.party.members[i].hp)+"/"+str(self.game.player.party.members[i].hpMax))
+            write(self.game, 20, self.right-maxPtyWidth-220, 170+offset, str(self.game.player.party.members[i].hp)+"/"+str(self.game.player.party.members[i].getMaxHP()))
             if self.game.player.party.members[i].status != Status.NoStatus:
                 if self.game.player.party.members[i].status == Status.Shocked:
                     write(self.game, 20, self.right-maxPtyWidth-280, 170+offset, "<P>")
@@ -647,8 +647,8 @@ class Combat():
         pygame.draw.line(self.game.screen,self.game.white,(self.left,350),(350,350),2)
         pygame.draw.line(self.game.screen,self.game.white,(350,320),(350,self.bottom+7),2)
         write(self.game, 11, 360, 328, self.game.player.party.members[self.combatOrder[self.currentTurn][1]].name+", Level "+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].level)+" "+self.game.player.party.members[self.combatOrder[self.currentTurn][1]].type.name)
-        write(self.game, 11, 360, 345, "HP "+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].hp)+"/"+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].hpMax))
-        write(self.game, 11, 420, 345, "MP "+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].mp)+"/"+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].mpMax))
+        write(self.game, 11, 360, 345, "HP "+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].hp)+"/"+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].getMaxHP()))
+        write(self.game, 11, 420, 345, "MP "+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].mp)+"/"+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].getMaxMP()))
         write(self.game, 11, 360, 360, "ATK "+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].getAttack()))
         write(self.game, 11, 420, 360, "DEF "+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].getDefense()))
         write(self.game, 11, 360, 375, "ACC "+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].getAccuracy()))
@@ -919,15 +919,15 @@ class Combat():
                 if spell.type == SpellType.Heal:
                     if self.game.player.party.members[action.target].hp > 0:
                         self.game.player.party.members[action.target].hp += self.game.player.party.members[action.target].amplify(spell.getHeal())
-                    if self.game.player.party.members[action.target].hp > self.game.player.party.members[action.target].hpMax:
-                        self.game.player.party.members[action.target].hp = self.game.player.party.members[action.target].hpMax
+                    if self.game.player.party.members[action.target].hp > self.game.player.party.members[action.target].getMaxHP():
+                        self.game.player.party.members[action.target].hp = self.game.player.party.members[action.target].getMaxHP()
                 elif spell.type == SpellType.Buff:
                     self.applyBuff(spell,action.target,action.source)
                 elif spell.type == SpellType.Raise:
                     if self.game.player.party.members[action.target].hp <= 0:
                         self.game.player.party.members[action.target].hp += spell.getHeal()
-                    if self.game.player.party.members[action.target].hp > self.game.player.party.members[action.target].hpMax:
-                        self.game.player.party.members[action.target].hp = self.game.player.party.members[action.target].hpMax
+                    if self.game.player.party.members[action.target].hp > self.game.player.party.members[action.target].getMaxHP():
+                        self.game.player.party.members[action.target].hp = self.game.player.party.members[action.target].getMaxHP()
                 elif spell.type == SpellType.Cleanse:
                     if self.game.player.party.members[action.target].hp > 0:
                         self.game.player.party.members[action.target].resetStatus()
@@ -937,16 +937,16 @@ class Combat():
                     for member in self.game.player.party.members:
                         if member.hp > 0:
                             member.hp += self.game.player.party.members[action.target].amplify(spell.getHeal())
-                        if member.hp > member.hpMax:
-                            member.hp = member.hpMax
+                        if member.hp > member.getMaxHP():
+                            member.hp = member.getMaxHP()
                 elif spell.type == SpellType.Buff:
                     self.applyBuff(spell,-1,action.source)
                 elif spell.type == SpellType.Raise:
                     for member in self.game.player.party.members:
                         if member.hp <= 0:
                             member.hp += spell.getHeal()
-                        if member.hp > member.hpMax:
-                            member.hp = member.hpMax
+                        if member.hp > member.getMaxHP():
+                            member.hp = member.getMaxHP()
                 elif spell.type == SpellType.Cleanse:
                     for member in self.game.player.party.members:
                         if member.hp > 0:
@@ -1031,8 +1031,9 @@ class Combat():
     def upkeep(self):
         for member in self.game.player.party.members:
             member.mp += member.getManaRegen()
-            if member.mp > member.mpMax:
-                member.mp = member.mpMax
+            if member.mp > member.getMaxMP():
+                member.mp = member.getMaxMP()
+            member.gainHP(member.getHPRegen())
             member.tickStatus()
             if member.status == Status.Burned:
                 member.takeDamage(5)
@@ -1041,7 +1042,7 @@ class Combat():
             if member.status == Status.Burned:
                 member.takeDamage(5)
         for target in self.deathWish:
-            self.encounter[target].takeDamage(math.ceil(self.encounter[target].hpMax*.10))
+            self.encounter[target].takeDamage(math.ceil(self.encounter[target].getMaxHP()*.10))
 
     def skip(self):
         while self.combatOrder[self.currentTurn][0] == "Encounter" or not self.isAlive(self.combatOrder[self.currentTurn]):
@@ -1245,10 +1246,10 @@ class Combat():
             self.miss = False
 
         elif talent.name == "Patch Up":
-            self.game.player.party.members[source[1]].gainHP(math.ceil(self.game.player.party.members[source[1]].hpMax*.20))
+            self.game.player.party.members[source[1]].gainHP(math.ceil(self.game.player.party.members[source[1]].getMaxHP()*.20))
 
         elif talent.name == "Meditate":
-            self.game.player.party.members[source[1]].gainMP(math.ceil(self.game.player.party.members[source[1]].mpMax*.20))
+            self.game.player.party.members[source[1]].gainMP(math.ceil(self.game.player.party.members[source[1]].getMaxMP()*.20))
 
         elif talent.name == "Wild Swing":
             target = self.checkRecalculateTarget(source[0],target,"Encounter")

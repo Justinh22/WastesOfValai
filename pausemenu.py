@@ -590,8 +590,8 @@ class PauseMenu():
         outlineRect = pygame.Rect(xPos,yPos,350,90)
         pygame.draw.rect(self.game.screen,self.game.white,outlineRect,2)
         write(self.game, 14, xPos+10, yPos+10, character.name + ", Level " + str(character.level) + " " + character.type.name)
-        write(self.game, 14, xPos+10, yPos+30, "HP " + str(character.hp) + "/" + str(character.hpMax))
-        write(self.game, 14, xPos+10, yPos+50, "MP " + str(character.mp) + "/" + str(character.mpMax))
+        write(self.game, 14, xPos+10, yPos+30, "HP " + str(character.getHP()) + "/" + str(character.getMaxHP()))
+        write(self.game, 14, xPos+10, yPos+50, "MP " + str(character.getMP()) + "/" + str(character.getMaxMP()))
         write(self.game, 14, xPos+10, yPos+70, "XP " + str(character.xp) + "/" + str(character.nextLevel))
         write(self.game, 12, xPos+120, yPos+30, "ATK Spl: " + str(character.type.attackMagicLevel[character.level-1]))
         write(self.game, 12, xPos+120, yPos+50, "SPT Spl: " + str(character.type.supportMagicLevel[character.level-1]))
@@ -656,7 +656,12 @@ class PauseMenu():
     def actionHandler(self,tgtList,action,targetPartyMember,targetElement,spellTarget=-1):
         if action == "equip":
             if self.game.player.party.members[targetPartyMember].checkProficiency(self.game.player.party.equipment[targetElement],self.game.directory):
-                self.game.player.party.equipment[targetElement] = self.game.player.party.members[targetPartyMember].equip(self.game.player.party.equipment[targetElement],self.game.directory)
+                replace = self.game.player.party.members[targetPartyMember].equip(self.game.player.party.equipment[targetElement],self.game.directory)
+                if replace != -1:
+                    print(f'Replace! Setting pos {targetElement} to {replace}')
+                    self.game.player.party.equipment[targetElement] = replace
+                else:
+                    self.game.player.party.equipment.pop(targetElement)
         elif action == "drop":
             if tgtList == "inventory":
                 self.game.player.party.dropItem(targetElement)

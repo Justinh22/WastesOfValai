@@ -32,11 +32,11 @@ class Potion(Item):
         self.mpGain = mpg
 
 class Accessory(Item):
-    def __init__(self,nm="NULL",desc="NULL",rar=-1,i=-1,ar=0,typ=AccessoryType.Passive,tmg=AccessoryTiming.Universal):
+    def __init__(self,nm="NULL",desc="NULL",rar=-1,i=-1,ar=0,typ=AccessoryType.Passive,tmg=AccessoryTiming.Universal,data=0):
         Item.__init__(self,nm,desc,rar,i)
         self.activationRate = ar
         self.type = typ
-        self.data = 0
+        self.data = data
         self.timing = tmg
 
 class AttackMagic(Item):
