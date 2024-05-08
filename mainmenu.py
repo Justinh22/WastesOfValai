@@ -2,6 +2,7 @@ import sys
 import pygame
 from writing import *
 from debug import *
+from constants import *
 import os
 import glob
 
@@ -13,6 +14,7 @@ class MainMenu():
         self.cursorState = "Start"
         self.debug_lv = 1
         self.debug_cls = -1
+        self.debug_startingItems = []
         self.debugOps = []
         self.startPos = (self.game.width/2,self.game.height/2+30)
         self.loadPos = (self.game.width/2,self.game.height/2+50)
@@ -84,6 +86,10 @@ class MainMenu():
             if "ManualLevelUp" not in self.debugOps:
                 print("ManualLevelUp")
                 self.debugOps.append("ManualLevelUp")
+        if self.game.START:
+            if "StartingItems" not in self.debugOps:
+                print("StartingItems")
+                self.debugOps.append("StartingItems")
 
 
     def cursorHandler(self):
@@ -119,12 +125,12 @@ class MainMenu():
             self.debug_lv = getDebug(0)
         if typ == "StartClass":
             self.debug_cls = getDebug(1)
-        #if typ == "StartClass" or typ == "StartLevel":
-        #    self.game.player.party.debug_setToLevel(self.game.directory,self.debug_lv,self.debug_cls)
         if typ == "ManualEncounters":
             self.game.debug_manualEncounters = True
         if typ == "ManualLevelUp":
             self.game.debug_manualLevelUp = True
+        if typ == "StartingItems":
+            self.debug_startingItems = getDebug(4)
     
     def executeDebug(self):
         print(self.debugOps)
@@ -134,3 +140,9 @@ class MainMenu():
             self.game.debug_manualEncounters = bool(getDebug(2))
         if "ManualLevelUp" not in self.debugOps:
             self.game.debug_manualLevelUp = bool(getDebug(3))
+        if "StartingItems" in self.debugOps:
+            print("Starting items!")
+            for i, item in enumerate(self.debug_startingItems):
+                self.game.player.party.add(item,self.game.directory)
+                print(f'Inventory Size: {len(self.game.player.party.inventory)}')
+                print(f'Equipment Size: {len(self.game.player.party.equipment)}')
