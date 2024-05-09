@@ -362,12 +362,11 @@ class Party():
     def debug_setToLevel(self,dir,lv,cls,id):
         self.members = []
         for i in range(0,4):
-            self.members.append(dir.buildCharacter(lv,self.members,id,cls))
+            self.members.append(dir.buildCharacter(lv,self.members,id+i,cls))
     def debug_RandomInventory(self,dir):
         while len(self.inventory) < MAX_INVENTORY_SIZE:
             self.addItem(dir.getItemByRarities(Type.Potion,1,5))
     def add(self,item,dir):
-        print(dir.getItemType(item))
         if dir.getItemType(item) == Type.Weapon or dir.getItemType(item) == Type.Armor or dir.getItemType(item) == Type.Accessory:
             return self.addEquipment(item)
         else:

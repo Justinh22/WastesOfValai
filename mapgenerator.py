@@ -39,7 +39,6 @@ class Map():
 
 
     def generateMap(self,startingZone=2):
-        print(startingZone)
         row = []
         revealedRow = []
         for i in range(0,self.sizeR):
@@ -70,9 +69,8 @@ class Map():
         potentialStartPoints = []
         startingZoneChar = self.valToLetter(startingZone)
         belowStartingZoneChar = self.valToLetter(startingZone-1)
-        print(f'Looking for {startingZone} or {startingZone-1}')
-        for r in range(self.sizeR):
-            for c in range(self.sizeC):
+        for r in range(1,self.sizeR-1):
+            for c in range(1,self.sizeC-1):
                 if self.difficultyMap[r][c] != belowStartingZoneChar and self.difficultyMap[r][c] != startingZoneChar:
                     continue
                 for coords in [(-1,0), (0,-1), (1,0), (0,1)]:
