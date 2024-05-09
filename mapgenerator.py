@@ -13,6 +13,7 @@ class Map():
         self.sizeC = MAP_WIDTH
         self.startingPos = (0,0)
         self.finishPos = (0,0)
+        self.startingZone = 2
 
 
     def loadMap(self,startR=-1,startC=-1):
@@ -37,7 +38,8 @@ class Map():
             self.startingPos = (startR,startC)
 
 
-    def generateMap(self):
+    def generateMap(self,startingZone=2):
+        print(startingZone)
         row = []
         revealedRow = []
         for i in range(0,self.sizeR):
@@ -66,16 +68,19 @@ class Map():
 
         # Setting starting point...
         potentialStartPoints = []
+        startingZoneChar = self.valToLetter(startingZone)
+        belowStartingZoneChar = self.valToLetter(startingZone-1)
+        print(f'Looking for {startingZone} or {startingZone-1}')
         for r in range(self.sizeR):
             for c in range(self.sizeC):
-                if self.difficultyMap[r][c] != 'A' and self.difficultyMap[r][c] != 'B':
+                if self.difficultyMap[r][c] != belowStartingZoneChar and self.difficultyMap[r][c] != startingZoneChar:
                     continue
                 for coords in [(-1,0), (0,-1), (1,0), (0,1)]:
-                    if self.map[r+coords[0]][c+coords[1]] == ' ' or (self.difficultyMap[r+coords[0]][c+coords[1]] != 'A' and self.difficultyMap[r+coords[0]][c+coords[1]] != 'B'):
+                    if self.map[r+coords[0]][c+coords[1]] == ' ' or (self.difficultyMap[r+coords[0]][c+coords[1]] != belowStartingZoneChar and self.difficultyMap[r+coords[0]][c+coords[1]] != startingZoneChar):
                         continue
                 potentialStartPoints.append((r,c))
 
-        if len(potentialStartPoints) is 0:
+        if len(potentialStartPoints) == 0:
             self.startingPos = (round(self.sizeR/2),round(self.sizeC/2))
             while self.map[self.startingPos[0]][self.startingPos[1]] == ' ':
                 if self.startingPos[0] > round(self.sizeR/3):
