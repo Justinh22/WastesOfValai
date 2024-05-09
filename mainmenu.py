@@ -15,6 +15,7 @@ class MainMenu():
         self.debug_lv = 1
         self.debug_cls = -1
         self.debug_startingItems = []
+        self.startingZone = 2
         self.debugOps = []
         self.startPos = (self.game.width/2,self.game.height/2+30)
         self.loadPos = (self.game.width/2,self.game.height/2+50)
@@ -51,10 +52,10 @@ class MainMenu():
                 self.game.write(20, self.startPos[0], self.startPos[1], "Loading...")
                 self.blitScreen()
                 self.wipeDungeonDir()
-                self.game.WorldMap.generateMap()
                 for op in self.debugOps:
                     self.setDebug(op)
                 self.executeDebug()
+                self.game.WorldMap.generateMap(self.startingZone)
                 print("Start!")
                 print(self.game.WorldMap.startingPos)
             if self.cursorState == "Load":
@@ -90,6 +91,10 @@ class MainMenu():
             if "StartingItems" not in self.debugOps:
                 print("StartingItems")
                 self.debugOps.append("StartingItems")
+        if self.game.SELECT:
+            if "StartingZone" not in self.debugOps:
+                print("StartingZone")
+                self.debugOps.append("StartingZone")
 
 
     def cursorHandler(self):
@@ -131,18 +136,23 @@ class MainMenu():
             self.game.debug_manualLevelUp = True
         if typ == "StartingItems":
             self.debug_startingItems = getDebug(4)
+        if typ == "StartingZone":
+            self.debug_startingZone = getDebug(5)
     
     def executeDebug(self):
         print(self.debugOps)
         if "StartLevel" in self.debugOps or "StartClass" in self.debugOps:
             self.game.player.party.debug_setToLevel(self.game.directory,self.debug_lv,self.debug_cls,self.game.player.getNewCharID())
+            self.game.player.getNewCharID()
+            self.game.player.getNewCharID()
+            self.game.player.getNewCharID()
+            # Accounting for all characters made in ID...
         if "ManualEncounters" not in self.debugOps:
             self.game.debug_manualEncounters = bool(getDebug(2))
         if "ManualLevelUp" not in self.debugOps:
             self.game.debug_manualLevelUp = bool(getDebug(3))
         if "StartingItems" in self.debugOps:
-            print("Starting items!")
             for i, item in enumerate(self.debug_startingItems):
                 self.game.player.party.add(item,self.game.directory)
-                print(f'Inventory Size: {len(self.game.player.party.inventory)}')
-                print(f'Equipment Size: {len(self.game.player.party.equipment)}')
+        if "StartingZone" in self.debugOps:
+            self.startingZone = self.debug_startingZone
