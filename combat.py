@@ -544,9 +544,9 @@ class Combat():
                         combatStr = self.game.player.party.members[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + "!"
                 elif self.game.directory.getSptSpell(self.actions[self.exTurn-1].action).type == SpellType.Heal:
                     if self.game.directory.getSptSpell(self.actions[self.exTurn-1].action).target == Target.Single:
-                        combatStr = self.game.player.party.members[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + " on " + self.game.player.party.members[self.actions[self.exTurn-1].target].name + ", restoring " + str(self.game.player.party.members[self.actions[self.exTurn-1].source[1]].amplify(self.game.directory.getSptSpell(self.actions[self.exTurn-1].action).getHeal())) + " HP!"
+                        combatStr = self.game.player.party.members[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + " on " + self.game.player.party.members[self.actions[self.exTurn-1].target].name + ", restoring " + str(self.heal) + " HP!"
                     else:
-                        combatStr = self.game.player.party.members[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + ", restoring " + str(self.game.player.party.members[self.actions[self.exTurn-1].source[1]].amplify(self.game.directory.getSptSpell(self.actions[self.exTurn-1].action).getHeal())) + " HP!"
+                        combatStr = self.game.player.party.members[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + ", restoring " + str(self.heal) + " HP!"
                 elif self.game.directory.getSptSpell(self.actions[self.exTurn-1].action).type == SpellType.Raise:
                     if self.game.directory.getSptSpell(self.actions[self.exTurn-1].action).target == Target.Single:
                         combatStr = self.game.player.party.members[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + " on " + self.game.player.party.members[self.actions[self.exTurn-1].target].name + ", bringing them back to life!"
@@ -749,21 +749,40 @@ class Combat():
             else:
                 self.miss = True
         if action.source[0] == "Party":
-            action.target = self.checkRecalculateTarget(action.source[0],action.target,"Encounter")
-            self.checkEffectTiming(action,Timing.Targeting)
-            if self.game.player.party.members[action.source[1]].getAttack() - self.encounter[action.target].defense < 0:
-                self.dmg = 0
-            else:
-                self.dmg = self.game.player.party.members[action.source[1]].getAttack() - self.encounter[action.target].defense
-            if self.calculateHit(self.game.player.party.members[action.source[1]],self.encounter[action.target]):
+            if not self.hitAll:
+                action.target = self.checkRecalculateTarget(action.source[0],action.target,"Encounter")
+                self.checkEffectTiming(action,Timing.Targeting)
+                if self.game.player.party.members[action.source[1]].getAttack() - self.encounter[action.target].defense < 0:
+                    self.dmg = 0
+                else:
+                    self.dmg = self.game.player.party.members[action.source[1]].getAttack() - self.encounter[action.target].defense
+                if self.calculateHit(self.game.player.party.members[action.source[1]],self.encounter[action.target]):
+                    if self.calculateCrit(self.game.player.party.members[action.source[1]]):
+                        self.dmg *= 2
+                        self.crit = True
+                    self.miss = False
+                    self.checkEffectTiming(action,Timing.DamageTaken)
+                    self.encounter[action.target].takeDamage(self.dmg)
+                else:
+                    self.miss = True
+            elif self.hitAll:
                 if self.calculateCrit(self.game.player.party.members[action.source[1]]):
-                    self.dmg *= 2
                     self.crit = True
-                self.miss = False
-                self.checkEffectTiming(action,Timing.DamageTaken)
-                self.encounter[action.target].takeDamage(self.dmg)
-            else:
-                self.miss = True
+                for tgt in range(len(self.encounter)):
+                    target = tgt
+                    if self.isAlive(("Encounter",target)):
+                        if self.game.player.party.members[action.source[1]].getAttack() - self.encounter[target].defense < 0:
+                            self.dmg = 0
+                        else:
+                            self.dmg = self.game.player.party.members[action.source[1]].getAttack() - self.encounter[target].defense
+                        if self.calculateHit(self.game.player.party.members[action.source[1]],self.encounter[target]):
+                            if self.crit:
+                                self.dmg *= 2
+                            self.encounter[target].takeDamage(self.dmg)
+                            self.miss = False
+                        else:
+                            self.miss = True
+
         self.hitAll = False
 
     def checkRecalculateTarget(self,source,target,tgtGroup):
@@ -1496,18 +1515,84 @@ class Combat():
 
         # Guardian's Belt is included in the trigger for the Guard talent
 
+        elif accessory.name == "Broken Pocketwatch":
+            if action.source == effect.source[1] and action.action >= 400 and action.action < 500:
+                if self.game.directory.getItem(action.action).type == SpellType.Buff: # Buff
+                    self.buff.duration += 2
+
+        elif accessory.name == "Translucent Cowl":
+            if action.source[0] == "Encounter" and action.target == effect.source[1]:
+                if random.randint(0,2) >= 1:
+                    target = random.randint(0,len(self.game.player.party.members)-1)
+                    target = self.checkRecalculateTarget(action.source[0],target,"Party")
+
+        elif accessory.name == "Warlord's Emblem":
+            if action.source[0] == "Encounter" and random.randint(0,2) < 2:
+                print("Warlord's Emblem!")
+                action.target = effect.source[1]
+
+        elif accessory.name == "Light Mage's Diadem":
+            if action.source[0] == "Encounter" and action.target == effect.source[1]:
+                mpLoss = self.dmg
+                self.game.player.party.members[effect.source[1]].mp -= mpLoss
+                if self.game.player.party.members[effect.source[1]].mp < 0:
+                    self.dmg = -(self.game.player.party.members[effect.source[1]].mp)
+                    self.game.player.party.members[effect.source[1]].mp = 0
+
+        elif accessory.name == "Warped Sunglasses":
+            if action.source[1] == effect.source[1] and action.action >= 300 and action.action < 400:
+                target = random.randint(0,len(self.game.player.party.members)-1)
+                target = self.checkRecalculateTarget(action.source[0],target,"Party")
+                self.dmg = math.ceil(self.dmg*1.5)
+
+        elif accessory.name == "Warped Eyeglasses":
+            if action.source[1] == effect.source[1] and action.action >= 400 and action.action < 500:
+                target = random.randint(0,len(self.game.player.party.members)-1)
+                target = self.checkRecalculateTarget(action.source[0],target,"Party")
+                spell = self.game.directory.getItem(action.action)
+                if spell.type == SpellType.Buff: # Buff
+                    for element in self.buff.potency:
+                        element = math.ceil(element*1.5)
+                if spell.type == SpellType.Heal: # Heal
+                    self.heal = math.ceil(self.heal*1.5)
+
+        elif accessory.name == "Enchanted Seedling":
+            if action.target == effect.source[1] and action.action >= 400 and action.action < 500:
+                if self.game.directory.getItem(action.action).type == SpellType.Buff: # Buff
+                    for element in self.buff.potency:
+                        element = math.ceil(element*1.5)
+
+        elif accessory.name == "Cursed Bracer":
+            if action.source == effect.source[1] and action.action == 0:
+                if self.miss == False:
+                    self.game.player.party.members[effect.source[1]].eqpAcc.data += 1
+                    self.dmg += self.game.player.party.members[effect.source[1]].eqpAcc.data
+                if self.miss == True:
+                    self.game.player.party.members[effect.source[1]].takeDamage(self.game.player.party.members[effect.source[1]].eqpAcc.data)
+                    self.game.player.party.members[effect.source[1]].eqpAcc.data = 0
+
+        elif accessory.name == "Cursed Earring":
+            if action.source == effect.source[1] and action.action == 0:
+                if self.miss == True:
+                    self.game.player.party.members[effect.source[1]].eqpAcc.data += 1
+                if self.miss == False:
+                    self.dmg += self.game.player.party.members[effect.source[1]].eqpAcc.data
+                    if random.randint(1,2) == 2:
+                        self.game.player.party.members[effect.source[1]].takeDamage(math.ceil(self.game.player.party.members[effect.source[1]].getMaxHP()*.1))
+                
+
     def accessoryActiveEffectHandler(self, effect, action):
         accessory = self.game.directory.getAccessory(effect.id)
         luck = self.game.player.party.members[effect.source[1]].getLuck()
         chance = random.randint(1,100)
 
         if accessory.name == "Crimson Scarf":
-            if action.source == effect.source[1]:
+            if action.source[1] == effect.source[1]:
                 if accessory.activationRate + luck >= chance:
                     self.game.player.party.members[effect.source[1]].gainHP(math.ceil(self.dmg/2))
         
         elif accessory.name == "Cerulean Scarf":
-            if action.source == effect.source[1]:
+            if action.source[1] == effect.source[1]:
                 if accessory.activationRate + luck >= chance:
                     self.game.player.party.members[effect.source[1]].gainMP(math.ceil(self.dmg/2))
 
@@ -1550,4 +1635,22 @@ class Combat():
         elif accessory.name == "Plasma Ring":
             if action.source == effect.source and action.action >= 300 and action.action < 500:
                 if accessory.activationRate + luck >= chance:
-                    
+                    spell = self.game.directory.getItem(action.action)
+                    if spell.type == SpellType.Attack: # Attack
+                        self.dmg *= 2
+                    if spell.type == SpellType.Buff: # Buff
+                        for element in self.buff.potency:
+                            element *= 2
+                    if spell.type == SpellType.Heal: # Heal
+                        self.heal *= 2
+
+        elif accessory.name == "Ivory Mirror":
+            if action.source[0] == "Encounter" and action.target == effect.source[1]:
+                if accessory.activationRate + luck >= chance:
+                    self.encounter[action.source[1]].takeDamage(self.dmg)
+
+        elif accessory.name == "Miracle Bracelet":
+            if action.target == effect.source[1] and action.action == 0:
+                if self.game.player.party.members[effect.source[1]].getHP() - self.dmg <= 0:
+                    if accessory.activationRate + luck >= chance:
+                        self.dmg = self.game.player.party.members[effect.source[1]].getHP() - 1
