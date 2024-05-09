@@ -78,12 +78,6 @@ class TalentType(Enum):
     EncounterEffect = 1
     Action = 2
 
-class TalentTiming(Enum):
-    InTurn = 0
-    Targeting = 1
-    Damage = 2
-    Ordering = 3
-
 class Target(Enum):
     Single = 0
     All = 1
@@ -123,9 +117,12 @@ class AccessoryType(Enum):
     Passive = 0
     Active = 1
 
-class AccessoryTiming(Enum):
-    InTurn = 0
+class Timing(Enum):
+    PreAttack = 0
     Targeting = 1
-    Damage = 2
+    DamageTaken = 2
+    DamageDealt = 3
     Support = 3
     Universal = 4
+    InTurn = 5
+    Ordering = 6

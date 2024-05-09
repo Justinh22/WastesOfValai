@@ -184,10 +184,10 @@ class Character():
             returner = self.eqpAcc.id
             if returner != -1:
                 print("Unequip")
-                if dir.getItem(returner).timing == AccessoryTiming.Universal:
+                if dir.getItem(returner).timing == Timing.Universal:
                     self.universalEffectHandler(self.eqpAcc,"Unequip")
             self.eqpAcc = dir.getItem(item)
-            if self.eqpAcc.timing == AccessoryTiming.Universal:
+            if self.eqpAcc.timing == Timing.Universal:
                 print("Equip")
                 self.universalEffectHandler(self.eqpAcc,"Equip")
         return returner

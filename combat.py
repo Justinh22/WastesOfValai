@@ -31,11 +31,9 @@ class Combat():
         self.exTurn = 0
         self.timeStart = 0
         self.dmg = 0
+        self.heal = 0
         self.miss = False
         self.crit = False
-        self.prayActive = False
-        self.curse = []
-        self.deathWish = []
         self.waitFlag = False
         self.cursorPos = -1
         self.menuTop = -1
@@ -47,6 +45,11 @@ class Combat():
         self.combatDialogue = ""
         self.defeat = False
         self.showElementalEffectivenessColorsTo = None
+        
+        self.hitAll = False
+        self.immune = False
+        self.curse = []
+        self.deathWish = []
 
     def initialize(self,encounter):
         self.currentTurn = 0
@@ -554,7 +557,7 @@ class Combat():
                         combatStr = self.game.player.party.members[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + " on " + self.game.player.party.members[self.actions[self.exTurn-1].target].name + ", removing status effects!"
                     else:
                         combatStr = self.game.player.party.members[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + ", removing all status effects!"
-            elif self.actions[self.exTurn-1].action >= 500 and self.game.directory.getItem(self.actions[self.exTurn-1].action).timing==TalentTiming.InTurn:
+            elif self.actions[self.exTurn-1].action >= 500 and self.game.directory.getItem(self.actions[self.exTurn-1].action).timing==Timing.InTurn:
                 if self.game.directory.getTalentTarget(self.actions[self.exTurn-1].action) == Target.Single or self.game.directory.getTalentTarget(self.actions[self.exTurn-1].action) == Target.Ally:
                     combatStr = self.game.player.party.members[self.actions[self.exTurn-1].source[1]].name + " performs " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + " on " + self.encounter[self.actions[self.exTurn-1].target].name + "!"
                 else:
@@ -734,20 +737,20 @@ class Combat():
         self.crit = False
         if action.source[0] == "Encounter":
             action.target = self.checkRecalculateTarget(action.source[0],action.target,"Party")
-            self.checkTalentEffectTiming(action,TalentTiming.Targeting)
+            self.checkEffectTiming(action,Timing.Targeting)
             if self.encounter[action.source[1]].attack - self.game.player.party.members[action.target].getDefense() < 0:
                 self.dmg = 0
             else:
                 self.dmg = self.encounter[action.source[1]].attack - self.game.player.party.members[action.target].getDefense()
             if self.calculateHit(self.encounter[action.source[1]],self.game.player.party.members[action.target]):
                 self.miss = False
-                self.checkTalentEffectTiming(action,TalentTiming.Damage)
+                self.checkEffectTiming(action,Timing.DamageTaken)
                 self.game.player.party.members[action.target].takeDamage(self.dmg)
             else:
                 self.miss = True
         if action.source[0] == "Party":
             action.target = self.checkRecalculateTarget(action.source[0],action.target,"Encounter")
-            self.checkTalentEffectTiming(action,TalentTiming.Targeting)
+            self.checkEffectTiming(action,Timing.Targeting)
             if self.game.player.party.members[action.source[1]].getAttack() - self.encounter[action.target].defense < 0:
                 self.dmg = 0
             else:
@@ -757,10 +760,11 @@ class Combat():
                     self.dmg *= 2
                     self.crit = True
                 self.miss = False
-                self.checkTalentEffectTiming(action,TalentTiming.Damage)
+                self.checkEffectTiming(action,Timing.DamageTaken)
                 self.encounter[action.target].takeDamage(self.dmg)
             else:
                 self.miss = True
+        self.hitAll = False
 
     def checkRecalculateTarget(self,source,target,tgtGroup):
         if source == "Encounter":
@@ -786,7 +790,7 @@ class Combat():
     
     def writeAction(self,source,target,action):
         if action > 500 and action <= 599:
-            if self.game.directory.getItem(action).timing == TalentTiming.Ordering:
+            if self.game.directory.getItem(action).timing == Timing.Ordering:
                 effect = ActiveEffect(action, source, target)
                 self.activeEffects.append(effect)
         act = Action(source, target, action)
@@ -807,7 +811,7 @@ class Combat():
             self.scheduledManaCosts.append((source[1],talent.mpcost))
             self.activeEffects.append(effect)
             self.writeAction(source,target,-1)
-        elif talent.type == TalentType.Action and talent.timing == TalentTiming.Ordering:
+        elif talent.type == TalentType.Action and talent.timing == Timing.Ordering:
             effect = ActiveEffect(talent.id, source, target)
             self.activeEffects.append(effect)
             self.writeAction(source,target,-1)
@@ -820,14 +824,14 @@ class Combat():
             if spell.target == Target.Single:
                 if action.source[0] == "Encounter":
                     action.target = self.checkRecalculateTarget(action.source[0],action.target,"Party")
-                    self.checkTalentEffectTiming(action,TalentTiming.Targeting)
+                    self.checkEffectTiming(action,Timing.Targeting)
                     if spell.type == SpellType.Attack:
                         self.dmg = spell.attack
-                        self.checkTalentEffectTiming(action,TalentTiming.Damage)
+                        self.checkEffectTiming(action,Timing.DamageTaken)
                         self.game.player.party.members[action.target].takeDamage(self.dmg)
                     elif spell.type == SpellType.Debuff:
-                        self.checkTalentEffectTiming(action,TalentTiming.Damage)
-                        if not self.prayActive:
+                        self.checkEffectTiming(action,Timing.DamageTaken)
+                        if not self.immune:
                             if (spell.id > 326) or random.randint(0,1) == 1: # 50% Chance for 324, 325, 326
                                 if spell.element == Element.Lightning:
                                     self.game.player.party.members[action.target].status = Status.Shocked
@@ -838,10 +842,10 @@ class Combat():
                                 elif spell.element == Element.Ice:
                                     self.game.player.party.members[action.target].status = Status.Freezing
                                     self.game.player.party.members[action.target].statusCount = -1
-                        self.prayActive = False
+                        self.immune = False
                 else:
                     action.target = self.checkRecalculateTarget(action.source[0],action.target,"Encounter")
-                    self.checkTalentEffectTiming(action,TalentTiming.Targeting)
+                    self.checkEffectTiming(action,Timing.Targeting)
                     if spell.type == SpellType.Attack:
                         self.dmg = self.game.player.party.members[action.source[1]].amplify(spell.attack)
                         effectiveness = self.checkElementalEffectiveness(spell.element, self.encounter[action.target].element)
@@ -851,7 +855,7 @@ class Combat():
                         if effectiveness == "Vulnerability":
                             print("Vulnerable!")
                             self.dmg = math.ceil(self.dmg*1.5)
-                        self.checkTalentEffectTiming(action,TalentTiming.Damage)
+                        self.checkEffectTiming(action,Timing.DamageTaken)
                         self.encounter[action.target].takeDamage(self.dmg)
                         self.game.player.party.members[action.source[1]].mp -= spell.manacost
                     elif spell.type == SpellType.Debuff:
@@ -871,11 +875,11 @@ class Combat():
                     if spell.type == SpellType.Attack:
                         for member in self.game.player.party.members:
                             self.dmg = spell.attack
-                            self.checkTalentEffectTiming(action,TalentTiming.Damage)
+                            self.checkEffectTiming(action,Timing.DamageTaken)
                             member.takeDamage(self.dmg)
                     elif spell.type == SpellType.Debuff:
-                        self.checkTalentEffectTiming(action,TalentTiming.Damage)
-                        if not self.prayActive:
+                        self.checkEffectTiming(action,Timing.DamageTaken)
+                        if not self.immune:
                             for member in self.game.player.party.members:
                                 if random.randint(0,1) == 1:
                                     if spell.element == Element.Lightning:
@@ -887,14 +891,19 @@ class Combat():
                                     elif spell.element == Element.Ice:
                                         member.status = Status.Freezing
                                         member.statusCount = -1
-                        self.prayActive = False
+                        self.immune = False
                 else:
                     if spell.type == SpellType.Attack:
                         for member in self.encounter:
                             self.dmg = self.game.player.party.members[action.source[1]].amplify(spell.attack)
-                            if spell.element == member.resistance:
-                                self.dmg = int(self.dmg/2)
-                            self.checkTalentEffectTiming(action,TalentTiming.Damage)
+                            effectiveness = self.checkElementalEffectiveness(spell.element, self.encounter[action.target].element)
+                            if effectiveness == "Resistance":
+                                print("Resisted!")
+                                self.dmg = math.ceil(self.dmg/2)
+                            if effectiveness == "Vulnerability":
+                                print("Vulnerable!")
+                                self.dmg = math.ceil(self.dmg*1.5)
+                            self.checkEffectTiming(action,Timing.DamageTaken)
                             member.takeDamage(self.dmg)
                         self.dmg = self.game.player.party.members[action.source[1]].amplify(spell.attack)
                         self.game.player.party.members[action.source[1]].mp -= spell.manacost
@@ -915,14 +924,18 @@ class Combat():
             spell = self.game.directory.getSptSpell(action.action)
             if spell.target == Target.Single:
                 action.target = self.checkRecalculateTarget(action.source[0],action.target,"Party")
-                self.checkTalentEffectTiming(action,TalentTiming.Targeting)
+                self.checkEffectTiming(action,Timing.Targeting)
                 if spell.type == SpellType.Heal:
                     if self.game.player.party.members[action.target].hp > 0:
-                        self.game.player.party.members[action.target].hp += self.game.player.party.members[action.target].amplify(spell.getHeal())
-                    if self.game.player.party.members[action.target].hp > self.game.player.party.members[action.target].getMaxHP():
+                        self.heal = self.game.player.party.members[action.target].amplify(spell.getHeal())
+                        self.checkEffectTiming(action,Timing.DamageDealt)
+                        self.game.player.party.members[action.target].hp += self.heal
+                    if self.game.player.party.members[action.target].hp > self.heal:
                         self.game.player.party.members[action.target].hp = self.game.player.party.members[action.target].getMaxHP()
                 elif spell.type == SpellType.Buff:
-                    self.applyBuff(spell,action.target,action.source)
+                    self.buff = spell
+                    self.checkEffectTiming(action,Timing.DamageDealt)
+                    self.applyBuff(self.buff,action.target,action.source)
                 elif spell.type == SpellType.Raise:
                     if self.game.player.party.members[action.target].hp <= 0:
                         self.game.player.party.members[action.target].hp += spell.getHeal()
@@ -936,11 +949,15 @@ class Combat():
                 if spell.type == SpellType.Heal:
                     for member in self.game.player.party.members:
                         if member.hp > 0:
-                            member.hp += self.game.player.party.members[action.target].amplify(spell.getHeal())
+                            self.heal = self.game.player.party.members[action.target].amplify(spell.getHeal())
+                            self.checkEffectTiming(action,Timing.DamageDealt)
+                            member.hp += self.heal
                         if member.hp > member.getMaxHP():
                             member.hp = member.getMaxHP()
                 elif spell.type == SpellType.Buff:
-                    self.applyBuff(spell,-1,action.source)
+                    self.buff = spell
+                    self.checkEffectTiming(action,Timing.DamageDealt)
+                    self.applyBuff(self.buff,-1,action.source)
                 elif spell.type == SpellType.Raise:
                     for member in self.game.player.party.members:
                         if member.hp <= 0:
@@ -968,6 +985,7 @@ class Combat():
                         self.endExecute()
                         return
                 print(f'Action: {self.actions[self.exTurn].source} -> {self.actions[self.exTurn].target}, {self.actions[self.exTurn].action} (exTurn {self.exTurn})')
+                self.checkEffectTiming(self.actions[self.exTurn],Timing.PreAttack)
                 if self.actions[self.exTurn].action == 0:
                     self.attack(self.actions[self.exTurn])
                 elif self.actions[self.exTurn].action >= 200 and self.actions[self.exTurn].action < 300:
@@ -977,7 +995,7 @@ class Combat():
                 elif self.actions[self.exTurn].action >= 400 and self.actions[self.exTurn].action < 500:
                     self.cast(self.actions[self.exTurn])
                 elif self.actions[self.exTurn].action >= 500:
-                    if self.game.directory.getItem(self.actions[self.exTurn].action).timing == TalentTiming.InTurn:
+                    if self.game.directory.getItem(self.actions[self.exTurn].action).timing == Timing.InTurn:
                         self.talentActionHandler(self.actions[self.exTurn])
                 self.exTurn += 1
                 self.timeStart = pygame.time.get_ticks()
@@ -1002,7 +1020,7 @@ class Combat():
 
     def startExecute(self):
         print("Execute!")
-        self.checkTalentEffectTiming(None,TalentTiming.Ordering)
+        self.checkEffectTiming(None,Timing.Ordering)
         for cost in self.scheduledManaCosts:
             self.game.player.party.members[cost[0]].mp -= cost[1]
         self.scheduledManaCosts = []
@@ -1154,17 +1172,24 @@ class Combat():
         return "Neutral"
         
         
-    def checkTalentEffectTiming(self,action,timing):
+    def checkEffectTiming(self,action,timing):
         for effect in self.activeEffects:
-            talent = self.game.directory.getTalent(effect.id)
-            if timing == talent.timing:
-                if talent.type == TalentType.PartyEffect:
-                    self.talentPartyTargetEffectHandler(effect,action)
-                elif talent.type == TalentType.EncounterEffect:
-                    self.talentEncounterTargetEffectHandler(effect,action)
-                elif talent.timing == TalentTiming.Ordering:
-                    print("Ordering!")
-                    self.talentOrderingEffectHandler(effect)
+            if self.game.directory.getItemType(effect.id) is Type.Talent:
+                talent = self.game.directory.getTalent(effect.id)
+                if timing == talent.timing:
+                    if talent.type == TalentType.PartyEffect:
+                        self.talentPartyTargetEffectHandler(effect,action)
+                    elif talent.type == TalentType.EncounterEffect:
+                        self.talentEncounterTargetEffectHandler(effect,action)
+                    elif talent.timing == Timing.Ordering:
+                        self.talentOrderingEffectHandler(effect)
+            elif self.game.directory.getItemType(effect.id) is Type.Accessory:
+                accessory = self.game.directory.getAccessory(effect.id)
+                if timing == accessory.timing:
+                    if accessory.type == AccessoryType.Passive:
+                        self.accessoryPassiveEffectHandler(effect,action)
+                    if accessory.type == AccessoryType.Active:
+                        self.accessoryActiveEffectHandler(effect,action)
 
     def talentOrderingEffectHandler(self,effect):
         talent = self.game.directory.getTalent(effect.id)
@@ -1209,11 +1234,14 @@ class Combat():
                 print("Hidden!")
 
         elif talent.name == "Pray":
-            self.prayActive = True
+            self.immune = True
 
         elif talent.name == "Guard":
             if action.target == effect.source[1]:
-                self.dmg = round(self.dmg/2)
+                if self.game.player.party.members[action.source[1]].eqpAcc.name == "Guardian's Belt":
+                    self.dmg = round(self.dmg*.2)
+                else:
+                    self.dmg = round(self.dmg/2)
 
     def talentEncounterTargetEffectHandler(self,effect,action):
         talent = self.game.directory.getTalent(effect.id)
@@ -1448,5 +1476,78 @@ class Combat():
         elif talent.name == "Death Wish":
             self.deathWish.append(target)
 
-        
+    def accessoryPassiveEffectHandler(self, effect, action):
+        accessory = self.game.directory.getAccessory(effect.id)
 
+        if accessory.name == "Ruby Circlet":
+            if action.target == effect.source[1] and action.action >= 300 and action.action < 400:
+                if self.game.directory.getItem(action.action).type == SpellType.Debuff and self.game.directory.getItem(action.action).element == Element.Fire:
+                    self.immune = True
+
+        elif accessory.name == "Topaz Circlet":
+            if action.target == effect.source[1] and action.action >= 300 and action.action < 400:
+                if self.game.directory.getItem(action.action).type == SpellType.Debuff and self.game.directory.getItem(action.action).element == Element.Lightning:
+                    self.immune = True
+
+        elif accessory.name == "Sapphire Circlet":
+            if action.target == effect.source[1] and action.action >= 300 and action.action < 400:
+                if self.game.directory.getItem(action.action).type == SpellType.Debuff and self.game.directory.getItem(action.action).element == Element.Ice:
+                    self.immune = True
+
+        # Guardian's Belt is included in the trigger for the Guard talent
+
+    def accessoryActiveEffectHandler(self, effect, action):
+        accessory = self.game.directory.getAccessory(effect.id)
+        luck = self.game.player.party.members[effect.source[1]].getLuck()
+        chance = random.randint(1,100)
+
+        if accessory.name == "Crimson Scarf":
+            if action.source == effect.source[1]:
+                if accessory.activationRate + luck >= chance:
+                    self.game.player.party.members[effect.source[1]].gainHP(math.ceil(self.dmg/2))
+        
+        elif accessory.name == "Cerulean Scarf":
+            if action.source == effect.source[1]:
+                if accessory.activationRate + luck >= chance:
+                    self.game.player.party.members[effect.source[1]].gainMP(math.ceil(self.dmg/2))
+
+        elif accessory.name == "Jade Bracer":
+            if action.target == effect.source[1] and action.action == 0:
+                if accessory.activationRate + luck >= chance:
+                    self.dmg = round(self.dmg/2)
+
+        elif accessory.name == "Bismuth Amulet":
+            if action.target == effect.source[1] and action.action != 0:
+                if accessory.activationRate + luck >= chance:
+                    self.dmg = 0
+                    
+        elif accessory.name == "Opal Circlet":
+            if action.target == effect.source[1] and action.action >= 300 and action.action < 400:
+                if self.game.directory.getItem(action.action).type == SpellType.Debuff:
+                    if accessory.activationRate + luck >= chance:
+                        self.immune = True
+
+        elif accessory.name == "Magician's Tome":
+            if action.source == effect.source and action.action >= 300 and action.action < 500:
+                if accessory.activationRate + luck >= chance:
+                    self.game.player.party.members[effect.source[1]].gainMP(self.game.directory.getManaCost(action.action))
+
+        elif accessory.name == "Master's Tome":
+            if action.source == effect.source and action.action >= 500 and action.action < 600:
+                if accessory.activationRate + luck >= chance:
+                    self.game.player.party.members[effect.source[1]].gainMP(self.game.directory.getManaCost(action.action))
+
+        elif accessory.name == "Blitzing Boots":
+            if action.source == effect.source and action.action == 0:
+                if accessory.activationRate + luck >= chance:
+                    self.actions.insert(self.exTurn,action)
+
+        elif accessory.name == "Whirlwind Cape":
+            if action.source == effect.source and action.action == 0:
+                if accessory.activationRate + luck >= chance:
+                    self.hitAll = True
+
+        elif accessory.name == "Plasma Ring":
+            if action.source == effect.source and action.action >= 300 and action.action < 500:
+                if accessory.activationRate + luck >= chance:
+                    
