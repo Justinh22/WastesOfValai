@@ -198,22 +198,23 @@ class Combat():
                     print("TALENTSUMMARY")
             elif self.state =="spellSummary":
                 if self.validManaCost(self.game.player.party.members[self.combatOrder[self.currentTurn][1]],self.game.player.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID]):
-                    self.lowMana = False
-                    self.actionVal = self.game.player.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID]
-                    if self.game.directory.getSpellTarget(self.actionVal) == Target.Single:
-                        self.state = "targetSelect"
-                        self.cursorPos = 0
-                        self.enterTargetSelect()
-                    else:
-                        self.state = "mainWindow"
-                        self.showElementalEffectivenessColorsTo = None
-                        if self.game.player.party.members[self.combatOrder[self.currentTurn][1]].status == Status.Shocked or (self.game.player.party.members[self.combatOrder[self.currentTurn][1]].status == Status.Freezing and random.randint(0,2)==0):
-                            self.actionVal = -1
-                        self.writeAction(self.combatOrder[self.currentTurn],0,self.actionVal)
-                        print(f'Action writing for {self.combatOrder[self.currentTurn]}, length {len(self.actions)}')
-                        self.next()
-                        self.cursorPos = -1
-                    print("SPELL")
+                    if self.game.player.party.members[self.combatOrder[self.currentTurn][1]].checkSpellProficiency(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID],self.game.directory):
+                        self.lowMana = False
+                        self.actionVal = self.game.player.party.members[self.combatOrder[self.currentTurn][1]].spells[self.spellID]
+                        if self.game.directory.getSpellTarget(self.actionVal) == Target.Single:
+                            self.state = "targetSelect"
+                            self.cursorPos = 0
+                            self.enterTargetSelect()
+                        else:
+                            self.state = "mainWindow"
+                            self.showElementalEffectivenessColorsTo = None
+                            if self.game.player.party.members[self.combatOrder[self.currentTurn][1]].status == Status.Shocked or (self.game.player.party.members[self.combatOrder[self.currentTurn][1]].status == Status.Freezing and random.randint(0,2)==0):
+                                self.actionVal = -1
+                            self.writeAction(self.combatOrder[self.currentTurn],0,self.actionVal)
+                            print(f'Action writing for {self.combatOrder[self.currentTurn]}, length {len(self.actions)}')
+                            self.next()
+                            self.cursorPos = -1
+                        print("SPELL")
                 else:
                     self.lowMana = True
             elif self.state =="itemSummary":

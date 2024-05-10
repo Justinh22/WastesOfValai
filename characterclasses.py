@@ -227,11 +227,21 @@ class Character():
             return self.type.armorProficiency[3]==1
         elif idType == ArmorType.Arcanist:
             return self.type.armorProficiency[4]==1
+    def checkSpellProficiency(self,id,dir):
+        print("Checking proficiency...")
+        out = False
+        if id >= 300 and id < 400:
+            out = self.checkAtkSpellProficiency(id,dir)
+        else:
+            out = self.checkSptSpellProficiency(id,dir)
+        return out
     def checkAtkSpellProficiency(self,id,dir):
         idRarity = dir.getItemRarity(id)
+        print(f'Level: {self.type.attackMagicLevel[self.level-1] + self.universalEffects.atkMagicLevel} vs Spell: {idRarity}')
         return self.type.attackMagicLevel[self.level-1] + self.universalEffects.atkMagicLevel >= idRarity
     def checkSptSpellProficiency(self,id,dir):
         idRarity = dir.getItemRarity(id)
+        print(f'Level: {self.type.supportMagicLevel[self.level-1] + self.universalEffects.sptMagicLevel} vs Spell: {idRarity}')
         return self.type.supportMagicLevel[self.level-1] + self.universalEffects.sptMagicLevel >= idRarity
     def fullRestore(self):
         self.hp = self.hpMax
