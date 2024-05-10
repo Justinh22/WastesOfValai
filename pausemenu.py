@@ -593,8 +593,8 @@ class PauseMenu():
         write(self.game, 14, xPos+10, yPos+30, "HP " + str(character.getHP()) + "/" + str(character.getMaxHP()))
         write(self.game, 14, xPos+10, yPos+50, "MP " + str(character.getMP()) + "/" + str(character.getMaxMP()))
         write(self.game, 14, xPos+10, yPos+70, "XP " + str(character.xp) + "/" + str(character.nextLevel))
-        write(self.game, 12, xPos+120, yPos+30, "ATK Spl: " + str(character.type.attackMagicLevel[character.level-1]))
-        write(self.game, 12, xPos+120, yPos+50, "SPT Spl: " + str(character.type.supportMagicLevel[character.level-1]))
+        write(self.game, 12, xPos+120, yPos+30, "ATK Spl: " + str(character.type.attackMagicLevel[character.level-1]+character.universalEffects.atkMagicLevel))
+        write(self.game, 12, xPos+120, yPos+50, "SPT Spl: " + str(character.type.supportMagicLevel[character.level-1]+character.universalEffects.sptMagicLevel))
         if character.status == Status.Burned:
             writeColor(self.game, 12, xPos+120, yPos+70, "Burned", self.game.red)
         if character.status == Status.Shocked:
@@ -642,7 +642,7 @@ class PauseMenu():
         elif type == "spellbook":
             list = self.game.player.party.members[self.targetPartyMember].spells
             
-        for i in range(5): # FIX: Allow for no capacity on spellbook
+        for i in range(5):
             if i*2 < len(list):
                 write(self.game, 15, 100, 275 + (25*i), str(((i+self.spellPageMod)*2)+1) + ") " + self.game.directory.getItemName(list[(i+self.spellPageMod)*2],scroll))
             else:

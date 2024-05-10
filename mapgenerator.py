@@ -291,7 +291,7 @@ class Map():
         count = 0
         coordsList = []
         randomQuadOn = False
-        burnout = 500
+        burnout = 50
         while count < num or burnout <= 0:
             upperBoundR = quadrantSizeR*(r+1)
             if upperBoundR >= MAP_HEIGHT:
@@ -305,6 +305,7 @@ class Map():
             if self.map[targetR][targetC] == ' ' or self.map[targetR][targetC] == 'X':
                 burnout -= 1
                 continue
+            burnout = 50
             coordsList.append((targetR,targetC))
 
             if not randomQuadOn:

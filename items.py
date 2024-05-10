@@ -628,7 +628,7 @@ def initAccessoryDirectory():
     accessoryDirectory.append(MiracleBracelet)
     CursedBracer = Accessory("Cursed Bracer","Deals an additional damage for each subsequent hit without missing. Deals damage equal to its power and resets upon missing.",3,637,0,AccessoryType.Passive,Timing.DamageDealt)
     accessoryDirectory.append(CursedBracer)
-    CursedEarring = Accessory("Cursed Earring","Gains one permanent damage upon missing with a strike. Has a 50% chance to deal damage to its wielder on a successful strike.",3,638,0,AccessoryType.Passive,Timing.DamageDealt)
+    CursedEarring = Accessory("Cursed Earring","Gains one permanent damage upon missing with a strike. Has a 50% chance to deal damage to its wielder equal to its power on a successful strike.",3,638,0,AccessoryType.Passive,Timing.DamageDealt)
     accessoryDirectory.append(CursedEarring)
 
     return accessoryDirectory
