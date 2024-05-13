@@ -432,6 +432,12 @@ class Party():
                 if self.members[i].gainXP((diff * 3) + (round(diff/2) * random.randint(2,4)) + round((diff*3)*underdogMultiplier)):
                     levelups[i] = 1
         return levelups
+    def removeAccessory(self,target):
+        if self.members[target].eqpAcc != None and len(self.equipment) < MAX_INVENTORY_SIZE:
+            self.equipment.append(self.members[target].eqpAcc.id)
+            self.members[target].universalEffectHandler(self.members[target].eqpAcc,"Unequip")
+            self.members[target].eqpAcc = Accessory()
+            
 
 class Creature():
     def __init__(self,nm,lv,idIN,hpIN,at,ac,df,dg,sd,elm,type,spells):

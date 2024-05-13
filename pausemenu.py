@@ -256,7 +256,11 @@ class PauseMenu():
             wrapWrite(self.game, 15, tgt.description, self.right-85, 60, 290)
         
         if self.state == "confirmAction":
-            write(self.game, 15, 35, 360, "Are you sure you want to "+self.action+" the "+self.itemName+"? (Press A to Confirm)")
+            if self.action == "removeAcc":
+                act = "Remove"
+            else:
+                act = self.action
+            write(self.game, 15, 35, 360, "Are you sure you want to "+act+" the "+self.itemName+"? (Press A to Confirm)")
 
         if self.state == "map":
             screenOutline = pygame.Rect(self.left,self.top,self.right,self.bottom)
@@ -477,6 +481,11 @@ class PauseMenu():
                 self.cursorPos = self.targetElement - (self.spellPageMod*2)
                 self.state = self.substate
                 self.substate = "none"
+        if self.game.X:
+            if self.state == "equipment":
+                self.action = "removeAcc"
+                self.state = "confirmAction"
+                self.substate = "equipment"
         if self.game.UP:
             if self.state == "main":
                 self.cursorPos -= 1
@@ -636,6 +645,7 @@ class PauseMenu():
         scroll = False
         if type == "equipment":
             list = self.game.player.party.equipment
+            write(self.game, 15, 420, 420, "X) Remove Accessory")
         elif type == "inventory":
             list = self.game.player.party.inventory
             scroll = True
@@ -667,6 +677,8 @@ class PauseMenu():
                 self.game.player.party.dropItem(targetElement)
             elif tgtList == "equipment":
                 self.game.player.party.dropEquipment(targetElement)
+        elif action == "removeAcc":
+            self.game.player.party.removeAccessory(targetPartyMember)
         elif action == "use":
             if self.game.directory.getItemType(self.game.player.party.inventory[targetElement]) == Type.Potion:
                 self.game.player.party.usePotion(targetPartyMember,targetElement,self.game.directory)
