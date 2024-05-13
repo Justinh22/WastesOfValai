@@ -327,14 +327,16 @@ class Directory():
             lootRarity = math.ceil(level / divVal)
         return lootRarity
     
-    def rollForLoot(self,difficulty,itemRarity,types):
+    def rollForLoot(self,difficulty,rarity,types):
         chosenType = types[random.randint(0,len(types)-1)]
-        itemRarity = difficulty + itemRarity.value
+        itemRarity = difficulty + rarity.value
+        #print(f'itemRarity ({itemRarity})= diff ({difficulty}) + rarity ({rarity.value})')
         if itemRarity < 1:
             itemRarity = 1
         if itemRarity > MAX_DIFFICULTY:
             itemRarity = MAX_DIFFICULTY
         itemRarity = self.getLootRarity(itemRarity, chosenType)
+        #print(f'Translated rarity for {chosenType}: {itemRarity}')
         return self.getItemByRarity(chosenType,itemRarity)
 
     def getCharacterName(self,members):

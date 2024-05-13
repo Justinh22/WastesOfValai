@@ -31,7 +31,6 @@ class DungeonDatabase():
                 floors = random.randint(1,DUNGEON_MAX_FLOORS)
             print(f'{floors} floors in dungeon')
             newDungeon = Dungeon(coords,type,level,floors)
-            newDungeon.generate()
             self.addDungeon(coords,newDungeon)
         return self.dungeons[coords]
     
@@ -125,6 +124,7 @@ class DungeonMap():
         self.maxRooms = max
 
     def generate(self):
+        print(f'GENERATING FLOOR {self.floor} MAP')
         self.initializeMap()
         numRooms = random.randint(self.minRooms,self.maxRooms)
         for i in range(numRooms):
@@ -313,7 +313,7 @@ class DungeonMap():
             if lootRooms[i].getCoords() == self.entranceRoom:
                 continue
             types = self.getLootTypesFromDungeonType()
-            self.loot.append(DungeonLoot(lootRooms[i].setLoot(self.map),self.dungeonLevel,types))
+            self.loot.append(DungeonLoot(lootRooms[i].setLoot(self.map),self.dungeonLevel,types,self.floor,self.maxFloors))
             #print(f'Loot in room {i}')
 
     def addWanderer(self):
@@ -400,15 +400,31 @@ class DungeonRoom():
     
 
 class DungeonLoot():
-    def __init__(self,coords,level,types):
+    def __init__(self,coords,level,types,floor,maxFloors):
         self.coords = coords
         self.level = level
         self.types = types
-        self.rarity = LootRarity.Uncommon
+        self.maxFloors = maxFloors
+        self.checkForAccessories(floor/maxFloors)
+        self.rarity = self.getRarity(floor/maxFloors)
         self.loot = self.rollItem(directory)
+
+    def checkForAccessories(self,ratio):
+        if ratio >= (1/2) and self.maxFloors >= 2:
+            self.types.append(Type.Accessory)
+
+    def getRarity(self,ratio):
+        if self.maxFloors >= 3:
+            if ratio <= (2/3):
+                return LootRarity.Uncommon
+            else:
+                return LootRarity.Rare
+        else:
+            return LootRarity.Uncommon
 
     def setLootRarity(self,rarity):
         self.rarity = rarity
 
     def rollItem(self,dir):
         return dir.rollForLoot(self.level,self.rarity,self.types)
+        
