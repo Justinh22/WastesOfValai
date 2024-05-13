@@ -1,4 +1,3 @@
-import pygame
 import random
 import math
 from directory import *
@@ -13,6 +12,8 @@ FLOOR_CHAR = ' '
 ENTRANCE_CHAR = 'O'
 LOOT_CHAR = 'L'
 WANDERER_CHAR = 'W'
+STAIRS_DOWN_CHAR = 'D'
+STAIRS_UP_CHAR = 'U'
 
 directory = Directory()
 
@@ -24,9 +25,12 @@ class DungeonDatabase():
     def addDungeon(self,coords,dungeon):
         self.dungeons[coords] = dungeon
 
-    def getDungeon(self,coords,type,level=0,hallFreq=2):
+    def getDungeon(self,coords,type,level=0,floors=-1):
         if coords not in self.dungeons.keys():
-            newDungeon = DungeonMap(coords,type,level,hallFreq)
+            if floors == -1:
+                floors = random.randint(1,DUNGEON_MAX_FLOORS)
+            print(f'{floors} floors in dungeon')
+            newDungeon = Dungeon(coords,type,level,floors)
             newDungeon.generate()
             self.addDungeon(coords,newDungeon)
         return self.dungeons[coords]
@@ -39,17 +43,42 @@ class DungeonDatabase():
             print(f'{entry}: {self.dungeons[entry].dungeonType.name}')
 
 
+class Dungeon():
+    def __init__(self,coords,type,level,floors):
+        self.coords = coords
+        self.dungeonType = type
+        self.dungeonLevel = level
+        self.floors = floors
+        self.floorMaps = []
+        self.generate()
+
+    def generate(self):
+        for i in range(self.floors):
+            newDungeonMap = DungeonMap(self.coords,self.dungeonType,self.dungeonLevel,i+1,self.floors)
+            newDungeonMap.generate()
+            self.floorMaps.append(newDungeonMap)
+
+    def getFloor(self,num):
+        if num <= self.floors and num > 0:
+            return self.floorMaps[num-1]
+        else:
+            return None
+
+
 class DungeonMap():
-    def __init__(self,coords,type=DungeonType.Well,level=0,hallFreq=2):
+    def __init__(self,coords,type,level,floor,maxFloors):
         self.map = []
         self.coords = coords        # Coords         : Duple containing (row,col) of where the dungeon is located in the world
         self.rooms = []             # Rooms          : List of DungeonRooms
         self.entranceRoom = -1
+        self.downStairsRoom = -1
         self.connectedRooms = {}    # ConnectedRooms : Dictionary of indexes in rooms, depicting how many connections each room has
+        self.floor = floor
+        self.maxFloors = maxFloors
         self.visited = []
         self.dungeonLevel = level
         self.dungeonType = type
-        self.hallwayFreq = hallFreq
+        self.hallwayFreq = 2
         self.maxRows = DUNGEON_DIM
         self.maxCols = DUNGEON_DIM
         self.minRooms = 6
@@ -60,6 +89,7 @@ class DungeonMap():
         self.maxRoomRows = 8
         self.roomBuffer = 1
         self.entrance = (0,0)
+        self.downStairs = (0,0)
         self.loot = []
         self.wallChar = self.getWallChar(type)
 
@@ -108,6 +138,8 @@ class DungeonMap():
         self.addLoot(numLoot)
         if random.randint(0,2) == 2:
             self.addWanderer()
+        if self.floor != self.maxFloors:
+            self.addDownStairs()
         self.writeMap()
 
     def writeMap(self):
@@ -251,9 +283,25 @@ class DungeonMap():
         while done == False:
             for i in range(len(self.connectedRooms)):
                 if len(self.connectedRooms[i]) == connections:
-                    self.entrance = self.rooms[i].setEntrance(self.map)
+                    if self.floor == 1:
+                        self.entrance = self.rooms[i].setEntrance(self.map)
+                    else:
+                        self.entrance = self.rooms[i].setUpStairs(self.map)
                     self.entranceRoom = self.rooms[i].getCoords()
                     #print(f'Entrance in room at {self.entranceRoom}')
+                    done = True
+                    break
+            connections += 1
+
+    def addDownStairs(self):
+        connections = 1
+        done = False
+        while done == False:
+            for i in range(len(self.connectedRooms)):
+                if len(self.connectedRooms[i]) == connections and self.rooms[i].getCoords() != self.entranceRoom:
+                    self.downStairs = self.rooms[i].setDownStairs(self.map)
+                    print(f'Downstairs: {self.downStairs}')
+                    self.downStairsRoom = self.rooms[i].getCoords()
                     done = True
                     break
             connections += 1
@@ -328,6 +376,16 @@ class DungeonRoom():
     def setEntrance(self,map):
         coords = self.getRandomPoint()
         map[coords[0]][coords[1]] = ENTRANCE_CHAR
+        return coords
+    
+    def setUpStairs(self,map):
+        coords = self.getRandomPoint()
+        map[coords[0]][coords[1]] = STAIRS_UP_CHAR
+        return coords
+    
+    def setDownStairs(self,map):
+        coords = self.getRandomPoint()
+        map[coords[0]][coords[1]] = STAIRS_DOWN_CHAR
         return coords
 
     def setLoot(self,map):
