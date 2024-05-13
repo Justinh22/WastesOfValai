@@ -282,7 +282,7 @@ class Enemy():
         if self.mode == "patrol" or self.mode == "return":
             self.speed = DUNGEON_ENEMY_SPEED
         elif self.mode == "hunt":
-            self.speed = DUNGEON_ENEMY_SPEED-60
+            self.speed = DUNGEON_ENEMY_SPEED/2
 
     def act(self,coords):
         self.actReady = False
