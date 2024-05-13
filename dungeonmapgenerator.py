@@ -412,6 +412,7 @@ class DungeonLoot():
     def checkForAccessories(self,ratio):
         if ratio >= (1/2) and self.maxFloors >= 2:
             self.types.append(Type.Accessory)
+            self.types.append(Type.Accessory)
 
     def getRarity(self,ratio):
         if self.maxFloors >= 3:
