@@ -97,6 +97,7 @@ class Combat():
 
         # Add accessory effects to combat
         self.activeEffects = []
+        self.buffs = []
         for i, member in enumerate(self.game.player.party.members):
             if member.eqpAcc is not None:
                 if member.eqpAcc.timing is not Timing.Universal:
