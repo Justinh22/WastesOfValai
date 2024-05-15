@@ -99,6 +99,7 @@ class Combat():
         self.activeEffects = []
         self.buffs = []
         for i, member in enumerate(self.game.player.party.members):
+            member.resetBuffs()
             if member.eqpAcc is not None:
                 if member.eqpAcc.timing is not Timing.Universal:
                     print(f'Effect of {member.eqpAcc.name} in play!')
@@ -664,16 +665,37 @@ class Combat():
         pygame.draw.line(self.game.screen,self.game.white,(self.left,350),(350,350),2)
         pygame.draw.line(self.game.screen,self.game.white,(350,320),(350,self.bottom+7),2)
         write(self.game, 11, 360, 328, self.game.player.party.members[self.combatOrder[self.currentTurn][1]].name+", Level "+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].level)+" "+self.game.player.party.members[self.combatOrder[self.currentTurn][1]].type.name)
-        write(self.game, 11, 360, 345, "HP "+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].hp)+"/"+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].getMaxHP()))
-        write(self.game, 11, 420, 345, "MP "+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].mp)+"/"+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].getMaxMP()))
-        write(self.game, 11, 360, 360, "ATK "+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].getAttack()))
-        write(self.game, 11, 420, 360, "DEF "+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].getDefense()))
-        write(self.game, 11, 360, 375, "ACC "+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].getAccuracy()))
-        write(self.game, 11, 420, 375, "DDG "+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].getDodge()))
-        write(self.game, 11, 360, 390, "CRT "+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].getCritRate()))
-        write(self.game, 11, 420, 390, "LCK "+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].getLuck()))
+        if self.game.player.party.members[self.combatOrder[self.currentTurn][1]].getBuff("HP") > 0:
+            write(self.game, 11, 360, 345, "HP "+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].hp)+"/"+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].getMaxHP()) + " (+" + str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].getBuff("HP")) + ")")
+        else:
+            write(self.game, 11, 360, 345, "HP "+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].hp)+"/"+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].getMaxHP()))
+        write(self.game, 11, 440, 345, "MP "+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].mp)+"/"+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].getMaxMP()))
+        if self.game.player.party.members[self.combatOrder[self.currentTurn][1]].getBuff("ATK") > 0:
+            write(self.game, 11, 360, 360, "ATK "+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].getAttack()) + " (+" + str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].getBuff("ATK")) + ")")
+        else:
+            write(self.game, 11, 360, 360, "ATK "+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].getAttack()))
+        if self.game.player.party.members[self.combatOrder[self.currentTurn][1]].getBuff("DEF") > 0:
+            write(self.game, 11, 440, 360, "DEF "+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].getDefense()) + " (+" + str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].getBuff("DEF")) + ")")
+        else:
+            write(self.game, 11, 440, 360, "DEF "+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].getDefense()))
+        if self.game.player.party.members[self.combatOrder[self.currentTurn][1]].getBuff("ACC") > 0:
+            write(self.game, 11, 360, 375, "ACC "+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].getAccuracy()) + " (+" + str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].getBuff("ACC")) + ")")
+        else:
+            write(self.game, 11, 360, 375, "ACC "+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].getAccuracy()))
+        if self.game.player.party.members[self.combatOrder[self.currentTurn][1]].getBuff("DDG") > 0:
+            write(self.game, 11, 440, 375, "DDG "+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].getDodge()) + " (+" + str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].getBuff("DDG")) + ")")
+        else:
+            write(self.game, 11, 440, 375, "DDG "+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].getDodge()))
+        if self.game.player.party.members[self.combatOrder[self.currentTurn][1]].getBuff("CRT") > 0:
+            write(self.game, 11, 360, 390, "CRT "+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].getCritRate()) + " (+" + str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].getBuff("CRT")) + ")")
+        else:
+            write(self.game, 11, 360, 390, "CRT "+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].getCritRate()))
+        if self.game.player.party.members[self.combatOrder[self.currentTurn][1]].getBuff("LCK") > 0:
+            write(self.game, 11, 440, 390, "LCK "+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].getLuck()) + " (+" + str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].getBuff("LCK")) + ")")
+        else:
+            write(self.game, 11, 440, 390, "LCK "+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].getLuck()))
         write(self.game, 11, 360, 405, "AMP "+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].getAmplifier()))
-        write(self.game, 11, 420, 405, "MPG "+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].getManaRegen()))
+        write(self.game, 11, 440, 405, "MPG "+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].getManaRegen()))
         write(self.game, 16, 360, 430, "\""+self.combatDialogue+"\"")
         iNext = 0
         for i in range(len(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].activeBuffs)):
