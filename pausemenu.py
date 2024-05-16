@@ -315,22 +315,24 @@ class PauseMenu():
                     #c = int(((x / blockSize)-math.ceil(gridWidth/2))+self.mapPos[1])
                     mapChar = '_'
                     if r < 0 or r >= self.game.WorldMap.sizeR:
-                        mapChar = ' '
+                        mapChar = OCEAN_CHAR
                     if c < 0 or c >= self.game.WorldMap.sizeC:
-                        mapChar = ' '
+                        mapChar = OCEAN_CHAR
                     if r == self.currentPos[0] and c == self.currentPos[1]:
                         mapChar = '@'
                     if mapChar == '_':
                         if self.game.WorldMap.revealedMap[r][c] == '1':
                             mapChar = self.game.WorldMap.map[r][c]
+                            if mapChar == PATH_CHAR: # Path
+                                color = self.game.orange
                             if self.mapMode == "biome":
-                                if mapChar == '#': # Forest
+                                if mapChar == FOREST_CHAR: # Forest
                                     color = self.game.green
-                                elif mapChar == ';': # Plains
+                                elif mapChar == PLAINS_CHAR: # Plains
                                     color = self.game.lightgreen
-                                elif mapChar == '.': # Desert
+                                elif mapChar == DESERT_CHAR: # Desert
                                     color = self.game.tan
-                            elif self.mapMode == "difficulty" and mapChar != ' ' and mapChar != 'X':
+                            elif self.mapMode == "difficulty" and mapChar != OCEAN_CHAR and mapChar != BORDER_CHAR and mapChar != PATH_CHAR:
                                 diff = self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c])
                                 power = math.ceil(self.game.player.party.getPower()/2)
                                 difficultyDiff = abs(diff-power)
@@ -343,12 +345,12 @@ class PauseMenu():
                                 else:
                                     color = self.game.white
                         else:
-                            if self.game.WorldMap.map[r][c] == 'X':
+                            if self.game.WorldMap.map[r][c] == BORDER_CHAR:
                                 mapChar = self.game.WorldMap.map[r][c]
                             elif r > MAP_HEIGHT or c > MAP_WIDTH:
-                                mapChar = ' '
+                                mapChar = OCEAN_CHAR
                             else:
-                                mapChar = 'x'
+                                mapChar = BORDER_CHAR
                                 color = self.game.darkgrey
                     
                     if r == (self.mapPos[0]) and c == (self.mapPos[1]):

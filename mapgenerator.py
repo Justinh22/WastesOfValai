@@ -323,11 +323,17 @@ class Map():
         return coordsList
 
 
-
-
     def saveRevealed(self):
         with open("revealed_map.txt","w") as file:
             for row in self.revealedMap:
+                for element in row:
+                    file.write(element)
+                file.write("\n")
+
+
+    def saveWorld(self):
+        with open("generated_map.txt","w") as file:
+            for row in self.map:
                 for element in row:
                     file.write(element)
                 file.write("\n")

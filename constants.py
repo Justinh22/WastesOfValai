@@ -18,6 +18,23 @@ DUNGEON_MAX_FLOORS = 5
 DUNGEON_ENEMY_SPEED = 120
 MAP_GROWTH_CYCLES = 20
 
+FOREST_CHAR = '#'
+PLAINS_CHAR = ';'
+DESERT_CHAR = '.'
+OCEAN_CHAR = ' '
+BORDER_CHAR = 'X'
+PATH_CHAR = '%'
+WELL_CHAR = 'W'
+PYRAMID_CHAR = 'P'
+BANDITCAMP_CHAR = 'B'
+CAVE_CHAR = 'C'
+RUINS_CHAR = 'R'
+TREEHOUSE_CHAR = 'T'
+
+SHACK_CHAR = 'S'
+ABANDONED_VILLAGE_CHAR = 'A'
+HAVEN_CHAR = 'H'
+
 class Type(Enum):
     Empty = 0
     Weapon = 1
@@ -92,6 +109,7 @@ class Biome(Enum):
     Plains = 1
     Desert = 2
     Other = 3
+    Path = 4
 
 class Status(Enum):
     Shocked = 0
