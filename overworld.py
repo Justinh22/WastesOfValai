@@ -172,14 +172,15 @@ class Overworld():
         # self.game.stir()
         if self.game.WorldMap.map[r][c] != FOREST_CHAR and self.game.WorldMap.map[r][c] != PLAINS_CHAR and self.game.WorldMap.map[r][c] != DESERT_CHAR and self.game.WorldMap.map[r][c] != PATH_CHAR:
             self.steps += 1
-            if not (self.game.roomDB.doesExist((r,c)) or self.game.dungeonDB.doesExist((r,c))):
-                if self.game.player.lastCheckpoint != (0,0):
-                    pathfinder = Pathfinder(self.game.player.lastCheckpoint,(r,c),self.game.WorldMap.map)
-                    path = pathfinder.calculatePath()
-                    for step in path:
-                        if self.game.WorldMap.map[step[0]][step[1]] == FOREST_CHAR or self.game.WorldMap.map[step[0]][step[1]] == PLAINS_CHAR or self.game.WorldMap.map[step[0]][step[1]] == DESERT_CHAR:
-                            self.game.WorldMap.map[step[0]][step[1]] = PATH_CHAR
-            self.game.player.lastCheckpoint = (r,c)
+            if self.game.WorldMap.map[r][c] == HAVEN_CHAR:
+                if not (self.game.roomDB.doesExist((r,c))):
+                    if self.game.player.lastCheckpoint != (0,0):
+                        pathfinder = Pathfinder(self.game.player.lastCheckpoint,(r,c),self.game.WorldMap.map)
+                        path = pathfinder.calculatePath()
+                        for step in path:
+                            if self.game.WorldMap.map[step[0]][step[1]] == FOREST_CHAR or self.game.WorldMap.map[step[0]][step[1]] == PLAINS_CHAR or self.game.WorldMap.map[step[0]][step[1]] == DESERT_CHAR:
+                                self.game.WorldMap.map[step[0]][step[1]] = PATH_CHAR
+                self.game.player.lastCheckpoint = (r,c)
             if self.game.WorldMap.map[r][c] == ABANDONED_VILLAGE_CHAR or self.game.WorldMap.map[r][c] == HAVEN_CHAR or self.game.WorldMap.map[r][c] == SHACK_CHAR:
                 if self.game.WorldMap.map[r][c] == HAVEN_CHAR:
                     typ = "haven"
@@ -201,11 +202,11 @@ class Overworld():
             difficultyDiffBias *= 5
 
             if self.steps < 5:
-                odds = 15
+                odds = 10
             elif self.steps < 10:
-                odds = 20
+                odds = 15
             else:
-                odds = 25
+                odds = 20
 
             odds += difficultyDiffBias
             rollA = random.randint(1,100)
