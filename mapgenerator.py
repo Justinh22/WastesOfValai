@@ -67,26 +67,21 @@ class Map():
 
         # Setting starting point...
         potentialStartPoints = []
-        startingZoneChar = self.valToLetter(startingZone)
-        for r in range(1,self.sizeR-1):
-            for c in range(1,self.sizeC-1):
-                if self.difficultyMap[r][c] != startingZoneChar:
-                    continue
-                for coords in [(-1,0), (0,-1), (1,0), (0,1)]:
-                    if self.map[r+coords[0]][c+coords[1]] == ' ' or self.difficultyMap[r+coords[0]][c+coords[1]] != startingZoneChar:
+        while potentialStartPoints == []:
+            startingZoneChar = self.valToLetter(startingZone)
+            for r in range(1,self.sizeR-1):
+                for c in range(1,self.sizeC-1):
+                    if self.difficultyMap[r][c] != startingZoneChar:
                         continue
-                print("Option!")
-                potentialStartPoints.append((r,c))
+                    for coords in [(-1,0), (0,-1), (1,0), (0,1)]:
+                        if self.map[r+coords[0]][c+coords[1]] == ' ' or self.difficultyMap[r+coords[0]][c+coords[1]] != startingZoneChar:
+                            continue
+                    print("Option!")
+                    potentialStartPoints.append((r,c))
+            if potentialStartPoints == []:
+                startingZone += 1
 
-        if len(potentialStartPoints) == 0:
-            self.startingPos = (round(self.sizeR/2),round(self.sizeC/2))
-            while self.map[self.startingPos[0]][self.startingPos[1]] == ' ':
-                if self.startingPos[0] > round(self.sizeR/3):
-                    self.startingPos = (self.startingPos[0]-1, self.startingPos[1])
-                else:
-                    self.startingPos = (self.startingPos[0], self.startingPos[1]+1)
-        else:
-            self.startingPos = random.choice(potentialStartPoints)
+        self.startingPos = random.choice(potentialStartPoints)
 
         endSet = random.randint(1,8)
         if endSet == 1:
