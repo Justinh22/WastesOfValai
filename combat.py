@@ -1249,7 +1249,7 @@ class Combat():
                         self.talentOrderingEffectHandler(effect)
             elif self.game.directory.getItemType(effect.id) is Type.Accessory:
                 accessory = self.game.directory.getAccessory(effect.id)
-                print(f'Checking for usage of {accessory.name} at {timing.name}...')
+                #print(f'Checking for usage of {accessory.name} at {timing.name}...')
                 if timing == accessory.timing:
                     if accessory.type == AccessoryType.Passive:
                         self.accessoryPassiveEffectHandler(effect,action)
@@ -1260,7 +1260,7 @@ class Combat():
         for effect in self.activeEffects:
             if effect.id >= 600 and effect.id < 700:
                 accessory = self.game.directory.getAccessory(effect.id)
-                print(f'Checking for usage of {accessory.name} at {timing.name}...')
+                #print(f'Checking for usage of {accessory.name} at {timing.name}...')
                 if timing == accessory.timing:
                     if accessory.type == AccessoryType.Passive:
                         self.accessoryPassiveEffectHandler(effect,action)

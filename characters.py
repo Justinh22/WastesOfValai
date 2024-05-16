@@ -94,7 +94,7 @@ def initCreatureDirectory():
     creatureDirectory.append(Water_Elemental)
     Air_Elemental = Creature("Air Elemental",8,13,300,76,95,19,35,40,Element.Lightning,Biome.Plains,[312])
     creatureDirectory.append(Air_Elemental)
-    Earth_Elemental = Creature("Earth Elemental",8,14,78,75,70,30,5,20,Element.Lightning,Biome.Desert,[312])
+    Earth_Elemental = Creature("Earth Elemental",8,14,300,78,70,30,5,20,Element.Lightning,Biome.Desert,[312])
     creatureDirectory.append(Earth_Elemental)
     Fire_Elemental = Creature("Fire Elemental",8,15,300,84,75,24,15,35,Element.Fire,Biome.Other,[313])
     creatureDirectory.append(Fire_Elemental)

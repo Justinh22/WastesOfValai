@@ -662,11 +662,11 @@ class PauseMenu():
             list = self.game.player.party.members[self.targetPartyMember].spells
             
         for i in range(5):
-            if i*2 < len(list):
+            if (i+self.spellPageMod)*2 < len(list):
                 write(self.game, 15, 100, 275 + (25*i), str(((i+self.spellPageMod)*2)+1) + ") " + self.game.directory.getItemName(list[(i+self.spellPageMod)*2],scroll))
             else:
                 write(self.game, 15, 100, 275 + (25*i), str(((i+self.spellPageMod)*2)+1) + ") ")
-            if (i*2)+1 < len(list):
+            if ((i+self.spellPageMod)*2)+1 < len(list):
                 write(self.game, 15, 350, 275 + (25*i), str(((i+self.spellPageMod)*2)+2) + ") " + self.game.directory.getItemName(list[((i+self.spellPageMod)*2)+1],scroll))
             else:
                 write(self.game, 15, 350, 275 + (25*i), str(((i+self.spellPageMod)*2)+2) + ") ")
