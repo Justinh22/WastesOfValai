@@ -196,16 +196,16 @@ class Overworld():
             difficultyDiffBias = self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]) - math.ceil(self.game.player.party.getPower()/2)
             if difficultyDiffBias > 3:
                 difficultyDiffBias = 3
-            elif difficultyDiffBias < -3:
+            elif difficultyDiffBias <= -3:
                 difficultyDiffBias = -3
             difficultyDiffBias *= 5
 
             if self.steps < 5:
-                odds = 10
-            elif self.steps < 10:
                 odds = 15
-            else:
+            elif self.steps < 10:
                 odds = 20
+            else:
+                odds = 25
 
             odds += difficultyDiffBias
             rollA = random.randint(1,100)
