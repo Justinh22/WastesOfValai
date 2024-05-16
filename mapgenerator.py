@@ -76,7 +76,6 @@ class Map():
                     for coords in [(-1,0), (0,-1), (1,0), (0,1)]:
                         if self.map[r+coords[0]][c+coords[1]] == ' ' or self.difficultyMap[r+coords[0]][c+coords[1]] != startingZoneChar:
                             continue
-                    print("Option!")
                     potentialStartPoints.append((r,c))
             if potentialStartPoints == []:
                 startingZone += 1
