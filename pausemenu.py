@@ -152,7 +152,7 @@ class PauseMenu():
                 self.itemName = self.game.directory.getItemName(tgt.id)
                 write(self.game, 20, 60, 220, self.itemName)
                 spelltype = "Attack" if tgt.type == SpellType.Attack or tgt.type == SpellType.Debuff else "Support"
-                writeOrientation(self.game, 20, self.right-40, 220, "Level "+str(tgt.rarity)+" "+spelltype+" Spell | "+str(tgt.manacost) + " MP", "R")
+                writeOrientation(self.game, 15, self.right-40, 220, "Level "+str(tgt.rarity)+" "+spelltype+" Spell | "+str(tgt.manacost) + " MP", "R")
                 if tgt.type == SpellType.Attack:
                     write(self.game, 15, 60, 245, "Deals " + str(self.game.player.party.members[self.targetPartyMember].amplify(tgt.attack)) + " damage.")
                 elif tgt.type == SpellType.Buff:
@@ -186,16 +186,19 @@ class PauseMenu():
                     write(self.game, 22, 540, 420, "Cast")
                     write(self.game, 22, 510 + (self.cursorPos*100), 417, "->")
             elif self.substate == "equipment":
-                tgt = self.game.directory.getItem(self.game.player.party.equipment[self.targetElement])
+                if self.action != "removeAcc":
+                    tgt = self.game.directory.getItem(self.game.player.party.equipment[self.targetElement])
+                else:
+                    tgt = self.game.directory.getItem(self.game.player.party.members[self.targetPartyMember].eqpAcc.id)
                 statText = ""
                 itemType = self.game.directory.getItemType(tgt.id)
                 self.itemName = self.game.directory.getItemName(tgt.id,True)
                 write(self.game, 20, 60, 220, self.itemName)
                 if itemType == Type.Weapon:
-                    writeOrientation(self.game, 20, self.right-40, 220, "Level "+str(tgt.rarity)+" "+tgt.type.name, "R")
+                    writeOrientation(self.game, 15, self.right-40, 220, "Level "+str(tgt.rarity)+" "+tgt.type.name, "R")
                     statText = "ATK " + str(tgt.attack) + " | ACC " + str(tgt.accuracy) + " | CRT " + str(tgt.critrate) + " | AMP " + str(tgt.amplifier)
                 elif itemType == Type.Armor:
-                    writeOrientation(self.game, 20, self.right-40, 220, "Level "+str(tgt.rarity)+" "+tgt.type.name+" Armor", "R")
+                    writeOrientation(self.game, 15, self.right-40, 220, "Level "+str(tgt.rarity)+" "+tgt.type.name+" Armor", "R")
                     statText = "DEF " + str(tgt.defense) + " | DDG " + str(tgt.dodge) + " | MPG " + str(tgt.manaregen)
                 write(self.game, 15, 60, 245, statText)
                 if self.state == "itemSummary":
@@ -218,7 +221,7 @@ class PauseMenu():
                     write(self.game, 15, 60, 245, statText)
                 if itemType == Type.AtkSpell or itemType == Type.SptSpell:
                     spelltype = "Attack" if itemType == Type.AtkSpell else "Support"
-                    writeOrientation(self.game, 20, self.right-40, 220, "Level "+str(tgt.rarity)+" "+spelltype+" Spell | "+str(tgt.manacost) + " MP", "R")
+                    writeOrientation(self.game, 15, self.right-40, 220, "Level "+str(tgt.rarity)+" "+spelltype+" Spell | "+str(tgt.manacost) + " MP", "R")
                     writeOrientation(self.game, 15, self.right-40, 245, "Use to learn spell.", "R")
                     if tgt.type == SpellType.Attack:
                         write(self.game, 15, 60, 245, "Deals " + str(self.game.player.party.members[self.targetPartyMember].amplify(tgt.attack)) + " damage.")
@@ -422,8 +425,11 @@ class PauseMenu():
                     self.action = "drop"
                     self.state = "confirmAction"
                 if self.substate == "inventory" and self.cursorPos == 0: # Use
-                    self.action = "use"
-                    self.state = "confirmAction"
+                    if self.game.player.party.members[self.targetPartyMember].getHP() >= 0:
+                        self.action = "use"
+                        self.state = "confirmAction"
+                    else:
+                        self.state = "itemList"
                 if self.substate == "spellbook" and self.cursorPos == 0 and self.game.directory.getItem(self.game.player.party.members[self.targetPartyMember].spells[self.targetElement]).target == Target.Single and (self.game.directory.getItem(self.game.player.party.members[self.targetPartyMember].spells[self.targetElement]).type == SpellType.Heal or self.game.directory.getItem(self.game.player.party.members[self.targetPartyMember].spells[self.targetElement]).type == SpellType.Cleanse): # Cast
                     self.action = "cast"
                     self.state = "targetSelect"
@@ -439,6 +445,7 @@ class PauseMenu():
                 elif self.substate == "spellbook":
                     self.state = "spellbook"
                     self.spellPageMod = 0
+                self.cursorPos = 0
                 self.substate = "none"
                 self.spellTarget = -1
                 print(f'STATE HERE IS {self.state}')
@@ -483,9 +490,10 @@ class PauseMenu():
                 self.substate = "none"
         if self.game.X:
             if self.state == "equipment":
-                self.action = "removeAcc"
-                self.state = "confirmAction"
-                self.substate = "equipment"
+                if self.game.player.party.members[self.targetPartyMember].eqpAcc.id != -1:
+                    self.action = "removeAcc"
+                    self.state = "confirmAction"
+                    self.substate = "equipment"
         if self.game.UP:
             if self.state == "main":
                 self.cursorPos -= 1
@@ -645,7 +653,8 @@ class PauseMenu():
         scroll = False
         if type == "equipment":
             list = self.game.player.party.equipment
-            write(self.game, 15, 420, 420, "X) Remove Accessory")
+            if self.game.player.party.members[self.targetPartyMember].eqpAcc.id != -1:
+                write(self.game, 15, 420, 420, "X) Remove Accessory")
         elif type == "inventory":
             list = self.game.player.party.inventory
             scroll = True
@@ -679,6 +688,7 @@ class PauseMenu():
                 self.game.player.party.dropEquipment(targetElement)
         elif action == "removeAcc":
             self.game.player.party.removeAccessory(targetPartyMember)
+            self.targetElement = 0
         elif action == "use":
             if self.game.directory.getItemType(self.game.player.party.inventory[targetElement]) == Type.Potion:
                 self.game.player.party.usePotion(targetPartyMember,targetElement,self.game.directory)

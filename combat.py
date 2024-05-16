@@ -97,9 +97,7 @@ class Combat():
 
         # Add accessory effects to combat
         self.activeEffects = []
-        self.buffs = []
         for i, member in enumerate(self.game.player.party.members):
-            member.resetBuffs()
             if member.eqpAcc is not None:
                 if member.eqpAcc.timing is not Timing.Universal:
                     print(f'Effect of {member.eqpAcc.name} in play!')
@@ -220,8 +218,8 @@ class Combat():
                 else:
                     self.lowMana = True
             elif self.state =="itemSummary":
-                if self.game.player.party.inventory[self.itemID].id >= 200 and self.game.player.party.inventory[self.itemID].id < 300:
-                    self.actionVal = self.game.player.party.inventory[self.itemID].id
+                if self.game.player.party.inventory[self.itemID] >= 200 and self.game.player.party.inventory[self.itemID] < 300:
+                    self.actionVal = self.game.player.party.inventory[self.itemID]
                     self.state = "targetSelect"
                     self.cursorPos = 0
                     self.enterTargetSelect()
@@ -261,6 +259,7 @@ class Combat():
                 print("CANCEL")
             elif self.state == "targetSelect":
                 self.state = "mainWindow"
+                self.showElementalEffectivenessColorsTo = None
                 print("BACK")
             elif self.state == "spellList":
                 self.state = "useMenu"
@@ -390,7 +389,7 @@ class Combat():
             pygame.draw.line(self.game.screen,self.game.white,(self.left,350),(self.right+9,350),2)
             write(self.game, 20, self.left+15, 325, "Select a target")
             group = "Encounter"
-            if (self.actionVal >= 400 and self.actionVal < 500) or (self.actionVal >= 500 and self.game.directory.getItem(self.actionVal).target==Target.Ally):
+            if (self.actionVal >= 200 and self.actionVal < 300) or (self.actionVal >= 400 and self.actionVal < 500) or (self.actionVal >= 500 and self.game.directory.getItem(self.actionVal).target==Target.Ally):
                 group = "Party"
             if group == "Encounter":
                 write(self.game, 20, 480, 30+(self.cursorPos*30), "<")
@@ -986,10 +985,9 @@ class Combat():
                 if spell.type == SpellType.Heal:
                     if self.game.player.party.members[action.target].hp > 0:
                         self.heal = self.game.player.party.members[action.target].amplify(spell.getHeal())
+                        print(f'Healing for {self.heal}')
                         self.checkEffectTiming(action,Timing.DamageDealt)
-                        self.game.player.party.members[action.target].hp += self.heal
-                    if self.game.player.party.members[action.target].hp > self.heal:
-                        self.game.player.party.members[action.target].hp = self.game.player.party.members[action.target].getMaxHP()
+                        self.game.player.party.members[action.target].gainHP(self.heal)
                 elif spell.type == SpellType.Buff:
                     self.buff = spell
                     print(f'Checking timing for {action}...')
@@ -1689,8 +1687,7 @@ class Combat():
     def accessoryActiveEffectHandler(self, effect, action):
         accessory = self.game.directory.getAccessory(effect.id)
         luck = self.game.player.party.members[effect.source[1]].getLuck()
-        #chance = random.randint(1,100)
-        chance = 1
+        chance = random.randint(1,100)
 
         if accessory.name == "Crimson Scarf":
             if action.source[1] == effect.source[1]:

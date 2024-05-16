@@ -37,8 +37,7 @@ class Room():
             self.implementHaven(self.id,difficulty)
         self.wanderer = True                        # bool : Shows whether or not a wanderer is in the room
         self.featureLen = len(self.features)        # int : Actual length of features, accounting for wanderer
-        chance = random.randint(1,3)
-        if self.type == "haven" and random.randint(1,3) <= 2:
+        if self.type != "haven" or random.randint(1,3) <= 2:
             self.wanderer = False
             self.featureLen -= 1
 

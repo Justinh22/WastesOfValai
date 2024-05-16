@@ -38,7 +38,7 @@ class Map():
             self.startingPos = (startR,startC)
 
 
-    def generateMap(self,startingZone=2):
+    def generateMap(self,startingZone=1):
         row = []
         revealedRow = []
         for i in range(0,self.sizeR):
@@ -68,14 +68,14 @@ class Map():
         # Setting starting point...
         potentialStartPoints = []
         startingZoneChar = self.valToLetter(startingZone)
-        belowStartingZoneChar = self.valToLetter(startingZone-1)
         for r in range(1,self.sizeR-1):
             for c in range(1,self.sizeC-1):
-                if self.difficultyMap[r][c] != belowStartingZoneChar and self.difficultyMap[r][c] != startingZoneChar:
+                if self.difficultyMap[r][c] != startingZoneChar:
                     continue
                 for coords in [(-1,0), (0,-1), (1,0), (0,1)]:
-                    if self.map[r+coords[0]][c+coords[1]] == ' ' or (self.difficultyMap[r+coords[0]][c+coords[1]] != belowStartingZoneChar and self.difficultyMap[r+coords[0]][c+coords[1]] != startingZoneChar):
+                    if self.map[r+coords[0]][c+coords[1]] == ' ' or self.difficultyMap[r+coords[0]][c+coords[1]] != startingZoneChar:
                         continue
+                print("Option!")
                 potentialStartPoints.append((r,c))
 
         if len(potentialStartPoints) == 0:
@@ -149,7 +149,7 @@ class Map():
 
         print("Generating landmarks...")
         self.placeLandmarks(LANDMARK_COUNT)
-        #self.setFirstHaven()
+        self.setFirstHaven()
 
         with open("generated_map.txt","w") as file:
             for row in self.map:

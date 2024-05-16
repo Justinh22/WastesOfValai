@@ -24,15 +24,18 @@ class Character():
         self.eqpWpn = Weapon()
         self.eqpAmr = Armor()
         self.eqpAcc = Accessory()
-        self.hpMax = 20
-        self.mpMax = 20
-        self.attack = 3
-        self.critrate = 0
-        self.defense = 1
-        self.dodge = 0
-        self.luck = 0
-        self.speed = 1
-        for i in range(0,lv):
+        self.hpMax = self.type.startingStats[0]
+        self.mpMax = self.type.startingStats[1]
+        self.attack = self.type.startingStats[2]
+        self.accuracy = self.type.startingStats[3]
+        self.critrate = self.type.startingStats[4]
+        self.defense = self.type.startingStats[5]
+        self.dodge = self.type.startingStats[6]
+        self.luck = self.type.startingStats[7]
+        self.speed = self.type.startingStats[8]
+        self.amplifier = self.type.startingStats[9]
+        self.manaregen = self.type.startingStats[10]
+        for i in range(1,lv):
             growth = tp.getGrowths()
             self.hpMax += growth[0]
             self.mpMax += growth[1]
@@ -45,9 +48,6 @@ class Character():
         self.lastLearned = []
         self.hp = self.hpMax
         self.mp = self.mpMax
-        self.accuracy = 70
-        self.amplifier = 0
-        self.manaregen = 0
         self.hpregen = 0
         self.buffs = [0,0,0,0,0,0,0]
         self.universalEffects = UniversalEffects()
@@ -312,9 +312,11 @@ class ClassType():
         self.id = idIN
         self.description = ""
         self.rating = []
-    def setAdditionalInfo(self,rating,desc):
+        self.startingStats = []
+    def setAdditionalInfo(self,rating,stats,desc):
         self.description = desc
-        self.rating = rating
+        self.rating = rating # Rating Order: [Power,Sturdiness,Nimbleness,Arcana,Faith,Luck]
+        self.startingStats = stats # [HP,MP,ATK,ACC,CRT,DEF,DDG,LCK,SPD,AMP,MPG]
     def getGrowths(self):
         return [self.hpGrowth[random.randint(0,2)], self.mpGrowth[random.randint(0,2)], self.atkGrowth[random.randint(0,2)], self.crtGrowth[random.randint(0,2)], self.defGrowth[random.randint(0,2)], self.ddgGrowth[random.randint(0,2)], self.lckGrowth[random.randint(0,2)], self.spdGrowth[random.randint(0,2)]]
     def wpnProfToString(self):
