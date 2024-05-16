@@ -179,7 +179,12 @@ class Overworld():
                         path = pathfinder.calculatePath()
                         for step in path:
                             if self.game.WorldMap.map[step[0]][step[1]] == FOREST_CHAR or self.game.WorldMap.map[step[0]][step[1]] == PLAINS_CHAR or self.game.WorldMap.map[step[0]][step[1]] == DESERT_CHAR:
-                                self.game.WorldMap.map[step[0]][step[1]] = PATH_CHAR
+                                tempList = list(self.game.WorldMap.map[step[0]])
+                                print(f'Writing a {type(self.game.WorldMap.map[step[0]][step[1]])} at ({step[0]},{step[1]})')
+                                tempList[step[1]] = PATH_CHAR
+                                self.game.WorldMap.map[step[0]] = ""
+                                for char in tempList:
+                                    self.game.WorldMap.map[step[0]] += char
                 self.game.player.lastCheckpoint = (r,c)
             if self.game.WorldMap.map[r][c] == ABANDONED_VILLAGE_CHAR or self.game.WorldMap.map[r][c] == HAVEN_CHAR or self.game.WorldMap.map[r][c] == SHACK_CHAR:
                 if self.game.WorldMap.map[r][c] == HAVEN_CHAR:

@@ -333,9 +333,12 @@ class Map():
 
     def saveWorld(self):
         with open("generated_map.txt","w") as file:
-            for row in self.map:
+            print("Saving...")
+            for i, row in enumerate(self.map):
+                #print(f'Writing row {i}: Length {len(row)}. Last element: {row[-1]}')
                 for element in row:
-                    file.write(element)
+                    if element != '\n':
+                        file.write(element)
                 file.write("\n")
 
     
