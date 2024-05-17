@@ -207,11 +207,11 @@ class Overworld():
             difficultyDiffBias *= 5
 
             if self.steps < 5:
-                odds = 10
-            elif self.steps < 10:
                 odds = 15
-            else:
+            elif self.steps < 10:
                 odds = 20
+            else:
+                odds = 25
 
             odds += difficultyDiffBias
             rollA = random.randint(1,100)

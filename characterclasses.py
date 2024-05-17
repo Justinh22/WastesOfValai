@@ -134,12 +134,12 @@ class Character():
         self.statusCount = 0
     def gainHP(self,val):
         self.hp += val
-        if self.hp > self.hpMax:
-            self.hp = self.hpMax
+        if self.hp > self.getMaxHP():
+            self.hp = self.getMaxHP()
     def gainMP(self,val):
         self.mp += val
-        if self.mp > self.mpMax:
-            self.mp = self.mpMax
+        if self.mp > self.getMaxMP():
+            self.mp = self.getMaxMP()
     def gainXP(self,val):
         self.xp += val
         if self.xp > self.nextLevel and self.level < 10:

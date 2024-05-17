@@ -333,17 +333,18 @@ class PauseMenu():
                                 elif mapChar == DESERT_CHAR: # Desert
                                     color = self.game.tan
                             elif self.mapMode == "difficulty" and mapChar != OCEAN_CHAR and mapChar != BORDER_CHAR and mapChar != PATH_CHAR:
-                                diff = self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c])
-                                power = math.ceil(self.game.player.party.getPower()/2)
-                                difficultyDiff = abs(diff-power)
-                                if difficultyDiff > 3:
-                                    difficultyDiff = 3
-                                if diff > power:
-                                    color = (255, 255 - (difficultyDiff * 85), 255 - (difficultyDiff * 85))
-                                elif diff < power:
-                                    color = (255 - (difficultyDiff * 85), 255, 255 - (difficultyDiff * 85))
-                                else:
-                                    color = self.game.white
+                                if mapChar == FOREST_CHAR or mapChar == PLAINS_CHAR or mapChar == DESERT_CHAR:
+                                    diff = self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c])
+                                    power = math.ceil(self.game.player.party.getPower()/2)
+                                    difficultyDiff = abs(diff-power)
+                                    if difficultyDiff > 3:
+                                        difficultyDiff = 3
+                                    if diff > power:
+                                        color = (255, 255 - (difficultyDiff * 85), 255 - (difficultyDiff * 85))
+                                    elif diff < power:
+                                        color = (255 - (difficultyDiff * 85), 255, 255 - (difficultyDiff * 85))
+                                    else:
+                                        color = self.game.white
                         else:
                             if self.game.WorldMap.map[r][c] == BORDER_CHAR:
                                 mapChar = self.game.WorldMap.map[r][c]
@@ -427,7 +428,7 @@ class PauseMenu():
                     self.action = "drop"
                     self.state = "confirmAction"
                 if self.substate == "inventory" and self.cursorPos == 0: # Use
-                    if self.game.player.party.members[self.targetPartyMember].getHP() >= 0:
+                    if self.game.player.party.members[self.targetPartyMember].getHP() > 0:
                         self.action = "use"
                         self.state = "confirmAction"
                     else:
