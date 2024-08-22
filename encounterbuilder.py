@@ -74,27 +74,27 @@ def pickLevels(level):
             encounterLevels = [15]
     elif level == 16:
         if picker == 0:
-            encounterLevels = [12,8,8]
+            encounterLevels = [12,10,10]
         else:
-            encounterLevels = [15,5,5,5]
+            encounterLevels = [15,8,8,8]
     elif level == 17:
         if picker == 0:
-            encounterLevels = [15,10]
+            encounterLevels = [15,12]
         else:
-            encounterLevels = [12,12]
+            encounterLevels = [12,12,12]
     elif level == 18:
         if picker == 0:
-            encounterLevels = [12,12,12]
+            encounterLevels = [15,15,12]
         else:
             encounterLevels = [18]
     elif level == 19:
         if picker == 0:
-            encounterLevels = [18,8,8,8]
+            encounterLevels = [18,12,12,12]
         else:
-            encounterLevels = [15,15]
+            encounterLevels = [15,15,15]
     elif level == 20:
         if picker == 0:
-            encounterLevels = [18,10,10,10]
+            encounterLevels = [18,15,12,10]
         else:
             encounterLevels = [20]
     # BENEATH THIS POINT, THESE ENCOUNTERS ARE UNUSED NOW

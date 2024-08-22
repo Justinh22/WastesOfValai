@@ -19,7 +19,7 @@ class Game():
         self.UP, self.DOWN, self.LEFT, self.RIGHT = False, False, False, False
         self.SELECT, self.START = False, False
         self.white, self.gray, self.darkgrey, self.black = (255,255,255), (150,150,150), (85,85,85), (0,0,0)
-        self.tan, self.lightgreen, self.green = (232, 235, 96), (181, 247, 94), (90, 176, 72)
+        self.tan, self.lightgreen, self.green, self.orange = (232, 235, 96), (181, 247, 94), (90, 176, 72), (179,114,2)
         self.brown, self.maroon, self.yellow = (173, 84, 0), (173, 0, 0), (255, 255, 0)
         self.red, self.blue, self.lightblue = (255,0,0), (0,0,255), (0,255,255)
 
@@ -53,7 +53,6 @@ class Game():
             self.overworld.display()
             self.screen.blit(self.screen, [0,0])
             pygame.display.update()
-        self.WorldMap.saveRevealed()
 
     def write(self,size,x,y,text):
         font = pygame.font.Font('freesansbold.ttf',size)
@@ -115,6 +114,8 @@ class Game():
         roomdb.close()
         dungeondb.close()
         playerdb.close()
+        self.WorldMap.saveRevealed()
+        self.WorldMap.saveWorld()
 
     def load(self):
         roomdb = open('databases/roomDatabase.db','rb')

@@ -19,7 +19,8 @@ class Directory():
         self.atkSpellDirectory = initAtkSpellDirectory()    # 300 - 399
         self.sptSpellDirectory = initSptSpellDirectory()    # 400 - 499
         self.talentDirectory = initTalentDirectory()        # 500 - 599
-        self.customDirectory = []                           # 600 - 699
+        self.accessoryDirectory = initAccessoryDirectory()  # 600 - 699
+        self.customDirectory = []                           # 700 - 799
         self.classDirectory = initClassDirectory()          # 0 - 99
         self.creatureDirectory = initCreatureDirectory()    # 0 - 99
         self.nameDirectory = initNameDirectory()            # 0 - 99
@@ -38,6 +39,8 @@ class Directory():
             item = self.getSptSpell(id)
         elif id < 600:
             item = self.getTalent(id)
+        elif id < 700:
+            item = self.getAccessory(id)
         return item
 
     def getItemName(self,id,scroll=False):
@@ -58,6 +61,8 @@ class Directory():
                 name += " Scroll"
         elif id < 600:
             name = self.talentDirectory[id-500].name
+        elif id < 700:
+            name = self.accessoryDirectory[id-600].name
         return name
 
     def getItemDesc(self,id):
@@ -74,6 +79,8 @@ class Directory():
             desc = self.sptSpellDirectory[id-400].description
         elif id < 600:
             desc = self.talentDirectory[id-500].description
+        elif id < 700:
+            desc = self.accessoryDirectory[id-600].description
         return desc
 
     def getItemRarity(self,id):
@@ -90,6 +97,8 @@ class Directory():
             rarity = self.sptSpellDirectory[id-400].rarity
         elif id < 600:
             rarity = self.talentDirectory[id-500].rarity
+        elif id < 700:
+            rarity = self.accessoryDirectory[id-600].rarity
         return rarity
     
     def getItemType(self,id):
@@ -108,6 +117,8 @@ class Directory():
             type = Type.SptSpell
         elif id < 600:
             type = Type.Talent
+        elif id < 700:
+            type = Type.Accessory
         return type
 
     def getSpellTarget(self,id):
@@ -146,6 +157,9 @@ class Directory():
     
     def getTalent(self,id):
         return self.copy(self.talentDirectory[id-500])
+    
+    def getAccessory(self,id):
+        return self.copy(self.accessoryDirectory[id-600])
 
     def getItemByRarity(self,type,rarity):
         print(f'Fetching {type} of rarity {rarity}...')
@@ -172,6 +186,10 @@ class Directory():
                     options.append(item.id)
         elif type == Type.Talent:
             for item in self.talentDirectory:
+                if item.rarity == rarity:
+                    options.append(item.id)
+        elif type == Type.Accessory:
+            for item in self.accessoryDirectory:
                 if item.rarity == rarity:
                     options.append(item.id)
         elif type == Type.Creature:
@@ -248,6 +266,11 @@ class Directory():
                 for rarity in range(rarityA,rarityB+1):
                     if item.rarity == rarity:
                         options.append(item.id)
+        elif type == Type.Accessory:
+            for item in self.accessoryDirectory:
+                for rarity in range(rarityA,rarityB+1):
+                    if item.rarity == rarity:
+                        options.append(item.id)
         elif type == Type.Creature:
             for item in self.creatureDirectory:
                 for rarity in range(rarityA,rarityB+1):
@@ -278,6 +301,9 @@ class Directory():
         if type == Type.SptSpell:
             divVal = MAX_DIFFICULTY / MAX_SPTSPELL_RARITY
             lootRarity = math.ceil(rarity / divVal)
+        if type == Type.Accessory:
+            divVal = MAX_DIFFICULTY / MAX_ACCESSORY_RARITY
+            lootRarity = math.ceil(rarity / divVal)
         return lootRarity
     
     def getLootRarityForCharacter(self,level,type):
@@ -296,16 +322,21 @@ class Directory():
         if type == Type.SptSpell:
             divVal = MAX_LEVEL / MAX_SPTSPELL_RARITY
             lootRarity = math.ceil(level / divVal)
+        if type == Type.Accessory:
+            divVal = MAX_LEVEL / MAX_ACCESSORY_RARITY
+            lootRarity = math.ceil(level / divVal)
         return lootRarity
     
-    def rollForLoot(self,difficulty,itemRarity,types):
+    def rollForLoot(self,difficulty,rarity,types):
         chosenType = types[random.randint(0,len(types)-1)]
-        itemRarity = difficulty + itemRarity.value
+        itemRarity = difficulty + rarity.value
+        #print(f'itemRarity ({itemRarity})= diff ({difficulty}) + rarity ({rarity.value})')
         if itemRarity < 1:
             itemRarity = 1
         if itemRarity > MAX_DIFFICULTY:
             itemRarity = MAX_DIFFICULTY
         itemRarity = self.getLootRarity(itemRarity, chosenType)
+        #print(f'Translated rarity for {chosenType}: {itemRarity}')
         return self.getItemByRarity(chosenType,itemRarity)
 
     def getCharacterName(self,members):

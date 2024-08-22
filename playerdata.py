@@ -9,6 +9,7 @@ class PlayerData():
         self.charNum = 100
         self.party.initializeMembers(directory,self.getNewCharID())
         self.hostel = hostel
+        self.lastCheckpoint = (0,0)
     def printContents(self):
         for member in self.party.members:
             print(member.name)

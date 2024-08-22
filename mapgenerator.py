@@ -13,6 +13,7 @@ class Map():
         self.sizeC = MAP_WIDTH
         self.startingPos = (0,0)
         self.finishPos = (0,0)
+        self.startingZone = 2
 
 
     def loadMap(self,startR=-1,startC=-1):
@@ -37,7 +38,7 @@ class Map():
             self.startingPos = (startR,startC)
 
 
-    def generateMap(self):
+    def generateMap(self,startingZone=1):
         row = []
         revealedRow = []
         for i in range(0,self.sizeR):
@@ -66,24 +67,20 @@ class Map():
 
         # Setting starting point...
         potentialStartPoints = []
-        for r in range(self.sizeR):
-            for c in range(self.sizeC):
-                if self.difficultyMap[r][c] != 'A' and self.difficultyMap[r][c] != 'B':
-                    continue
-                for coords in [(-1,0), (0,-1), (1,0), (0,1)]:
-                    if self.map[r+coords[0]][c+coords[1]] == ' ' or (self.difficultyMap[r+coords[0]][c+coords[1]] != 'A' and self.difficultyMap[r+coords[0]][c+coords[1]] != 'B'):
+        while potentialStartPoints == []:
+            startingZoneChar = self.valToLetter(startingZone)
+            for r in range(1,self.sizeR-1):
+                for c in range(1,self.sizeC-1):
+                    if self.difficultyMap[r][c] != startingZoneChar:
                         continue
-                potentialStartPoints.append((r,c))
+                    for coords in [(-1,0), (0,-1), (1,0), (0,1)]:
+                        if self.map[r+coords[0]][c+coords[1]] == ' ' or self.difficultyMap[r+coords[0]][c+coords[1]] != startingZoneChar:
+                            continue
+                    potentialStartPoints.append((r,c))
+            if potentialStartPoints == []:
+                startingZone += 1
 
-        if len(potentialStartPoints) is 0:
-            self.startingPos = (round(self.sizeR/2),round(self.sizeC/2))
-            while self.map[self.startingPos[0]][self.startingPos[1]] == ' ':
-                if self.startingPos[0] > round(self.sizeR/3):
-                    self.startingPos = (self.startingPos[0]-1, self.startingPos[1])
-                else:
-                    self.startingPos = (self.startingPos[0], self.startingPos[1]+1)
-        else:
-            self.startingPos = random.choice(potentialStartPoints)
+        self.startingPos = random.choice(potentialStartPoints)
 
         endSet = random.randint(1,8)
         if endSet == 1:
@@ -146,7 +143,7 @@ class Map():
 
         print("Generating landmarks...")
         self.placeLandmarks(LANDMARK_COUNT)
-        #self.setFirstHaven()
+        self.setFirstHaven()
 
         with open("generated_map.txt","w") as file:
             for row in self.map:
@@ -288,7 +285,7 @@ class Map():
         count = 0
         coordsList = []
         randomQuadOn = False
-        burnout = 500
+        burnout = 50
         while count < num or burnout <= 0:
             upperBoundR = quadrantSizeR*(r+1)
             if upperBoundR >= MAP_HEIGHT:
@@ -302,6 +299,7 @@ class Map():
             if self.map[targetR][targetC] == ' ' or self.map[targetR][targetC] == 'X':
                 burnout -= 1
                 continue
+            burnout = 50
             coordsList.append((targetR,targetC))
 
             if not randomQuadOn:
@@ -319,13 +317,22 @@ class Map():
         return coordsList
 
 
-
-
     def saveRevealed(self):
         with open("revealed_map.txt","w") as file:
             for row in self.revealedMap:
                 for element in row:
                     file.write(element)
+                file.write("\n")
+
+
+    def saveWorld(self):
+        with open("generated_map.txt","w") as file:
+            print("Saving...")
+            for i, row in enumerate(self.map):
+                #print(f'Writing row {i}: Length {len(row)}. Last element: {row[-1]}')
+                for element in row:
+                    if element != '\n':
+                        file.write(element)
                 file.write("\n")
 
     
@@ -352,6 +359,7 @@ class Map():
             biomeList.clear()
             biomeList.append(currentBiome)
             self.difficultyMap[r][c] = diff
+            self.spread(self.sizeR, self.sizeC, r, c, currentBiome, diff)
             #self.printCoords(r,c)
             while r < startingPoint[0] + radius:
                 if r < self.sizeR-1:

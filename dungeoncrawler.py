@@ -9,10 +9,11 @@ from dungeonmapgenerator import *
 from characterpopups import *
 
 class Crawler():
-    def __init__(self,game,dungeonMap):
+    def __init__(self,game,dungeon):
         self.game = game
-        self.dungeonMap = dungeonMap
-        self.dungeonPos = self.setEntry()
+        self.dungeon = dungeon
+        self.dungeonMap = self.dungeon.getFloor(1)
+        self.dungeonPos = self.setEntryAt()
         self.inDungeon = True
         self.state = "main"
         self.width = self.game.width - 60
@@ -114,7 +115,9 @@ class Crawler():
     def drawScreen(self):
         blockSize = 30 #Set the size of the grid block
         self.game.screen.fill((0,0,0))
-        write(self.game, 20,self.width-80,self.height+10,"ST) Pause")
+        floorInfo = "Floor " + str(self.dungeonMap.floor) + "/" + str(self.dungeonMap.maxFloors)
+        write(self.game,15,self.width-80,self.height+10,"ST) Pause")
+        write(self.game,15,self.width-80,self.height+30,floorInfo)
         for x in range(30, self.width, blockSize):
             for y in range(30, self.height, blockSize):
                 color = self.game.white
@@ -155,16 +158,32 @@ class Crawler():
             write(self.game, 20, 30,self.height+10,self.message)
             self.messageTimer -= 1
 
+    def nextFloor(self):
+        nextFloor = self.dungeonMap.floor + 1
+        self.dungeonMap = self.dungeon.getFloor(nextFloor)
+        self.dungeonPos = list(self.setEntryAt("Entrance"))
+        self.enemyList = []
 
-    def setEntry(self):
-        if self.dungeonMap.map[self.dungeonMap.entrance[0]-1][self.dungeonMap.entrance[1]] == ' ':
-            return ((self.dungeonMap.entrance[0]-1,self.dungeonMap.entrance[1]))
-        if self.dungeonMap.map[self.dungeonMap.entrance[0]][self.dungeonMap.entrance[1]+1] == ' ':
-            return ((self.dungeonMap.entrance[0],self.dungeonMap.entrance[1]+1))
-        if self.dungeonMap.map[self.dungeonMap.entrance[0]+1][self.dungeonMap.entrance[1]] == ' ':
-            return ((self.dungeonMap.entrance[0]+1,self.dungeonMap.entrance[1]))
-        if self.dungeonMap.map[self.dungeonMap.entrance[0]][self.dungeonMap.entrance[1]-1] == ' ':
-            return ((self.dungeonMap.entrance[0],self.dungeonMap.entrance[1]-1))
+    def previousFloor(self):
+        prevFloor = self.dungeonMap.floor - 1
+        self.dungeonMap = self.dungeon.getFloor(prevFloor)
+        self.dungeonPos = list(self.setEntryAt("Downstairs"))
+        self.enemyList = []
+
+    def setEntryAt(self,entry="Entrance"):
+        if entry == "Entrance":
+            enterPoint = self.dungeonMap.entrance
+        elif entry == "Downstairs":
+            enterPoint = self.dungeonMap.downStairs
+        return enterPoint
+        #if self.dungeonMap.map[enterPoint[0]-1][enterPoint[1]] == FLOOR_CHAR:
+        #    return ((enterPoint[0]-1,enterPoint[1]))
+        #if self.dungeonMap.map[enterPoint[0]][enterPoint[1]+1] == FLOOR_CHAR:
+        #    return ((enterPoint[0],enterPoint[1]+1))
+        #if self.dungeonMap.map[enterPoint[0]+1][enterPoint[1]] == FLOOR_CHAR:
+        #    return ((enterPoint[0]+1,enterPoint[1]))
+        #if self.dungeonMap.map[enterPoint[0]][enterPoint[1]-1] == FLOOR_CHAR:
+        #    return ((enterPoint[0],enterPoint[1]-1))
         
     def setColor(self,mapChar):
         if mapChar == WELL_WALL:
@@ -214,6 +233,10 @@ class Crawler():
             self.state = "lootSummary"
         elif self.dungeonMap.map[r][c] == WANDERER_CHAR:
             self.state = "wandererSummary"
+        elif self.dungeonMap.map[r][c] == STAIRS_DOWN_CHAR:
+            self.nextFloor()
+        elif self.dungeonMap.map[r][c] == STAIRS_UP_CHAR:
+            self.previousFloor()
         else:
             self.state = "main"
 
@@ -233,7 +256,7 @@ class Enemy():
         self.patrolPoints = coords
         self.coords = list(self.patrolPoints[0])
         self.tick = 0
-        self.speed = 150
+        self.speed = DUNGEON_ENEMY_SPEED
         self.mode = "patrol"
         self.fov = 6
         self.huntFov = 10
@@ -257,9 +280,9 @@ class Enemy():
 
     def setSpeed(self):
         if self.mode == "patrol" or self.mode == "return":
-            self.speed = 150
+            self.speed = DUNGEON_ENEMY_SPEED
         elif self.mode == "hunt":
-            self.speed = 100
+            self.speed = DUNGEON_ENEMY_SPEED/2
 
     def act(self,coords):
         self.actReady = False
