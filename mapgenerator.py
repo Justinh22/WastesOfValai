@@ -38,7 +38,7 @@ class Map():
             self.startingPos = (startR,startC)
 
 
-    def generateMap(self,startingZone=2):
+    def generateMap(self,startingZone=1):
         row = []
         revealedRow = []
         for i in range(0,self.sizeR):
@@ -67,26 +67,20 @@ class Map():
 
         # Setting starting point...
         potentialStartPoints = []
-        startingZoneChar = self.valToLetter(startingZone)
-        belowStartingZoneChar = self.valToLetter(startingZone-1)
-        for r in range(1,self.sizeR-1):
-            for c in range(1,self.sizeC-1):
-                if self.difficultyMap[r][c] != belowStartingZoneChar and self.difficultyMap[r][c] != startingZoneChar:
-                    continue
-                for coords in [(-1,0), (0,-1), (1,0), (0,1)]:
-                    if self.map[r+coords[0]][c+coords[1]] == ' ' or (self.difficultyMap[r+coords[0]][c+coords[1]] != belowStartingZoneChar and self.difficultyMap[r+coords[0]][c+coords[1]] != startingZoneChar):
+        while potentialStartPoints == []:
+            startingZoneChar = self.valToLetter(startingZone)
+            for r in range(1,self.sizeR-1):
+                for c in range(1,self.sizeC-1):
+                    if self.difficultyMap[r][c] != startingZoneChar:
                         continue
-                potentialStartPoints.append((r,c))
+                    for coords in [(-1,0), (0,-1), (1,0), (0,1)]:
+                        if self.map[r+coords[0]][c+coords[1]] == ' ' or self.difficultyMap[r+coords[0]][c+coords[1]] != startingZoneChar:
+                            continue
+                    potentialStartPoints.append((r,c))
+            if potentialStartPoints == []:
+                startingZone += 1
 
-        if len(potentialStartPoints) == 0:
-            self.startingPos = (round(self.sizeR/2),round(self.sizeC/2))
-            while self.map[self.startingPos[0]][self.startingPos[1]] == ' ':
-                if self.startingPos[0] > round(self.sizeR/3):
-                    self.startingPos = (self.startingPos[0]-1, self.startingPos[1])
-                else:
-                    self.startingPos = (self.startingPos[0], self.startingPos[1]+1)
-        else:
-            self.startingPos = random.choice(potentialStartPoints)
+        self.startingPos = random.choice(potentialStartPoints)
 
         endSet = random.randint(1,8)
         if endSet == 1:
@@ -149,7 +143,7 @@ class Map():
 
         print("Generating landmarks...")
         self.placeLandmarks(LANDMARK_COUNT)
-        #self.setFirstHaven()
+        self.setFirstHaven()
 
         with open("generated_map.txt","w") as file:
             for row in self.map:
@@ -323,13 +317,22 @@ class Map():
         return coordsList
 
 
-
-
     def saveRevealed(self):
         with open("revealed_map.txt","w") as file:
             for row in self.revealedMap:
                 for element in row:
                     file.write(element)
+                file.write("\n")
+
+
+    def saveWorld(self):
+        with open("generated_map.txt","w") as file:
+            print("Saving...")
+            for i, row in enumerate(self.map):
+                #print(f'Writing row {i}: Length {len(row)}. Last element: {row[-1]}')
+                for element in row:
+                    if element != '\n':
+                        file.write(element)
                 file.write("\n")
 
     

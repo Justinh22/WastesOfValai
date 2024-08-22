@@ -15,7 +15,7 @@ class MainMenu():
         self.debug_lv = 1
         self.debug_cls = -1
         self.debug_startingItems = []
-        self.startingZone = 2
+        self.startingZone = 1
         self.debugOps = []
         self.startPos = (self.game.width/2,self.game.height/2+30)
         self.loadPos = (self.game.width/2,self.game.height/2+50)

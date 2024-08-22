@@ -11,7 +11,9 @@ class Character():
         self.level = lv
         self.id = id
         self.xp = 0
-        self.nextLevel = 200*lv
+        self.nextLevel = 0
+        for i in range(1,lv+1):
+            self.nextLevel += i*100
         self.type = tp # Class; Type is used to avoid defined 'class' name
         self.spells = []
         self.talents = []
@@ -24,15 +26,18 @@ class Character():
         self.eqpWpn = Weapon()
         self.eqpAmr = Armor()
         self.eqpAcc = Accessory()
-        self.hpMax = 20
-        self.mpMax = 20
-        self.attack = 3
-        self.critrate = 0
-        self.defense = 1
-        self.dodge = 0
-        self.luck = 0
-        self.speed = 1
-        for i in range(0,lv):
+        self.hpMax = self.type.startingStats[0]
+        self.mpMax = self.type.startingStats[1]
+        self.attack = self.type.startingStats[2]
+        self.accuracy = self.type.startingStats[3]
+        self.critrate = self.type.startingStats[4]
+        self.defense = self.type.startingStats[5]
+        self.dodge = self.type.startingStats[6]
+        self.luck = self.type.startingStats[7]
+        self.speed = self.type.startingStats[8]
+        self.amplifier = self.type.startingStats[9]
+        self.manaregen = self.type.startingStats[10]
+        for i in range(1,lv):
             growth = tp.getGrowths()
             self.hpMax += growth[0]
             self.mpMax += growth[1]
@@ -45,9 +50,6 @@ class Character():
         self.lastLearned = []
         self.hp = self.hpMax
         self.mp = self.mpMax
-        self.accuracy = 70
-        self.amplifier = 0
-        self.manaregen = 0
         self.hpregen = 0
         self.buffs = [0,0,0,0,0,0,0]
         self.universalEffects = UniversalEffects()
@@ -70,11 +72,16 @@ class Character():
     def getCritRate(self):
         return self.eqpWpn.critrate + self.critrate + self.universalEffects.critrate + self.getBuff("CRT")
     def getAccuracy(self):
+        ablazePenalty = 0
+        if self.status is Status.Ablaze:
+            ablazePenalty = 33
         if self.eqpWpn.accuracy > 0:
-            return self.eqpWpn.accuracy + self.universalEffects.accuracy + self.getBuff("ACC")
+            return self.eqpWpn.accuracy + self.universalEffects.accuracy + self.getBuff("ACC") - ablazePenalty
         else:
-            return self.accuracy + self.universalEffects.accuracy + self.getBuff("ACC")
+            return self.accuracy + self.universalEffects.accuracy + self.getBuff("ACC") - ablazePenalty
     def getDodge(self):
+        if self.status is Status.Shocked:
+            return 0
         return self.eqpAmr.dodge + self.dodge + self.universalEffects.dodge + self.getBuff("DDG")
     def getLuck(self):
         return self.luck + self.universalEffects.luck + self.getBuff("LCK")
@@ -94,8 +101,11 @@ class Character():
         return val
     def takeDamage(self,val):
         print(f'{self.name} took {val} damage!')
-        if val > self.hp:
+        if val >= self.hp:
             self.hp = 0
+            print(f'{self.name} has fallen!')
+            self.resetStatus()
+            self.resetBuffs()
         else:
             self.hp -= val
         return val
@@ -134,12 +144,12 @@ class Character():
         self.statusCount = 0
     def gainHP(self,val):
         self.hp += val
-        if self.hp > self.hpMax:
-            self.hp = self.hpMax
+        if self.hp > self.getMaxHP():
+            self.hp = self.getMaxHP()
     def gainMP(self,val):
         self.mp += val
-        if self.mp > self.mpMax:
-            self.mp = self.mpMax
+        if self.mp > self.getMaxMP():
+            self.mp = self.getMaxMP()
     def gainXP(self,val):
         self.xp += val
         if self.xp > self.nextLevel and self.level < 10:
@@ -154,7 +164,7 @@ class Character():
         if self.level != 10:
             self.level += 1
         self.xp = 0
-        self.nextLevel += 200
+        self.nextLevel += self.level*100
         growth = self.type.getGrowths()
         self.hpMax += growth[0]
         self.mpMax += growth[1]
@@ -244,8 +254,8 @@ class Character():
         print(f'Level: {self.type.supportMagicLevel[self.level-1] + self.universalEffects.sptMagicLevel} vs Spell: {idRarity}')
         return self.type.supportMagicLevel[self.level-1] + self.universalEffects.sptMagicLevel >= idRarity
     def fullRestore(self):
-        self.hp = self.hpMax
-        self.mp = self.mpMax
+        self.hp = self.getMaxHP()
+        self.mp = self.getMaxMP()
         self.resetStatus()
     def canCast(self,spellbookIndex,dir):
         return dir.getManaCost(self.spells[spellbookIndex]) <= self.mp
@@ -253,6 +263,12 @@ class Character():
         self.mp -= dir.getManaCost(self.spells[spellbookIndex])
         if self.mp < 0:
             self.mp = 0
+    def changeMana(self,amount):
+        self.mp += amount
+        if self.mp < 0:
+            self.mp = 0
+        if self.mp > self.getMaxMP():
+            self.mp = self.getMaxMP()
     def canPerform(self,talentID,dir):
         return dir.getManaCost(talentID) <= self.mp
     def universalEffectHandler(self,accessory,mode):
@@ -312,9 +328,11 @@ class ClassType():
         self.id = idIN
         self.description = ""
         self.rating = []
-    def setAdditionalInfo(self,rating,desc):
+        self.startingStats = []
+    def setAdditionalInfo(self,rating,stats,desc):
         self.description = desc
-        self.rating = rating
+        self.rating = rating # Rating Order: [Power,Sturdiness,Nimbleness,Arcana,Faith,Luck]
+        self.startingStats = stats # [HP,MP,ATK,ACC,CRT,DEF,DDG,LCK,SPD,AMP,MPG]
     def getGrowths(self):
         return [self.hpGrowth[random.randint(0,2)], self.mpGrowth[random.randint(0,2)], self.atkGrowth[random.randint(0,2)], self.crtGrowth[random.randint(0,2)], self.defGrowth[random.randint(0,2)], self.ddgGrowth[random.randint(0,2)], self.lckGrowth[random.randint(0,2)], self.spdGrowth[random.randint(0,2)]]
     def wpnProfToString(self):
@@ -455,12 +473,19 @@ class Creature():
         self.biomeType = type
         self.knownSpells = spells
         self.spellCooldown = 0
-        self.status = "None"
+        self.status = Status.NoStatus
         self.statusCount = 0
     def getAccuracy(self):
-        return self.accuracy
+        ablazePenalty = 0
+        if self.status is Status.Ablaze:
+            ablazePenalty = 30
+        return self.accuracy - ablazePenalty
     def getDodge(self):
+        if self.status is Status.Shocked:
+            return 0
         return self.dodge
+    def getSpeed(self):
+        return self.speed
     def getHP(self):
         return self.hp
     def getMaxHP(self):
@@ -473,6 +498,8 @@ class Creature():
         print(f'{self.name} took {val} damage!')
         if val > self.hp:
             self.hp = 0
+            print(f'{self.name} has fallen!')
+            self.resetStatus()
         else:
             self.hp -= val
         return val
@@ -480,7 +507,10 @@ class Creature():
         if self.statusCount > 0:
             self.statusCount -= 1
             if self.statusCount == 0:
-                self.status = "None"
+                self.status = Status.NoStatus
+    def resetStatus(self):
+        self.status = Status.NoStatus
+        self.statusCount = 0
 
 class Encounter():
     def __init__(self):

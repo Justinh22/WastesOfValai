@@ -175,15 +175,15 @@ class Crawler():
             enterPoint = self.dungeonMap.entrance
         elif entry == "Downstairs":
             enterPoint = self.dungeonMap.downStairs
-
-        if self.dungeonMap.map[enterPoint[0]-1][enterPoint[1]] == FLOOR_CHAR:
-            return ((enterPoint[0]-1,enterPoint[1]))
-        if self.dungeonMap.map[enterPoint[0]][enterPoint[1]+1] == FLOOR_CHAR:
-            return ((enterPoint[0],enterPoint[1]+1))
-        if self.dungeonMap.map[enterPoint[0]+1][enterPoint[1]] == FLOOR_CHAR:
-            return ((enterPoint[0]+1,enterPoint[1]))
-        if self.dungeonMap.map[enterPoint[0]][enterPoint[1]-1] == FLOOR_CHAR:
-            return ((enterPoint[0],enterPoint[1]-1))
+        return enterPoint
+        #if self.dungeonMap.map[enterPoint[0]-1][enterPoint[1]] == FLOOR_CHAR:
+        #    return ((enterPoint[0]-1,enterPoint[1]))
+        #if self.dungeonMap.map[enterPoint[0]][enterPoint[1]+1] == FLOOR_CHAR:
+        #    return ((enterPoint[0],enterPoint[1]+1))
+        #if self.dungeonMap.map[enterPoint[0]+1][enterPoint[1]] == FLOOR_CHAR:
+        #    return ((enterPoint[0]+1,enterPoint[1]))
+        #if self.dungeonMap.map[enterPoint[0]][enterPoint[1]-1] == FLOOR_CHAR:
+        #    return ((enterPoint[0],enterPoint[1]-1))
         
     def setColor(self,mapChar):
         if mapChar == WELL_WALL:
