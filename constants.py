@@ -113,7 +113,7 @@ class Biome(Enum):
 
 class Status(Enum):
     Shocked = 0
-    Burned = 1
+    Ablaze = 1
     Freezing = 2
     NoStatus = 3
 

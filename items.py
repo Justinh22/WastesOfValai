@@ -246,14 +246,14 @@ def initPotionDirectory():
     potionDirectory = []
 
     #1
-    Potion_of_Minor_Healing = Potion("Minor Healing Potion","A potion capable of restoring a meager amount of life.",1,200,25,0)
+    Potion_of_Minor_Healing = Potion("Minor Healing Potion","A potion capable of restoring a meager amount of life.",1,200,30,0)
     potionDirectory.append(Potion_of_Minor_Healing)
-    Potion_of_Minor_Calming = Potion("Minor Calming Potion","A potion capable of restoring a meager amount of magical ability.",1,201,0,25)
+    Potion_of_Minor_Calming = Potion("Minor Calming Potion","A potion capable of restoring a meager amount of magical ability.",1,201,0,30)
     potionDirectory.append(Potion_of_Minor_Calming)
     #2
-    Potion_of_Lesser_Healing = Potion("Lesser Healing Potion","A potion capable of restoring a small amount of life.",2,202,50,0)
+    Potion_of_Lesser_Healing = Potion("Lesser Healing Potion","A potion capable of restoring a small amount of life.",2,202,70,0)
     potionDirectory.append(Potion_of_Lesser_Healing)
-    Potion_of_Lesser_Calming = Potion("Lesser Calming Potion","A potion capable of restoring a small amount of magical ability.",2,203,0,50)
+    Potion_of_Lesser_Calming = Potion("Lesser Calming Potion","A potion capable of restoring a small amount of magical ability.",2,203,0,70)
     potionDirectory.append(Potion_of_Lesser_Calming)
     #3
     Potion_of_Healing = Potion("Healing Potion","A potion capable of restoring life.",3,204,100,0)
@@ -265,7 +265,7 @@ def initPotionDirectory():
     potionDirectory.append(Potion_of_Greater_Healing)
     Potion_of_Greater_Calming = Potion("Greater Calming Potion","A potion capable of restoring a great amount of magical ability.",4,207,0,150)
     potionDirectory.append(Potion_of_Greater_Calming)
-    Potion_of_Replenishment = Potion("Replenishment Potion","A potion capable of restoring both life and magical ability.",4,208,50,50)
+    Potion_of_Replenishment = Potion("Replenishment Potion","A potion capable of restoring both life and magical ability.",4,208,70,70)
     potionDirectory.append(Potion_of_Replenishment)
     #5
     Potion_of_Major_Healing = Potion("Major Healing Potion","A potion capable of restoring a massive amount of life.",5,209,250,0)
@@ -337,24 +337,28 @@ def initAtkSpellDirectory():
     attackSpellDirectory.append(Blizzard)
 
     #DEBUFFS
-    Shock = AttackMagic("Shock","Has a chance to inflict Shock on a target.",2,324,18,0,SpellType.Debuff,Element.Lightning,Target.Single)
+
+    # SHOCK: Has a 50% chance to have action cancelled. DDG is set to 0%. Moved to last in the combat order.
+    # ABLAZE: Takes damage equal to 10% of max hp each turn. ACC is reduced by 33%.
+    # FREEZING: Has a 50% chance to have action cancelled. Unable to cast spells. Saps 10% of max mp each turn. 
+    Shock = AttackMagic("Shock","Has a chance to inflict Shocked on a target.",2,324,18,0,SpellType.Debuff,Element.Lightning,Target.Single)
     attackSpellDirectory.append(Shock)
-    Burn = AttackMagic("Burn","Has a chance to inflict Burned on a target.",2,325,18,0,SpellType.Debuff,Element.Fire,Target.Single)
-    attackSpellDirectory.append(Burn)
+    Ablaze = AttackMagic("Ablaze","Has a chance to inflict Ablaze on a target.",2,325,18,0,SpellType.Debuff,Element.Fire,Target.Single)
+    attackSpellDirectory.append(Ablaze)
     Freeze = AttackMagic("Freeze","Has a chance to inflict Freezing on a target.",2,326,18,0,SpellType.Debuff,Element.Ice,Target.Single)
     attackSpellDirectory.append(Freeze)
 
-    Shock_II = AttackMagic("Shock II","Inflicts Shock on a target.",3,327,30,0,SpellType.Debuff,Element.Lightning,Target.Single)
+    Shock_II = AttackMagic("Shock II","Inflicts Shocked on a target.",3,327,30,0,SpellType.Debuff,Element.Lightning,Target.Single)
     attackSpellDirectory.append(Shock_II)
-    Burn_II = AttackMagic("Burn II","Inflicts Burned on a target.",3,328,30,0,SpellType.Debuff,Element.Fire,Target.Single)
-    attackSpellDirectory.append(Burn_II)
+    Ablaze_II = AttackMagic("Ablaze II","Inflicts Ablaze on a target.",3,328,30,0,SpellType.Debuff,Element.Fire,Target.Single)
+    attackSpellDirectory.append(Ablaze_II)
     Freeze_II = AttackMagic("Freeze II","Inflicts Freezing on a target.",3,329,30,0,SpellType.Debuff,Element.Ice,Target.Single)
     attackSpellDirectory.append(Freeze_II)
 
-    Shock_Wave = AttackMagic("Shock Wave","Has a chance to inflict Shock on all targets.",4,330,50,0,SpellType.Debuff,Element.Lightning,Target.All)
+    Shock_Wave = AttackMagic("Shock Wave","Has a chance to inflict Shocked on all targets.",4,330,50,0,SpellType.Debuff,Element.Lightning,Target.All)
     attackSpellDirectory.append(Shock_Wave)
-    Burn_Wave = AttackMagic("Burn Wave","Has a chance to inflict Burned on all targets.",4,331,50,0,SpellType.Debuff,Element.Fire,Target.All)
-    attackSpellDirectory.append(Burn_Wave)
+    Ablaze_Wave = AttackMagic("Ablaze Wave","Has a chance to inflict Ablaze on all targets.",4,331,50,0,SpellType.Debuff,Element.Fire,Target.All)
+    attackSpellDirectory.append(Ablaze_Wave)
     Freeze_Wave = AttackMagic("Freeze Wave","Has a chance to inflict Freezing on all targets.",4,332,50,0,SpellType.Debuff,Element.Ice,Target.All)
     attackSpellDirectory.append(Freeze_Wave)
 
@@ -380,7 +384,7 @@ def initSptSpellDirectory():
     sptSpellDirectory.append(Speed)
     Fortune = SupportMagic("Fortune","Increases Lck.",1,405,[0,0,0,0,0,15,0],16,SpellType.Buff,Target.Single)
     sptSpellDirectory.append(Fortune)
-    Minor_Heal = SupportMagic("Minor Heal","Heals for a small amount of health.",1,406,[0,0,0,0,0,0,20],16,SpellType.Heal,Target.Single)
+    Minor_Heal = SupportMagic("Minor Heal","Heals for a small amount of health.",1,406,[0,0,0,0,0,0,30],16,SpellType.Heal,Target.Single)
     sptSpellDirectory.append(Minor_Heal)
     #2
     Rally = SupportMagic("Rally","Increases Atk and Def.",2,407,[10,0,0,10,0,0,0],30,SpellType.Buff,Target.Single)
@@ -395,9 +399,9 @@ def initSptSpellDirectory():
     sptSpellDirectory.append(Veil)
     Fate = SupportMagic("Fate","Increases Crt and Lck.",2,412,[0,0,15,0,0,15,0],30,SpellType.Buff,Target.Single)
     sptSpellDirectory.append(Fate)
-    Heal = SupportMagic("Heal","Heals for a moderate amount of health.",2,413,[0,0,0,0,0,0,50],30,SpellType.Heal,Target.Single)
+    Heal = SupportMagic("Heal","Heals for a moderate amount of health.",2,413,[0,0,0,0,0,0,75],30,SpellType.Heal,Target.Single)
     sptSpellDirectory.append(Heal)
-    Minor_Regenerate = SupportMagic("Minor Regenerate","Heals for a small amount of health over time.",2,414,[0,0,0,0,0,0,12],24,SpellType.Buff,Target.Single)
+    Minor_Regenerate = SupportMagic("Minor Regenerate","Heals for a small amount of health over time.",2,414,[0,0,0,0,0,0,15],24,SpellType.Buff,Target.Single)
     sptSpellDirectory.append(Minor_Regenerate)
     #3
     Rage_II =  SupportMagic("Rage II","Increases Atk by a great amount.",3,415,[20,0,0,0,0,0,0],30,SpellType.Buff,Target.Single)
@@ -424,9 +428,9 @@ def initSptSpellDirectory():
     sptSpellDirectory.append(Speed_Aura)
     Fortune_Aura = SupportMagic("Fortune Aura","Increases your party's Lck.",3,426,[0,0,0,0,0,15,0],36,SpellType.Buff,Target.All)
     sptSpellDirectory.append(Fortune_Aura)
-    Minor_Heal_Aura = SupportMagic("Minor Heal Aura","Heals all party members for a small amount of health.",3,427,[0,0,0,0,0,0,20],30,SpellType.Heal,Target.All)
+    Minor_Heal_Aura = SupportMagic("Minor Heal Aura","Heals all party members for a small amount of health.",3,427,[0,0,0,0,0,0,30],30,SpellType.Heal,Target.All)
     sptSpellDirectory.append(Minor_Heal_Aura)
-    Regenerate = SupportMagic("Regenerate","Heals for a moderate amount of health over time.",3,428,[0,0,0,0,0,0,24],40,SpellType.Buff,Target.Single)
+    Regenerate = SupportMagic("Regenerate","Heals for a moderate amount of health over time.",3,428,[0,0,0,0,0,0,30],40,SpellType.Buff,Target.Single)
     sptSpellDirectory.append(Regenerate)
     #4
     Rally_II = SupportMagic("Rally II","Increases Atk and Def by a great amount.",4,429,[20,0,0,20,0,0],40,SpellType.Buff,Target.Single)
@@ -455,13 +459,13 @@ def initSptSpellDirectory():
     sptSpellDirectory.append(Fate_Aura)
     Spectrum = SupportMagic("Spectrum","Increases all stats.",4,441,[10,15,15,10,15,15,0],50,SpellType.Buff,Target.Single)
     sptSpellDirectory.append(Spectrum)
-    Heal_Aura = SupportMagic("Heal Aura","Heals all party members for a moderate amount of health.",4,442,[0,0,0,0,0,0,50],50,SpellType.Heal,Target.All)
+    Heal_Aura = SupportMagic("Heal Aura","Heals all party members for a moderate amount of health.",4,442,[0,0,0,0,0,0,70],50,SpellType.Heal,Target.All)
     sptSpellDirectory.append(Heal_Aura)
-    Minor_Regenerate_Aura = SupportMagic("Minor Regenerate Aura","Heals all party members for a small amount of health over time.",4,443,[0,0,0,0,0,0,12],46,SpellType.Buff,Target.All)
+    Minor_Regenerate_Aura = SupportMagic("Minor Regenerate Aura","Heals all party members for a small amount of health over time.",4,443,[0,0,0,0,0,0,15],46,SpellType.Buff,Target.All)
     sptSpellDirectory.append(Minor_Regenerate_Aura)
-    Major_Heal = SupportMagic("Major Heal","Heals for a large amount of health.",4,444,[0,0,0,0,0,0,80],40,SpellType.Heal,Target.Single)
+    Major_Heal = SupportMagic("Major Heal","Heals for a large amount of health.",4,444,[0,0,0,0,0,0,120],40,SpellType.Heal,Target.Single)
     sptSpellDirectory.append(Major_Heal)
-    Raise = SupportMagic("Raise","Raises a party member from the dead with 30 HP.",4,445,[0,0,0,0,0,0,30],40,SpellType.Raise,Target.Single)
+    Raise = SupportMagic("Raise","Raises a party member from the dead with 50 HP.",4,445,[0,0,0,0,0,0,50],40,SpellType.Raise,Target.Single)
     sptSpellDirectory.append(Raise)
     #5
     Rage_Aura_II =  SupportMagic("Rage Aura II","Increases your party's Atk by a great amount.",5,446,[20,0,0,0,0,0,0],50,SpellType.Buff,Target.All)
@@ -478,11 +482,11 @@ def initSptSpellDirectory():
     sptSpellDirectory.append(Fortune_Aura_II)
     Spectrum_Aura = SupportMagic("Spectrum Aura","Increases all stats for all party members.",5,452,[10,15,15,10,15,15,0],64,SpellType.Buff,Target.All)
     sptSpellDirectory.append(Spectrum_Aura)
-    Major_Regenerate = SupportMagic("Major Regenerate","Heals for a large amount of health over time.",5,453,[0,0,0,0,0,0,40],64,SpellType.Buff,Target.Single)
+    Major_Regenerate = SupportMagic("Major Regenerate","Heals for a large amount of health over time.",5,453,[0,0,0,0,0,0,50],64,SpellType.Buff,Target.Single)
     sptSpellDirectory.append(Major_Regenerate)
-    Regenerate_Aura = SupportMagic("Regenerate Aura","Heals all party members for a moderate amount of health over time.",5,454,[0,0,0,0,0,0,24],64,SpellType.Buff,Target.All)
+    Regenerate_Aura = SupportMagic("Regenerate Aura","Heals all party members for a moderate amount of health over time.",5,454,[0,0,0,0,0,0,30],64,SpellType.Buff,Target.All)
     sptSpellDirectory.append(Regenerate_Aura)
-    Raise_Aura = SupportMagic("Raise Aura","Raises all fallen party members from the dead with 30 HP.",5,455,[0,0,0,0,0,0,30],80,SpellType.Raise,Target.All)
+    Raise_Aura = SupportMagic("Raise Aura","Raises all fallen party members from the dead with 50 HP.",5,455,[0,0,0,0,0,0,50],80,SpellType.Raise,Target.All)
     sptSpellDirectory.append(Raise_Aura)
 
     #Cleansing Spells
@@ -524,9 +528,9 @@ def initTalentDirectory():
     talentDirectory.append(Swift_Strike)
     Cleave = Talent("Cleave","Attack all enemies.",1,512,16,TalentType.Action,Target.All,Timing.InTurn)
     talentDirectory.append(Cleave)
-    Heartrend = Talent("Heartrend","Attack an enemy, restoring half of damage dealt as HP.",1,513,16,TalentType.Action,Target.Single,Timing.InTurn)
+    Heartrend = Talent("Heartrend","Attack an enemy, restoring damage dealt as HP.",1,513,16,TalentType.Action,Target.Single,Timing.InTurn)
     talentDirectory.append(Heartrend)
-    Soulrend = Talent("Soulrend","Attack an enemy, restoring half of damage dealt as MP.",1,514,8,TalentType.Action,Target.Single,Timing.InTurn)
+    Soulrend = Talent("Soulrend","Attack an enemy, restoring damage dealt as MP.",1,514,8,TalentType.Action,Target.Single,Timing.InTurn)
     talentDirectory.append(Soulrend)
     Blitz = Talent("Blitz","Attack an enemy twice.",1,515,16,TalentType.Action,Target.Single,Timing.InTurn)
     talentDirectory.append(Blitz)
@@ -584,7 +588,7 @@ def initAccessoryDirectory():
     accessoryDirectory.append(JadeBracer)
     BismuthAmulet = Accessory("Bismuth Amulet","Has a chance to negate magical damage.",1,615,15,AccessoryType.Active,Timing.DamageTaken)
     accessoryDirectory.append(BismuthAmulet)
-    RubyCirclet = Accessory("Ruby Circlet","Grants immunity to Burn.",1,616,0,AccessoryType.Passive,Timing.DamageTaken)
+    RubyCirclet = Accessory("Ruby Circlet","Grants immunity to Ablaze.",1,616,0,AccessoryType.Passive,Timing.DamageTaken)
     accessoryDirectory.append(RubyCirclet)
     TopazCirclet = Accessory("Topaz Circlet","Grants immunity to Shock.",1,617,0,AccessoryType.Passive,Timing.DamageTaken)
     accessoryDirectory.append(TopazCirclet)

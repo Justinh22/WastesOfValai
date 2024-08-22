@@ -204,14 +204,14 @@ class Overworld():
                 difficultyDiffBias = 3
             elif difficultyDiffBias <= -3:
                 difficultyDiffBias = -3
-            difficultyDiffBias *= 5
+            difficultyDiffBias *= 4
 
             if self.steps < 5:
                 odds = 15
             elif self.steps < 10:
-                odds = 20
+                odds = 18
             else:
-                odds = 25
+                odds = 20
 
             odds += difficultyDiffBias
             rollA = random.randint(1,100)

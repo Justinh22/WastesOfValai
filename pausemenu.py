@@ -182,6 +182,7 @@ class PauseMenu():
                 elif tgt.type == SpellType.Heal:
                     write(self.game, 15, 60, 245, "Heals for " + str(self.game.player.party.members[self.targetPartyMember].amplify(tgt.potency[6])) + " HP.")
                 if self.state == "itemSummary" and (self.game.directory.getItem(self.game.player.party.members[self.targetPartyMember].spells[self.targetElement]).type == SpellType.Heal or \
+                                                    self.game.directory.getItem(self.game.player.party.members[self.targetPartyMember].spells[self.targetElement]).type == SpellType.Raise or \
                                                     self.game.directory.getItem(self.game.player.party.members[self.targetPartyMember].spells[self.targetElement]).type == SpellType.Cleanse): # Cast:
                     write(self.game, 22, 540, 420, "Cast")
                     write(self.game, 22, 510 + (self.cursorPos*100), 417, "->")
@@ -433,12 +434,16 @@ class PauseMenu():
                         self.state = "confirmAction"
                     else:
                         self.state = "itemList"
-                if self.substate == "spellbook" and self.cursorPos == 0 and self.game.directory.getItem(self.game.player.party.members[self.targetPartyMember].spells[self.targetElement]).target == Target.Single and (self.game.directory.getItem(self.game.player.party.members[self.targetPartyMember].spells[self.targetElement]).type == SpellType.Heal or self.game.directory.getItem(self.game.player.party.members[self.targetPartyMember].spells[self.targetElement]).type == SpellType.Cleanse): # Cast
-                    self.action = "cast"
-                    self.state = "targetSelect"
-                if self.substate == "spellbook" and self.cursorPos == 0 and self.game.directory.getItem(self.game.player.party.members[self.targetPartyMember].spells[self.targetElement]).target == Target.All:
-                    self.action = "cast"
-                    self.state = "confirmAction"
+                if self.game.player.party.members[self.targetPartyMember].getHP() > 0:
+                    if self.substate == "spellbook" and self.cursorPos == 0 and self.game.directory.getItem(self.game.player.party.members[self.targetPartyMember].spells[self.targetElement]).target == Target.Single and (self.game.directory.getItem(self.game.player.party.members[self.targetPartyMember].spells[self.targetElement]).type == SpellType.Heal or self.game.directory.getItem(self.game.player.party.members[self.targetPartyMember].spells[self.targetElement]).type == SpellType.Cleanse): # Cast
+                        self.action = "cast"
+                        self.state = "targetSelect"
+                    if self.substate == "spellbook" and self.cursorPos == 0 and self.game.directory.getItem(self.game.player.party.members[self.targetPartyMember].spells[self.targetElement]).target == Target.Single and self.game.directory.getItem(self.game.player.party.members[self.targetPartyMember].spells[self.targetElement]).type == SpellType.Raise: # Cast
+                        self.action = "cast"
+                        self.state = "targetSelect"
+                    if self.substate == "spellbook" and self.cursorPos == 0 and self.game.directory.getItem(self.game.player.party.members[self.targetPartyMember].spells[self.targetElement]).target == Target.All:
+                        self.action = "cast"
+                        self.state = "confirmAction"
             elif self.state == "confirmAction":
                 self.actionHandler(self.substate, self.action, self.targetPartyMember, self.targetElement, self.spellTarget)
                 if self.substate == "equipment":
@@ -448,22 +453,26 @@ class PauseMenu():
                 elif self.substate == "spellbook":
                     self.state = "spellbook"
                     self.spellPageMod = 0
-                self.cursorPos = 0
+                if self.state == "equipment" or self.state == "inventory":
+                    self.cursorPos = 0
                 self.substate = "none"
                 self.spellTarget = -1
                 print(f'STATE HERE IS {self.state}')
             elif self.state == "targetSelect":
-                self.spellTarget = self.cursorPos
-                self.actionHandler(self.substate, self.action, self.targetPartyMember, self.targetElement, self.spellTarget)
-                if self.substate == "equipment":
-                    self.state = "equipment"
-                elif self.substate == "inventory":
-                    self.state = "inventory"
-                elif self.substate == "spellbook":
-                    self.state = "spellbook"
-                self.substate = "none"
-                self.spellTarget = -1
-                self.cursorPos = 0
+                if not (self.game.player.party.members[self.cursorPos].getHP() > 0 and self.game.directory.getItem(self.game.player.party.members[self.targetPartyMember].spells[self.targetElement]).type == SpellType.Raise) and \
+                    not (self.game.player.party.members[self.cursorPos].getHP() <= 0 and self.game.directory.getItem(self.game.player.party.members[self.targetPartyMember].spells[self.targetElement]).type == SpellType.Heal) and \
+                    not (self.game.player.party.members[self.cursorPos].getHP() <= 0 and self.game.directory.getItem(self.game.player.party.members[self.targetPartyMember].spells[self.targetElement]).type == SpellType.Cleanse):
+                    self.spellTarget = self.cursorPos
+                    self.actionHandler(self.substate, self.action, self.targetPartyMember, self.targetElement, self.spellTarget)
+                    if self.substate == "equipment":
+                        self.state = "equipment"
+                    elif self.substate == "inventory":
+                        self.state = "inventory"
+                    elif self.substate == "spellbook":
+                        self.state = "spellbook"
+                    self.substate = "none"
+                    self.spellTarget = -1
+                    self.cursorPos = 0
         if self.game.B:
             if self.state == "partySelect":
                 self.state = "main"
@@ -615,8 +624,8 @@ class PauseMenu():
         write(self.game, 14, xPos+10, yPos+70, "XP " + str(character.xp) + "/" + str(character.nextLevel))
         write(self.game, 12, xPos+120, yPos+30, "ATK Spl: " + str(character.type.attackMagicLevel[character.level-1]+character.universalEffects.atkMagicLevel))
         write(self.game, 12, xPos+120, yPos+50, "SPT Spl: " + str(character.type.supportMagicLevel[character.level-1]+character.universalEffects.sptMagicLevel))
-        if character.status == Status.Burned:
-            writeColor(self.game, 12, xPos+120, yPos+70, "Burned", self.game.red)
+        if character.status == Status.Ablaze:
+            writeColor(self.game, 12, xPos+120, yPos+70, "Ablaze", self.game.red)
         if character.status == Status.Shocked:
             writeColor(self.game, 12, xPos+120, yPos+70, "Shocked", self.game.yellow)
         if character.status == Status.Freezing:
@@ -713,6 +722,12 @@ class PauseMenu():
                     else:
                         for member in self.game.player.party.members:
                             member.resetStatus()
+                if self.game.directory.getItem(self.game.player.party.members[targetPartyMember].spells[targetElement]).type == SpellType.Raise:
+                    if spellTarget != -1:
+                        self.game.player.party.members[spellTarget].gainHP(50)
+                    else:
+                        for member in self.game.player.party.members:
+                            self.game.player.party.members[spellTarget].gainHP(50)
     
     def intToRating(self,val):
         ret = ""

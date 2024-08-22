@@ -50,6 +50,7 @@ class Combat():
         self.hitAll = False
         self.immune = False
         self.manaspent = False
+        self.risen = False
         self.curse = []
         self.deathWish = []
 
@@ -166,9 +167,11 @@ class Combat():
             elif self.state == "targetSelect":
                 self.state = "mainWindow"
                 self.showElementalEffectivenessColorsTo = None
-                if self.game.player.party.members[self.combatOrder[self.currentTurn][1]].status == Status.Shocked:
+                if self.game.player.party.members[self.combatOrder[self.currentTurn][1]].status == Status.Shocked and random.randint(0,1)==1:
                     self.actionVal = -2
-                if self.game.player.party.members[self.combatOrder[self.currentTurn][1]].status == Status.Freezing and random.randint(0,2)==0:
+                elif self.game.player.party.members[self.combatOrder[self.currentTurn][1]].status == Status.Freezing and (self.game.directory.getItemType(self.actionVal) == Type.AtkSpell or self.game.directory.getItemType(self.actionVal) == Type.SptSpell):
+                    self.actionVal = -4
+                elif self.game.player.party.members[self.combatOrder[self.currentTurn][1]].status == Status.Freezing and random.randint(0,1)==1:
                     self.actionVal = -3
                 if self.game.directory.getItem(self.actionVal).type == TalentType.PartyEffect or self.game.directory.getItem(self.actionVal).type == TalentType.EncounterEffect:
                     self.useTalent(self.combatOrder[self.currentTurn],self.cursorPos,self.actionVal)
@@ -208,8 +211,12 @@ class Combat():
                         else:
                             self.state = "mainWindow"
                             self.showElementalEffectivenessColorsTo = None
-                            if self.game.player.party.members[self.combatOrder[self.currentTurn][1]].status == Status.Shocked or (self.game.player.party.members[self.combatOrder[self.currentTurn][1]].status == Status.Freezing and random.randint(0,2)==0):
-                                self.actionVal = -1
+                            if self.game.player.party.members[self.combatOrder[self.currentTurn][1]].status == Status.Shocked and random.randint(0,1)==0:
+                                self.actionVal = -2
+                            elif self.game.player.party.members[self.combatOrder[self.currentTurn][1]].status == Status.Freezing:
+                                self.actionVal = -4
+                            elif self.game.player.party.members[self.combatOrder[self.currentTurn][1]].status == Status.Freezing and random.randint(0,1)==0:
+                                self.actionVal = -3
                             self.writeAction(self.combatOrder[self.currentTurn],0,self.actionVal)
                             print(f'Action writing for {self.combatOrder[self.currentTurn]}, length {len(self.actions)}')
                             self.next()
@@ -235,11 +242,14 @@ class Combat():
                         self.enterTargetSelect()
                     else:
                         self.state = "mainWindow"
-                        if self.game.player.party.members[self.combatOrder[self.currentTurn][1]].status == Status.Shocked:
+                        if self.game.player.party.members[self.combatOrder[self.currentTurn][1]].status == Status.Shocked and random.randint(0,1)==0:
                             self.actionVal = -2
-                        if self.game.player.party.members[self.combatOrder[self.currentTurn][1]].status == Status.Freezing and random.randint(0,2)==0:
+                        elif self.game.player.party.members[self.combatOrder[self.currentTurn][1]].status == Status.Freezing and random.randint(0,1)==0:
                             self.actionVal = -3
-                        self.useTalent(self.combatOrder[self.currentTurn],0,self.actionVal)
+                        if self.game.directory.getItemType(self.actionVal) == Type.Talent:
+                            self.useTalent(self.combatOrder[self.currentTurn],0,self.actionVal)
+                        else:
+                            self.writeAction(self.combatOrder[self.currentTurn],0,self.actionVal)
                         print(f'Action writing for {self.combatOrder[self.currentTurn]}, length {len(self.actions)}')
                         self.next()
                         self.cursorPos = -1
@@ -295,9 +305,14 @@ class Combat():
                 tgtList = self.encounter if self.actionVal < 200 else self.game.player.party.members
                 if self.actionVal >= 500:
                     tgtList = self.encounter if self.game.directory.getItem(self.actionVal).target == Target.Single else self.game.player.party.members
-                for i in range(0,self.cursorPos):
-                    if tgtList[i].hp > 0:
-                        self.cursorPos = i
+                if tgtList == self.encounter:
+                    for i in range(0,self.cursorPos):
+                        if tgtList[i].hp > 0:
+                            self.cursorPos = i
+                else:
+                    self.cursorPos -= 1
+                    if self.cursorPos < 0:
+                        self.cursorPos = len(self.game.player.party.members)-1
             elif self.state == "useMenu":
                 if self.cursorPos == 2 or self.cursorPos == 3:
                     self.cursorPos -= 2
@@ -312,10 +327,15 @@ class Combat():
                 tgtList = self.encounter if self.actionVal < 200 or (self.actionVal >= 300 and self.actionVal < 400) else self.game.player.party.members
                 if self.actionVal >= 500:
                     tgtList = self.encounter if self.game.directory.getItem(self.actionVal).target == Target.Single else self.game.player.party.members
-                for i in range(self.cursorPos+1,len(tgtList)):
-                    if tgtList[i].hp > 0:
-                        self.cursorPos = i
-                        break
+                if tgtList == self.encounter:
+                    for i in range(self.cursorPos+1,len(tgtList)):
+                        if tgtList[i].hp > 0:
+                            self.cursorPos = i
+                            break
+                else:
+                    self.cursorPos += 1
+                    if self.cursorPos > len(self.game.player.party.members)-1:
+                        self.cursorPos = 0
             elif self.state == "useMenu":
                 if self.cursorPos == 0 or self.cursorPos == 1:
                     self.cursorPos += 2
@@ -327,7 +347,7 @@ class Combat():
                     self.cursorPos += 2
             elif self.state == "talentList":
                 if self.cursorPos == 2 or self.cursorPos == 3:
-                    if self.menuTop+4 < len(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].talent):
+                    if self.menuTop+4 < len(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].talents):
                         self.menuTop += 2
                 else:
                     self.cursorPos += 2
@@ -357,10 +377,11 @@ class Combat():
         tgtList = self.encounter if self.actionVal < 200 else self.game.player.party.members
         if self.actionVal >= 500:
             tgtList = self.encounter if self.game.directory.getItem(self.actionVal).target == Target.Single else self.game.player.party.members
-        for i in range(0,len(tgtList)):
-            if tgtList[i].hp > 0:
-                self.cursorPos = i
-                break
+        if tgtList == self.encounter:
+            for i in range(0,len(tgtList)):
+                if tgtList[i].hp > 0:
+                    self.cursorPos = i
+                    break
 
     def drawScreen(self):
         screenOutline = pygame.Rect(self.left,self.top,self.right,self.bottom)
@@ -528,6 +549,11 @@ class Combat():
                     combatStr = self.encounter[self.actions[self.exTurn-1].source[1]].name + " is shocked, and cannot move!"
                 else:
                     combatStr = self.game.player.party.members[self.actions[self.exTurn-1].source[1]].name + " is shocked, and cannot move!"
+            elif self.actions[self.exTurn-1].action == -4:
+                if self.actions[self.exTurn-1].source[0] == "Encounter":
+                    combatStr = self.encounter[self.actions[self.exTurn-1].source[1]].name + " is freezing, and cannot cast spells!"
+                else:
+                    combatStr = self.game.player.party.members[self.actions[self.exTurn-1].source[1]].name + " is freezing, and cannot cast spells!"
             elif self.actions[self.exTurn-1].action == -3:
                 if self.actions[self.exTurn-1].source[0] == "Encounter":
                     combatStr = self.encounter[self.actions[self.exTurn-1].source[1]].name + " is freezing, and cannot move!"
@@ -634,11 +660,11 @@ class Combat():
             write(self.game, 20, 180+maxEncWidth, 30+offset, str(self.encounter[i].hp)+"/"+str(self.encounter[i].getMaxHP()))
             if self.encounter[i].status != Status.NoStatus:
                 if self.encounter[i].status == Status.Shocked:
-                    write(self.game, 20, 280+maxEncWidth, 30+offset, "<P"+str(self.encounter[i].statusCount)+">")
-                elif self.encounter[i].status == Status.Burned:
-                    write(self.game, 20, 280+maxEncWidth, 30+offset, "<B>")
+                    writeColor(self.game, 20, 280+maxEncWidth, 30+offset, "<S"+str(self.encounter[i].statusCount)+">", self.game.yellow)
+                elif self.encounter[i].status == Status.Ablaze:
+                    writeColor(self.game, 20, 280+maxEncWidth, 30+offset, "<A"+str(self.encounter[i].statusCount)+">", self.game.red)
                 elif self.encounter[i].status == Status.Freezing:
-                    write(self.game, 20, 280+maxEncWidth, 30+offset, "<F>")
+                    writeColor(self.game, 20, 280+maxEncWidth, 30+offset, "<F"+str(self.encounter[i].statusCount)+">", self.game.lightblue)
         for i in range(0,len(self.game.player.party.members)):
             offset = 30*i
             textWidth, textHeight = self.font.size(self.game.player.party.members[i].name)
@@ -652,11 +678,11 @@ class Combat():
             write(self.game, 20, self.right-maxPtyWidth-220, 170+offset, str(self.game.player.party.members[i].hp)+"/"+str(self.game.player.party.members[i].getMaxHP()))
             if self.game.player.party.members[i].status != Status.NoStatus:
                 if self.game.player.party.members[i].status == Status.Shocked:
-                    write(self.game, 20, self.right-maxPtyWidth-280, 170+offset, "<P>")
-                elif self.game.player.party.members[i].status == Status.Burned:
-                    write(self.game, 20, self.right-maxPtyWidth-280, 170+offset, "<B>")
+                    writeColor(self.game, 20, self.right-maxPtyWidth-280, 170+offset, "<S"+str(self.game.player.party.members[i].statusCount)+">", self.game.yellow)
+                elif self.game.player.party.members[i].status == Status.Ablaze:
+                    writeColor(self.game, 20, self.right-maxPtyWidth-280, 170+offset, "<A"+str(self.game.player.party.members[i].statusCount)+">", self.game.red)
                 elif self.game.player.party.members[i].status == Status.Freezing:
-                    write(self.game, 20, self.right-maxPtyWidth-280, 170+offset, "<F>")
+                    writeColor(self.game, 20, self.right-maxPtyWidth-280, 170+offset, "<F"+str(self.game.player.party.members[i].statusCount)+">", self.game.lightblue)
         #Setting border
         pygame.draw.line(self.game.screen,self.game.white,(self.left,320),(self.right+9,320),2)
 
@@ -700,10 +726,8 @@ class Combat():
         for i in range(len(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].activeBuffs)):
             writeOrientation(self.game, 11, self.right, 330+(i*15), self.game.player.party.members[self.combatOrder[self.currentTurn][1]].activeBuffs[i][0]+" ("+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].activeBuffs[i][1])+")","R")
             iNext += 1
-        if self.game.player.party.members[self.combatOrder[self.currentTurn][1]].status == Status.Shocked:
+        if self.game.player.party.members[self.combatOrder[self.currentTurn][1]].status != Status.NoStatus:
             writeOrientation(self.game, 11, self.right, 330+(iNext*15), self.game.player.party.members[self.combatOrder[self.currentTurn][1]].status.name+" ("+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].statusCount)+")","R")
-        elif self.game.player.party.members[self.combatOrder[self.currentTurn][1]].status != Status.NoStatus:
-            writeOrientation(self.game, 11, self.right, 330+(iNext*15), self.game.player.party.members[self.combatOrder[self.currentTurn][1]].status.name,"R")
 
     def next(self):
         self.currentTurn += 1
@@ -744,11 +768,11 @@ class Combat():
             self.writeAction(source,0,-1)
             print(f'Action writing for {source}, length {len(self.actions)}')
             return
-        elif self.encounter[self.combatOrder[self.currentTurn][1]].status == Status.Shocked:
+        elif self.encounter[self.combatOrder[self.currentTurn][1]].status == Status.Shocked and random.randint(0,1)==0:
             self.writeAction(source,0,-2)
             print(f'Action writing for {source}, length {len(self.actions)}')
             return
-        elif self.encounter[self.combatOrder[self.currentTurn][1]].status == Status.Freezing and random.randint(0,2)==0:
+        elif self.encounter[self.combatOrder[self.currentTurn][1]].status == Status.Freezing and random.randint(0,1)==0:
             self.writeAction(source,0,-3)
             print(f'Action writing for {source}, length {len(self.actions)}')
             return
@@ -764,8 +788,12 @@ class Combat():
             if self.encounter[self.combatOrder[self.currentTurn][1]].spellCooldown > 0:
                 self.encounter[self.combatOrder[self.currentTurn][1]].spellCooldown -= 1
         else:
-            self.encounter[self.combatOrder[self.currentTurn][1]].spellCooldown = 2
-            self.writeAction(source, target, self.encounter[self.combatOrder[self.currentTurn][1]].knownSpells[move-1])
+            if self.encounter[self.combatOrder[self.currentTurn][1]].status == Status.Freezing:
+                self.encounter[self.combatOrder[self.currentTurn][1]].spellCooldown = 2
+                self.writeAction(source, target, -4)
+            else:
+                self.encounter[self.combatOrder[self.currentTurn][1]].spellCooldown = 2
+                self.writeAction(source, target, self.encounter[self.combatOrder[self.currentTurn][1]].knownSpells[move-1])
         print(f'Action writing for {source}, length {len(self.actions)}')
 
     def attack(self,action):
@@ -853,12 +881,12 @@ class Combat():
         self.actions.append(act)
 
     def usePotion(self,target,itemID):
-        target = self.checkRecalculateTarget("Party",target,"Encounter")
+        target = self.checkRecalculateTarget("Party",target,"Party")
         for i in range(len(self.game.player.party.inventory)):
-            if self.game.player.party.inventory[i].id == itemID:
+            if self.game.player.party.inventory[i] == itemID:
                 index = i
                 break
-        self.game.player.party.usePotion(target,index)
+        self.game.player.party.usePotion(target,index,self.game.directory)
 
     def useTalent(self,source,target,id):
         talent = self.game.directory.getTalent(id)
@@ -888,16 +916,7 @@ class Combat():
                     elif spell.type == SpellType.Debuff:
                         self.checkEffectTiming(action,Timing.DamageTaken)
                         if not self.immune:
-                            if (spell.id > 326) or random.randint(0,1) == 1: # 50% Chance for 324, 325, 326
-                                if spell.element == Element.Lightning:
-                                    self.game.player.party.members[action.target].status = Status.Shocked
-                                    self.game.player.party.members[action.target].statusCount = 3
-                                elif spell.element == Element.Fire:
-                                    self.game.player.party.members[action.target].status = Status.Burned
-                                    self.game.player.party.members[action.target].statusCount = -1
-                                elif spell.element == Element.Ice:
-                                    self.game.player.party.members[action.target].status = Status.Freezing
-                                    self.game.player.party.members[action.target].statusCount = -1
+                            self.applyStatusEffect(self.game.player.party.members,action.target,spell)
                         self.immune = False
                 else:
                     action.target = self.checkRecalculateTarget(action.source[0],action.target,"Encounter")
@@ -915,16 +934,7 @@ class Combat():
                         self.checkEffectTiming(action,Timing.DamageDealt)
                         self.encounter[action.target].takeDamage(self.dmg)
                     elif spell.type == SpellType.Debuff:
-                        if spell.id > 326 or random.randint(0,1) == 1: # 50% Chance for 324, 325, 326
-                            if spell.element == Element.Lightning:
-                                self.encounter[action.target].status = Status.Shocked
-                                self.encounter[action.target].statusCount = 3
-                            elif spell.element == Element.Fire:
-                                self.encounter[action.target].status = Status.Burned
-                                self.encounter[action.target].statusCount = -1
-                            elif spell.element == Element.Ice:
-                                self.encounter[action.target].status = Status.Freezing
-                                self.encounter[action.target].statusCount = -1
+                        self.applyStatusEffect(self.encounter,action.target,spell)
                         self.game.player.party.members[action.source[1]].mp -= spell.manacost
             else:
                 if action.source[0] == "Encounter":
@@ -934,19 +944,10 @@ class Combat():
                             self.checkEffectTiming(Action(action.source,i,action.action),Timing.DamageTaken)
                             member.takeDamage(self.dmg)
                     elif spell.type == SpellType.Debuff:
-                            for member in self.game.player.party.members:
+                            for index, member in enumerate(self.game.player.party.members):
                                 self.checkEffectTiming(action,Timing.DamageTaken)
                                 if not self.immune:
-                                    if random.randint(0,1) == 1:
-                                        if spell.element == Element.Lightning:
-                                            member.status = Status.Shocked
-                                            member.statusCount = 3
-                                        elif spell.element == Element.Fire:
-                                            member.status = Status.Burned
-                                            member.statusCount = -1
-                                        elif spell.element == Element.Ice:
-                                            member.status = Status.Freezing
-                                            member.statusCount = -1
+                                    self.applyStatusEffect(self.game.player.party.members,index,spell)
                                 self.immune = False
                 else:
                     if spell.type == SpellType.Attack:
@@ -964,22 +965,14 @@ class Combat():
                         self.dmg = self.game.player.party.members[action.source[1]].amplify(spell.attack)
                         self.game.player.party.members[action.source[1]].mp -= spell.manacost
                     elif spell.type == SpellType.Debuff:
-                        for member in self.encounter:
-                            if random.randint(0,1) == 1:
-                                if spell.element == Element.Lightning:
-                                    member.status = Status.Shocked
-                                    member.statusCount = 3
-                                elif spell.element == Element.Fire:
-                                    member.status = Status.Burned
-                                    member.statusCount = -1
-                                elif spell.element == Element.Ice:
-                                    member.status = Status.Freezing
-                                    member.statusCount = -1
+                        for index, member in enumerate(self.encounter):
+                            self.applyStatusEffect(self.encounter,index,spell)
                         self.game.player.party.members[action.source[1]].mp -= spell.manacost
         elif action.action < 500:
             spell = self.game.directory.getSptSpell(action.action)
             if spell.target == Target.Single:
-                action.target = self.checkRecalculateTarget(action.source[0],action.target,"Party")
+                if spell.type != SpellType.Raise:
+                    action.target = self.checkRecalculateTarget(action.source[0],action.target,"Party")
                 self.checkEffectTiming(action,Timing.Targeting)
                 self.game.player.party.members[action.source[1]].mp -= spell.manacost
                 if spell.type == SpellType.Heal:
@@ -1001,6 +994,7 @@ class Combat():
                         self.game.player.party.members[action.target].hp += self.heal
                     if self.game.player.party.members[action.target].hp > self.game.player.party.members[action.target].getMaxHP():
                         self.game.player.party.members[action.target].hp = self.game.player.party.members[action.target].getMaxHP()
+                    self.risen = True
                 elif spell.type == SpellType.Cleanse:
                     self.checkEffectTiming(action,Timing.DamageDealt)
                     if self.game.player.party.members[action.target].hp > 0:
@@ -1017,6 +1011,7 @@ class Combat():
                             member.hp = member.getMaxHP()
                 elif spell.type == SpellType.Buff:
                     self.buff = spell
+                    self.duration = 5
                     self.checkEffectTiming(action,Timing.DamageDealt)
                     self.applyBuff(self.buff,-1,action.source)
                 elif spell.type == SpellType.Raise:
@@ -1060,6 +1055,7 @@ class Combat():
                 elif self.actions[self.exTurn].action >= 500:
                     if self.game.directory.getItem(self.actions[self.exTurn].action).timing == Timing.InTurn:
                         self.talentActionHandler(self.actions[self.exTurn])
+                self.tupleToMember(self.actions[self.exTurn].source).tickStatus()
                 self.manaspent = False
                 self.exTurn += 1
                 self.timeStart = pygame.time.get_ticks()
@@ -1074,6 +1070,7 @@ class Combat():
         pygame.time.delay(remWait)
 
     def isAlive(self,source):
+        print(f'Is alive? {source}')
         if source[0]=="Party":
             if self.game.player.party.members[source[1]].hp<=0:
                 return False
@@ -1085,6 +1082,16 @@ class Combat():
     def startExecute(self):
         print("Execute!")
         self.checkEffectTiming(None,Timing.Ordering)
+        # Sending members with Shocked debuff to back of combat order
+        stayList = []
+        shockedList = []
+        for index in range(len(self.actions)):
+            if self.tupleToMember(self.actions[index].source).status == Status.Shocked:
+                shockedList.append(self.actions[index])
+            else:
+                stayList.append(self.actions[index])
+        self.actions = stayList + shockedList
+        # Applying scheduled mana costs
         for cost in self.scheduledManaCosts:
             self.game.player.party.members[cost[0]].mp -= cost[1]
         self.scheduledManaCosts = []
@@ -1101,6 +1108,19 @@ class Combat():
         for i in range(len(self.combatOrder)-1,-1,-1):
             if self.isAlive(self.combatOrder[i]) == False:
                 self.combatOrder.pop(i)
+        if self.risen:
+            for index, member in enumerate(self.game.player.party.members):
+                found = False
+                for i in range(len(self.combatOrder)):
+                    if self.tupleToMember(self.combatOrder[i]) == member:
+                        found = True
+                if found or not member.getHP() > 0:
+                    continue
+                print(f'{member.name} was found to have been raised! Adding to the combatOrder...')
+                for i in range(len(self.combatOrder)):
+                    if member.getSpeed() > self.tupleToMember(self.combatOrder[i]).getSpeed():
+                        self.combatOrder.insert(i,('Party',index))
+                        break
         self.actions.clear()
         self.state = "mainWindow"
         self.ex = False
@@ -1116,13 +1136,13 @@ class Combat():
             if member.mp > member.getMaxMP():
                 member.mp = member.getMaxMP()
             member.gainHP(member.getHPRegen())
-            member.tickStatus()
-            if member.status == Status.Burned:
-                member.takeDamage(5)
+            if member.status == Status.Ablaze:
+                member.takeDamage(math.ceil(member.getMaxHP()*.10))
+            if member.status == Status.Freezing:
+                member.changeMana(-(math.ceil(member.getMaxMP()*.10)))
         for member in self.encounter:
-            member.tickStatus()
-            if member.status == Status.Burned:
-                member.takeDamage(5)
+            if member.status == Status.Ablaze:
+                member.takeDamage(math.ceil(member.getMaxHP()*.10))
         for target in self.deathWish:
             self.encounter[target].takeDamage(math.ceil(self.encounter[target].getMaxHP()*.10))
 
@@ -1192,6 +1212,18 @@ class Combat():
                 print(f'{bf.name} expired.')
                 self.buffs.pop(i)
 
+    def applyStatusEffect(self,group,target,spell):
+        if (spell.id > 326 and spell.id < 330) or random.randint(1,10) <= 6: # 60% Chance for regular debuffs and AoE debuffs
+            if spell.element == Element.Lightning:
+                group[target].status = Status.Shocked
+                group[target].statusCount = 3
+            elif spell.element == Element.Fire:
+                group[target].status = Status.Ablaze
+                group[target].statusCount = 3
+            elif spell.element == Element.Ice:
+                group[target].status = Status.Freezing
+                group[target].statusCount = 3
+
     def processEffects(self):
         for i in range(len(self.activeEffects)-1,-1,-1):
             if self.activeEffects[i].tick():
@@ -1213,6 +1245,12 @@ class Combat():
             return "LCK"
         elif i == 6:
             return "HP"
+        
+    def tupleToMember(self,tuple):
+        if tuple[0] == "Party":
+            return self.game.player.party.members[tuple[1]]
+        else:
+            return self.encounter[tuple[1]]
         
     def checkElementalEffectiveness(self,source,target):
         if source == target:
@@ -1478,7 +1516,7 @@ class Combat():
                     self.crit = True
                 self.checkAccessoryEffectTiming(action,Timing.DamageDealt)
                 self.encounter[target].takeDamage(self.dmg)
-                self.game.player.party.members[source[1]].gainHP(math.ceil(self.dmg/2))
+                self.game.player.party.members[source[1]].gainHP(self.dmg)
                 self.miss = False
             else:
                 print("Miss!")
@@ -1499,7 +1537,7 @@ class Combat():
                     self.crit = True
                 self.checkAccessoryEffectTiming(action,Timing.DamageDealt)
                 self.encounter[target].takeDamage(self.dmg)
-                self.game.player.party.members[source[1]].gainMP(math.ceil(self.dmg/2))
+                self.game.player.party.members[source[1]].gainMP(self.dmg)
                 self.miss = False
             else:
                 print("Miss!")
@@ -1613,7 +1651,6 @@ class Combat():
         # Guardian's Belt is included in the trigger for the Guard talent
 
         elif accessory.name == "Broken Pocketwatch":
-            print("Pocketwatch...?")
             if action.source[1] == effect.source[1] and action.action >= 400 and action.action < 500:
                 if self.game.directory.getItem(action.action).type == SpellType.Buff: # Buff
                     print(f'{accessory.name} triggered!')

@@ -1,8 +1,8 @@
 {
-    "StartLevel": 5,
+    "StartLevel": 9,
     "StartClass": 3,
     "ManualEncounters": 0,
     "ManualLevelUp": 0,
-    "StartingItems": [611,612,614,615,616,617,618,619],
-    "StartingZone": 10
+    "StartingItems": [624,625],
+    "StartingZone": 2
 }

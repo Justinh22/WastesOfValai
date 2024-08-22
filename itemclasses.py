@@ -30,6 +30,7 @@ class Potion(Item):
         Item.__init__(self,nm,desc,rar,i)
         self.hpGain = hpg
         self.mpGain = mpg
+        self.type = "Potion"
 
 class Accessory(Item):
     def __init__(self,nm="NULL",desc="NULL",rar=-1,i=-1,ar=0,typ=AccessoryType.Passive,tmg=Timing.Universal,data=0):

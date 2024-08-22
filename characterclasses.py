@@ -11,7 +11,9 @@ class Character():
         self.level = lv
         self.id = id
         self.xp = 0
-        self.nextLevel = 200*lv
+        self.nextLevel = 0
+        for i in range(1,lv+1):
+            self.nextLevel += i*100
         self.type = tp # Class; Type is used to avoid defined 'class' name
         self.spells = []
         self.talents = []
@@ -70,11 +72,16 @@ class Character():
     def getCritRate(self):
         return self.eqpWpn.critrate + self.critrate + self.universalEffects.critrate + self.getBuff("CRT")
     def getAccuracy(self):
+        ablazePenalty = 0
+        if self.status is Status.Ablaze:
+            ablazePenalty = 33
         if self.eqpWpn.accuracy > 0:
-            return self.eqpWpn.accuracy + self.universalEffects.accuracy + self.getBuff("ACC")
+            return self.eqpWpn.accuracy + self.universalEffects.accuracy + self.getBuff("ACC") - ablazePenalty
         else:
-            return self.accuracy + self.universalEffects.accuracy + self.getBuff("ACC")
+            return self.accuracy + self.universalEffects.accuracy + self.getBuff("ACC") - ablazePenalty
     def getDodge(self):
+        if self.status is Status.Shocked:
+            return 0
         return self.eqpAmr.dodge + self.dodge + self.universalEffects.dodge + self.getBuff("DDG")
     def getLuck(self):
         return self.luck + self.universalEffects.luck + self.getBuff("LCK")
@@ -94,8 +101,11 @@ class Character():
         return val
     def takeDamage(self,val):
         print(f'{self.name} took {val} damage!')
-        if val > self.hp:
+        if val >= self.hp:
             self.hp = 0
+            print(f'{self.name} has fallen!')
+            self.resetStatus()
+            self.resetBuffs()
         else:
             self.hp -= val
         return val
@@ -154,7 +164,7 @@ class Character():
         if self.level != 10:
             self.level += 1
         self.xp = 0
-        self.nextLevel += 200
+        self.nextLevel += self.level*100
         growth = self.type.getGrowths()
         self.hpMax += growth[0]
         self.mpMax += growth[1]
@@ -244,8 +254,8 @@ class Character():
         print(f'Level: {self.type.supportMagicLevel[self.level-1] + self.universalEffects.sptMagicLevel} vs Spell: {idRarity}')
         return self.type.supportMagicLevel[self.level-1] + self.universalEffects.sptMagicLevel >= idRarity
     def fullRestore(self):
-        self.hp = self.hpMax
-        self.mp = self.mpMax
+        self.hp = self.getMaxHP()
+        self.mp = self.getMaxMP()
         self.resetStatus()
     def canCast(self,spellbookIndex,dir):
         return dir.getManaCost(self.spells[spellbookIndex]) <= self.mp
@@ -253,6 +263,12 @@ class Character():
         self.mp -= dir.getManaCost(self.spells[spellbookIndex])
         if self.mp < 0:
             self.mp = 0
+    def changeMana(self,amount):
+        self.mp += amount
+        if self.mp < 0:
+            self.mp = 0
+        if self.mp > self.getMaxMP():
+            self.mp = self.getMaxMP()
     def canPerform(self,talentID,dir):
         return dir.getManaCost(talentID) <= self.mp
     def universalEffectHandler(self,accessory,mode):
@@ -457,12 +473,19 @@ class Creature():
         self.biomeType = type
         self.knownSpells = spells
         self.spellCooldown = 0
-        self.status = "None"
+        self.status = Status.NoStatus
         self.statusCount = 0
     def getAccuracy(self):
-        return self.accuracy
+        ablazePenalty = 0
+        if self.status is Status.Ablaze:
+            ablazePenalty = 30
+        return self.accuracy - ablazePenalty
     def getDodge(self):
+        if self.status is Status.Shocked:
+            return 0
         return self.dodge
+    def getSpeed(self):
+        return self.speed
     def getHP(self):
         return self.hp
     def getMaxHP(self):
@@ -475,6 +498,8 @@ class Creature():
         print(f'{self.name} took {val} damage!')
         if val > self.hp:
             self.hp = 0
+            print(f'{self.name} has fallen!')
+            self.resetStatus()
         else:
             self.hp -= val
         return val
@@ -482,7 +507,10 @@ class Creature():
         if self.statusCount > 0:
             self.statusCount -= 1
             if self.statusCount == 0:
-                self.status = "None"
+                self.status = Status.NoStatus
+    def resetStatus(self):
+        self.status = Status.NoStatus
+        self.statusCount = 0
 
 class Encounter():
     def __init__(self):
