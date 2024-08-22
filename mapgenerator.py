@@ -359,6 +359,7 @@ class Map():
             biomeList.clear()
             biomeList.append(currentBiome)
             self.difficultyMap[r][c] = diff
+            self.spread(self.sizeR, self.sizeC, r, c, currentBiome, diff)
             #self.printCoords(r,c)
             while r < startingPoint[0] + radius:
                 if r < self.sizeR-1:
