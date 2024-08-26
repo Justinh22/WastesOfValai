@@ -10,9 +10,13 @@ MAX_SPTSPELL_RARITY = 5
 MAX_INVENTORY_SIZE = 10
 
 LANDMARK_COUNT = 300
+VILLAGE_WEIGHT = 5 # 1 in every VILLAGE_WEIGHT havens is a village
 MAP_WIDTH = 250
 MAP_HEIGHT = 250
 DUNGEON_DIM = 40
+VILLAGE_DIM = 30
+TOWN_DIM = 40
+CITY_DIM = 50
 MAP_GROWTH_CYCLES = 20
 
 class Type(Enum):
@@ -109,6 +113,11 @@ class DungeonType(Enum):
     Cave = 3
     Ruins = 4
     Treehouse = 5
+
+class VillageType(Enum):
+    Village = 0
+    Town = 1
+    City = 2
 
 class Personality(Enum):
     Brave = 0

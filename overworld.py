@@ -5,6 +5,7 @@ from directory import *
 from roomhandler import *
 from writing import *
 from dungeoncrawler import *
+from villagemapgenerator import *
 from utility import *
 
 class Overworld():
@@ -168,14 +169,17 @@ class Overworld():
         # self.game.stir()
         self.steps += 1
         if self.game.WorldMap.map[r][c] != '#' and self.game.WorldMap.map[r][c] != ';' and self.game.WorldMap.map[r][c] != '.':
-            if self.game.WorldMap.map[r][c] == 'A' or self.game.WorldMap.map[r][c] == 'H' or self.game.WorldMap.map[r][c] == 'S':
+            if self.game.WorldMap.map[r][c] == 'H' or self.game.WorldMap.map[r][c] == 'S':
                 if self.game.WorldMap.map[r][c] == 'H':
                     typ = "haven"
-                else:
+                elif self.game.WorldMap.map[r][c] == 'S':
                     typ = "room"
                 print(f'Type: {typ}')
                 newRoom = RoomHandler(self.game, self.game.roomDB.getRoom((r,c),self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]),typ))
                 newRoom.enter()
+            elif self.game.WorldMap.map[r][c] == 'V':
+                print("Das a village bay-be!")
+                self.game.villageDB.getVillage((r,c),1,VillageType.Town,self.getBiome(self.game.player.currentPos[0],self.game.player.currentPos[1]))
             else:
                 self.currentDungeon = Crawler(self.game,self.game.dungeonDB.getDungeon((r,c),self.getDungeonType(r,c),self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c])))
                 self.currentDungeon.inDungeon = True

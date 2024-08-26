@@ -7,6 +7,7 @@ from overworld import *
 from writing import *
 from room import *
 from dungeonmapgenerator import *
+from villagemapgenerator import *
 from playerdata import *
 
 class Game():
@@ -39,6 +40,7 @@ class Game():
         self.overworld = Overworld(self)
         self.roomDB = RoomDatabase()
         self.dungeonDB = DungeonDatabase()
+        self.villageDB = VillageDatabase()
 
         self.steps = 0
         self.stepsThreshold = 100
@@ -108,24 +110,31 @@ class Game():
     def save(self):
         roomdb = open('databases/roomDatabase.db','wb')
         dungeondb = open('databases/dungeonDatabase.db','wb')
+        villagedb = open('databases/villageDatabase.db','wb')
         playerdb = open('databases/playerDatabase.db','wb')
         pickle.dump(self.roomDB, roomdb)
         pickle.dump(self.dungeonDB, dungeondb)
+        pickle.dump(self.villageDB, villagedb)
         pickle.dump(self.player,playerdb)
         roomdb.close()
         dungeondb.close()
+        villagedb.close()
         playerdb.close()
 
     def load(self):
         roomdb = open('databases/roomDatabase.db','rb')
         dungeondb = open('databases/dungeonDatabase.db','rb')
+        villagedb = open('databases/villageDatabase.db','wb')
         playerdb = open('databases/playerDatabase.db','rb')
         self.roomDB = pickle.load(roomdb)
         self.dungeonDB = pickle.load(dungeondb)
+        self.villageDB = pickle.load(villagedb)
         self.player = pickle.load(playerdb)
         self.roomDB.printContents()
         self.dungeonDB.printContents()
+        self.villageDB.printContents()
         self.player.party.printContents()
         roomdb.close()
         dungeondb.close()
+        villagedb.close()
         playerdb.close()
