@@ -125,6 +125,12 @@ class MainMenu():
             if filename.endswith('.txt'):
                 os.remove(os.path.join(folder,filename))
 
+    def wipeVillageDir(self):
+        folder = 'villages/'
+        for filename in os.listdir(folder):
+            if filename.endswith('.txt'):
+                os.remove(os.path.join(folder,filename))
+
     def setDebug(self,typ):
         if typ == "StartLevel":
             self.debug_lv = getDebug(0)

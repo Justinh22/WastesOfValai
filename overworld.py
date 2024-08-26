@@ -197,7 +197,7 @@ class Overworld():
                 newRoom.enter()
             elif self.game.WorldMap.map[r][c] == VILLAGE_CHAR:
                 print("Das a village bay-be!")
-                self.game.villageDB.getVillage((r,c),1,VillageType.Town,self.getBiome(self.game.player.currentPos[0],self.game.player.currentPos[1]))
+                self.game.villageDB.getVillage((r,c),1,VillageType.Town,self.approximateBiome(self.game.player.currentPos[0],self.game.player.currentPos[1]))
             else:
                 self.currentDungeon = Crawler(self.game,self.game.dungeonDB.getDungeon((r,c),self.getDungeonType(r,c),self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c])))
                 self.currentDungeon.inDungeon = True
@@ -227,6 +227,15 @@ class Overworld():
                 encounter = self.game.directory.buildEncounter(self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]),self.getBiome(self.game.player.currentPos[0],self.game.player.currentPos[1]))
                 self.combat.initialize(encounter)
         self.lastDiff = self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c])
+
+
+    def approximateBiome(self,r,c):
+        checklist = [(-1,0),(0,1),(1,0),(0,-1)]
+        biomeRankings = {Biome.Forest: 0, Biome.Plains: 0, Biome.Desert: 0}
+        for mod in checklist:
+            biome = self.getBiome(r+mod[0],c+mod[1])
+            biomeRankings[biome] += 1
+        return max(biomeRankings, key=biomeRankings.get)
 
 
 class Pathfinder():

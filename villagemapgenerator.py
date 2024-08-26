@@ -44,9 +44,9 @@ class VillageMap():
     def __init__(self,coords,level,type,biome):
         self.map = []
         self.coords = coords        # Coords         : Duple containing (row,col) of where the village is located in the world
-        self.buildings = []         # Buildings      : List of VillageRooms
-        self.entranceRoom = -1
-        self.connectedRooms = {}    # ConnectedRooms : Dictionary of indexes in rooms, depicting how many connections each room has
+        self.buildings = []         # Buildings      : List of VillageBuildings
+        self.entranceBuilding = -1
+        self.connectedBuildings = {}    # connectedBuildings : Dictionary of indexes in buildings, depicting how many connections each building has
         self.visited = []
         self.villageLevel = level
         self.villageType = type
@@ -60,7 +60,7 @@ class VillageMap():
             self.setBuildingNumberRange(7,9)
             self.maxRows = TOWN_DIM
             self.maxCols = TOWN_DIM
-        elif type is VillageType.City:
+        else:
             self.setBuildingNumberRange(10,12)
             self.maxRows = CITY_DIM
             self.maxCols = CITY_DIM
@@ -94,35 +94,27 @@ class VillageMap():
         numBuildings = random.randint(self.minBuildings,self.maxBuildings)
         for i in range(numBuildings):
             self.fitBuilding(20)
-        for room in self.buildings:
-            print(room.toString())
+        for building in self.buildings:
+            print(building.toString())
         self.buildPathways(self.pathFreq)
         self.addEntrance()
-        numLoot = math.ceil(numBuildings/3) + random.choice([-1,0,0,0,1,1])
-        self.addLoot(numLoot)
-        if random.randint(0,2) == 2:
-            self.addWanderer()
         self.writeMap()
 
     def writeMap(self):
         filename = "villages/" + str(self.coords[0]) + "_" + str(self.coords[1]) + "_village.txt"
+        print(f'Map: {len(self.map)}')
         with open(filename,"w") as file:
             for row in self.map:
                 for element in row:
                     file.write(element)
                 file.write("\n")
-
-    def makeBuilding(self):
-        rows = random.randint(self.minRoomRows,self.maxRoomRows)
-        cols = random.randint(self.minRoomCols,self.maxRoomCols)
-        return (rows,cols)
     
     def fitBuilding(self,attempts=100):
         success = False
         for i in range(attempts):
-            testRow = random.randint(self.roomBuffer,self.maxRows-BUILDING_HEIGHT-self.roomBuffer)
-            testCol = random.randint(self.roomBuffer,self.maxCols-BUILDING_WIDTH-self.roomBuffer)
-            # print(f'Trying to make a room at {testRow}, {testCol}, with dimensions {size[0]}x{size[1]}')
+            testRow = random.randint(self.buildingBuffer,self.maxRows-BUILDING_HEIGHT-self.buildingBuffer)
+            testCol = random.randint(self.buildingBuffer,self.maxCols-BUILDING_WIDTH-self.buildingBuffer)
+            # print(f'Trying to make a building at {testRow}, {testCol}, with dimensions {size[0]}x{size[1]}')
             success = self.checkBuildingFit(testRow,testCol)
             if success:
                 self.buildings.append(VillageBuilding(testRow,testCol))
@@ -130,8 +122,8 @@ class VillageMap():
                 break
             
     def checkBuildingFit(self,testR,testC):
-        for i in range(testR-self.roomBuffer,(testR+BUILDING_HEIGHT)+self.roomBuffer):
-            for j in range(testC-self.roomBuffer,(testC+BUILDING_WIDTH)+self.roomBuffer):
+        for i in range(testR-self.buildingBuffer,(testR+BUILDING_HEIGHT)+self.buildingBuffer):
+            for j in range(testC-self.buildingBuffer,(testC+BUILDING_WIDTH)+self.buildingBuffer):
                 if self.map[i][j] == BUILDING_WALL:
                     return False
         return True
@@ -143,34 +135,34 @@ class VillageMap():
 
     def buildPathways(self,n):
         for i in range(len(self.buildings)):
-            if i not in self.connectedRooms:
-                #print(f'Connecting room {i}')
-                closestRooms = self.findNClosestBuildings(i,n)
-                for closeRoom in closestRooms:
-                    self.connect(i,closeRoom)
+            if i not in self.connectedBuildings:
+                #print(f'Connecting building {i}')
+                closestBuildings = self.findNClosestBuildings(i,n)
+                for closeBuilding in closestBuildings:
+                    self.connect(i,closeBuilding)
         self.ensureAllBuildingsConnect()
-        #print(self.connectedRooms)
+        #print(self.connectedBuildings)
 
-    def findNClosestBuildings(self,roomIndex,n):
+    def findNClosestBuildings(self,buildingIndex,n):
         lowestNDistances = []
         lowestNIndexes = []
         for i in range(len(self.buildings)):
-            if i == roomIndex:
+            if i == buildingIndex:
                 continue
-            distance = self.buildings[roomIndex].getDistanceFrom(self.buildings[i].getCoords())
+            distance = self.buildings[buildingIndex].getDistanceFrom(self.buildings[i].getCoords())
             if len(lowestNDistances) < n:
                 lowestNDistances.append(distance)
                 lowestNIndexes.append(i)
             elif distance < max(lowestNDistances):
                 lowestNDistances[lowestNDistances.index(max(lowestNDistances))] = distance
                 lowestNIndexes[lowestNDistances.index(max(lowestNDistances))] = i
-        #print(f'Closest rooms are {lowestNIndexes}')
+        #print(f'Closest buildings are {lowestNIndexes}')
         return lowestNIndexes
 
     def connect(self,indexA,indexB):
         #print(f'Connecting {indexA} to {indexB}')
-        connA = self.buildings[indexA].getRandomPoint()
-        connB = self.buildings[indexB].getRandomPoint()
+        connA = self.buildings[indexA].getDoorway()
+        connB = self.buildings[indexB].getDoorway()
         if random.randint(1,2) == 1:
 
             if connA[1] < connB[1]:
@@ -201,15 +193,15 @@ class VillageMap():
                 for i in range(connB[1],connA[1]+1):
                     self.map[connA[0]][i] = PATH_CHAR
 
-        if indexA in self.connectedRooms:
-            self.connectedRooms[indexA].append(indexB)
+        if indexA in self.connectedBuildings:
+            self.connectedBuildings[indexA].append(indexB)
         else:
-            self.connectedRooms[indexA] = [indexB]
+            self.connectedBuildings[indexA] = [indexB]
 
-        if indexB in self.connectedRooms:
-            self.connectedRooms[indexB].append(indexA)
+        if indexB in self.connectedBuildings:
+            self.connectedBuildings[indexB].append(indexA)
         else:
-            self.connectedRooms[indexB] = [indexA]
+            self.connectedBuildings[indexB] = [indexA]
 
     def ensureAllBuildingsConnect(self):
         repeat = True
@@ -217,7 +209,7 @@ class VillageMap():
         while repeat:
             print("Ensuring...")
             repeat = False
-            for index in self.connectedRooms.keys():
+            for index in self.connectedBuildings.keys():
                 self.visited = [0]*len(self.buildings)
                 self.dfs(index)
                 if 0 in self.visited:
@@ -225,7 +217,7 @@ class VillageMap():
                     timeout = 0
                     while(timeout<10):
                         closest = self.findNClosestBuildings(index,n)
-                        if closest not in self.connectedRooms[index]:
+                        if closest not in self.connectedBuildings[index]:
                             self.connect(closest[0],index)
                             timeout = 10
                         timeout += 1
@@ -235,9 +227,12 @@ class VillageMap():
     def dfs(self,node):
         #print(node)
         self.visited[node] = 1
-        for connection in self.connectedRooms[node]:
+        for connection in self.connectedBuildings[node]:
             if self.visited[connection] == 0:
                 self.dfs(connection)
+
+    def addEntrance(self):
+        return (random.randint(0,self.maxRows),0)
 
 
 class VillageBuilding():
@@ -260,7 +255,7 @@ class VillageBuilding():
         return abs(self.row-coords[0]) + abs(self.col-coords[1])
     
     def setEntrance(self,map):
-        coords = self.getRandomPoint()
+        coords = self.getDoorway()
         map[coords[0]][coords[1]] = BUILDING_DOOR
         return coords
     
