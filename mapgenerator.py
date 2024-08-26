@@ -139,7 +139,7 @@ class Map():
         while self.map[-rEnd][-cEnd] == ' ':
             rEnd = random.randint(randRA,randRB)
             cEnd = random.randint(randCA,randCB)
-        self.map[-rEnd][-cEnd] = 'V'
+        self.map[-rEnd][-cEnd] = 'Z'
 
         print("Generating landmarks...")
         self.placeLandmarks(LANDMARK_COUNT)
@@ -272,8 +272,14 @@ class Map():
                     self.map[dungeon[0]][dungeon[1]] = 'T' # Treehouse
 
         havenList = self.pseudoRandomPlacement(havens)
+        villageCount = 0
+        random.shuffle(havenList)
         for haven in havenList:
-            self.map[haven[0]][haven[1]] = 'H' # Haven
+            if villageCount % VILLAGE_WEIGHT == 0:
+                self.map[haven[0]][haven[1]] = 'V' # Village
+            else:
+                self.map[haven[0]][haven[1]] = 'H' # Haven
+            villageCount += 1
 
 
     def pseudoRandomPlacement(self,num):

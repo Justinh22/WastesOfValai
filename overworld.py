@@ -5,6 +5,7 @@ from directory import *
 from roomhandler import *
 from writing import *
 from dungeoncrawler import *
+from villagemapgenerator import *
 from utility import *
 
 class Overworld():
@@ -189,11 +190,14 @@ class Overworld():
             if self.game.WorldMap.map[r][c] == ABANDONED_VILLAGE_CHAR or self.game.WorldMap.map[r][c] == HAVEN_CHAR or self.game.WorldMap.map[r][c] == SHACK_CHAR:
                 if self.game.WorldMap.map[r][c] == HAVEN_CHAR:
                     typ = "haven"
-                else:
+                elif self.game.WorldMap.map[r][c] == SHACK_CHAR:
                     typ = "room"
                 print(f'Type: {typ}')
                 newRoom = RoomHandler(self.game, self.game.roomDB.getRoom((r,c),self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]),typ))
                 newRoom.enter()
+            elif self.game.WorldMap.map[r][c] == VILLAGE_CHAR:
+                print("Das a village bay-be!")
+                self.game.villageDB.getVillage((r,c),1,VillageType.Town,self.getBiome(self.game.player.currentPos[0],self.game.player.currentPos[1]))
             else:
                 self.currentDungeon = Crawler(self.game,self.game.dungeonDB.getDungeon((r,c),self.getDungeonType(r,c),self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c])))
                 self.currentDungeon.inDungeon = True
