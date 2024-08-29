@@ -108,10 +108,11 @@ class VillageMap():
         self.initializeMap()
         numBuildings = random.randint(self.minBuildings,self.maxBuildings)
         self.buildPathways()
-        print(f'At this point, 0,0 is {self.map[0][0]}')
         for i in range(numBuildings):
             self.fitBuilding(20)
         random.shuffle(self.buildings)
+        for building in self.buildings:
+            building.setEntrance(self.map)
         self.connectBuildingsToPath()
         self.addEntrance()
         self.writeMap()
@@ -129,7 +130,6 @@ class VillageMap():
         for i in range(attempts):
             testRow = random.randint(self.buildingBuffer,self.maxRows-BUILDING_HEIGHT-self.buildingBuffer)
             testCol = random.randint(self.buildingBuffer,self.maxCols-BUILDING_WIDTH-self.buildingBuffer)
-            # print(f'Trying to make a building at {testRow}, {testCol}, with dimensions {size[0]}x{size[1]}')
             success = self.checkBuildingFit(testRow,testCol)
             if success:
                 self.buildings.append(VillageBuilding(testRow,testCol))
@@ -155,48 +155,21 @@ class VillageMap():
         for i in range(round(self.maxCols/2)):
             self.map[currentR][currentC] = PATH_CHAR
             currentC += 1
-        #for branchNum in range(self.branches):
-        #    length = random.randint(round(self.maxCols/4),round(self.maxCols/2))
-        #    direction = random.randint(1,4) # North, East, South, West
-        #    if (direction == 1 and currentR - length < 0) or \
-        #       (direction == 2 and currentC + length >= self.maxCols) or \
-        #       (direction == 3 and currentR + length >= self.maxRows) or \
-        #       (direction == 4 and currentC - length < 0):
-        #        burnout += 1
-        #        if burnout > 20:
-        #            break
-        #        i -= 1
-        #        continue
-        #    for i in range(length):
-        #        if direction == 1:
-        #            currentR -= 1
-        #        elif direction == 2:
-        #            currentC += 1
-        #        elif direction == 3:
-        #            currentR += 1
-        #        elif direction == 4:
-        #            currentC -= 1
-        #        self.map[currentR][currentC] = PATH_CHAR
 
     def connectBuildingsToPath(self):
         for building in self.buildings:
-            print(f'0,0 is {self.map[0][0]}')
             closestPath = self.findClosestValidPath(building)
             self.connect(building,closestPath)
 
     def findClosestValidPath(self,building):
         minDistance = 100
         pathCoords = (0,0)
-        buildingRow = building.getOutsideDoorway()[0]
-        found = False
         for rowIndex, row in enumerate(self.map):
             for colIndex, element in enumerate(row):
                 if minDistance > building.getDistanceFrom((rowIndex,colIndex)) and element == PATH_CHAR:
                     found = True
                     minDistance = building.getDistanceFrom((rowIndex,colIndex))
                     pathCoords = (rowIndex,colIndex)
-        if found:
-            print(f'Found! Connecting building at {building.toString()} to {pathCoords}')
         return pathCoords
 
     def connect(self,building,pathCoords):
