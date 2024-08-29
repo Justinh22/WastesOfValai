@@ -52,6 +52,7 @@ class MainMenu():
                 self.game.write(20, self.startPos[0], self.startPos[1], "Loading...")
                 self.blitScreen()
                 self.wipeDungeonDir()
+                self.wipeVillageDir()
                 for op in self.debugOps:
                     self.setDebug(op)
                 self.executeDebug()

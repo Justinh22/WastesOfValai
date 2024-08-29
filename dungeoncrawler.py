@@ -7,6 +7,7 @@ from directory import *
 from writing import *
 from dungeonmapgenerator import *
 from characterpopups import *
+from pathfinder import *
 
 class Crawler():
     def __init__(self,game,dungeon):
@@ -317,45 +318,6 @@ class Enemy():
         self.coords = list(self.huntPath[self.huntIndex])
         
     def pathfind(self,start,target,path):
-        pathfinder = Pathfinder(start,target,self.map)
+        pathfinder = Pathfinder(start,target,self.map.map)
+        pathfinder.setObstacle(self.map.wallChar)
         path += pathfinder.calculatePath()
-
-class Pathfinder():
-    def __init__(self,start,end,map):
-        self.startPoint = start
-        self.endPoint = end
-        self.map = map
-        self.path = []
-        self.workingPath = set()
-
-    def calculatePath(self):
-        path = self.bfs(self.startPoint)
-        return path
-    
-    def isValid(self,row,col):
-        return self.map.map[row][col] != self.map.wallChar
-
-    def bfs(self,start):
-        queue = deque([(start, [])])
-        visited = set()
-
-        while queue:
-            current, path = queue.popleft()
-            row, col = current
-
-            if current == self.endPoint:
-                return path + [current]
-            
-            if current in visited:
-                continue
-
-            visited.add(current)
-
-            for r, c in [(0,1), (1,0), (0,-1), (-1,0)]:
-                newR, newC = row + r, col + c
-                nextPos = (newR, newC)
-
-                if self.isValid(newR, newC):
-                    queue.append((nextPos, path + [current]))
-
-        return None

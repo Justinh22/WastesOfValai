@@ -2,6 +2,7 @@ import pygame
 import random
 import math
 from directory import *
+from pathfinder import Pathfinder
 
 BUILDING_HEIGHT = 4
 BUILDING_WIDTH = 7
@@ -14,6 +15,10 @@ PATH_CHAR = '%'
 FOREST_CHAR = '#'
 PLAINS_CHAR = ';'
 DESERT_CHAR = '.'
+
+VILLAGE_PATH_BRANCHES = 4
+TOWN_PATH_BRANCHES = 7
+CITY_PATH_BRANCHES = 10
 
 directory = Directory()
 
@@ -45,8 +50,6 @@ class VillageMap():
         self.map = []
         self.coords = coords        # Coords         : Duple containing (row,col) of where the village is located in the world
         self.buildings = []         # Buildings      : List of VillageBuildings
-        self.entranceBuilding = -1
-        self.connectedBuildings = {}    # connectedBuildings : Dictionary of indexes in buildings, depicting how many connections each building has
         self.visited = []
         self.villageLevel = level
         self.villageType = type
@@ -66,9 +69,10 @@ class VillageMap():
             self.maxCols = CITY_DIM
         self.buildingBuffer = 3
         self.entranceSide = "None"
-        self.entrance = (0,0)
+        self.entrance = (round(self.maxRows/2),0)
         self.floorChar = self.getFloorChar(biome)
         self.pathFreq = PATH_FREQUENCY
+        self.branches = self.getPathBranches()
 
     def initializeMap(self):
         for i in range(0,self.maxRows):
@@ -84,6 +88,17 @@ class VillageMap():
             return PLAINS_CHAR
         elif biome is Biome.Desert:
             return DESERT_CHAR
+        return None
+        
+    def getPathBranches(self):
+        print(self.villageType)
+        if self.villageType == VillageType.Village.value:
+            return VILLAGE_PATH_BRANCHES
+        elif self.villageType == VillageType.Town.value:
+            return TOWN_PATH_BRANCHES
+        elif self.villageType == VillageType.City.value:
+            return CITY_PATH_BRANCHES
+        return None
 
     def setBuildingNumberRange(self,min,max):
         self.minBuildings = min
@@ -92,24 +107,24 @@ class VillageMap():
     def generate(self):
         self.initializeMap()
         numBuildings = random.randint(self.minBuildings,self.maxBuildings)
+        self.buildPathways()
+        print(f'At this point, 0,0 is {self.map[0][0]}')
         for i in range(numBuildings):
             self.fitBuilding(20)
-        for building in self.buildings:
-            print(building.toString())
-        self.buildPathways(self.pathFreq)
+        random.shuffle(self.buildings)
+        self.connectBuildingsToPath()
         self.addEntrance()
         self.writeMap()
 
     def writeMap(self):
         filename = "villages/" + str(self.coords[0]) + "_" + str(self.coords[1]) + "_village.txt"
-        print(f'Map: {len(self.map)}')
         with open(filename,"w") as file:
             for row in self.map:
                 for element in row:
                     file.write(element)
                 file.write("\n")
     
-    def fitBuilding(self,attempts=100):
+    def fitBuilding(self,attempts=20):
         success = False
         for i in range(attempts):
             testRow = random.randint(self.buildingBuffer,self.maxRows-BUILDING_HEIGHT-self.buildingBuffer)
@@ -124,7 +139,7 @@ class VillageMap():
     def checkBuildingFit(self,testR,testC):
         for i in range(testR-self.buildingBuffer,(testR+BUILDING_HEIGHT)+self.buildingBuffer):
             for j in range(testC-self.buildingBuffer,(testC+BUILDING_WIDTH)+self.buildingBuffer):
-                if self.map[i][j] == BUILDING_WALL:
+                if self.map[i][j] == BUILDING_WALL or self.map[i][j] == PATH_CHAR:
                     return False
         return True
     
@@ -133,103 +148,64 @@ class VillageMap():
             for j in range(testC,testC+BUILDING_WIDTH):
                 self.map[i][j] = BUILDING_WALL
 
-    def buildPathways(self,n):
-        for i in range(len(self.buildings)):
-            if i not in self.connectedBuildings:
-                #print(f'Connecting building {i}')
-                closestBuildings = self.findNClosestBuildings(i,n)
-                for closeBuilding in closestBuildings:
-                    self.connect(i,closeBuilding)
-        self.ensureAllBuildingsConnect()
-        #print(self.connectedBuildings)
+    def buildPathways(self):
+        burnout = 0
+        currentR = self.entrance[0]
+        currentC = self.entrance[1]
+        for i in range(round(self.maxCols/2)):
+            self.map[currentR][currentC] = PATH_CHAR
+            currentC += 1
+        #for branchNum in range(self.branches):
+        #    length = random.randint(round(self.maxCols/4),round(self.maxCols/2))
+        #    direction = random.randint(1,4) # North, East, South, West
+        #    if (direction == 1 and currentR - length < 0) or \
+        #       (direction == 2 and currentC + length >= self.maxCols) or \
+        #       (direction == 3 and currentR + length >= self.maxRows) or \
+        #       (direction == 4 and currentC - length < 0):
+        #        burnout += 1
+        #        if burnout > 20:
+        #            break
+        #        i -= 1
+        #        continue
+        #    for i in range(length):
+        #        if direction == 1:
+        #            currentR -= 1
+        #        elif direction == 2:
+        #            currentC += 1
+        #        elif direction == 3:
+        #            currentR += 1
+        #        elif direction == 4:
+        #            currentC -= 1
+        #        self.map[currentR][currentC] = PATH_CHAR
 
-    def findNClosestBuildings(self,buildingIndex,n):
-        lowestNDistances = []
-        lowestNIndexes = []
-        for i in range(len(self.buildings)):
-            if i == buildingIndex:
-                continue
-            distance = self.buildings[buildingIndex].getDistanceFrom(self.buildings[i].getCoords())
-            if len(lowestNDistances) < n:
-                lowestNDistances.append(distance)
-                lowestNIndexes.append(i)
-            elif distance < max(lowestNDistances):
-                lowestNDistances[lowestNDistances.index(max(lowestNDistances))] = distance
-                lowestNIndexes[lowestNDistances.index(max(lowestNDistances))] = i
-        #print(f'Closest buildings are {lowestNIndexes}')
-        return lowestNIndexes
+    def connectBuildingsToPath(self):
+        for building in self.buildings:
+            print(f'0,0 is {self.map[0][0]}')
+            closestPath = self.findClosestValidPath(building)
+            self.connect(building,closestPath)
 
-    def connect(self,indexA,indexB):
-        #print(f'Connecting {indexA} to {indexB}')
-        connA = self.buildings[indexA].getDoorway()
-        connB = self.buildings[indexB].getDoorway()
-        if random.randint(1,2) == 1:
+    def findClosestValidPath(self,building):
+        minDistance = 100
+        pathCoords = (0,0)
+        buildingRow = building.getOutsideDoorway()[0]
+        found = False
+        for rowIndex, row in enumerate(self.map):
+            for colIndex, element in enumerate(row):
+                if minDistance > building.getDistanceFrom((rowIndex,colIndex)) and element == PATH_CHAR:
+                    found = True
+                    minDistance = building.getDistanceFrom((rowIndex,colIndex))
+                    pathCoords = (rowIndex,colIndex)
+        if found:
+            print(f'Found! Connecting building at {building.toString()} to {pathCoords}')
+        return pathCoords
 
-            if connA[1] < connB[1]:
-                for i in range(connA[1],connB[1]+1):
-                    self.map[connA[0]][i] = PATH_CHAR
-            else:
-                for i in range(connB[1],connA[1]+1):
-                    self.map[connA[0]][i] = PATH_CHAR
-            if connA[0] < connB[0]:
-                for i in range(connA[0],connB[0]+1):
-                    self.map[i][connB[1]] = PATH_CHAR
-            else:
-                for i in range(connB[0],connA[0]+1):
-                    self.map[i][connB[1]] = PATH_CHAR
-
-        else:
-            
-            if connA[0] < connB[0]:
-                for i in range(connA[0],connB[0]+1):
-                    self.map[i][connB[1]] = PATH_CHAR
-            else:
-                for i in range(connB[0],connA[0]+1):
-                    self.map[i][connB[1]] = PATH_CHAR
-            if connA[1] < connB[1]:
-                for i in range(connA[1],connB[1]+1):
-                    self.map[connA[0]][i] = PATH_CHAR
-            else:
-                for i in range(connB[1],connA[1]+1):
-                    self.map[connA[0]][i] = PATH_CHAR
-
-        if indexA in self.connectedBuildings:
-            self.connectedBuildings[indexA].append(indexB)
-        else:
-            self.connectedBuildings[indexA] = [indexB]
-
-        if indexB in self.connectedBuildings:
-            self.connectedBuildings[indexB].append(indexA)
-        else:
-            self.connectedBuildings[indexB] = [indexA]
-
-    def ensureAllBuildingsConnect(self):
-        repeat = True
-        n = 1
-        while repeat:
-            print("Ensuring...")
-            repeat = False
-            for index in self.connectedBuildings.keys():
-                self.visited = [0]*len(self.buildings)
-                self.dfs(index)
-                if 0 in self.visited:
-                    #print(f'Not all nodes reachable from {index}')
-                    timeout = 0
-                    while(timeout<10):
-                        closest = self.findNClosestBuildings(index,n)
-                        if closest not in self.connectedBuildings[index]:
-                            self.connect(closest[0],index)
-                            timeout = 10
-                        timeout += 1
-                    repeat = True
-                    n += 1
-
-    def dfs(self,node):
-        #print(node)
-        self.visited[node] = 1
-        for connection in self.connectedBuildings[node]:
-            if self.visited[connection] == 0:
-                self.dfs(connection)
+    def connect(self,building,pathCoords):
+        pathfinder = Pathfinder(building.getOutsideDoorway(),pathCoords,self.map)
+        pathfinder.setObstacle(BUILDING_WALL)
+        path = pathfinder.calculatePath()
+        if path is not None:
+            for step in path:
+                self.map[step[0]][step[1]] = PATH_CHAR
 
     def addEntrance(self):
         return (random.randint(0,self.maxRows),0)
@@ -243,33 +219,21 @@ class VillageBuilding():
         self.width = BUILDING_WIDTH
     
     def getDoorway(self):
-        return (self.row+3,self.col)
+        return (self.row+3,self.col+3)
+    
+    def getOutsideDoorway(self):
+        return (self.row+4,self.col+3)
     
     def toString(self):
-        return "(" + str(self.row) + "," + str(self.col) + ") to (" + str(self.row+self.height) + "," + str(self.col+self.width) + ")"
-    
+        return "(" + str(self.getOutsideDoorway()[0]) + "," + str(self.getOutsideDoorway()[1]) + ")"
+
     def getCoords(self):
         return ((self.row,self.col))
     
     def getDistanceFrom(self,coords):
-        return abs(self.row-coords[0]) + abs(self.col-coords[1])
+        return abs(self.getOutsideDoorway()[0]-coords[0]) + abs(self.getOutsideDoorway()[1]-coords[1])
     
     def setEntrance(self,map):
         coords = self.getDoorway()
         map[coords[0]][coords[1]] = BUILDING_DOOR
         return coords
-    
-
-class VillageLoot():
-    def __init__(self,coords,level,types):
-        self.coords = coords
-        self.level = level
-        self.types = types
-        self.rarity = LootRarity.Uncommon
-        self.loot = self.rollItem(directory)
-
-    def setLootRarity(self,rarity):
-        self.rarity = rarity
-
-    def rollItem(self,dir):
-        return dir.rollForLoot(self.level,self.rarity,self.types)

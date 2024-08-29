@@ -234,7 +234,8 @@ class Overworld():
         biomeRankings = {Biome.Forest: 0, Biome.Plains: 0, Biome.Desert: 0}
         for mod in checklist:
             biome = self.getBiome(r+mod[0],c+mod[1])
-            biomeRankings[biome] += 1
+            if biome is not Biome.Other:
+                biomeRankings[biome] += 1
         return max(biomeRankings, key=biomeRankings.get)
 
 
