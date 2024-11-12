@@ -3,6 +3,7 @@ import random
 import math
 from directory import *
 from pathfinder import Pathfinder
+from constants import *
 
 BUILDING_HEIGHT = 4
 BUILDING_WIDTH = 7
@@ -30,9 +31,10 @@ class VillageDatabase():
     def addVillage(self,coords,village):
         self.villages[coords] = village
 
-    def getVillage(self,coords,type,level,biome):
+    def getVillage(self,coords,level,biome):
         if coords not in self.villages.keys():
-            newVillage = VillageMap(coords,level,type,biome)
+            typ = self.getVillageType()
+            newVillage = VillageMap(coords,level,typ,biome)
             newVillage.generate()
             self.addVillage(coords,newVillage)
         return self.villages[coords]
@@ -44,6 +46,9 @@ class VillageDatabase():
         for entry in self.villages:
             print(f'{entry}: {self.villages[entry].villageType.name}')
 
+    def getVillageType(self):
+        randomNum = random.randint(1,7)
+
 
 class VillageMap():
     def __init__(self,coords,level,type,biome):
@@ -53,6 +58,7 @@ class VillageMap():
         self.visited = []
         self.villageLevel = level
         self.villageType = type
+        self.groundChar = self.getGroundChar(biome)
         self.minBuildings = 0
         self.maxBuildings = 0
         if type is VillageType.Village:
@@ -69,8 +75,7 @@ class VillageMap():
             self.maxCols = CITY_DIM
         self.buildingBuffer = 3
         self.entranceSide = "None"
-        self.entrance = (round(self.maxRows/2),0)
-        self.floorChar = self.getFloorChar(biome)
+        self.entrance = (round(self.maxRows/2),3)
         self.pathFreq = PATH_FREQUENCY
         self.branches = self.getPathBranches()
 
@@ -78,10 +83,10 @@ class VillageMap():
         for i in range(0,self.maxRows):
             row = []
             for j in range(0,self.maxCols):
-                row.append(self.floorChar)
+                row.append(self.groundChar)
             self.map.append(row)
 
-    def getFloorChar(self,biome):
+    def getGroundChar(self,biome):
         if biome is Biome.Forest:
             return FOREST_CHAR
         elif biome is Biome.Plains:

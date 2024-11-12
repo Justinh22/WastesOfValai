@@ -5,7 +5,7 @@ from directory import *
 from roomhandler import *
 from writing import *
 from dungeoncrawler import *
-from villagemapgenerator import *
+from villageexplorer import *
 from utility import *
 
 class Overworld():
@@ -13,6 +13,7 @@ class Overworld():
         self.game = game
         self.inWorld = True
         self.inDungeon = False
+        self.inVillage = False
         self.currentDungeon = 0
         self.width = self.game.width - 60
         self.height = self.game.height - 60
@@ -43,6 +44,11 @@ class Overworld():
                 self.currentDungeon.display()
                 if self.currentDungeon.inDungeon == False:
                     self.inDungeon = False
+            if self.inVillage:
+                self.game.screen.fill(self.game.black)
+                self.currentVillage.display()
+                if self.currentVillage.inVillage == False:
+                    self.inVillage = False
             self.drawScreen()
             self.blitScreen()
         self.game.screen.fill(self.game.black)
@@ -197,7 +203,9 @@ class Overworld():
                 newRoom.enter()
             elif self.game.WorldMap.map[r][c] == VILLAGE_CHAR:
                 print("Das a village bay-be!")
-                self.game.villageDB.getVillage((r,c),1,VillageType.Town,self.approximateBiome(self.game.player.currentPos[0],self.game.player.currentPos[1]))
+                self.currentVillage = Explorer(self.game,self.game.villageDB.getVillage((r,c),self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]), self.approximateBiome(r,c)))
+                self.currentVillage.inVillage = True
+                self.inVillage = True
             else:
                 self.currentDungeon = Crawler(self.game,self.game.dungeonDB.getDungeon((r,c),self.getDungeonType(r,c),self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c])))
                 self.currentDungeon.inDungeon = True

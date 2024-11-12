@@ -1,4 +1,3 @@
-from collections import deque
 import pygame
 import time
 from combat import *

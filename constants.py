@@ -158,3 +158,13 @@ class Timing(Enum):
     Universal = 4
     InTurn = 5
     Ordering = 6
+
+class VillageBuildings(Enum):
+    House = 0
+    WeaponShop = 1
+    ArmorShop = 2
+    ConsumableShop = 3
+    Forge = 4
+    Enchanter = 5
+    Bazaar = 6
+    Inn = 7
