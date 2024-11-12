@@ -68,6 +68,7 @@ class PauseMenu():
             write(self.game, 20, 60, 115, "Party")
             write(self.game, 20, 60, 140, "Map")
             write(self.game, 20, 60, 165, "Quit")
+            write(self.game, 20, 60, 430, "Gold: " + str(self.game.player.gold))
             if self.state == "main":
                 write(self.game, 20, 30, 87 + (self.cursorPos*25), "->")
             if self.state == "partySelect":
