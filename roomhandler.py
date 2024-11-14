@@ -150,7 +150,7 @@ class RoomHandler():
         id = self.room.features[index].loot
         type = self.game.directory.getItemType(id)
         if type == Type.Weapon or type == Type.Armor:
-            if self.game.player.party.addEquipment(id):
+            if self.game.player.party.addEquipment(self.game.directory.getItem(id)):
                 self.room.features[index].lootStatus = LootStatus.Taken
             else:
                 return False

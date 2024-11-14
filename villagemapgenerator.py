@@ -26,6 +26,7 @@ class VillageDatabase():
 
     def addVillage(self,coords,village):
         self.villages[coords] = village
+        print(f'Villages: {self.villages}')
 
     def getVillage(self,coords,level,biome):
         if coords not in self.villages.keys():
@@ -43,25 +44,31 @@ class VillageDatabase():
             print(f'{entry}: {self.villages[entry].villageType.name}')
 
     def getVillageType(self):
-        randomNum = random.randint(1,7)
+        randomNum = random.randint(1,3)
+        if randomNum == 1:
+            return VillageType.Village
+        elif randomNum == 2:
+            return VillageType.Town
+        elif randomNum == 3:
+            return VillageType.City
 
 
 class VillageMap():
-    def __init__(self,coords,level,type,biome):
+    def __init__(self,coords,level,typ,biome):
         self.map = []
         self.coords = coords        # Coords         : Duple containing (row,col) of where the village is located in the world
         self.buildings = []         # Buildings      : List of Buildings
         self.visited = []
         self.villageLevel = level
-        self.villageType = type
+        self.villageType = typ
         self.groundChar = self.getGroundChar(biome)
         self.minBuildings = 0
         self.maxBuildings = 0
-        if type is VillageType.Village:
+        if self.villageType is VillageType.Village:
             self.setBuildingNumberRange(4,6)
             self.maxRows = VILLAGE_DIM
             self.maxCols = VILLAGE_DIM
-        elif type is VillageType.Town:
+        elif self.villageType is VillageType.Town:
             self.setBuildingNumberRange(7,9)
             self.maxRows = TOWN_DIM
             self.maxCols = TOWN_DIM

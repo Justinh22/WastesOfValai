@@ -250,6 +250,10 @@ class Forge(Building):
                     self.cursorPos = 0
             elif self.state == "selectItem":
                 self.targetItem = self.game.player.party.equipment[self.cursorPos]
+                if self.game.directory.getItemType(self.targetItem) == Type.Weapon:
+                     self.itemType = "weapon"
+                elif self.game.directory.getItemType(self.targetItem) == Type.Armor:
+                     self.itemType = "armor"
                 if self.substate == "refine" and self.itemType == "weapon":
                     self.currentRefineLevel = [self.targetItem.atkRefine,self.targetItem.accRefine,self.targetItem.crtRefine]
                     self.tentativeRefineLevel = [self.targetItem.atkRefine,self.targetItem.accRefine,self.targetItem.crtRefine]
@@ -332,10 +336,10 @@ class Forge(Building):
             write(self.game, 20, 60, 140, "Back")
             if self.state == "chooseInventory":
                 write(self.game, 20, 30, 87 + (self.cursorPos*25), "->")
+                for i in range(0,len(self.game.player.party.members)):
+                    self.drawEquipmentBlock(250, 45 + (i*100), self.game.player.party.members[i])
             elif self.state == "selectItem":
                 self.printEquipment()
-            for i in range(0,len(self.game.player.party.members)):
-                self.drawEquipmentBlock(250, 45 + (i*100), self.game.player.party.members[i])
 
         elif self.state == "chooseItemType" or self.state == "partySelect":
             write(self.game, 40, 30, 40, "Forge")

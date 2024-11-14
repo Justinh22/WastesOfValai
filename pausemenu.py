@@ -189,9 +189,9 @@ class PauseMenu():
                     write(self.game, 22, 510 + (self.cursorPos*100), 417, "->")
             elif self.substate == "equipment":
                 if self.action != "removeAcc":
-                    tgt = self.game.directory.getItem(self.game.player.party.equipment[self.targetElement])
+                    tgt = self.game.player.party.equipment[self.targetElement]
                 else:
-                    tgt = self.game.directory.getItem(self.game.player.party.members[self.targetPartyMember].eqpAcc.id)
+                    tgt = self.game.player.party.members[self.targetPartyMember].eqpAcc
                 statText = ""
                 itemType = self.game.directory.getItemType(tgt.id)
                 self.itemName = self.game.directory.getItemName(tgt.id,True)
@@ -199,7 +199,7 @@ class PauseMenu():
                 if itemType == Type.Weapon:
                     writeOrientation(self.game, 15, self.right-40, 220, "Level "+str(tgt.rarity)+" "+tgt.type.name, "R")
                     if tgt.atkRefine > 0 or tgt.accRefine > 0 or tgt.crtRefine > 0:
-                        writeOrientation(self.game, 15, self.right-40, 245, "+" + str(tgt.atkRefine) + "/+" + str(tgt.accRefine) + "/+" + str(tgt.crtRefine))
+                        writeOrientation(self.game, 15, self.right-40, 245, "+" + str(tgt.atkRefine) + "/+" + str(tgt.accRefine) + "/+" + str(tgt.crtRefine), "R")
                     statText = "ATK " + str(tgt.getAttack()) + " | ACC " + str(tgt.getAccuracy()) + " | CRT " + str(tgt.getCritrate()) + " | AMP " + str(tgt.amplifier)
                 elif itemType == Type.Armor:
                     writeOrientation(self.game, 15, self.right-40, 220, "Level "+str(tgt.rarity)+" "+tgt.type.name+" Armor", "R")
@@ -230,7 +230,7 @@ class PauseMenu():
                     writeOrientation(self.game, 15, self.right-40, 220, "Level "+str(tgt.rarity)+" "+spelltype+" Spell | "+str(tgt.manacost) + " MP", "R")
                     writeOrientation(self.game, 15, self.right-40, 245, "Use to learn spell.", "R")
                     if tgt.type == SpellType.Attack:
-                        write(self.game, 15, 60, 245, "Deals " + str(self.game.player.party.members[self.targetPartyMember].amplify(tgt.getAttack())) + " damage.")
+                        write(self.game, 15, 60, 245, "Deals " + str(self.game.player.party.members[self.targetPartyMember].amplify(tgt.attack)) + " damage.")
                     elif tgt.type == SpellType.Buff:
                         buffText = ""
                         commaSeparator = ""
@@ -691,9 +691,9 @@ class PauseMenu():
 
     def actionHandler(self,tgtList,action,targetPartyMember,targetElement,spellTarget=-1):
         if action == "equip":
-            if self.game.player.party.members[targetPartyMember].checkProficiency(self.game.player.party.equipment[targetElement],self.game.directory):
+            if self.game.player.party.members[targetPartyMember].checkProficiency(self.game.player.party.equipment[targetElement].id,self.game.directory):
                 replace = self.game.player.party.members[targetPartyMember].equip(self.game.player.party.equipment[targetElement],self.game.directory)
-                if replace != -1:
+                if replace.id != -1:
                     print(f'Replace! Setting pos {targetElement} to {replace}')
                     self.game.player.party.equipment[targetElement] = replace
                 else:
@@ -705,6 +705,7 @@ class PauseMenu():
                 self.game.player.party.dropEquipment(targetElement)
         elif action == "removeAcc":
             self.game.player.party.removeAccessory(targetPartyMember)
+            self.action = "none"
             self.targetElement = 0
         elif action == "use":
             if self.game.directory.getItemType(self.game.player.party.inventory[targetElement]) == Type.Potion:

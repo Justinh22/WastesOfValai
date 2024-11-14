@@ -183,20 +183,20 @@ class Character():
             self.lastLearned.append(self.type.knownTalents[self.level-1])
         return growth
     def equip(self,item,dir):
-        print(dir.getItemType(item))
-        if dir.getItemType(item) == Type.Weapon:
-            returner = self.eqpWpn.id
-            self.eqpWpn = dir.getItem(item)
-        elif dir.getItemType(item) == Type.Armor:
-            returner = self.eqpAmr.id
-            self.eqpAmr = dir.getItem(item)
-        elif dir.getItemType(item) == Type.Accessory:
-            returner = self.eqpAcc.id
-            if returner != -1:
+        itemType = dir.getItemType(item.id)
+        if itemType == Type.Weapon:
+            returner = self.eqpWpn
+            self.eqpWpn = item
+        elif itemType == Type.Armor:
+            returner = self.eqpAmr
+            self.eqpAmr = item
+        elif itemType == Type.Accessory:
+            returner = self.eqpAcc
+            if returner.id != -1:
                 print("Unequip")
-                if dir.getItem(returner).timing == Timing.Universal:
+                if returner.timing == Timing.Universal:
                     self.universalEffectHandler(self.eqpAcc,"Unequip")
-            self.eqpAcc = dir.getItem(item)
+            self.eqpAcc = item
             if self.eqpAcc.timing == Timing.Universal:
                 print("Equip")
                 self.universalEffectHandler(self.eqpAcc,"Equip")
@@ -379,7 +379,7 @@ class Party():
     def __init__(self):
         self.members = []
         self.inventory = []         # List of int : Contains id of all items in inventory
-        self.equipment = []         # List of int : Contains id of all equipment in inventory
+        self.equipment = []         # List of int : Contains all equipment in inventory
     def printContents(self):
         for member in self.members:
             print(member.name)
@@ -394,14 +394,14 @@ class Party():
     def debug_RandomInventory(self,dir):
         while len(self.inventory) < MAX_INVENTORY_SIZE:
             self.addItem(dir.getItemByRarities(Type.Potion,1,5))
-    def add(self,item,dir):
-        if dir.getItemType(item) == Type.Weapon or dir.getItemType(item) == Type.Armor or dir.getItemType(item) == Type.Accessory:
-            return self.addEquipment(item)
+    def add(self,id,dir):
+        if dir.getItemType(id) == Type.Weapon or dir.getItemType(id) == Type.Armor or dir.getItemType(id) == Type.Accessory:
+            return self.addEquipment(dir.getItem(id))
         else:
-            return self.addItem(item)
-    def addItem(self,item):
+            return self.addItem(id)
+    def addItem(self,id):
         if len(self.inventory) < MAX_INVENTORY_SIZE:
-            self.inventory.append(item)
+            self.inventory.append(id)
             return True
         print("Item inventory is full")
         return False
@@ -452,7 +452,7 @@ class Party():
         return levelups
     def removeAccessory(self,target):
         if self.members[target].eqpAcc != None and len(self.equipment) < MAX_INVENTORY_SIZE:
-            self.equipment.append(self.members[target].eqpAcc.id)
+            self.equipment.append(self.members[target].eqpAcc)
             self.members[target].universalEffectHandler(self.members[target].eqpAcc,"Unequip")
             self.members[target].eqpAcc = Accessory()
             

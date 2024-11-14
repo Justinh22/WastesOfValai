@@ -44,6 +44,8 @@ class Directory():
         return item
 
     def getItemName(self,id,scroll=False):
+        if type(id) != int:
+            id = id.id
         name = "NULL"
         if id < 100:
             name = self.weaponDirectory[id].name
@@ -66,6 +68,8 @@ class Directory():
         return name
 
     def getItemDesc(self,id):
+        if type(id) != int:
+            id = id.id
         desc = "NULL"
         if id < 100:
             desc = self.weaponDirectory[id].description
@@ -84,6 +88,8 @@ class Directory():
         return desc
 
     def getItemRarity(self,id):
+        if type(id) != int:
+            id = id.id
         rarity = "NULL"
         if id < 100:
             rarity = self.weaponDirectory[id].rarity
@@ -102,24 +108,26 @@ class Directory():
         return rarity
     
     def getItemType(self,id):
-        type = Type.Empty
+        if type(id) != int:
+            id = id.id
+        itemType = Type.Empty
         if id < 0:
-            type = Type.Empty
+            itemType = Type.Empty
         elif id < 100:
-            type = Type.Weapon
+            itemType = Type.Weapon
         elif id < 200:
-            type = Type.Armor
+            itemType = Type.Armor
         elif id < 300:
-            type = Type.Potion
+            itemType = Type.Potion
         elif id < 400:
-            type = Type.AtkSpell
+            itemType = Type.AtkSpell
         elif id < 500:
-            type = Type.SptSpell
+            itemType = Type.SptSpell
         elif id < 600:
-            type = Type.Talent
+            itemType = Type.Talent
         elif id < 700:
-            type = Type.Accessory
-        return type
+            itemType = Type.Accessory
+        return itemType
 
     def getSpellTarget(self,id):
         if id < 400:
