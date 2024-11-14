@@ -4,13 +4,9 @@ import math
 from directory import *
 from pathfinder import Pathfinder
 from constants import *
+from buildings import *
 
-BUILDING_HEIGHT = 4
-BUILDING_WIDTH = 7
 PATH_FREQUENCY = 2
-
-BUILDING_WALL = '='
-BUILDING_DOOR = 'O'
 PATH_CHAR = '%'
 
 FOREST_CHAR = '#'
@@ -54,7 +50,7 @@ class VillageMap():
     def __init__(self,coords,level,type,biome):
         self.map = []
         self.coords = coords        # Coords         : Duple containing (row,col) of where the village is located in the world
-        self.buildings = []         # Buildings      : List of VillageBuildings
+        self.buildings = []         # Buildings      : List of Buildings
         self.visited = []
         self.villageLevel = level
         self.villageType = type
@@ -137,7 +133,11 @@ class VillageMap():
             testCol = random.randint(self.buildingBuffer,self.maxCols-BUILDING_WIDTH-self.buildingBuffer)
             success = self.checkBuildingFit(testRow,testCol)
             if success:
-                self.buildings.append(VillageBuilding(testRow,testCol))
+                if random.randint(1,2) == 1:
+                    self.buildings.append(Building(testRow,testCol,self.villageLevel))
+                else:
+                    print("FORGE")
+                    self.buildings.append(Forge(testRow,testCol,self.villageLevel))
                 self.placeBuilding(testRow,testCol)
                 break
             
@@ -187,31 +187,3 @@ class VillageMap():
 
     def addEntrance(self):
         return (random.randint(0,self.maxRows),0)
-
-
-class VillageBuilding():
-    def __init__(self,row,col):
-        self.row = row
-        self.col = col
-        self.height = BUILDING_HEIGHT
-        self.width = BUILDING_WIDTH
-    
-    def getDoorway(self):
-        return (self.row+3,self.col+3)
-    
-    def getOutsideDoorway(self):
-        return (self.row+4,self.col+3)
-    
-    def toString(self):
-        return "(" + str(self.getOutsideDoorway()[0]) + "," + str(self.getOutsideDoorway()[1]) + ")"
-
-    def getCoords(self):
-        return ((self.row,self.col))
-    
-    def getDistanceFrom(self,coords):
-        return abs(self.getOutsideDoorway()[0]-coords[0]) + abs(self.getOutsideDoorway()[1]-coords[1])
-    
-    def setEntrance(self,map):
-        coords = self.getDoorway()
-        map[coords[0]][coords[1]] = BUILDING_DOOR
-        return coords

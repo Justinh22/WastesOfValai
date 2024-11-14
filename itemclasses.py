@@ -16,6 +16,20 @@ class Weapon(Item):
         self.critrate = crt
         self.amplifier = amp
         self.type = typ
+        self.atkRefine = 0
+        self.accRefine = 0
+        self.crtRefine = 0
+    def getAttack(self):
+        return self.attack + (self.atkRefine * ATK_REFINE_BOOST)
+    def getAccuracy(self):
+        return self.accuracy + (self.accRefine * ACC_REFINE_BOOST)
+    def getCritrate(self):
+        return self.critrate + (self.crtRefine * CRT_REFINE_BOOST)
+    def refine(self,newRefineValues):
+        self.atkRefine = newRefineValues[0]
+        self.accRefine = newRefineValues[1]
+        self.crtRefine = newRefineValues[2]
+        print(f'Refined! +{self.atkRefine}/+{self.accRefine}/+{self.crtRefine}')
 
 class Armor(Item):
     def __init__(self,nm="NULL",desc="NULL",rar=-1,i=-1,df=0,ddg=0,mpr=0,typ=ArmorType.Medium):
@@ -24,6 +38,16 @@ class Armor(Item):
         self.dodge = ddg
         self.manaregen = mpr
         self.type = typ
+        self.defRefine = 0
+        self.ddgRefine = 0
+    def getDefense(self):
+        return self.defense + (self.defRefine * DEF_REFINE_BOOST)
+    def getDodge(self):
+        return self.dodge + (self.ddgRefine * DDG_REFINE_BOOST)
+    def refine(self,newRefineValues):
+        self.defRefine = newRefineValues[0]
+        self.ddgRefine = newRefineValues[1]
+        print(f'Refined! +{self.defRefine}/+{self.ddgRefine}')
 
 class Potion(Item):
     def __init__(self,nm,desc,rar,i,hpg,mpg):

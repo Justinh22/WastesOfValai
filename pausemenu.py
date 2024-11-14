@@ -98,9 +98,9 @@ class PauseMenu():
             write(self.game, 20, 60, 165, "Spells")
             self.drawMinStatBlock(250, 45, self.game.player.party.members[self.targetPartyMember])
             weapon = self.game.player.party.members[self.targetPartyMember].eqpWpn
-            write(self.game, 12, 250, 145, "Weapon: " + weapon.name + " (" + str(weapon.attack) + " ATK, " + str(weapon.accuracy) + " ACC, " + str(weapon.critrate) + " CRT, " + str(weapon.amplifier) + " AMP)")
+            write(self.game, 12, 250, 145, "Weapon: " + weapon.name + " (" + str(weapon.getAttack()) + " ATK, " + str(weapon.getAccuracy()) + " ACC, " + str(weapon.getCritrate()) + " CRT, " + str(weapon.amplifier) + " AMP)")
             armor = self.game.player.party.members[self.targetPartyMember].eqpAmr
-            write(self.game, 12, 250, 162, "Armor: " + armor.name + " (" + str(armor.defense) + " DEF, " + str(armor.dodge) + " DDG, " + str(armor.manaregen) + " MPG)")
+            write(self.game, 12, 250, 162, "Armor: " + armor.name + " (" + str(armor.getDefense()) + " DEF, " + str(armor.getDodge()) + " DDG, " + str(armor.manaregen) + " MPG)")
             accessory = self.game.player.party.members[self.targetPartyMember].eqpAcc
             if accessory.id == -1:
                 write(self.game, 12, 250, 179, "Accessory: None")
@@ -155,7 +155,7 @@ class PauseMenu():
                 spelltype = "Attack" if tgt.type == SpellType.Attack or tgt.type == SpellType.Debuff else "Support"
                 writeOrientation(self.game, 15, self.right-40, 220, "Level "+str(tgt.rarity)+" "+spelltype+" Spell | "+str(tgt.manacost) + " MP", "R")
                 if tgt.type == SpellType.Attack:
-                    write(self.game, 15, 60, 245, "Deals " + str(self.game.player.party.members[self.targetPartyMember].amplify(tgt.attack)) + " damage.")
+                    write(self.game, 15, 60, 245, "Deals " + str(self.game.player.party.members[self.targetPartyMember].amplify(tgt.getAttack())) + " damage.")
                 elif tgt.type == SpellType.Buff:
                     buffText = ""
                     commaSeparator = ""
@@ -198,10 +198,14 @@ class PauseMenu():
                 write(self.game, 20, 60, 220, self.itemName)
                 if itemType == Type.Weapon:
                     writeOrientation(self.game, 15, self.right-40, 220, "Level "+str(tgt.rarity)+" "+tgt.type.name, "R")
-                    statText = "ATK " + str(tgt.attack) + " | ACC " + str(tgt.accuracy) + " | CRT " + str(tgt.critrate) + " | AMP " + str(tgt.amplifier)
+                    if tgt.atkRefine > 0 or tgt.accRefine > 0 or tgt.crtRefine > 0:
+                        writeOrientation(self.game, 15, self.right-40, 245, "+" + str(tgt.atkRefine) + "/+" + str(tgt.accRefine) + "/+" + str(tgt.crtRefine))
+                    statText = "ATK " + str(tgt.getAttack()) + " | ACC " + str(tgt.getAccuracy()) + " | CRT " + str(tgt.getCritrate()) + " | AMP " + str(tgt.amplifier)
                 elif itemType == Type.Armor:
                     writeOrientation(self.game, 15, self.right-40, 220, "Level "+str(tgt.rarity)+" "+tgt.type.name+" Armor", "R")
-                    statText = "DEF " + str(tgt.defense) + " | DDG " + str(tgt.dodge) + " | MPG " + str(tgt.manaregen)
+                    if tgt.defRefine > 0 or tgt.ddgRefine > 0:
+                        writeOrientation(self.game, 15, self.right-40, 245, "+" + str(tgt.defRefine) + "/+" + str(tgt.ddgRefine))
+                    statText = "DEF " + str(tgt.getDefense()) + " | DDG " + str(tgt.getDodge()) + " | MPG " + str(tgt.manaregen)
                 write(self.game, 15, 60, 245, statText)
                 if self.state == "itemSummary":
                     write(self.game, 22, 440, 420, "Equip")
@@ -226,7 +230,7 @@ class PauseMenu():
                     writeOrientation(self.game, 15, self.right-40, 220, "Level "+str(tgt.rarity)+" "+spelltype+" Spell | "+str(tgt.manacost) + " MP", "R")
                     writeOrientation(self.game, 15, self.right-40, 245, "Use to learn spell.", "R")
                     if tgt.type == SpellType.Attack:
-                        write(self.game, 15, 60, 245, "Deals " + str(self.game.player.party.members[self.targetPartyMember].amplify(tgt.attack)) + " damage.")
+                        write(self.game, 15, 60, 245, "Deals " + str(self.game.player.party.members[self.targetPartyMember].amplify(tgt.getAttack())) + " damage.")
                     elif tgt.type == SpellType.Buff:
                         buffText = ""
                         commaSeparator = ""

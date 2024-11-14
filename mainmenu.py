@@ -15,6 +15,7 @@ class MainMenu():
         self.debug_lv = 1
         self.debug_cls = -1
         self.debug_startingItems = []
+        self.debug_startingGold = []
         self.startingZone = 1
         self.debugOps = []
         self.startPos = (self.game.width/2,self.game.height/2+30)
@@ -96,6 +97,10 @@ class MainMenu():
             if "StartingZone" not in self.debugOps:
                 print("StartingZone")
                 self.debugOps.append("StartingZone")
+        if self.game.B:
+            if "StartingGold" not in self.debugOps:
+                print("StartingGold")
+                self.debugOps.append("StartingGold")
 
 
     def cursorHandler(self):
@@ -145,6 +150,8 @@ class MainMenu():
             self.debug_startingItems = getDebug(4)
         if typ == "StartingZone":
             self.debug_startingZone = getDebug(5)
+        if typ == "StartingGold":
+            self.debug_startingGold = getDebug(6)
     
     def executeDebug(self):
         print(self.debugOps)
@@ -163,3 +170,5 @@ class MainMenu():
                 self.game.player.party.add(item,self.game.directory)
         if "StartingZone" in self.debugOps:
             self.startingZone = self.debug_startingZone
+        if "StartingGold" in self.debugOps:
+            self.game.player.gold += self.debug_startingGold

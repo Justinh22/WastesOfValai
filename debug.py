@@ -15,4 +15,6 @@ def getDebug(typ):
             return debugdata['StartingItems']
         if typ == 5:
             return debugdata['StartingZone']
+        if typ == 6:
+            return debugdata['StartingGold']
 

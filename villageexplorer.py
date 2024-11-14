@@ -79,21 +79,21 @@ class Explorer():
                 mapChar = '_'
                 if r < 0 or r >= self.village.maxRows:
                     mapChar = self.village.groundChar
-                    color = self.setColor(mapChar)
+                    color = self.setColor(mapChar,r,c)
                 if c < 0 or c >= self.village.maxCols:
                     mapChar = self.village.groundChar
-                    color = self.setColor(mapChar)
+                    color = self.setColor(mapChar,r,c)
                 if r == self.villagePos[0] and c == self.villagePos[1]:
                     mapChar = '@'
                 if mapChar == '_':
                     mapChar = self.village.map[r][c]
-                    color = self.setColor(mapChar)
+                    color = self.setColor(mapChar,r,c)
                 text = self.font.render(mapChar,True,color)
                 textWidth, textHeight = self.font.size(mapChar)
                 offset = (blockSize-textWidth)/2
                 self.game.screen.blit(text,(x+offset,y+5))
         
-    def setColor(self,mapChar):
+    def setColor(self,mapChar,r,c):
         if mapChar == FOREST_CHAR: # Forest
             color = self.game.green
         elif mapChar == PLAINS_CHAR: # Plains
@@ -102,9 +102,12 @@ class Explorer():
             color = self.game.tan
         elif mapChar == PATH_CHAR: # Path
             color = self.game.orange
-        elif mapChar == BUILDING_WALL: # Building
+        elif mapChar == BUILDING_WALL: # Building Wall
             color = self.game.brown
-        elif mapChar == BUILDING_DOOR: # Building
+            for building in self.village.buildings:
+                if building.isInBuilding(r,c):
+                    color = building.color
+        elif mapChar == BUILDING_DOOR: # Building Door
             color = self.game.gray
         return color
 
@@ -118,6 +121,14 @@ class Explorer():
         if self.village.map[self.villagePos[0]][self.villagePos[1]] == BUILDING_WALL:
             self.villagePos[0] -= rMod
             self.villagePos[1] -= cMod
+        if self.village.map[self.villagePos[0]][self.villagePos[1]] == BUILDING_DOOR:
+            building = self.buildingLookup(self.villagePos[0],self.villagePos[1])
+            building.enter(self.game,self.game.player)
+
+    def buildingLookup(self,r,c):
+        for building in self.village.buildings:
+            if (r,c) == building.getDoorway():
+                return building
 
     def getDistance(self,start,target):
         return (abs(start[0]-target[0]) + abs(start[1]-target[1]))

@@ -66,23 +66,23 @@ class Character():
     def getMaxMP(self):
         return self.mpMax + self.universalEffects.mp
     def getAttack(self):
-        return self.eqpWpn.attack + self.attack + self.universalEffects.attack + self.getBuff("ATK")
+        return self.eqpWpn.getAttack() + self.attack + self.universalEffects.attack + self.getBuff("ATK")
     def getDefense(self):
-        return self.eqpAmr.defense + self.defense + self.universalEffects.defense + self.getBuff("DEF")
+        return self.eqpAmr.getDefense() + self.defense + self.universalEffects.defense + self.getBuff("DEF")
     def getCritRate(self):
-        return self.eqpWpn.critrate + self.critrate + self.universalEffects.critrate + self.getBuff("CRT")
+        return self.eqpWpn.getCritrate() + self.critrate + self.universalEffects.critrate + self.getBuff("CRT")
     def getAccuracy(self):
         ablazePenalty = 0
         if self.status is Status.Ablaze:
             ablazePenalty = 33
-        if self.eqpWpn.accuracy > 0:
-            return self.eqpWpn.accuracy + self.universalEffects.accuracy + self.getBuff("ACC") - ablazePenalty
+        if self.eqpWpn.getAccuracy() > 0:
+            return self.eqpWpn.getAccuracy() + self.universalEffects.accuracy + self.getBuff("ACC") - ablazePenalty
         else:
             return self.accuracy + self.universalEffects.accuracy + self.getBuff("ACC") - ablazePenalty
     def getDodge(self):
         if self.status is Status.Shocked:
             return 0
-        return self.eqpAmr.dodge + self.dodge + self.universalEffects.dodge + self.getBuff("DDG")
+        return self.eqpAmr.getDodge() + self.dodge + self.universalEffects.dodge + self.getBuff("DDG")
     def getLuck(self):
         return self.luck + self.universalEffects.luck + self.getBuff("LCK")
     def getAmplifier(self):

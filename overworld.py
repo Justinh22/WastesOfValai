@@ -196,7 +196,7 @@ class Overworld():
             if self.game.WorldMap.map[r][c] == ABANDONED_VILLAGE_CHAR or self.game.WorldMap.map[r][c] == HAVEN_CHAR or self.game.WorldMap.map[r][c] == SHACK_CHAR:
                 if self.game.WorldMap.map[r][c] == HAVEN_CHAR:
                     typ = "haven"
-                elif self.game.WorldMap.map[r][c] == SHACK_CHAR:
+                elif self.game.WorldMap.map[r][c] == SHACK_CHAR or self.game.WorldMap.map[r][c] == ABANDONED_VILLAGE_CHAR:
                     typ = "room"
                 print(f'Type: {typ}')
                 newRoom = RoomHandler(self.game, self.game.roomDB.getRoom((r,c),self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]),typ))
