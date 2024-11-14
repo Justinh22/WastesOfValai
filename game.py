@@ -125,7 +125,7 @@ class Game():
     def load(self):
         roomdb = open('databases/roomDatabase.db','rb')
         dungeondb = open('databases/dungeonDatabase.db','rb')
-        villagedb = open('databases/villageDatabase.db','wb')
+        villagedb = open('databases/villageDatabase.db','rb')
         playerdb = open('databases/playerDatabase.db','rb')
         self.roomDB = pickle.load(roomdb)
         self.dungeonDB = pickle.load(dungeondb)
