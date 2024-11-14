@@ -120,6 +120,12 @@ class Forge(Building):
     def __init__(self,row,col,level):
         Building.__init__(self,row,col,level)
         self.color = (0,0,255) # Blue
+        self.itemType = "none"
+        self.targetItem = None
+        self.currentRefineLevel = []
+        self.tentativeRefineLevel = []
+        self.refinementStatCurrentValues = []
+        self.refinementStatTentativeValues = []
 
     def initializeOnEnter(self):
         self.itemType = "none"
@@ -437,7 +443,132 @@ class Forge(Building):
         write(self.game, 14, xPos+10, yPos+10, character.name + ", Level " + str(character.level) + " " + character.type.name)
 
 
-class Weaponsmith(Building):
+class Shop(Building):
+    def __init__(self,row,col,level):
+        Building.__init__(self,row,col,level)
+        self.color = (90,176,72) # Green
+        self.shopInventory = []
+        self.playerInventory = []
+        self.shopPageModifier = 0
+        self.targetItem = None
+
+    def initializeOnEnter(self):
+        if len(self.shopInventory) == 0:
+            self.fillShopInventory()
+        self.playerInventory = self.getTargetInventory()
+        self.shopPageModifier = 0
+        self.targetItem = None
+
+    def getInput(self):
+        if self.delay > 0:
+            self.delay -= 1
+            return
+        if self.game.UP:
+            print("UP")
+            if self.state == "shopScreen":
+                if self.cursorPos == 1 and self.shopPageModifier > 0:
+                    self.shopPageModifier -= 1
+                elif self.cursorPos > 0:
+                    self.cursorPos -= 1
+        if self.game.DOWN:
+            print("DOWN")
+            if self.state == "shopScreen":
+                if self.cursorPos == 3 and (self.shopPageModifier+5 < len(self.shopInventory)):
+                    self.shopPageModifier += 1
+                elif self.cursorPos < 4:
+                    self.cursorPos += 1
+        if self.game.A:
+            print("A")
+            if self.state == "main":
+                self.state = "shopScreen"
+                self.substate = "none"
+            elif self.state == "shopScreen":
+                if self.player.gold > self.calculateCost(self.shopInventory[self.cursorPos+self.shopPageModifier]):
+                    if len(self.playerInventory) < MAX_INVENTORY_SIZE:
+                        self.targetItem = self.shopInventory[self.cursorPos+self.shopPageModifier]
+                        self.state = "confirmPurchase"
+                    else:
+                        self.substate = "inventoryFull"
+                else:
+                    self.substate = "tooExpensive"
+            elif self.state == "confirmPurchase":
+                self.player.gold -= self.calculateCost(self.targetItem)
+                self.player.party.add(self.game.directory.copy(self.targetItem),self.game.directory)
+                self.state = "shopScreen"
+                self.substate = "purchased"
+        if self.game.B:
+            print("B")
+            if self.state == "main":
+                self.inMenu = False
+            elif self.state == "shopScreen":
+                self.state = "main"
+                self.substate = "none"
+            elif self.state == "confirmPurchase":
+                self.state = "shopScreen"
+                self.substate = "none"
+        if self.game.X:
+            print("X")
+        if self.game.Y:
+            print("Y")
+
+    def drawScreen(self):
+        self.game.screen.fill((0,0,0))
+        screenOutline = pygame.Rect(self.left,self.top,self.right,self.bottom)
+        pygame.draw.line(self.game.screen,self.game.white,(self.left,300),(self.right+9,300),2)
+        pygame.draw.line(self.game.screen,self.game.white,(self.right-self.left-180,300),(self.right-self.left-180,self.bottom+8),2)
+        pygame.draw.rect(self.game.screen,self.game.white,screenOutline,2)
+        
+        if self.state == "main":
+            description = self.getShopDescription(self.state)
+            wrapWrite(self.game, 20, description, self.right-self.left-15)
+            write(self.game, 25,self.right-150,self.top+340,"A) Shop")
+            write(self.game, 25,self.right-150,self.top+390,"B) Leave")
+
+        elif self.state == "shopScreen":
+            description = self.getShopDescription(self.state)
+            self.printShopInventory()
+            write(self.game, 25,self.right-150,self.top+340,"A) Buy")
+            write(self.game, 25,self.right-150,self.top+390,"B) Back")
+
+        elif self.state == "confirmPurchase":
+            description = self.getShopDescription(self.state)
+            self.printShopInventory()
+            write(self.game, 25,self.right-150,self.top+340,"A) Confirm")
+            write(self.game, 25,self.right-150,self.top+390,"B) Cancel")
+
+    def printShopInventory(self):
+        shopDisplay = []
+        for i in range(5):
+            if i + self.shopPageModifier >= len(self.shopInventory):
+                shopDisplay.append("None")
+            else:
+                shopDisplay.append(self.shopInventory[i + self.shopPageModifier])
+        for i in range(5):
+            if shopDisplay[i] == "None":
+                write(self.game, 20, self.left+35, (self.top+310)+(25*i), str(i+1+self.shopPageModifier) + ")")
+            else:
+                write(self.game, 20, self.left+35, (self.top+310)+(25*i), str(i+1+self.shopPageModifier) + ") " + self.game.directory.getItemName(shopDisplay[i]))
+                writeOrientation(self.game, 20, self.right-self.left-200, (self.top+310)+(25*i), str(self.calculateCost(shopDisplay[i])) + "g", "R")
+        write(self.game, 20,self.left+20,(self.top+310)+(25*self.cursorPos),">")
+
+    def getShopName(self):
+        return "Shop"
+
+    def getShopDescription(self,state):
+        return "Basic shop template!"
+
+    def getTargetInventory(self):
+        return self.player.party.equipment
+
+    def fillShopInventory(self):
+        for i in range(8):
+            self.shopInventory.append(self.game.directory.getWeaponByRarity([WeaponType.Axe,WeaponType.Sword,WeaponType.Spear,WeaponType.Dagger,WeaponType.Staff],self.game.directory.getLootRarity(self.level,Type.Weapon)))
+
+    def calculateCost(self, item):
+        return 20
+
+
+class Weaponsmith(Shop):
     def __init__(self,row,col,level):
         Building.__init__(self,row,col,level)
 
@@ -464,7 +595,7 @@ class Weaponsmith(Building):
         pygame.draw.rect(self.game.screen,self.game.white,screenOutline,2)
 
 
-class Armory(Building):
+class Armory(Shop):
     def __init__(self,row,col,level):
         Building.__init__(self,row,col,level)
 
@@ -491,7 +622,61 @@ class Armory(Building):
         pygame.draw.rect(self.game.screen,self.game.white,screenOutline,2)
 
 
-class TradingPost(Building):
+class TradingPost(Shop):
+    def __init__(self,row,col,level):
+        Building.__init__(self,row,col,level)
+
+    def getInput(self):
+        if self.delay > 0:
+            self.delay -= 1
+            return
+        if self.game.UP:
+            print("UP")
+        if self.game.DOWN:
+            print("DOWN")
+        if self.game.A:
+            print("A")
+        if self.game.B:
+            print("B")
+        if self.game.X:
+            print("X")
+        if self.game.Y:
+            print("Y")
+
+    def drawScreen(self):
+        self.game.screen.fill((0,0,0))
+        screenOutline = pygame.Rect(self.left,self.top,self.right,self.bottom)
+        pygame.draw.rect(self.game.screen,self.game.white,screenOutline,2)
+
+
+class Library(Shop):
+    def __init__(self,row,col,level):
+        Building.__init__(self,row,col,level)
+
+    def getInput(self):
+        if self.delay > 0:
+            self.delay -= 1
+            return
+        if self.game.UP:
+            print("UP")
+        if self.game.DOWN:
+            print("DOWN")
+        if self.game.A:
+            print("A")
+        if self.game.B:
+            print("B")
+        if self.game.X:
+            print("X")
+        if self.game.Y:
+            print("Y")
+
+    def drawScreen(self):
+        self.game.screen.fill((0,0,0))
+        screenOutline = pygame.Rect(self.left,self.top,self.right,self.bottom)
+        pygame.draw.rect(self.game.screen,self.game.white,screenOutline,2)
+
+
+class Temple(Shop):
     def __init__(self,row,col,level):
         Building.__init__(self,row,col,level)
 

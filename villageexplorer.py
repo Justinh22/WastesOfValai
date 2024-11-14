@@ -115,7 +115,7 @@ class Explorer():
         #print(f'({r}, {c})')
         self.villagePos[0] += rMod
         self.villagePos[1] += cMod
-        if self.villagePos[0]+rMod < 0 or self.villagePos[0]+rMod > self.village.maxRows or self.villagePos[1]+cMod < 0 or self.villagePos[1]+cMod > self.village.maxCols:
+        if self.villagePos[0]+rMod < 0 or self.villagePos[0]+rMod > self.village.maxRows-1 or self.villagePos[1]+cMod < 0 or self.villagePos[1]+cMod > self.village.maxCols-1:
             self.inVillage = False
             return
         if self.village.map[self.villagePos[0]][self.villagePos[1]] == BUILDING_WALL:
