@@ -446,7 +446,6 @@ class Forge(Building):
 class Shop(Building):
     def __init__(self,row,col,level):
         Building.__init__(self,row,col,level)
-        self.color = (90,176,72) # Green
         self.shopInventory = []
         self.playerInventory = []
         self.shopPageModifier = 0
@@ -475,7 +474,7 @@ class Shop(Building):
             if self.state == "shopScreen":
                 if self.cursorPos == 3 and (self.shopPageModifier+5 < len(self.shopInventory)):
                     self.shopPageModifier += 1
-                elif self.cursorPos < 4:
+                elif self.cursorPos < 4 and self.cursorPos < len(self.shopInventory)-1:
                     self.cursorPos += 1
         if self.game.A:
             print("A")
@@ -484,7 +483,7 @@ class Shop(Building):
                 self.substate = "none"
             elif self.state == "shopScreen":
                 if self.player.gold > self.calculateCost(self.shopInventory[self.cursorPos+self.shopPageModifier]):
-                    if len(self.playerInventory) < MAX_INVENTORY_SIZE:
+                    if self.canAddItem():
                         self.targetItem = self.shopInventory[self.cursorPos+self.shopPageModifier]
                         self.state = "confirmPurchase"
                     else:
@@ -493,7 +492,7 @@ class Shop(Building):
                     self.substate = "tooExpensive"
             elif self.state == "confirmPurchase":
                 self.player.gold -= self.calculateCost(self.targetItem)
-                self.player.party.add(self.game.directory.copy(self.targetItem),self.game.directory)
+                self.player.party.add(self.targetItem.id,self.game.directory)
                 self.state = "shopScreen"
                 self.substate = "purchased"
         if self.game.B:
@@ -517,21 +516,19 @@ class Shop(Building):
         pygame.draw.line(self.game.screen,self.game.white,(self.left,300),(self.right+9,300),2)
         pygame.draw.line(self.game.screen,self.game.white,(self.right-self.left-180,300),(self.right-self.left-180,self.bottom+8),2)
         pygame.draw.rect(self.game.screen,self.game.white,screenOutline,2)
+        description = self.getShopDescription(self.state, self.substate)
+        wrapWrite(self.game, 20, description, self.right-self.left-15)
         
         if self.state == "main":
-            description = self.getShopDescription(self.state)
-            wrapWrite(self.game, 20, description, self.right-self.left-15)
             write(self.game, 25,self.right-150,self.top+340,"A) Shop")
             write(self.game, 25,self.right-150,self.top+390,"B) Leave")
 
         elif self.state == "shopScreen":
-            description = self.getShopDescription(self.state)
             self.printShopInventory()
             write(self.game, 25,self.right-150,self.top+340,"A) Buy")
             write(self.game, 25,self.right-150,self.top+390,"B) Back")
 
         elif self.state == "confirmPurchase":
-            description = self.getShopDescription(self.state)
             self.printShopInventory()
             write(self.game, 25,self.right-150,self.top+340,"A) Confirm")
             write(self.game, 25,self.right-150,self.top+390,"B) Cancel")
@@ -554,7 +551,7 @@ class Shop(Building):
     def getShopName(self):
         return "Shop"
 
-    def getShopDescription(self,state):
+    def getShopDescription(self,state,substate):
         return "Basic shop template!"
 
     def getTargetInventory(self):
@@ -563,144 +560,225 @@ class Shop(Building):
     def fillShopInventory(self):
         for i in range(8):
             self.shopInventory.append(self.game.directory.getWeaponByRarity([WeaponType.Axe,WeaponType.Sword,WeaponType.Spear,WeaponType.Dagger,WeaponType.Staff],self.game.directory.getLootRarity(self.level,Type.Weapon)))
-
+    
     def calculateCost(self, item):
         return 20
+        
+    def canAddItem(self):
+        return len(self.playerInventory) < MAX_INVENTORY_SIZE
 
 
 class Weaponsmith(Shop):
     def __init__(self,row,col,level):
-        Building.__init__(self,row,col,level)
+        Shop.__init__(self,row,col,level)
+        self.color = (90,176,72) # Green
 
-    def getInput(self):
-        if self.delay > 0:
-            self.delay -= 1
-            return
-        if self.game.UP:
-            print("UP")
-        if self.game.DOWN:
-            print("DOWN")
-        if self.game.A:
-            print("A")
-        if self.game.B:
-            print("B")
-        if self.game.X:
-            print("X")
-        if self.game.Y:
-            print("Y")
+    def getShopName(self):
+        return "Weaponsmith"
 
-    def drawScreen(self):
-        self.game.screen.fill((0,0,0))
-        screenOutline = pygame.Rect(self.left,self.top,self.right,self.bottom)
-        pygame.draw.rect(self.game.screen,self.game.white,screenOutline,2)
+    def getShopDescription(self,state,substate):
+        description = ""
+        if state == "main":
+            description = "The inside of the shack is rather cluttered, with shelves and racks being full of weaponry. A burly-looking man stands behind a wooden counter. \
+                'Ah, nice to see an out-of-towner for once. So? You gonna buy somethin', or just stand there? I've got the finest weapons gold can buy.'"
+        elif state == "shopScreen" and substate == "none":
+            description = "Take a look, kid. I'm sure you'll find somethin' that'll pique your interest."
+        elif state == "shopScreen" and substate == "purchased":
+            description = "You won't regret it, kid. Got your eye on anything else?"
+        elif state == "shopScreen" and substate == "inventoryFull":
+            description = "You, uh, might want to make some room in your backpack there first, kid..."
+        elif state == "shopScreen" and substate == "tooExpensive":
+            description = "Hey, you tryna hustle me or somethin'? Come back when you can afford it."
+        elif state == "confirmPurchase":
+            description = "You want the " + self.game.directory.getItemName(self.targetItem) + "? That's gonna cost you 'bout " + str(self.calculateCost(self.targetItem)) + " gold."
+        return description
+
+    def getTargetInventory(self):
+        return self.player.party.equipment
+
+    def fillShopInventory(self):
+        weaponTypes = [WeaponType.Axe,WeaponType.Sword,WeaponType.Spear,WeaponType.Dagger,WeaponType.Staff]
+        random.shuffle(weaponTypes)
+        shopWeaponTypes = weaponTypes[0:2]
+        for weapon in self.game.directory.weaponDirectory:
+            if weapon.rarity <= self.game.directory.getLootRarity(self.level, Type.Weapon)+1 and (weapon.type in shopWeaponTypes):
+                self.shopInventory.append(weapon)
+
+    def calculateCost(self, item):
+        return 20 * round(item.rarity ** 1.5)
+        
+    def canAddItem(self):
+        return len(self.playerInventory) < MAX_INVENTORY_SIZE
 
 
 class Armory(Shop):
     def __init__(self,row,col,level):
-        Building.__init__(self,row,col,level)
+        Shop.__init__(self,row,col,level)
+        self.color = (255, 255, 0) # Yellow
 
-    def getInput(self):
-        if self.delay > 0:
-            self.delay -= 1
-            return
-        if self.game.UP:
-            print("UP")
-        if self.game.DOWN:
-            print("DOWN")
-        if self.game.A:
-            print("A")
-        if self.game.B:
-            print("B")
-        if self.game.X:
-            print("X")
-        if self.game.Y:
-            print("Y")
+    def getShopName(self):
+        return "Armory"
 
-    def drawScreen(self):
-        self.game.screen.fill((0,0,0))
-        screenOutline = pygame.Rect(self.left,self.top,self.right,self.bottom)
-        pygame.draw.rect(self.game.screen,self.game.white,screenOutline,2)
+    def getShopDescription(self,state,substate):
+        description = ""
+        if state == "main":
+            description = "The armory is filled with racks with full suits of armor of different shapes and sizes. From a back room, you hear the clanging of metal. A young boy stands behind a small counter. \
+                'Ah, hello! We've got lots of armor! You want some?'"
+        elif state == "shopScreen" and substate == "none":
+            description = "Great! Take a look at what we have. My mom makes all of it by hand at the forge, so it's top quality."
+        elif state == "shopScreen" and substate == "purchased":
+            description = "Really!? Thanks! You won't regret it!"
+        elif state == "shopScreen" and substate == "inventoryFull":
+            description = "Hey, uh, your bag looks pretty full there..."
+        elif state == "shopScreen" and substate == "tooExpensive":
+            description = "My mom says I shouldn't barter with this stuff... you sure you don't have any more gold on you?"
+        elif state == "confirmPurchase":
+            description = "Okay, so you want the " + self.game.directory.getItemName(self.targetItem) + "? Cool, that'll be... " + str(self.calculateCost(self.targetItem)) + " gold!"
+        return description
+
+    def getTargetInventory(self):
+        return self.player.party.equipment
+
+    def fillShopInventory(self):
+        armorTypes = [ArmorType.Light,ArmorType.Medium,ArmorType.Heavy,ArmorType.Robe]
+        random.shuffle(armorTypes)
+        shopArmorTypes = armorTypes[0:2]
+        if ArmorType.Robe in shopArmorTypes:
+            shopArmorTypes.append(ArmorType.Arcanist)
+        for armor in self.game.directory.armorDirectory:
+            if armor.rarity <= self.game.directory.getLootRarity(self.level, Type.Armor)+1 and (armor.type in shopArmorTypes):
+                self.shopInventory.append(armor)
+
+    def calculateCost(self, item):
+        return 20 * round(item.rarity ** 1.5)
+        
+    def canAddItem(self):
+        return len(self.playerInventory) < MAX_INVENTORY_SIZE
 
 
-class TradingPost(Shop):
+class GeneralStore(Shop):
     def __init__(self,row,col,level):
-        Building.__init__(self,row,col,level)
+        Shop.__init__(self,row,col,level)
+        self.color = (179,114,2) # Orange
 
-    def getInput(self):
-        if self.delay > 0:
-            self.delay -= 1
-            return
-        if self.game.UP:
-            print("UP")
-        if self.game.DOWN:
-            print("DOWN")
-        if self.game.A:
-            print("A")
-        if self.game.B:
-            print("B")
-        if self.game.X:
-            print("X")
-        if self.game.Y:
-            print("Y")
+    def getShopName(self):
+        return "General Store + Bakery"
 
-    def drawScreen(self):
-        self.game.screen.fill((0,0,0))
-        screenOutline = pygame.Rect(self.left,self.top,self.right,self.bottom)
-        pygame.draw.rect(self.game.screen,self.game.white,screenOutline,2)
+    def getShopDescription(self,state,substate):
+        description = ""
+        if state == "main":
+            description = "A mystifying aroma hits you as you enter the store. A short, slender woman walks out from a back room, hastily taking off an apron and oven mitts. 'Sorry, sorry! It's a busy day \
+                today, let me tell you... Anyway, what do you want? I've got a fresh batch of muffins ready to go!'"
+        elif state == "shopScreen" and substate == "none":
+            description = "Here's our general exploring items menu. Aaaand over here we have our baked goods menu! What looks good to you?"
+        elif state == "shopScreen" and substate == "purchased":
+            description = "You know, a long day of shopping always works up my appetite, I dunno about you!"
+        elif state == "shopScreen" and substate == "inventoryFull":
+            description = "Hey, looks like your pockets are pretty full there!"
+        elif state == "shopScreen" and substate == "tooExpensive":
+            description = "Hey, my prices aren't that high! You can cough up a bit more gold to support your local bakery- I mean general store!"
+        elif state == "confirmPurchase":
+            description = "Ah, so you want the " + self.game.directory.getItemName(self.targetItem) + "... That'll be " + str(self.calculateCost(self.targetItem)) + " gold then. (you know, those go great with cookies...)"
+        return description
+
+    def getTargetInventory(self):
+        return self.player.party.inventory
+
+    def fillShopInventory(self):
+        for item in self.game.directory.potionDirectory:
+            if item.rarity <= self.game.directory.getLootRarity(self.level, Type.Potion)+1:
+                self.shopInventory.append(item)
+
+    def calculateCost(self, item):
+        return 20 * item.rarity
+        
+    def canAddItem(self):
+        return len(self.playerInventory) < MAX_INVENTORY_SIZE
 
 
 class Library(Shop):
     def __init__(self,row,col,level):
-        Building.__init__(self,row,col,level)
+        Shop.__init__(self,row,col,level)
+        self.color = (0,255,255) # Light Blue
 
-    def getInput(self):
-        if self.delay > 0:
-            self.delay -= 1
-            return
-        if self.game.UP:
-            print("UP")
-        if self.game.DOWN:
-            print("DOWN")
-        if self.game.A:
-            print("A")
-        if self.game.B:
-            print("B")
-        if self.game.X:
-            print("X")
-        if self.game.Y:
-            print("Y")
+    def getShopName(self):
+        return "Library"
 
-    def drawScreen(self):
-        self.game.screen.fill((0,0,0))
-        screenOutline = pygame.Rect(self.left,self.top,self.right,self.bottom)
-        pygame.draw.rect(self.game.screen,self.game.white,screenOutline,2)
+    def getShopDescription(self,state,substate):
+        description = ""
+        if state == "main":
+            description = "The library is completely silent, with the only sound being the door gently closing behind you as you step inside. A tall man leans from around a tall bookshelf and shushes you. \
+                He whispers toward you; '*excuse me, would you please peruse a little more quietly? You are disrupting the others.*' There is no one else here."
+        elif state == "shopScreen" and substate == "none":
+            description = "*Spells, you say? Very well, we have a variety of scrolls here. Just don't rummage around so brutishly.*"
+        elif state == "shopScreen" and substate == "purchased":
+            description = "*Pleasure doing business with you. Will there be anything else for you this evening?*"
+        elif state == "shopScreen" and substate == "inventoryFull":
+            description = "*Excuse me, I think we both know quite well that you cannot carry this.*"
+        elif state == "shopScreen" and substate == "tooExpensive":
+            description = "*Ahem... You seem to lack the finances for that particular scroll.*"
+        elif state == "confirmPurchase":
+            description = "*Ah, the " + self.game.directory.getItemName(self.targetItem, True) + "? Excellent choice, that will be " + str(self.calculateCost(self.targetItem)) + " gold.*"
+        return description
+
+    def getTargetInventory(self):
+        return self.player.party.inventory
+
+    def fillShopInventory(self):
+        elements = [Element.Lightning, Element.Fire, Element.Ice]
+        element = random.choice(elements)
+        for spell in self.game.directory.atkSpellDirectory:
+            if spell.rarity <= self.game.directory.getLootRarity(self.level, Type.AtkSpell)+1 and (spell.element == element):
+                self.shopInventory.append(spell)
+
+    def calculateCost(self, item):
+        return 20 * round(item.rarity ** 1.5)
+        
+    def canAddItem(self):
+        return len(self.playerInventory) < MAX_INVENTORY_SIZE
 
 
 class Temple(Shop):
     def __init__(self,row,col,level):
-        Building.__init__(self,row,col,level)
+        Shop.__init__(self,row,col,level)
+        self.color = (255,255,255) # White
 
-    def getInput(self):
-        if self.delay > 0:
-            self.delay -= 1
-            return
-        if self.game.UP:
-            print("UP")
-        if self.game.DOWN:
-            print("DOWN")
-        if self.game.A:
-            print("A")
-        if self.game.B:
-            print("B")
-        if self.game.X:
-            print("X")
-        if self.game.Y:
-            print("Y")
+    def getShopName(self):
+        return "Temple"
 
-    def drawScreen(self):
-        self.game.screen.fill((0,0,0))
-        screenOutline = pygame.Rect(self.left,self.top,self.right,self.bottom)
-        pygame.draw.rect(self.game.screen,self.game.white,screenOutline,2)
+    def getShopDescription(self,state,substate):
+        description = ""
+        if state == "main":
+            description = "The temple is serene, and a large stained glass window bathes the room in colored light, depicting a large golden bird soaring over a figure wielding a warhammer. 'Hi! You aren't \
+                from around here, are you?' a soft voice says, as a tall, robed woman stands from a pew. 'Would you like to pray, or look over our scroll collection?'"
+        elif state == "shopScreen" and substate == "none":
+            description = "Spells to help others, or yourself. Whatever Rendai wills."
+        elif state == "shopScreen" and substate == "purchased":
+            description = "You made a great choice. I thank you."
+        elif state == "shopScreen" and substate == "inventoryFull":
+            description = "I apologize, but I don't think you'll be able to fit that in your pack..."
+        elif state == "shopScreen" and substate == "tooExpensive":
+            description = "I'm sorry... but our temple needs to fund itself somehow."
+        elif state == "confirmPurchase":
+            description = "Ah, the " + self.game.directory.getItemName(self.targetItem, True) + "! That'll just be " + str(self.calculateCost(self.targetItem)) + " gold, if you wouldn't mind."
+        return description
+
+    def getTargetInventory(self):
+        return self.player.party.inventory
+
+    def fillShopInventory(self):
+        spellTypesA = [SpellType.Heal, SpellType.Buff]
+        spellTypesB = [SpellType.Raise, SpellType.Cleanse]
+        spellTypes = [random.choice(spellTypesA), random.choice(spellTypesB)]
+        for spell in self.game.directory.sptSpellDirectory:
+            if spell.rarity <= self.game.directory.getLootRarity(self.level, Type.SptSpell)+1 and (spell.type in spellTypes):
+                self.shopInventory.append(spell)
+
+    def calculateCost(self, item):
+        return 20 * round(item.rarity ** 1.5)
+        
+    def canAddItem(self):
+        return len(self.playerInventory) < MAX_INVENTORY_SIZE
 
 
 class Bazaar(Building):

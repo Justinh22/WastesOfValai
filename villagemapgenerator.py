@@ -140,13 +140,19 @@ class VillageMap():
             testCol = random.randint(self.buildingBuffer,self.maxCols-BUILDING_WIDTH-self.buildingBuffer)
             success = self.checkBuildingFit(testRow,testCol)
             if success:
-                chance = random.randint(1,3)
+                chance = random.randint(1,6)
                 if chance == 1:
-                    self.buildings.append(Building(testRow,testCol,self.villageLevel))
-                elif chance == 2:
                     self.buildings.append(Forge(testRow,testCol,self.villageLevel))
+                elif chance == 2:
+                    self.buildings.append(Weaponsmith(testRow,testCol,self.villageLevel))
                 elif chance == 3:
-                    self.buildings.append(Shop(testRow,testCol,self.villageLevel))
+                    self.buildings.append(Armory(testRow,testCol,self.villageLevel))
+                elif chance == 4:
+                    self.buildings.append(GeneralStore(testRow,testCol,self.villageLevel))
+                elif chance == 5:
+                    self.buildings.append(Library(testRow,testCol,self.villageLevel))
+                elif chance == 6:
+                    self.buildings.append(Temple(testRow,testCol,self.villageLevel))
                 self.placeBuilding(testRow,testCol)
                 break
             
