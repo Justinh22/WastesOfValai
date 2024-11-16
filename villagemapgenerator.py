@@ -58,6 +58,7 @@ class VillageMap():
         self.map = []
         self.coords = coords        # Coords         : Duple containing (row,col) of where the village is located in the world
         self.buildings = []         # Buildings      : List of Buildings
+        self.buildingTypes = list(range(1,BUILDING_TYPES+1))
         self.visited = []
         self.villageLevel = level
         self.villageType = typ
@@ -140,7 +141,9 @@ class VillageMap():
             testCol = random.randint(self.buildingBuffer,self.maxCols-BUILDING_WIDTH-self.buildingBuffer)
             success = self.checkBuildingFit(testRow,testCol)
             if success:
-                chance = random.randint(1,6)
+                chance = self.buildingTypes.pop(random.randint(0,len(self.buildingTypes)-1))
+                if len(self.buildingTypes) == 0:
+                    self.buildingTypes = list(range(1,BUILDING_TYPES+1))
                 if chance == 1:
                     self.buildings.append(Forge(testRow,testCol,self.villageLevel))
                 elif chance == 2:
@@ -153,20 +156,25 @@ class VillageMap():
                     self.buildings.append(Library(testRow,testCol,self.villageLevel))
                 elif chance == 6:
                     self.buildings.append(Temple(testRow,testCol,self.villageLevel))
+                elif chance == 7:
+                    self.buildings.append(BlackMarket(testRow,testCol,self.villageLevel))
                 self.placeBuilding(testRow,testCol)
                 break
             
     def checkBuildingFit(self,testR,testC):
         for i in range(testR-self.buildingBuffer,(testR+BUILDING_HEIGHT)+self.buildingBuffer):
             for j in range(testC-self.buildingBuffer,(testC+BUILDING_WIDTH)+self.buildingBuffer):
-                if self.map[i][j] == BUILDING_WALL or self.map[i][j] == PATH_CHAR:
+                if self.map[i][j] == BUILDING_WALL or self.map[i][j] == BUILDING_ROOF or self.map[i][j] == PATH_CHAR:
                     return False
         return True
     
     def placeBuilding(self,testR,testC):
         for i in range(testR,testR+BUILDING_HEIGHT):
             for j in range(testC,testC+BUILDING_WIDTH):
-                self.map[i][j] = BUILDING_WALL
+                if i < (testR+BUILDING_HEIGHT/2):
+                    self.map[i][j] = BUILDING_ROOF
+                else:
+                    self.map[i][j] = BUILDING_WALL
 
     def buildPathways(self):
         burnout = 0
@@ -195,6 +203,7 @@ class VillageMap():
     def connect(self,building,pathCoords):
         pathfinder = Pathfinder(building.getOutsideDoorway(),pathCoords,self.map)
         pathfinder.setObstacle(BUILDING_WALL)
+        pathfinder.setObstacle(BUILDING_ROOF)
         path = pathfinder.calculatePath()
         if path is not None:
             for step in path:

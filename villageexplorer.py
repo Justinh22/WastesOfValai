@@ -104,6 +104,8 @@ class Explorer():
             color = self.game.orange
         elif mapChar == BUILDING_WALL: # Building Wall
             color = self.game.brown
+        elif mapChar == BUILDING_ROOF: # Building Roof
+            color = self.game.brown
             for building in self.village.buildings:
                 if building.isInBuilding(r,c):
                     color = building.color
