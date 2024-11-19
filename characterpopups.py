@@ -152,23 +152,25 @@ class Hostel():
             self.delay -= 1
             return
         if self.game.UP:
-            self.cursorPos -= 1
-            self.cursorPos %= len(self.game.player.hostel)
-            if self.cursorPos < self.listTop:
-                self.listTop -= 1
-                self.listBottom -= 1
-            if self.cursorPos >= self.listBottom:
-                self.listBottom = self.cursorPos + 1
-                self.listTop = self.listBottom - 7
+            if len(self.game.player.hostel) > 0:
+                self.cursorPos -= 1
+                self.cursorPos %= len(self.game.player.hostel)
+                if self.cursorPos < self.listTop:
+                    self.listTop -= 1
+                    self.listBottom -= 1
+                if self.cursorPos >= self.listBottom:
+                    self.listBottom = self.cursorPos + 1
+                    self.listTop = self.listBottom - 7
         if self.game.DOWN:
-            self.cursorPos += 1
-            self.cursorPos %= len(self.game.player.hostel)
-            if self.cursorPos < self.listTop:
-                self.listTop = 0
-                self.listBottom = 7
-            if self.cursorPos >= self.listBottom:
-                self.listBottom += 1
-                self.listTop += 1
+            if len(self.game.player.hostel) > 0:
+                self.cursorPos += 1
+                self.cursorPos %= len(self.game.player.hostel)
+                if self.cursorPos < self.listTop:
+                    self.listTop = 0
+                    self.listBottom = 7
+                if self.cursorPos >= self.listBottom:
+                    self.listBottom += 1
+                    self.listTop += 1
         if self.game.A:
             print("A")
             CharacterSwap(self.game, self.game.player.hostel[self.cursorPos], True)

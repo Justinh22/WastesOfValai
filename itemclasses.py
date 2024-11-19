@@ -90,3 +90,8 @@ class Talent(Item):
         self.type = tp # ATTACK, SUPPORT
         self.target = tgt # SELF, ALLY, SINGLE, ALL
         self.timing = tmg # INSTANT, INTURN
+
+class Food(Item):
+    def __init__(self,nm,desc,rar,i,buff):
+        Item.__init__(self,nm,desc,rar,i)
+        self.buff = buff # List of size 12: [HP,MP,ACC,CRT,DEF,ATK,LCK,MPG,AMP,DDG,SPD,HPG]

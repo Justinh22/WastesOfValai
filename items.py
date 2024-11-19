@@ -636,3 +636,37 @@ def initAccessoryDirectory():
     accessoryDirectory.append(CursedEarring)
 
     return accessoryDirectory
+
+    ######### FOOD #########
+
+def initFoodDirectory():
+    foodDirectory = []
+
+    # Buff List: [HP,MP,ACC,CRT,DEF,ATK,LCK,MPG,AMP,DDG,SPD,HPG]
+
+    ReelerSteak = Food("Reeler Steak","Meat cut from a Reeler, a large mammal known for running backwards on all four legs when threatened. Increases max HP by 10.",1,700,[10,0,0,0,0,0,0,0,0,0,0,0])
+    foodDirectory.append(ReelerSteak)
+    SourberryTart = Food("Sourberry Tart","A small pastry filled with crushed sourberries, known for temporarily changing the eye color of whoever eats them. Increases max MP by 10.",1,701,[0,10,0,0,0,0,0,0,0,0,0,0])
+    foodDirectory.append(SourberryTart)
+    DriedBladeleaf = Food("Dried Bladeleaf","A dehydraded leaf from the bladeleaf bush. Unexpectedly filling, armies have been known to carry bushels to feed their soldiers. Increases accuracy by 10.",1,702,[0,0,10,0,0,0,0,0,0,0,0,0])
+    foodDirectory.append(DriedBladeleaf)
+    GrilledMyrkafruit = Food("Grilled Myrkafruit","Grilled fruit of the Myrka tree. Can be lethal if eaten raw. Increases crit rate by 5.",1,703,[0,0,0,5,0,0,0,0,0,0,0,0])
+    foodDirectory.append(GrilledMyrkafruit)
+    TalliriteFragment = Food("Tallirite Fragment","A small piece of gemstone from Tallirite Isle. Eons ago, an ancient civilization was said to have evolved to subsist on these stones to survive. Increases defense by 5.",1,704,[0,0,0,0,5,0,0,0,0,0,0,0])
+    foodDirectory.append(TalliriteFragment)
+    WommiMilk = Food("Wommi Milk","Milk from the domesticated Wommi. Wommi are said to produce more potent milk if their caretakers are unhappy, in an attempt to help them. Increases attack by 5.",1,705,[0,0,0,0,0,5,0,0,0,0,0,0])
+    foodDirectory.append(WommiMilk)
+    StarrySalad = Food("Starry Salad","Salad made from greens in close proximity to the crash site in Bentro Forest. Plants taken from the area of the meteor impact are said to have special properties and provide good fortune. Increases luck by 10.",1,706,[0,0,0,0,0,0,10,0,0,0,0,0])
+    foodDirectory.append(StarrySalad)
+    SpellpaperCookie = Food("Spellpaper Cookie","A tiny shortbread cookie with a piece of an archmage's spell tome cooked into it. Mage's tomes are said to absorb some of their magical ability over time, which eventually led to many spellcasters abandoning tomes. Increases mana regen by 2.",1,707,[0,0,0,0,0,0,0,2,0,0,0,0])
+    foodDirectory.append(SpellpaperCookie)
+    PrombolStew = Food("Prombol Stew","Stew cooked with fresh vegetables and Prombol meat. Prombols are small six-legged frogs, which inexplicably teleport on an hourly basis. Increases magic amplification by 10.",1,708,[0,0,0,0,0,0,0,0,10,0,0,0])
+    foodDirectory.append(PrombolStew)
+    MirageDumplings = Food("Mirage Dumplings","Dumplings made with the meat and feathres of Mirage Owls, a semi-transparent bird that often lives underground. Increases dodge by 10.",1,709,[0,0,0,0,0,0,0,0,0,10,0,0])
+    foodDirectory.append(MirageDumplings)
+    SilkwingCandy = Food("Silkwing Candy","A hard candy made from melted silkwings, extraordinarily fast insects. Increases speed by 5.",1,710,[0,0,0,0,0,0,0,0,0,0,5,0])
+    foodDirectory.append(SilkwingCandy)
+    Ulvomelon = Food("Ulvomelon","A whole Ulvomelon, a fruit which regenerates rapidly once it is taken from the vine. Increases hp regen by 4.",1,711,[0,0,0,0,0,0,0,0,0,0,0,4])
+    foodDirectory.append(Ulvomelon)
+
+    return foodDirectory

@@ -704,7 +704,7 @@ class PauseMenu():
             elif tgtList == "equipment":
                 self.game.player.party.dropEquipment(targetElement)
         elif action == "removeAcc":
-            self.game.player.party.removeAccessory(targetPartyMember)
+            self.game.player.party.removeAccessory(targetPartyMember,self.game.directory)
             self.action = "none"
             self.targetElement = 0
         elif action == "use":

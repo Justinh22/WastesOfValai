@@ -4,6 +4,7 @@ from utility import *
 from constants import *
 from writing import *
 from playerdata import *
+from characterpopups import Hostel
 
 BUILDING_HEIGHT = 4
 BUILDING_WIDTH = 7
@@ -515,8 +516,8 @@ class Shop(Building):
         if type(item) == int:
             item = self.game.directory.getItem(item)
         itemType = self.game.directory.getItemType(item)
-        write(self.game, 20, self.left + 10, 315, item.name)
-        wrapWrite(self.game, 15, item.description, self.right - self.left - 175, self.left + 10, 370)
+        write(self.game, 15, self.left + 10, 315, item.name)
+        wrapWrite(self.game, 15, item.description, self.right - self.left - 190, self.left + 10, 370)
         if itemType == Type.AtkSpell or itemType == Type.SptSpell:
             spelltype = "Attack" if item.type == SpellType.Attack or item.type == SpellType.Debuff else "Support"
             writeOrientation(self.game, 15, self.right - self.left - 185, 315, "Level "+str(item.rarity)+" "+spelltype+" Spell | "+str(item.manacost) + " MP", "R")
@@ -1106,6 +1107,13 @@ class Bazaar(Building):
 class Inn(Building):
     def __init__(self,row,col,level):
         Building.__init__(self,row,col,level)
+        self.color = (255,0,0) # Red
+        self.foodList = []
+        self.pageModifier = 0
+
+    def initializeOnEnter(self):
+        if len(self.foodList) == 0:
+            self.fillMenu()
 
     def getInput(self):
         if self.delay > 0:
@@ -1113,18 +1121,157 @@ class Inn(Building):
             return
         if self.game.UP:
             print("UP")
+            if self.state == "menu":
+                if self.cursorPos == 1 and self.pageModifier > 0:
+                    self.pageModifier -= 1
+                elif self.cursorPos > 0:
+                    self.cursorPos -= 1
         if self.game.DOWN:
             print("DOWN")
+            if self.state == "menu":
+                if self.cursorPos == 3 and (self.pageModifier+5 < len(self.foodList)):
+                    self.pageModifier += 1
+                elif self.cursorPos < 4 and self.cursorPos < len(self.foodList)-1:
+                    self.cursorPos += 1
         if self.game.A:
             print("A")
+            if self.state == "main":
+                self.player.party.fullRestore()
+                self.game.save()
+                self.substate = "rested"
+            elif self.state == "menu":
+                if self.player.gold > self.calculateCost(self.foodList[self.cursorPos+self.pageModifier]):
+                    self.targetItem = self.foodList[self.cursorPos+self.pageModifier]
+                    self.state = "confirmFood"
+                else:
+                    self.substate = "tooExpensive"
+            elif self.state == "confirmFood":
+                self.player.gold -= self.calculateCost(self.targetItem)
+                print(self.targetItem.name)
+                self.player.party.addFoodEffect(self.targetItem,self.game.directory)
+                self.state = "menu"
+                self.substate = "purchased"
         if self.game.B:
             print("B")
+            if self.state == "main":
+                self.inMenu = False
+            elif self.state == "menu":
+                self.state = "main"
+                self.substate = "none"
+            elif self.state == "confirmFood":
+                self.state = "menu"
+                self.substate = "none"
         if self.game.X:
             print("X")
+            if self.state == "main":
+                Hostel(self.game)
         if self.game.Y:
             print("Y")
+            if self.state == "main":
+                self.state = "menu"
+                self.substate = "none"
 
     def drawScreen(self):
         self.game.screen.fill((0,0,0))
         screenOutline = pygame.Rect(self.left,self.top,self.right,self.bottom)
+        pygame.draw.line(self.game.screen,self.game.white,(self.left,300),(self.right+9,300),2)
+        pygame.draw.line(self.game.screen,self.game.white,(self.right-self.left-180,300),(self.right-self.left-180,self.bottom+8),2)
         pygame.draw.rect(self.game.screen,self.game.white,screenOutline,2)
+        description = self.getDescription(self.state, self.substate)
+        wrapWrite(self.game, 20, description, self.right-self.left-15)
+
+        if self.state == "main":
+            write(self.game, 20,self.right-155,self.top+310,"A) Rest")
+            write(self.game, 20,self.right-155,self.top+340,"X) Hostel")
+            write(self.game, 20,self.right-155,self.top+370,"Y) Eat")
+            write(self.game, 20,self.right-155,self.top+400,"B) Leave")
+
+        elif self.state == "menu":
+            write(self.game, 25,self.right-150,self.top+340,"A) Buy")
+            write(self.game, 25,self.right-150,self.top+390,"B) Back")
+            shopDisplay = []
+            for i in range(5):
+                if i + self.pageModifier >= len(self.foodList):
+                    shopDisplay.append("None")
+                else:
+                    shopDisplay.append(self.foodList[i + self.pageModifier])
+            for i in range(5):
+                if shopDisplay[i] == "None":
+                    write(self.game, 20, self.left+35, (self.top+310)+(25*i), str(i+1+self.pageModifier) + ")")
+                else:
+                    write(self.game, 20, self.left+35, (self.top+310)+(25*i), str(i+1+self.pageModifier) + ") " + self.game.directory.getItemName(shopDisplay[i]))
+                    writeOrientation(self.game, 20, self.right-self.left-200, (self.top+310)+(25*i), "40g", "R")
+            write(self.game, 20,self.left+20,(self.top+310)+(25*self.cursorPos),">")
+
+        elif self.state == "confirmFood":
+            write(self.game, 25,self.right-150,self.top+340,"A) Confirm")
+            write(self.game, 25,self.right-150,self.top+390,"B) Cancel")
+            self.printStatBlock(self.targetItem)
+
+    def getDescription(self,state,substate):
+        description = ""
+        if state == "main" and substate == "none":
+            description = "You enter a cozy log cabin, with a roaring fire in the hearth. An old man sitting by the fire looks up as you enter; \
+                'Ah, a visitor! Stay as long as you like, friend. The rooms are free of charge, it's rough out there. If you'd like anything to eat, \
+                just let me know.'"
+        elif state == "main" and substate == "rested":
+            description = "'Mornin'! Hope you slept well.'"
+        elif state == "menu" and substate == "none":
+            description = "'Lots of good food here, take a look!'"
+        elif state == "menu" and substate == "purchased":
+            description = "'Enjoy!'"
+        elif state == "menu" and substate == "tooExpensive":
+            description = "'Sorry, friend. I've gotta keep my family fed somehow.'"
+        elif state == "confirmFood":
+            description = "'Ah, the " + self.targetItem.name + "? Great choice, that'll be 40 gold.'"
+        return description
+    
+    def printStatBlock(self,item):
+        write(self.game, 15, self.left + 10, 315, item.name)
+        wrapWrite(self.game, 15, item.description, self.right - self.left - 190, self.left + 10, 370)
+        writeOrientation(self.game, 15, self.right - self.left - 185, 315, "Rarity " + str(item.rarity) + " Food", "R")
+        buffString = ""
+        commaString = ""
+        if item.buff[0] > 0:
+            buffString += commaString + "MHP +" + str(item.buff[0])
+            commaString = ", "
+        elif item.buff[1] > 0:
+            buffString += commaString + "MMP +" + str(item.buff[1])
+            commaString = ", "
+        elif item.buff[2] > 0:
+            buffString += commaString + "ACC +" + str(item.buff[2])
+            commaString = ", "
+        elif item.buff[3] > 0:
+            buffString += commaString + "CRT +" + str(item.buff[3])
+            commaString = ", "
+        elif item.buff[4] > 0:
+            buffString += commaString + "DEF +" + str(item.buff[4])
+            commaString = ", "
+        elif item.buff[5] > 0:
+            buffString += commaString + "ATK +" + str(item.buff[5])
+            commaString = ", "
+        elif item.buff[6] > 0:
+            buffString += commaString + "LCK +" + str(item.buff[6])
+            commaString = ", "
+        elif item.buff[7] > 0:
+            buffString += commaString + "MPG +" + str(item.buff[7])
+            commaString = ", "
+        elif item.buff[8] > 0:
+            buffString += commaString + "AMP +" + str(item.buff[8])
+            commaString = ", "
+        elif item.buff[9] > 0:
+            buffString += commaString + "DDG +" + str(item.buff[9])
+            commaString = ", "
+        elif item.buff[10] > 0:
+            buffString += commaString + "SPD +" + str(item.buff[10])
+            commaString = ", "
+        elif item.buff[11] > 0:
+            buffString += commaString + "HPG +" + str(item.buff[11])
+            commaString = ", "
+        write(self.game, 15, self.left + 10, 345, "Provides " + buffString + " to entire party.")
+    
+    def fillMenu(self):
+        self.foodList = self.game.directory.getRandomFood(8)
+
+    def calculateCost(self,item):
+        return 40

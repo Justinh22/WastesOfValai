@@ -58,13 +58,14 @@ class VillageMap():
         self.map = []
         self.coords = coords        # Coords         : Duple containing (row,col) of where the village is located in the world
         self.buildings = []         # Buildings      : List of Buildings
-        self.buildingTypes = list(range(1,BUILDING_TYPES+1))
         self.visited = []
         self.villageLevel = level
         self.villageType = typ
         self.groundChar = self.getGroundChar(biome)
         self.minBuildings = 0
         self.maxBuildings = 0
+        self.firstPriorityBuildings = [VillageBuildings.Inn, VillageBuildings.BlackMarket, VillageBuildings.Forge]
+        self.shopBuildings = [VillageBuildings.Weaponsmith, VillageBuildings.Armory, VillageBuildings.GeneralStore, VillageBuildings.Library, VillageBuildings.Temple]
         if self.villageType is VillageType.Village:
             self.setBuildingNumberRange(4,6)
             self.maxRows = VILLAGE_DIM
@@ -141,23 +142,30 @@ class VillageMap():
             testCol = random.randint(self.buildingBuffer,self.maxCols-BUILDING_WIDTH-self.buildingBuffer)
             success = self.checkBuildingFit(testRow,testCol)
             if success:
-                chance = self.buildingTypes.pop(random.randint(0,len(self.buildingTypes)-1))
-                if len(self.buildingTypes) == 0:
-                    self.buildingTypes = list(range(1,BUILDING_TYPES+1))
-                if chance == 1:
+                if len(self.firstPriorityBuildings) > 0:
+                    chance = self.firstPriorityBuildings.pop(random.randint(0,len(self.firstPriorityBuildings)-1))
+                else:
+                    if len(self.shopBuildings) > 0:
+                        chance = self.shopBuildings.pop(random.randint(0,len(self.shopBuildings)-1))
+                    else:
+                        self.shopBuildings = [VillageBuildings.Weaponsmith, VillageBuildings.Armory, VillageBuildings.GeneralStore, VillageBuildings.Library, VillageBuildings.Temple]
+                        chance = self.shopBuildings.pop(random.randint(0,len(self.shopBuildings)-1))
+                if chance == VillageBuildings.Forge:
                     self.buildings.append(Forge(testRow,testCol,self.villageLevel))
-                elif chance == 2:
+                elif chance == VillageBuildings.Weaponsmith:
                     self.buildings.append(Weaponsmith(testRow,testCol,self.villageLevel))
-                elif chance == 3:
+                elif chance == VillageBuildings.Armory:
                     self.buildings.append(Armory(testRow,testCol,self.villageLevel))
-                elif chance == 4:
+                elif chance == VillageBuildings.GeneralStore:
                     self.buildings.append(GeneralStore(testRow,testCol,self.villageLevel))
-                elif chance == 5:
+                elif chance == VillageBuildings.Library:
                     self.buildings.append(Library(testRow,testCol,self.villageLevel))
-                elif chance == 6:
+                elif chance == VillageBuildings.Temple:
                     self.buildings.append(Temple(testRow,testCol,self.villageLevel))
-                elif chance == 7:
+                elif chance == VillageBuildings.BlackMarket:
                     self.buildings.append(BlackMarket(testRow,testCol,self.villageLevel))
+                elif chance == VillageBuildings.Inn:
+                    self.buildings.append(Inn(testRow,testCol,self.villageLevel))
                 self.placeBuilding(testRow,testCol)
                 break
             

@@ -20,7 +20,8 @@ class Directory():
         self.sptSpellDirectory = initSptSpellDirectory()    # 400 - 499
         self.talentDirectory = initTalentDirectory()        # 500 - 599
         self.accessoryDirectory = initAccessoryDirectory()  # 600 - 699
-        self.customDirectory = []                           # 700 - 799
+        self.foodDirectory = initFoodDirectory()            # 700 - 799
+        self.customDirectory = []                           # 800 - 899
         self.classDirectory = initClassDirectory()          # 0 - 99
         self.creatureDirectory = initCreatureDirectory()    # 0 - 99
         self.nameDirectory = initNameDirectory()            # 0 - 99
@@ -41,6 +42,8 @@ class Directory():
             item = self.getTalent(id)
         elif id < 700:
             item = self.getAccessory(id)
+        elif id < 800:
+            item = self.getFood(id)
         return item
 
     def getItemName(self,id,scroll=False):
@@ -65,6 +68,8 @@ class Directory():
             name = self.talentDirectory[id-500].name
         elif id < 700:
             name = self.accessoryDirectory[id-600].name
+        elif id < 800:
+            name = self.foodDirectory[id-700].name
         return name
 
     def getItemDesc(self,id):
@@ -85,6 +90,8 @@ class Directory():
             desc = self.talentDirectory[id-500].description
         elif id < 700:
             desc = self.accessoryDirectory[id-600].description
+        elif id < 800:
+            desc = self.foodDirectory[id-700].description
         return desc
 
     def getItemRarity(self,id):
@@ -105,6 +112,8 @@ class Directory():
             rarity = self.talentDirectory[id-500].rarity
         elif id < 700:
             rarity = self.accessoryDirectory[id-600].rarity
+        elif id < 800:
+            rarity = self.foodDirectory[id-700].rarity
         return rarity
     
     def getItemType(self,id):
@@ -127,6 +136,8 @@ class Directory():
             itemType = Type.Talent
         elif id < 700:
             itemType = Type.Accessory
+        elif id < 800:
+            itemType = Type.Food
         return itemType
 
     def getSpellTarget(self,id):
@@ -168,6 +179,9 @@ class Directory():
     
     def getAccessory(self,id):
         return self.copy(self.accessoryDirectory[id-600])
+    
+    def getFood(self,id):
+        return self.copy(self.foodDirectory[id-700])
 
     def getItemByRarity(self,type,rarity):
         print(f'Fetching {type} of rarity {rarity}...')
@@ -198,6 +212,10 @@ class Directory():
                     options.append(item.id)
         elif type == Type.Accessory:
             for item in self.accessoryDirectory:
+                if item.rarity == rarity:
+                    options.append(item.id)
+        elif type == Type.Food:
+            for item in self.foodDirectory:
                 if item.rarity == rarity:
                     options.append(item.id)
         elif type == Type.Creature:
@@ -362,6 +380,20 @@ class Directory():
     
     def getRandomPersonality(self):
         return random.choice(list(Personality))
+    
+    def getRandomFood(self,listSize):
+        list = []
+        burnout = 0
+        for i in range(listSize):
+            food = random.choice(self.foodDirectory)
+            if food not in list:
+                list.append(food)
+            else:
+                i -= 1
+                burnout += 1
+            if burnout >= 50:
+                break
+        return list
     
     def buildCharacter(self,level,members,id,cls=-1):
         if cls == -1:

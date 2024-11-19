@@ -23,7 +23,7 @@ DUNGEON_ENEMY_SPEED = 120
 VILLAGE_DIM = 30
 TOWN_DIM = 40
 CITY_DIM = 50
-BUILDING_TYPES = 7
+BUILDING_TYPES = 8
 
 FOREST_CHAR = '#'
 PLAINS_CHAR = ';'
@@ -59,8 +59,9 @@ class Type(Enum):
     SptSpell = 5
     Talent = 6
     Accessory = 7
-    Creature = 8
-    Class = 9
+    Food = 8
+    Creature = 9
+    Class = 10
 
 class LootOdds(Enum):
     Impossible = 0
@@ -168,11 +169,11 @@ class Timing(Enum):
     Ordering = 6
 
 class VillageBuildings(Enum):
-    House = 0
-    WeaponShop = 1
-    ArmorShop = 2
-    ConsumableShop = 3
-    Forge = 4
-    Enchanter = 5
-    Bazaar = 6
+    Forge = 0
+    Weaponsmith = 1
+    Armory = 2
+    GeneralStore = 3
+    Library = 4
+    Temple = 5
+    BlackMarket = 6
     Inn = 7
