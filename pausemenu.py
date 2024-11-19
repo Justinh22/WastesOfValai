@@ -204,7 +204,7 @@ class PauseMenu():
                 elif itemType == Type.Armor:
                     writeOrientation(self.game, 15, self.right-40, 220, "Level "+str(tgt.rarity)+" "+tgt.type.name+" Armor", "R")
                     if tgt.defRefine > 0 or tgt.ddgRefine > 0:
-                        writeOrientation(self.game, 15, self.right-40, 245, "+" + str(tgt.defRefine) + "/+" + str(tgt.ddgRefine))
+                        writeOrientation(self.game, 15, self.right-40, 245, "+" + str(tgt.defRefine) + "/+" + str(tgt.ddgRefine), "R")
                     statText = "DEF " + str(tgt.getDefense()) + " | DDG " + str(tgt.getDodge()) + " | MPG " + str(tgt.manaregen)
                 write(self.game, 15, 60, 245, statText)
                 if self.state == "itemSummary":

@@ -16,7 +16,7 @@ def writeColor(game,size,x,y,text,color):
     game.screen.blit(text_surface,text_rect)
     return font.size(text)
 
-def writeOrientation(game,size,x,y,text,orn):
+def writeOrientation(game,size,x,y,text,orn="R"):
     font = pygame.font.Font('freesansbold.ttf',size)
     text_surface = font.render(text, True, game.white)
     text_rect = text_surface.get_rect()

@@ -127,6 +127,7 @@ class Forge(Building):
         self.tentativeRefineLevel = []
         self.refinementStatCurrentValues = []
         self.refinementStatTentativeValues = []
+        self.pageModifer = 0
 
     def initializeOnEnter(self):
         self.itemType = "none"
@@ -135,6 +136,7 @@ class Forge(Building):
         self.tentativeRefineLevel = []
         self.refinementStatCurrentValues = []
         self.refinementStatTentativeValues = []
+        self.pageModifer = 0
 
     def getInput(self):
         if self.delay > 0:
@@ -142,23 +144,11 @@ class Forge(Building):
             return
         if self.game.UP:
             print("UP")
-            if self.state == "main":
-                self.cursorPos -= 1
-                if self.cursorPos < 0:
-                    self.cursorPos = 2
-            if self.state == "chooseInventory":
-                self.cursorPos -= 1
-                if self.cursorPos < 0:
-                    self.cursorPos = 2
             if self.state == "selectItem":
-                if self.cursorPos <= 1:
-                    self.cursorPos += 8
-                else:
-                    self.cursorPos -= 2
-            if self.state == "chooseItemType":
-                self.cursorPos -= 1
-                if self.cursorPos < 0:
-                    self.cursorPos = 2
+                if self.cursorPos == 1 and self.pageModifer > 0:
+                    self.pageModifer -= 1
+                elif self.cursorPos > 0:
+                    self.cursorPos -= 1
             if self.state == "partySelect":
                 self.cursorPos -= 1
                 if self.cursorPos < 0:
@@ -173,23 +163,11 @@ class Forge(Building):
                     self.cursorPos = 1
         if self.game.DOWN:
             print("DOWN")
-            if self.state == "main":
-                self.cursorPos += 1
-                if self.cursorPos > 2:
-                    self.cursorPos = 0
-            if self.state == "chooseInventory":
-                self.cursorPos += 1
-                if self.cursorPos > 2:
-                    self.cursorPos = 0
             if self.state == "selectItem":
-                if self.cursorPos >= 8:
-                    self.cursorPos -= 8
-                else:
-                    self.cursorPos += 2
-            if self.state == "chooseItemType":
-                self.cursorPos += 1
-                if self.cursorPos > 2:
-                    self.cursorPos = 0
+                if self.cursorPos == 3 and (self.pageModifer+5 < len(self.player.party.equipment)):
+                    self.pageModifer += 1
+                elif self.cursorPos < 4 and self.cursorPos < len(self.player.party.equipment)-1:
+                    self.cursorPos += 1
             if self.state == "partySelect":
                 self.cursorPos += 1
                 if self.cursorPos > len(self.game.player.party.members)-1:
@@ -203,58 +181,26 @@ class Forge(Building):
                 if self.cursorPos > 1:
                     self.cursorPos = 0
         if self.game.LEFT:
-            if self.state == "selectItem":
-                if self.cursorPos % 2 == 0:
-                    self.cursorPos += 1
-                else:
-                    self.cursorPos -= 1
             if self.state == "weaponRefinement" or self.state == "armorRefinement":
                 if self.tentativeRefineLevel[self.cursorPos] > self.currentRefineLevel[self.cursorPos]:
                     self.tentativeRefineLevel[self.cursorPos] -= 1
         if self.game.RIGHT:
-            if self.state == "selectItem":
-                if self.cursorPos % 2 == 0:
-                    self.cursorPos += 1
-                else:
-                    self.cursorPos -= 1
             if self.state == "weaponRefinement" or self.state == "armorRefinement":
                 if self.tentativeRefineLevel[self.cursorPos] < MAX_REFINE_LEVEL:
                     self.tentativeRefineLevel[self.cursorPos] += 1
         if self.game.A:
             print("A")
             if self.state == "main":
-                if self.cursorPos == 0:
-                    self.state = "chooseInventory"
-                    self.substate = "refine"
-                    self.cursorPos = 0
-                elif self.cursorPos == 1:
-                    self.state = "chooseInventory"
-                    self.substate = "reforge"
-                    self.cursorPos = 0
-                elif self.cursorPos == 2:
-                    self.inMenu = False
+                self.state = "chooseInventory"
+                self.substate = "refine"
+                self.cursorPos = 0
             elif self.state == "chooseInventory":
-                if self.cursorPos == 0:
-                    self.state = "chooseItemType"
-                    self.cursorPos = 0
-                elif self.cursorPos == 1:
-                    self.state = "selectItem"
-                    self.cursorPos = 0
-                elif self.cursorPos == 2:
-                    self.state = "main"
-                    self.cursorPos = 0
+                self.state = "chooseItemType"
+                self.cursorPos = 0
             elif self.state == "chooseItemType":
-                if self.cursorPos == 0:
-                    self.state = "partySelect"
-                    self.itemType = "weapon"
-                    self.cursorPos = 0
-                elif self.cursorPos == 1:
-                    self.state = "partySelect"
-                    self.itemType = "armor"
-                    self.cursorPos = 0
-                elif self.cursorPos == 2:
-                    self.state = "chooseInventory"
-                    self.cursorPos = 0
+                self.state = "partySelect"
+                self.itemType = "weapon"
+                self.cursorPos = 0
             elif self.state == "selectItem":
                 self.targetItem = self.game.player.party.equipment[self.cursorPos]
                 if self.game.directory.getItemType(self.targetItem) == Type.Weapon:
@@ -316,6 +262,17 @@ class Forge(Building):
                 self.substate = "refine"
         if self.game.X:
             print("X")
+            if self.state == "main":
+                self.state = "chooseInventory"
+                self.substate = "reforge"
+                self.cursorPos = 0
+            elif self.state == "chooseInventory":
+                self.state = "selectItem"
+                self.cursorPos = 0
+            elif self.state == "chooseItemType":
+                self.state = "partySelect"
+                self.itemType = "armor"
+                self.cursorPos = 0
         if self.game.Y:
             print("Y")
         if self.game.START:
@@ -325,44 +282,39 @@ class Forge(Building):
     def drawScreen(self):
         self.game.screen.fill((0,0,0))
         screenOutline = pygame.Rect(self.left,self.top,self.right,self.bottom)
+        pygame.draw.line(self.game.screen,self.game.white,(self.left,300),(self.right+9,300),2)
+        pygame.draw.line(self.game.screen,self.game.white,(self.right-self.left-180,300),(self.right-self.left-180,self.bottom+8),2)
         pygame.draw.rect(self.game.screen,self.game.white,screenOutline,2)
+        description = self.getDescription(self.state, self.substate)
+        wrapWrite(self.game, 20, description, self.right-self.left-15)
 
         if self.state == "main":
-            write(self.game, 40, 30, 40, "Forge")
-            write(self.game, 20, 60, 90, "Refine")
-            write(self.game, 20, 60, 115, "Reforge")
-            write(self.game, 20, 60, 140, "Exit")
-            write(self.game, 20, 30, 87 + (self.cursorPos*25), "->")
-            for i in range(0,len(self.game.player.party.members)):
-                self.drawEquipmentBlock(250, 45 + (i*100), self.game.player.party.members[i])
+            write(self.game, 30, self.left+10, self.top+305, "Forge")
+            write(self.game, 25,self.right-150,self.top+310,"A) Refine")
+            write(self.game, 25,self.right-150,self.top+360,"X) Reforge")
+            write(self.game, 25,self.right-150,self.top+410,"B) Leave")
 
         elif self.state == "chooseInventory" or self.state == "selectItem":
-            write(self.game, 40, 30, 40, "Forge")
-            write(self.game, 20, 60, 90, "Equipped")
-            write(self.game, 20, 60, 115, "Inventory")
-            write(self.game, 20, 60, 140, "Back")
-            if self.state == "chooseInventory":
-                write(self.game, 20, 30, 87 + (self.cursorPos*25), "->")
-                for i in range(0,len(self.game.player.party.members)):
-                    self.drawEquipmentBlock(250, 45 + (i*100), self.game.player.party.members[i])
-            elif self.state == "selectItem":
+            write(self.game, 25,self.right-150,self.top+310,"A) Equipped")
+            write(self.game, 25,self.right-150,self.top+360,"X) Inventory")
+            write(self.game, 25,self.right-150,self.top+410,"B) Back")
+            if self.state == "selectItem":
                 self.printEquipment()
 
+        elif self.state == "chooseItemType":
+            write(self.game, 25,self.right-150,self.top+310,"A) Weapon")
+            write(self.game, 25,self.right-150,self.top+360,"X) Armor")
+            write(self.game, 25,self.right-150,self.top+410,"B) Back")
+
         elif self.state == "chooseItemType" or self.state == "partySelect":
-            write(self.game, 40, 30, 40, "Forge")
-            write(self.game, 20, 60, 90, "Weapon")
-            write(self.game, 20, 60, 115, "Armor")
-            write(self.game, 20, 60, 140, "Back")
-            if self.state == "chooseItemType":
-                write(self.game, 20, 30, 87 + (self.cursorPos*25), "->")
-            elif self.state == "partySelect":
-                write(self.game, 30, 210, 75 + (self.cursorPos*100), "->")
-            for i in range(0,len(self.game.player.party.members)):
-                self.drawEquipmentBlock(250, 45 + (i*100), self.game.player.party.members[i])
+            write(self.game, 25,self.right-150,self.top+340,"A) Select")
+            write(self.game, 25,self.right-150,self.top+390,"B) Back")
+            write(self.game, 15, self.left+300, (self.top+310)+(25*self.cursorPos), "<-")
+            for i, member in enumerate(self.player.party.members):
+                write(self.game, 20, self.left+35, (self.top+310)+(25*i), str(i+1) + ") " + member.name)
 
         elif self.state == "weaponRefinement" or self.state == "armorRefinement" or self.state == "confirmWeaponRefine" or self.state == "confirmArmorRefine":
-            write(self.game, 40, 30, 40, "Refining")
-            write(self.game, 35, 30, 145, self.targetItem.name)
+            write(self.game, 25, self.left+10, self.top+305, self.targetItem.name)
             refinementString = []
             refinementStat = []
             if self.state == "weaponRefinement" or self.state == "confirmWeaponRefine":
@@ -391,16 +343,30 @@ class Forge(Building):
                 refinementStatTentativeValues = [self.targetItem.defense + (self.tentativeRefineLevel[0] * DEF_REFINE_BOOST), self.targetItem.dodge + (self.tentativeRefineLevel[1] * DDG_REFINE_BOOST)]
             cursorXVal = 0
             for i in range(len(refinementStat)):
-                cursorXVal, _ = write(self.game, 25, 30, 200 + (i*40), refinementStat[i] + ": " + refinementString[i] + " - " + str(refinementStatCurrentValues[i]) + " -> " + str(refinementStatTentativeValues[i]))
+                cursorXVal, _ = write(self.game, 20, self.left+35, (self.top+340) + (i*25), refinementStat[i] + ": " + refinementString[i] + " - " + str(refinementStatCurrentValues[i]) + " -> " + str(refinementStatTentativeValues[i]))
+            write(self.game, 20, self.left+300, (self.top+340) + (self.cursorPos*25), "<-")
             if self.state == "weaponRefinement" or self.state == "armorRefinement":
-                write(self.game, 20, 120 + cursorXVal, 202 + (self.cursorPos*40), "<-")
-                write(self.game, 20, 30, 350, "Cost: " + str(self.calculateCost(self.targetItem.rarity,self.currentRefineLevel,self.tentativeRefineLevel)) + " (You have: " + str(self.player.gold) + ")")
-                write(self.game, 20, 30, 380, "A) Refine")
-                write(self.game, 20, 130, 380, "B) Back")
+                write(self.game, 20, self.left+35, 430, "Cost: " + str(self.calculateCost(self.targetItem.rarity,self.currentRefineLevel,self.tentativeRefineLevel)) + " (You have: " + str(self.player.gold) + ")")
+                write(self.game, 25,self.right-150,self.top+340,"A) Refine")
+                write(self.game, 25,self.right-150,self.top+390,"B) Back")
             elif self.state == "confirmWeaponRefine" or self.state == "confirmArmorRefine":
-                write(self.game, 15, 30, 350, "Refine your " + self.targetItem.name + " for " +  str(self.calculateCost(self.targetItem.rarity,self.currentRefineLevel,self.tentativeRefineLevel)) + " gold?")
-                write(self.game, 20, 30, 380, "A) Confirm")
-                write(self.game, 20, 180, 380, "B) Cancel")
+                write(self.game, 25,self.right-150,self.top+340,"A) Confirm")
+                write(self.game, 25,self.right-150,self.top+390,"B) Cancel")
+
+    def getDescription(self,state,substate):
+        description = ""
+        if state == "main":
+            description = "'Ah, welcome!' A short, thin man smiles warmly from the back of the forge, setting a mallet down on an anvil. 'What can I do for you today?'"
+        elif state == "chooseInventory" or state == "selectItem" or state == "chooseItemType" or state == "partySelect":
+            description = "'Take your time. I can bend and refine metal at your command.'"
+        elif state == "weaponRefinement" or state == "armorRefinement":
+            description = "'People, we're stubborn. But metal... with a bit of convincing, can become anything.'"
+        elif state == "confirmWeaponRefine" or state == "confirmArmorRefine":
+            description = "'Alright, so you want me to refine your " + self.targetItem.name + " to "
+            for entry in self.tentativeRefineLevel:
+                description += "+" + str(entry) + "/"
+            description += "? That'll just be " + str(self.calculateCost(self.targetItem.rarity,self.currentRefineLevel,self.tentativeRefineLevel)) + " gold, please.'"
+        return description
 
     def calculateCost(self,rarity,currentLevel,tentativeLevel):
         totalCost = 0
@@ -427,15 +393,11 @@ class Forge(Building):
     def printEquipment(self):
         list = self.game.player.party.equipment
         for i in range(5):
-            if i*2 < len(list):
-                write(self.game, 15, 100, 275 + (25*i), str((i*2)+1) + ") " + self.game.directory.getItemName(list[i*2],False))
+            if i < len(list):
+                write(self.game, 20, self.left+35, (self.top+310)+(25*i), str(i+1+self.pageModifer) + ") " + self.game.directory.getItemName(list[i]))
             else:
-                write(self.game, 15, 100, 275 + (25*i), str((i*2)+1) + ") ")
-            if (i*2)+1 < len(list):
-                write(self.game, 15, 350, 275 + (25*i), str((i*2)+2) + ") " + self.game.directory.getItemName(list[(i*2)+1],False))
-            else:
-                write(self.game, 15, 350, 275 + (25*i), str((i*2)+2) + ") ")
-        write(self.game, 15, 85 + ((self.cursorPos%2)*250), 272 + (25*(math.floor(self.cursorPos/2))), ">")
+                write(self.game, 20, self.left+35, (self.top+310)+(25*i), str(i+1+self.pageModifer) + ")")
+        write(self.game, 15, self.left+300, (self.top+310)+(25*self.cursorPos), "<-")
 
     def drawCharacterNameBlock(self,xPos,yPos,character):
         outlineRect = pygame.Rect(xPos,yPos,250,33)
@@ -554,7 +516,7 @@ class Shop(Building):
             item = self.game.directory.getItem(item)
         itemType = self.game.directory.getItemType(item)
         write(self.game, 20, self.left + 10, 315, item.name)
-        wrapWrite(self.game, 15, item.description, self.right - self.left - 185, self.left + 10, 370)
+        wrapWrite(self.game, 15, item.description, self.right - self.left - 175, self.left + 10, 370)
         if itemType == Type.AtkSpell or itemType == Type.SptSpell:
             spelltype = "Attack" if item.type == SpellType.Attack or item.type == SpellType.Debuff else "Support"
             writeOrientation(self.game, 15, self.right - self.left - 185, 315, "Level "+str(item.rarity)+" "+spelltype+" Spell | "+str(item.manacost) + " MP", "R")

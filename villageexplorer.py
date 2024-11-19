@@ -120,7 +120,7 @@ class Explorer():
         if self.villagePos[0]+rMod < 0 or self.villagePos[0]+rMod > self.village.maxRows-1 or self.villagePos[1]+cMod < 0 or self.villagePos[1]+cMod > self.village.maxCols-1:
             self.inVillage = False
             return
-        if self.village.map[self.villagePos[0]][self.villagePos[1]] == BUILDING_WALL:
+        if self.village.map[self.villagePos[0]][self.villagePos[1]] == BUILDING_WALL or self.village.map[self.villagePos[0]][self.villagePos[1]] == BUILDING_ROOF:
             self.villagePos[0] -= rMod
             self.villagePos[1] -= cMod
         if self.village.map[self.villagePos[0]][self.villagePos[1]] == BUILDING_DOOR:
