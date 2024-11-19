@@ -15,7 +15,7 @@ BUILDING_DOOR = 'O'
 
 class Building():
     def __init__(self,row,col,level):
-        self.game = None
+        self.directory = None
         self.row = row
         self.col = col
         self.height = BUILDING_HEIGHT
@@ -34,14 +34,14 @@ class Building():
         self.color = (173, 84, 0) # Brown
 
     def enter(self,game,player):
-        self.game = game
+        self.directory = game.directory
         self.player = player
-        self.right = self.game.width - 20
-        self.bottom = self.game.height - 20
-        self.initializeOnEnter()
-        self.display()
+        self.right = game.width - 20
+        self.bottom = game.height - 20
+        self.initializeOnEnter(game)
+        self.display(game)
 
-    def initializeOnEnter(self):
+    def initializeOnEnter(self, game):
         self.cursorPos = 0
         self.state = "main"
         self.substate = "none"
@@ -73,49 +73,49 @@ class Building():
         map[coords[0]][coords[1]] = BUILDING_DOOR
         return coords
 
-    def blitScreen(self):
-        self.game.screen.blit(self.game.screen, (0,0))
+    def blitScreen(self,game):
+        game.screen.blit(game.screen, (0,0))
         pygame.display.update()
-        self.game.buttonReset()
+        game.buttonReset()
 
-    def display(self):
+    def display(self,game):
         self.inMenu = True
-        self.game.screen.fill(self.game.black)
-        self.drawScreen()
-        while self.inMenu and self.game.inGame:
-            self.game.eventHandler()
-            self.getInput()
+        game.screen.fill(game.black)
+        self.drawScreen(game)
+        while self.inMenu and game.inGame:
+            game.eventHandler()
+            self.getInput(game)
             if not self.inMenu:
                 break
-            self.drawScreen()
-            self.blitScreen()
-        self.game.screen.fill(self.game.black)
-        self.blitScreen()
+            self.drawScreen(game)
+            self.blitScreen(game)
+        game.screen.fill(game.black)
+        self.blitScreen(game)
 
-    def getInput(self):
+    def getInput(self,game):
         if self.delay > 0:
             self.delay -= 1
             return
-        if self.game.UP:
+        if game.UP:
             print("UP")
-        if self.game.DOWN:
+        if game.DOWN:
             print("DOWN")
-        if self.game.A:
+        if game.A:
             print("A")
-        if self.game.B:
+        if game.B:
             print("B")
-        if self.game.X:
+        if game.X:
             print("X")
-        if self.game.Y:
+        if game.Y:
             print("Y")
 
-    def drawScreen(self):
-        self.game.screen.fill((0,0,0))
+    def drawScreen(self,game):
+        game.screen.fill((0,0,0))
         screenOutline = pygame.Rect(self.left,self.top,self.right,self.bottom)
-        pygame.draw.rect(self.game.screen,self.game.white,screenOutline,2)
+        pygame.draw.rect(game.screen,game.white,screenOutline,2)
 
         if self.state == "main":
-            write(self.game, 40, 30, 40, "Building")
+            write(game, 40, 30, 40, "Building")
 
 
 class Forge(Building):
@@ -130,7 +130,7 @@ class Forge(Building):
         self.refinementStatTentativeValues = []
         self.pageModifer = 0
 
-    def initializeOnEnter(self):
+    def initializeOnEnter(self, game):
         self.itemType = "none"
         self.targetItem = None
         self.currentRefineLevel = []
@@ -139,11 +139,11 @@ class Forge(Building):
         self.refinementStatTentativeValues = []
         self.pageModifer = 0
 
-    def getInput(self):
+    def getInput(self,game):
         if self.delay > 0:
             self.delay -= 1
             return
-        if self.game.UP:
+        if game.UP:
             print("UP")
             if self.state == "selectItem":
                 if self.cursorPos == 1 and self.pageModifer > 0:
@@ -153,7 +153,7 @@ class Forge(Building):
             if self.state == "partySelect":
                 self.cursorPos -= 1
                 if self.cursorPos < 0:
-                    self.cursorPos = len(self.game.player.party.members)-1
+                    self.cursorPos = len(game.player.party.members)-1
             if self.state == "weaponRefinement":
                 self.cursorPos -= 1
                 if self.cursorPos < 0:
@@ -162,7 +162,7 @@ class Forge(Building):
                 self.cursorPos -= 1
                 if self.cursorPos < 0:
                     self.cursorPos = 1
-        if self.game.DOWN:
+        if game.DOWN:
             print("DOWN")
             if self.state == "selectItem":
                 if self.cursorPos == 3 and (self.pageModifer+5 < len(self.player.party.equipment)):
@@ -171,7 +171,7 @@ class Forge(Building):
                     self.cursorPos += 1
             if self.state == "partySelect":
                 self.cursorPos += 1
-                if self.cursorPos > len(self.game.player.party.members)-1:
+                if self.cursorPos > len(game.player.party.members)-1:
                     self.cursorPos = 0
             if self.state == "weaponRefinement":
                 self.cursorPos += 1
@@ -181,15 +181,15 @@ class Forge(Building):
                 self.cursorPos += 1
                 if self.cursorPos > 1:
                     self.cursorPos = 0
-        if self.game.LEFT:
+        if game.LEFT:
             if self.state == "weaponRefinement" or self.state == "armorRefinement":
                 if self.tentativeRefineLevel[self.cursorPos] > self.currentRefineLevel[self.cursorPos]:
                     self.tentativeRefineLevel[self.cursorPos] -= 1
-        if self.game.RIGHT:
+        if game.RIGHT:
             if self.state == "weaponRefinement" or self.state == "armorRefinement":
                 if self.tentativeRefineLevel[self.cursorPos] < MAX_REFINE_LEVEL:
                     self.tentativeRefineLevel[self.cursorPos] += 1
-        if self.game.A:
+        if game.A:
             print("A")
             if self.state == "main":
                 self.state = "chooseInventory"
@@ -203,10 +203,10 @@ class Forge(Building):
                 self.itemType = "weapon"
                 self.cursorPos = 0
             elif self.state == "selectItem":
-                self.targetItem = self.game.player.party.equipment[self.cursorPos]
-                if self.game.directory.getItemType(self.targetItem) == Type.Weapon:
+                self.targetItem = game.player.party.equipment[self.cursorPos]
+                if self.directory.getItemType(self.targetItem) == Type.Weapon:
                      self.itemType = "weapon"
-                elif self.game.directory.getItemType(self.targetItem) == Type.Armor:
+                elif self.directory.getItemType(self.targetItem) == Type.Armor:
                      self.itemType = "armor"
                 if self.substate == "refine" and self.itemType == "weapon":
                     self.currentRefineLevel = [self.targetItem.atkRefine,self.targetItem.accRefine,self.targetItem.crtRefine]
@@ -219,12 +219,12 @@ class Forge(Building):
                 self.substate = "selectItem"
             elif self.state == "partySelect":
                 if self.substate == "refine" and self.itemType == "weapon":
-                    self.targetItem = self.game.player.party.members[self.cursorPos].eqpWpn
+                    self.targetItem = game.player.party.members[self.cursorPos].eqpWpn
                     self.currentRefineLevel = [self.targetItem.atkRefine,self.targetItem.accRefine,self.targetItem.crtRefine]
                     self.tentativeRefineLevel = [self.targetItem.atkRefine,self.targetItem.accRefine,self.targetItem.crtRefine]
                     self.state = "weaponRefinement"
                 elif self.substate == "refine" and self.itemType == "armor":
-                    self.targetItem = self.game.player.party.members[self.cursorPos].eqpAmr
+                    self.targetItem = game.player.party.members[self.cursorPos].eqpAmr
                     self.currentRefineLevel = [self.targetItem.defRefine,self.targetItem.ddgRefine]
                     self.tentativeRefineLevel = [self.targetItem.defRefine,self.targetItem.ddgRefine]
                     self.state = "armorRefinement"
@@ -241,7 +241,7 @@ class Forge(Building):
                     self.currentRefineLevel = self.tentativeRefineLevel[:]
                     self.state = self.substate
                     self.substate = "refine"
-        if self.game.B:
+        if game.B:
             print("B")
             if self.state == "main":
                 self.inMenu = False
@@ -261,7 +261,7 @@ class Forge(Building):
                 self.cursorPos = 0
                 self.state = self.substate
                 self.substate = "refine"
-        if self.game.X:
+        if game.X:
             print("X")
             if self.state == "main":
                 self.state = "chooseInventory"
@@ -274,48 +274,48 @@ class Forge(Building):
                 self.state = "partySelect"
                 self.itemType = "armor"
                 self.cursorPos = 0
-        if self.game.Y:
+        if game.Y:
             print("Y")
-        if self.game.START:
+        if game.START:
             print("START")
             self.inMenu = False
 
-    def drawScreen(self):
-        self.game.screen.fill((0,0,0))
+    def drawScreen(self,game):
+        game.screen.fill((0,0,0))
         screenOutline = pygame.Rect(self.left,self.top,self.right,self.bottom)
-        pygame.draw.line(self.game.screen,self.game.white,(self.left,300),(self.right+9,300),2)
-        pygame.draw.line(self.game.screen,self.game.white,(self.right-self.left-180,300),(self.right-self.left-180,self.bottom+8),2)
-        pygame.draw.rect(self.game.screen,self.game.white,screenOutline,2)
+        pygame.draw.line(game.screen,game.white,(self.left,300),(self.right+9,300),2)
+        pygame.draw.line(game.screen,game.white,(self.right-self.left-180,300),(self.right-self.left-180,self.bottom+8),2)
+        pygame.draw.rect(game.screen,game.white,screenOutline,2)
         description = self.getDescription(self.state, self.substate)
-        wrapWrite(self.game, 20, description, self.right-self.left-15)
+        wrapWrite(game, 20, description, self.right-self.left-15)
 
         if self.state == "main":
-            write(self.game, 30, self.left+10, self.top+305, "Forge")
-            write(self.game, 25,self.right-150,self.top+310,"A) Refine")
-            write(self.game, 25,self.right-150,self.top+360,"X) Reforge")
-            write(self.game, 25,self.right-150,self.top+410,"B) Leave")
+            write(game, 30, self.left+10, self.top+305, "Forge")
+            write(game, 25,self.right-150,self.top+310,"A) Refine")
+            write(game, 25,self.right-150,self.top+360,"X) Reforge")
+            write(game, 25,self.right-150,self.top+410,"B) Leave")
 
         elif self.state == "chooseInventory" or self.state == "selectItem":
-            write(self.game, 25,self.right-150,self.top+310,"A) Equipped")
-            write(self.game, 25,self.right-150,self.top+360,"X) Inventory")
-            write(self.game, 25,self.right-150,self.top+410,"B) Back")
+            write(game, 25,self.right-150,self.top+310,"A) Equipped")
+            write(game, 25,self.right-150,self.top+360,"X) Inventory")
+            write(game, 25,self.right-150,self.top+410,"B) Back")
             if self.state == "selectItem":
-                self.printEquipment()
+                self.printEquipment(game)
 
         elif self.state == "chooseItemType":
-            write(self.game, 25,self.right-150,self.top+310,"A) Weapon")
-            write(self.game, 25,self.right-150,self.top+360,"X) Armor")
-            write(self.game, 25,self.right-150,self.top+410,"B) Back")
+            write(game, 25,self.right-150,self.top+310,"A) Weapon")
+            write(game, 25,self.right-150,self.top+360,"X) Armor")
+            write(game, 25,self.right-150,self.top+410,"B) Back")
 
         elif self.state == "chooseItemType" or self.state == "partySelect":
-            write(self.game, 25,self.right-150,self.top+340,"A) Select")
-            write(self.game, 25,self.right-150,self.top+390,"B) Back")
-            write(self.game, 15, self.left+300, (self.top+310)+(25*self.cursorPos), "<-")
+            write(game, 25,self.right-150,self.top+340,"A) Select")
+            write(game, 25,self.right-150,self.top+390,"B) Back")
+            write(game, 15, self.left+300, (self.top+310)+(25*self.cursorPos), "<-")
             for i, member in enumerate(self.player.party.members):
-                write(self.game, 20, self.left+35, (self.top+310)+(25*i), str(i+1) + ") " + member.name)
+                write(game, 20, self.left+35, (self.top+310)+(25*i), str(i+1) + ") " + member.name)
 
         elif self.state == "weaponRefinement" or self.state == "armorRefinement" or self.state == "confirmWeaponRefine" or self.state == "confirmArmorRefine":
-            write(self.game, 25, self.left+10, self.top+305, self.targetItem.name)
+            write(game, 25, self.left+10, self.top+305, self.targetItem.name)
             refinementString = []
             refinementStat = []
             if self.state == "weaponRefinement" or self.state == "confirmWeaponRefine":
@@ -344,15 +344,15 @@ class Forge(Building):
                 refinementStatTentativeValues = [self.targetItem.defense + (self.tentativeRefineLevel[0] * DEF_REFINE_BOOST), self.targetItem.dodge + (self.tentativeRefineLevel[1] * DDG_REFINE_BOOST)]
             cursorXVal = 0
             for i in range(len(refinementStat)):
-                cursorXVal, _ = write(self.game, 20, self.left+35, (self.top+340) + (i*25), refinementStat[i] + ": " + refinementString[i] + " - " + str(refinementStatCurrentValues[i]) + " -> " + str(refinementStatTentativeValues[i]))
-            write(self.game, 20, self.left+300, (self.top+340) + (self.cursorPos*25), "<-")
+                cursorXVal, _ = write(game, 20, self.left+35, (self.top+340) + (i*25), refinementStat[i] + ": " + refinementString[i] + " - " + str(refinementStatCurrentValues[i]) + " -> " + str(refinementStatTentativeValues[i]))
+            write(game, 20, self.left+300, (self.top+340) + (self.cursorPos*25), "<-")
             if self.state == "weaponRefinement" or self.state == "armorRefinement":
-                write(self.game, 20, self.left+35, 430, "Cost: " + str(self.calculateCost(self.targetItem.rarity,self.currentRefineLevel,self.tentativeRefineLevel)) + " (You have: " + str(self.player.gold) + ")")
-                write(self.game, 25,self.right-150,self.top+340,"A) Refine")
-                write(self.game, 25,self.right-150,self.top+390,"B) Back")
+                write(game, 20, self.left+35, 430, "Cost: " + str(self.calculateCost(self.targetItem.rarity,self.currentRefineLevel,self.tentativeRefineLevel)) + " (You have: " + str(self.player.gold) + ")")
+                write(game, 25,self.right-150,self.top+340,"A) Refine")
+                write(game, 25,self.right-150,self.top+390,"B) Back")
             elif self.state == "confirmWeaponRefine" or self.state == "confirmArmorRefine":
-                write(self.game, 25,self.right-150,self.top+340,"A) Confirm")
-                write(self.game, 25,self.right-150,self.top+390,"B) Cancel")
+                write(game, 25,self.right-150,self.top+340,"A) Confirm")
+                write(game, 25,self.right-150,self.top+390,"B) Cancel")
 
     def getDescription(self,state,substate):
         description = ""
@@ -376,34 +376,14 @@ class Forge(Building):
                 totalCost += 20 * rarity * j
         return totalCost
 
-    def drawEquipmentBlock(self,xPos,yPos,character):
-        outlineRect = pygame.Rect(xPos,yPos,350,90)
-        pygame.draw.rect(self.game.screen,self.game.white,outlineRect,2)
-        write(self.game, 14, xPos+10, yPos+10, character.name + ", Level " + str(character.level) + " " + character.type.name)
-        write(self.game, 14, xPos+10, yPos+30, "HP " + str(character.getHP()) + "/" + str(character.getMaxHP()))
-        write(self.game, 14, xPos+10, yPos+50, "MP " + str(character.getMP()) + "/" + str(character.getMaxMP()))
-        write(self.game, 14, xPos+10, yPos+70, "XP " + str(character.xp) + "/" + str(character.nextLevel))
-        write(self.game, 12, xPos+120, yPos+30, "Weapon: " + str(character.eqpWpn.name))
-        write(self.game, 12, xPos+120, yPos+50, "Armor: " + str(character.eqpAmr.name))
-        if character.eqpAcc.name == "NULL":
-            name = "None"
-        else:
-            name = character.eqpAcc.name
-        write(self.game, 12, xPos+120, yPos+70, "Accessory: " + str(name))
-
-    def printEquipment(self):
-        list = self.game.player.party.equipment
+    def printEquipment(self,game):
+        list = game.player.party.equipment
         for i in range(5):
             if i < len(list):
-                write(self.game, 20, self.left+35, (self.top+310)+(25*i), str(i+1+self.pageModifer) + ") " + self.game.directory.getItemName(list[i]))
+                write(game, 20, self.left+35, (self.top+310)+(25*i), str(i+1+self.pageModifer) + ") " + self.directory.getItemName(list[i]))
             else:
-                write(self.game, 20, self.left+35, (self.top+310)+(25*i), str(i+1+self.pageModifer) + ")")
-        write(self.game, 15, self.left+300, (self.top+310)+(25*self.cursorPos), "<-")
-
-    def drawCharacterNameBlock(self,xPos,yPos,character):
-        outlineRect = pygame.Rect(xPos,yPos,250,33)
-        pygame.draw.rect(self.game.screen,self.game.white,outlineRect,2)
-        write(self.game, 14, xPos+10, yPos+10, character.name + ", Level " + str(character.level) + " " + character.type.name)
+                write(game, 20, self.left+35, (self.top+310)+(25*i), str(i+1+self.pageModifer) + ")")
+        write(game, 15, self.left+300, (self.top+310)+(25*self.cursorPos), "<-")
 
 
 class Shop(Building):
@@ -414,32 +394,32 @@ class Shop(Building):
         self.shopPageModifier = 0
         self.targetItem = None
 
-    def initializeOnEnter(self):
+    def initializeOnEnter(self, game):
         if len(self.shopInventory) == 0:
             self.fillShopInventory()
         self.playerInventory = self.getTargetInventory()
         self.shopPageModifier = 0
         self.targetItem = None
 
-    def getInput(self):
+    def getInput(self,game):
         if self.delay > 0:
             self.delay -= 1
             return
-        if self.game.UP:
+        if game.UP:
             print("UP")
             if self.state == "shopScreen":
                 if self.cursorPos == 1 and self.shopPageModifier > 0:
                     self.shopPageModifier -= 1
                 elif self.cursorPos > 0:
                     self.cursorPos -= 1
-        if self.game.DOWN:
+        if game.DOWN:
             print("DOWN")
             if self.state == "shopScreen":
                 if self.cursorPos == 3 and (self.shopPageModifier+5 < len(self.shopInventory)):
                     self.shopPageModifier += 1
                 elif self.cursorPos < 4 and self.cursorPos < len(self.shopInventory)-1:
                     self.cursorPos += 1
-        if self.game.A:
+        if game.A:
             print("A")
             if self.state == "main":
                 self.state = "shopScreen"
@@ -455,10 +435,10 @@ class Shop(Building):
                     self.substate = "tooExpensive"
             elif self.state == "confirmPurchase":
                 self.player.gold -= self.calculateCost(self.targetItem)
-                self.player.party.add(self.targetItem.id,self.game.directory)
+                self.player.party.add(self.targetItem.id,self.directory)
                 self.state = "shopScreen"
                 self.substate = "purchased"
-        if self.game.B:
+        if game.B:
             print("B")
             if self.state == "main":
                 self.inMenu = False
@@ -468,36 +448,36 @@ class Shop(Building):
             elif self.state == "confirmPurchase":
                 self.state = "shopScreen"
                 self.substate = "none"
-        if self.game.X:
+        if game.X:
             print("X")
-        if self.game.Y:
+        if game.Y:
             print("Y")
 
-    def drawScreen(self):
-        self.game.screen.fill((0,0,0))
+    def drawScreen(self,game):
+        game.screen.fill((0,0,0))
         screenOutline = pygame.Rect(self.left,self.top,self.right,self.bottom)
-        pygame.draw.line(self.game.screen,self.game.white,(self.left,300),(self.right+9,300),2)
-        pygame.draw.line(self.game.screen,self.game.white,(self.right-self.left-180,300),(self.right-self.left-180,self.bottom+8),2)
-        pygame.draw.rect(self.game.screen,self.game.white,screenOutline,2)
+        pygame.draw.line(game.screen,game.white,(self.left,300),(self.right+9,300),2)
+        pygame.draw.line(game.screen,game.white,(self.right-self.left-180,300),(self.right-self.left-180,self.bottom+8),2)
+        pygame.draw.rect(game.screen,game.white,screenOutline,2)
         description = self.getShopDescription(self.state, self.substate)
-        wrapWrite(self.game, 20, description, self.right-self.left-15)
+        wrapWrite(game, 20, description, self.right-self.left-15)
         
         if self.state == "main":
-            write(self.game, 30, self.left+10, self.top+305, self.getShopName())
-            write(self.game, 25,self.right-150,self.top+340,"A) Shop")
-            write(self.game, 25,self.right-150,self.top+390,"B) Leave")
+            write(game, 30, self.left+10, self.top+305, self.getShopName())
+            write(game, 25,self.right-150,self.top+340,"A) Shop")
+            write(game, 25,self.right-150,self.top+390,"B) Leave")
 
         elif self.state == "shopScreen":
-            self.printShopInventory()
-            write(self.game, 25,self.right-150,self.top+340,"A) Buy")
-            write(self.game, 25,self.right-150,self.top+390,"B) Back")
+            self.printShopInventory(game)
+            write(game, 25,self.right-150,self.top+340,"A) Buy")
+            write(game, 25,self.right-150,self.top+390,"B) Back")
 
         elif self.state == "confirmPurchase":
-            self.printStatBlock(self.targetItem)
-            write(self.game, 25,self.right-150,self.top+340,"A) Confirm")
-            write(self.game, 25,self.right-150,self.top+390,"B) Cancel")
+            self.printStatBlock(self.targetItem,game)
+            write(game, 25,self.right-150,self.top+340,"A) Confirm")
+            write(game, 25,self.right-150,self.top+390,"B) Cancel")
 
-    def printShopInventory(self):
+    def printShopInventory(self,game):
         shopDisplay = []
         for i in range(5):
             if i + self.shopPageModifier >= len(self.shopInventory):
@@ -506,23 +486,23 @@ class Shop(Building):
                 shopDisplay.append(self.shopInventory[i + self.shopPageModifier])
         for i in range(5):
             if shopDisplay[i] == "None":
-                write(self.game, 20, self.left+35, (self.top+310)+(25*i), str(i+1+self.shopPageModifier) + ")")
+                write(game, 20, self.left+35, (self.top+310)+(25*i), str(i+1+self.shopPageModifier) + ")")
             else:
-                write(self.game, 20, self.left+35, (self.top+310)+(25*i), str(i+1+self.shopPageModifier) + ") " + self.game.directory.getItemName(shopDisplay[i]))
-                writeOrientation(self.game, 20, self.right-self.left-200, (self.top+310)+(25*i), str(self.calculateCost(shopDisplay[i])) + "g", "R")
-        write(self.game, 20,self.left+20,(self.top+310)+(25*self.cursorPos),">")
+                write(game, 20, self.left+35, (self.top+310)+(25*i), str(i+1+self.shopPageModifier) + ") " + self.directory.getItemName(shopDisplay[i]))
+                writeOrientation(game, 20, self.right-self.left-200, (self.top+310)+(25*i), str(self.calculateCost(shopDisplay[i])) + "g", "R")
+        write(game, 20,self.left+20,(self.top+310)+(25*self.cursorPos),">")
 
-    def printStatBlock(self, item):
+    def printStatBlock(self, item, game):
         if type(item) == int:
-            item = self.game.directory.getItem(item)
-        itemType = self.game.directory.getItemType(item)
-        write(self.game, 15, self.left + 10, 315, item.name)
-        wrapWrite(self.game, 15, item.description, self.right - self.left - 190, self.left + 10, 370)
+            item = self.directory.getItem(item)
+        itemType = self.directory.getItemType(item)
+        write(game, 15, self.left + 10, 315, item.name)
+        wrapWrite(game, 15, item.description, self.right - self.left - 190, self.left + 10, 370)
         if itemType == Type.AtkSpell or itemType == Type.SptSpell:
             spelltype = "Attack" if item.type == SpellType.Attack or item.type == SpellType.Debuff else "Support"
-            writeOrientation(self.game, 15, self.right - self.left - 185, 315, "Level "+str(item.rarity)+" "+spelltype+" Spell | "+str(item.manacost) + " MP", "R")
+            writeOrientation(game, 15, self.right - self.left - 185, 315, "Level "+str(item.rarity)+" "+spelltype+" Spell | "+str(item.manacost) + " MP", "R")
             if item.type == SpellType.Attack:
-                write(self.game, 15, self.left + 10, 345, "Deals " + str(item.attack) + " damage.")
+                write(game, 15, self.left + 10, 345, "Deals " + str(item.attack) + " damage.")
             elif item.type == SpellType.Buff:
                 buffText = ""
                 commaSeparator = ""
@@ -546,22 +526,22 @@ class Shop(Building):
                     commaSeparator = ", "
                 if item.potency[6] > 0:
                     buffText += commaSeparator + "Regenerates " + str(item.potency[6]) + " HP each turn."
-                write(self.game, 15, self.left + 10, 345, buffText)
+                write(game, 15, self.left + 10, 345, buffText)
             elif item.type == SpellType.Heal:
-                write(self.game, 15, self.left + 10, 345, "Heals for " + str(item.potency[6]) + " HP.")
+                write(game, 15, self.left + 10, 345, "Heals for " + str(item.potency[6]) + " HP.")
         elif itemType == Type.Weapon or itemType == Type.Armor or itemType == Accessory:
             statText = ""
             if itemType == Type.Weapon:
-                writeOrientation(self.game, 15, self.right - self.left - 185, 315, "Level "+str(item.rarity)+" "+item.type.name, "R")
+                writeOrientation(game, 15, self.right - self.left - 185, 315, "Level "+str(item.rarity)+" "+item.type.name, "R")
                 if item.atkRefine > 0 or item.accRefine > 0 or item.crtRefine > 0:
-                    writeOrientation(self.game, 15, self.right-40, 245, "+" + str(item.atkRefine) + "/+" + str(item.accRefine) + "/+" + str(item.crtRefine), "R")
+                    writeOrientation(game, 15, self.right-40, 245, "+" + str(item.atkRefine) + "/+" + str(item.accRefine) + "/+" + str(item.crtRefine), "R")
                 statText = "ATK " + str(item.getAttack()) + " | ACC " + str(item.getAccuracy()) + " | CRT " + str(item.getCritrate()) + " | AMP " + str(item.amplifier)
             elif itemType == Type.Armor:
-                writeOrientation(self.game, 15, self.right - self.left - 185, 315, "Level "+str(item.rarity)+" "+item.type.name+" Armor", "R")
+                writeOrientation(game, 15, self.right - self.left - 185, 315, "Level "+str(item.rarity)+" "+item.type.name+" Armor", "R")
                 if item.defRefine > 0 or item.ddgRefine > 0:
-                    writeOrientation(self.game, 15, self.right - self.left - 185, 315, "+" + str(item.defRefine) + "/+" + str(item.ddgRefine))
+                    writeOrientation(game, 15, self.right - self.left - 185, 315, "+" + str(item.defRefine) + "/+" + str(item.ddgRefine))
                 statText = "DEF " + str(item.getDefense()) + " | DDG " + str(item.getDodge()) + " | MPG " + str(item.manaregen)
-            write(self.game, 15, self.left + 10, 345, statText)
+            write(game, 15, self.left + 10, 345, statText)
         elif itemType == Type.Potion:
             statText = ""
             commaSeparator = ""
@@ -571,13 +551,13 @@ class Shop(Building):
                     commaSeparator = ", "
                 if item.mpGain > 0:
                     statText += commaSeparator + "+" + str(item.mpGain) + " MP"
-                write(self.game, 15, self.left + 10, 345, statText)
+                write(game, 15, self.left + 10, 345, statText)
             if itemType == Type.AtkSpell or itemType == Type.SptSpell:
                 spelltype = "Attack" if itemType == Type.AtkSpell else "Support"
-                writeOrientation(self.game, 15, self.right - self.left - 185, 315, "Level "+str(item.rarity)+" "+spelltype+" Spell | "+str(item.manacost) + " MP", "R")
-                writeOrientation(self.game, 15, self.right - self.left - 185, 315, "Use to learn spell.", "R")
+                writeOrientation(game, 15, self.right - self.left - 185, 315, "Level "+str(item.rarity)+" "+spelltype+" Spell | "+str(item.manacost) + " MP", "R")
+                writeOrientation(game, 15, self.right - self.left - 185, 315, "Use to learn spell.", "R")
                 if item.type == SpellType.Attack:
-                    write(self.game, 15, self.left + 10, 345, "Deals " + str(item.attack) + " damage.")
+                    write(game, 15, self.left + 10, 345, "Deals " + str(item.attack) + " damage.")
                 elif item.type == SpellType.Buff:
                     buffText = ""
                     commaSeparator = ""
@@ -601,9 +581,9 @@ class Shop(Building):
                         commaSeparator = ", "
                     if item.potency[6] > 0:
                         buffText += commaSeparator + "Regenerates " + str(item.potency[6]) + " HP each turn."
-                    write(self.game, 15, self.left + 10, 345, buffText)
+                    write(game, 15, self.left + 10, 345, buffText)
                 elif item.type == SpellType.Heal:
-                    write(self.game, 15, self.left + 10, 345, "Heals for " + str(item.potency[6]) + " HP.")
+                    write(game, 15, self.left + 10, 345, "Heals for " + str(item.potency[6]) + " HP.")
 
     def getShopName(self):
         return "Shop"
@@ -616,7 +596,7 @@ class Shop(Building):
 
     def fillShopInventory(self):
         for i in range(8):
-            self.shopInventory.append(self.game.directory.getWeaponByRarity([WeaponType.Axe,WeaponType.Sword,WeaponType.Spear,WeaponType.Dagger,WeaponType.Staff],self.game.directory.getLootRarity(self.level,Type.Weapon)))
+            self.shopInventory.append(self.directory.getWeaponByRarity([WeaponType.Axe,WeaponType.Sword,WeaponType.Spear,WeaponType.Dagger,WeaponType.Staff],self.directory.getLootRarity(self.level,Type.Weapon)))
     
     def calculateCost(self, item):
         return 20
@@ -647,7 +627,7 @@ class Weaponsmith(Shop):
         elif state == "shopScreen" and substate == "tooExpensive":
             description = "'Hey, you tryna hustle me or somethin'? Come back when you can afford it.'"
         elif state == "confirmPurchase":
-            description = "'You want the " + self.game.directory.getItemName(self.targetItem) + "? That's gonna cost you 'bout " + str(self.calculateCost(self.targetItem)) + " gold.'"
+            description = "'You want the " + self.directory.getItemName(self.targetItem) + "? That's gonna cost you 'bout " + str(self.calculateCost(self.targetItem)) + " gold.'"
         return description
 
     def getTargetInventory(self):
@@ -657,8 +637,8 @@ class Weaponsmith(Shop):
         weaponTypes = [WeaponType.Axe,WeaponType.Sword,WeaponType.Spear,WeaponType.Dagger,WeaponType.Staff]
         random.shuffle(weaponTypes)
         shopWeaponTypes = weaponTypes[0:2]
-        for weapon in self.game.directory.weaponDirectory:
-            if weapon.rarity <= self.game.directory.getLootRarity(self.level, Type.Weapon)+1 and (weapon.type in shopWeaponTypes):
+        for weapon in self.directory.weaponDirectory:
+            if weapon.rarity <= self.directory.getLootRarity(self.level, Type.Weapon)+1 and (weapon.type in shopWeaponTypes):
                 self.shopInventory.append(weapon)
 
     def calculateCost(self, item):
@@ -690,7 +670,7 @@ class Armory(Shop):
         elif state == "shopScreen" and substate == "tooExpensive":
             description = "'My mom says I shouldn't barter with this stuff... you sure you don't have any more gold on you?'"
         elif state == "confirmPurchase":
-            description = "'Okay, so you want the " + self.game.directory.getItemName(self.targetItem) + "? Cool, that'll be... " + str(self.calculateCost(self.targetItem)) + " gold!'"
+            description = "'Okay, so you want the " + self.directory.getItemName(self.targetItem) + "? Cool, that'll be... " + str(self.calculateCost(self.targetItem)) + " gold!'"
         return description
 
     def getTargetInventory(self):
@@ -702,8 +682,8 @@ class Armory(Shop):
         shopArmorTypes = armorTypes[0:2]
         if ArmorType.Robe in shopArmorTypes:
             shopArmorTypes.append(ArmorType.Arcanist)
-        for armor in self.game.directory.armorDirectory:
-            if armor.rarity <= self.game.directory.getLootRarity(self.level, Type.Armor)+1 and (armor.type in shopArmorTypes):
+        for armor in self.directory.armorDirectory:
+            if armor.rarity <= self.directory.getLootRarity(self.level, Type.Armor)+1 and (armor.type in shopArmorTypes):
                 self.shopInventory.append(armor)
 
     def calculateCost(self, item):
@@ -735,15 +715,15 @@ class GeneralStore(Shop):
         elif state == "shopScreen" and substate == "tooExpensive":
             description = "'Hey, my prices aren't that high! You can cough up a bit more gold to support your local bakery- I mean general store!'"
         elif state == "confirmPurchase":
-            description = "'Ah, so you want the " + self.game.directory.getItemName(self.targetItem) + "... That'll be " + str(self.calculateCost(self.targetItem)) + " gold then. (you know, those go great with cookies...)'"
+            description = "'Ah, so you want the " + self.directory.getItemName(self.targetItem) + "... That'll be " + str(self.calculateCost(self.targetItem)) + " gold then. (you know, those go great with cookies...)'"
         return description
 
     def getTargetInventory(self):
         return self.player.party.inventory
 
     def fillShopInventory(self):
-        for item in self.game.directory.potionDirectory:
-            if item.rarity <= self.game.directory.getLootRarity(self.level, Type.Potion)+1:
+        for item in self.directory.potionDirectory:
+            if item.rarity <= self.directory.getLootRarity(self.level, Type.Potion)+1:
                 self.shopInventory.append(item)
 
     def calculateCost(self, item):
@@ -775,7 +755,7 @@ class Library(Shop):
         elif state == "shopScreen" and substate == "tooExpensive":
             description = "'*Ahem... You seem to lack the finances for that particular scroll.*'"
         elif state == "confirmPurchase":
-            description = "'*Ah, the " + self.game.directory.getItemName(self.targetItem, True) + "? Excellent choice, that will be " + str(self.calculateCost(self.targetItem)) + " gold.*'"
+            description = "'*Ah, the " + self.directory.getItemName(self.targetItem, True) + "? Excellent choice, that will be " + str(self.calculateCost(self.targetItem)) + " gold.*'"
         return description
 
     def getTargetInventory(self):
@@ -784,8 +764,8 @@ class Library(Shop):
     def fillShopInventory(self):
         elements = [Element.Lightning, Element.Fire, Element.Ice]
         element = random.choice(elements)
-        for spell in self.game.directory.atkSpellDirectory:
-            if spell.rarity <= self.game.directory.getLootRarity(self.level, Type.AtkSpell)+1 and (spell.element == element):
+        for spell in self.directory.atkSpellDirectory:
+            if spell.rarity <= self.directory.getLootRarity(self.level, Type.AtkSpell)+1 and (spell.element == element):
                 self.shopInventory.append(spell)
 
     def calculateCost(self, item):
@@ -817,7 +797,7 @@ class Temple(Shop):
         elif state == "shopScreen" and substate == "tooExpensive":
             description = "'I'm sorry... but our temple needs to fund itself somehow.'"
         elif state == "confirmPurchase":
-            description = "'Ah, the " + self.game.directory.getItemName(self.targetItem, True) + "! That'll just be " + str(self.calculateCost(self.targetItem)) + " gold, if you wouldn't mind.'"
+            description = "'Ah, the " + self.directory.getItemName(self.targetItem, True) + "! That'll just be " + str(self.calculateCost(self.targetItem)) + " gold, if you wouldn't mind.'"
         return description
 
     def getTargetInventory(self):
@@ -827,8 +807,8 @@ class Temple(Shop):
         spellTypesA = [SpellType.Heal, SpellType.Buff]
         spellTypesB = [SpellType.Raise, SpellType.Cleanse]
         spellTypes = [random.choice(spellTypesA), random.choice(spellTypesB)]
-        for spell in self.game.directory.sptSpellDirectory:
-            if spell.rarity <= self.game.directory.getLootRarity(self.level, Type.SptSpell)+1 and (spell.type in spellTypes):
+        for spell in self.directory.sptSpellDirectory:
+            if spell.rarity <= self.directory.getLootRarity(self.level, Type.SptSpell)+1 and (spell.type in spellTypes):
                 self.shopInventory.append(spell)
 
     def calculateCost(self, item):
@@ -843,25 +823,25 @@ class BlackMarket(Shop):
         Shop.__init__(self,row,col,level)
         self.color = (85,85,85) # Dark Gray
 
-    def getInput(self):
+    def getInput(self,game):
         if self.delay > 0:
             self.delay -= 1
             return
-        if self.game.UP:
+        if game.UP:
             print("UP")
             if self.state == "shopScreen" or self.state == "sellEquipmentScreen" or self.state == "sellInventoryScreen":
                 if self.cursorPos == 1 and self.shopPageModifier > 0:
                     self.shopPageModifier -= 1
                 elif self.cursorPos > 0:
                     self.cursorPos -= 1
-        if self.game.DOWN:
+        if game.DOWN:
             print("DOWN")
             if self.state == "shopScreen" or self.state == "sellEquipmentScreen" or self.state == "sellInventoryScreen":
                 if self.cursorPos == 3 and (self.shopPageModifier+5 < len(self.shopInventory)):
                     self.shopPageModifier += 1
                 elif self.cursorPos < 4 and self.cursorPos < len(self.shopInventory)-1:
                     self.cursorPos += 1
-        if self.game.A:
+        if game.A:
             print("A")
             if self.state == "main":
                 self.state = "shopScreen"
@@ -881,7 +861,7 @@ class BlackMarket(Shop):
                     itemID = self.targetItem
                 else:
                     itemID = self.targetItem.id
-                self.player.party.add(itemID,self.game.directory)
+                self.player.party.add(itemID,self.directory)
                 self.state = "shopScreen"
                 self.substate = "purchased"
             elif self.state == "sellInventorySelect":
@@ -916,7 +896,7 @@ class BlackMarket(Shop):
                     self.player.gold += self.calculateSellValue(item)
                     self.player.party.inventory.pop(self.targetItem)
                 self.substate = "purchased"
-        if self.game.B:
+        if game.B:
             print("B")
             if self.state == "main":
                 self.inMenu = False
@@ -938,7 +918,7 @@ class BlackMarket(Shop):
                 elif self.substate == "inventory":
                     self.state = "sellInventoryScreen"
                 self.substate = "none"
-        if self.game.X:
+        if game.X:
             print("X")
             if self.state == "main":
                 self.state = "sellInventorySelect"
@@ -948,38 +928,38 @@ class BlackMarket(Shop):
                 self.substate = "none"
                 self.cursorPos = 0
                 self.shopPageModifier = 0
-        if self.game.Y:
+        if game.Y:
             print("Y")
 
-    def drawScreen(self):
-        self.game.screen.fill((0,0,0))
+    def drawScreen(self,game):
+        game.screen.fill((0,0,0))
         screenOutline = pygame.Rect(self.left,self.top,self.right,self.bottom)
-        pygame.draw.line(self.game.screen,self.game.white,(self.left,300),(self.right+9,300),2)
-        pygame.draw.line(self.game.screen,self.game.white,(self.right-self.left-180,300),(self.right-self.left-180,self.bottom+8),2)
-        pygame.draw.rect(self.game.screen,self.game.white,screenOutline,2)
+        pygame.draw.line(game.screen,game.white,(self.left,300),(self.right+9,300),2)
+        pygame.draw.line(game.screen,game.white,(self.right-self.left-180,300),(self.right-self.left-180,self.bottom+8),2)
+        pygame.draw.rect(game.screen,game.white,screenOutline,2)
         description = self.getShopDescription(self.state, self.substate)
-        wrapWrite(self.game, 20, description, self.right-self.left-15)
+        wrapWrite(game, 20, description, self.right-self.left-15)
         
         if self.state == "main":
-            write(self.game, 30, self.left+10, self.top+305, self.getShopName())
-            write(self.game, 25,self.right-150,self.top+310,"A) Shop")
-            write(self.game, 25,self.right-150,self.top+360,"X) Sell")
-            write(self.game, 25,self.right-150,self.top+410,"B) Leave")
+            write(game, 30, self.left+10, self.top+305, self.getShopName())
+            write(game, 25,self.right-150,self.top+310,"A) Shop")
+            write(game, 25,self.right-150,self.top+360,"X) Sell")
+            write(game, 25,self.right-150,self.top+410,"B) Leave")
 
         elif self.state == "shopScreen":
             self.printShopInventory()
-            write(self.game, 25,self.right-150,self.top+340,"A) Buy")
-            write(self.game, 25,self.right-150,self.top+390,"B) Back")
+            write(game, 25,self.right-150,self.top+340,"A) Buy")
+            write(game, 25,self.right-150,self.top+390,"B) Back")
 
         elif self.state == "confirmPurchase":
-            self.printStatBlock(self.targetItem)
-            write(self.game, 25,self.right-150,self.top+340,"A) Confirm")
-            write(self.game, 25,self.right-150,self.top+390,"B) Cancel")
+            self.printStatBlock(self.targetItem,game)
+            write(game, 25,self.right-150,self.top+340,"A) Confirm")
+            write(game, 25,self.right-150,self.top+390,"B) Cancel")
 
         elif self.state == "sellInventorySelect":
-            write(self.game, 25,self.right-150,self.top+310,"A) Eqmnt")
-            write(self.game, 25,self.right-150,self.top+360,"X) Items")
-            write(self.game, 25,self.right-150,self.top+410,"B) Back")
+            write(game, 25,self.right-150,self.top+310,"A) Eqmnt")
+            write(game, 25,self.right-150,self.top+360,"X) Items")
+            write(game, 25,self.right-150,self.top+410,"B) Back")
 
         elif self.state == "sellEquipmentScreen" or self.state == "sellInventoryScreen":
             stock = []
@@ -987,19 +967,19 @@ class BlackMarket(Shop):
                 stock = self.player.party.equipment
             elif self.state == "sellInventoryScreen":
                 stock = self.player.party.inventory
-            self.printSellInventory(stock)
-            write(self.game, 25,self.right-150,self.top+340,"A) Sell")
-            write(self.game, 25,self.right-150,self.top+390,"B) Back")
+            self.printSellInventory(stock,game)
+            write(game, 25,self.right-150,self.top+340,"A) Sell")
+            write(game, 25,self.right-150,self.top+390,"B) Back")
 
         elif self.state == "confirmSale":
             if self.substate == "equipment":
-                self.printStatBlock(self.player.party.equipment[self.targetItem])
+                self.printStatBlock(self.player.party.equipment[self.targetItem],game)
             elif self.substate == "inventory":
-                self.printStatBlock(self.player.party.inventory[self.targetItem])
-            write(self.game, 25,self.right-150,self.top+340,"A) Confirm")
-            write(self.game, 25,self.right-150,self.top+390,"B) Cancel")
+                self.printStatBlock(self.player.party.inventory[self.targetItem],game)
+            write(game, 25,self.right-150,self.top+340,"A) Confirm")
+            write(game, 25,self.right-150,self.top+390,"B) Cancel")
 
-    def printSellInventory(self, stock):
+    def printSellInventory(self, stock, game):
         sellDisplay = []
         for i in range(5):
             if i + self.shopPageModifier >= len(stock):
@@ -1008,11 +988,11 @@ class BlackMarket(Shop):
                 sellDisplay.append(stock[i + self.shopPageModifier])
         for i in range(5):
             if sellDisplay[i] == "None":
-                write(self.game, 20, self.left+35, (self.top+310)+(25*i), str(i+1+self.shopPageModifier) + ")")
+                write(game, 20, self.left+35, (self.top+310)+(25*i), str(i+1+self.shopPageModifier) + ")")
             else:
-                write(self.game, 20, self.left+35, (self.top+310)+(25*i), str(i+1+self.shopPageModifier) + ") " + self.game.directory.getItemName(sellDisplay[i]))
-                writeOrientation(self.game, 20, self.right-self.left-200, (self.top+310)+(25*i), str(self.calculateSellValue(sellDisplay[i])) + "g", "R")
-        write(self.game, 20,self.left+20,(self.top+310)+(25*self.cursorPos),">")
+                write(game, 20, self.left+35, (self.top+310)+(25*i), str(i+1+self.shopPageModifier) + ") " + self.directory.getItemName(sellDisplay[i]))
+                writeOrientation(game, 20, self.right-self.left-200, (self.top+310)+(25*i), str(self.calculateSellValue(sellDisplay[i])) + "g", "R")
+        write(game, 20,self.left+20,(self.top+310)+(25*self.cursorPos),">")
 
     def getShopName(self):
         return "Black Market"
@@ -1032,7 +1012,7 @@ class BlackMarket(Shop):
         elif state == "shopScreen" and substate == "tooExpensive":
             description = "The woman flashes a dagger from her hip; 'Listen, you'd best have the gold if you're gonna be looking, you got it?'"
         elif state == "confirmPurchase":
-            description = "Got your eye on the " + self.game.directory.getItemName(self.targetItem, True) + ", eh? " + str(self.calculateCost(self.targetItem)) + " gold, final offer."
+            description = "Got your eye on the " + self.directory.getItemName(self.targetItem, True) + ", eh? " + str(self.calculateCost(self.targetItem)) + " gold, final offer."
         elif state == "sellEquipmentScreen" or state == "sellInventoryScreen" or state == "sellInventorySelect" and substate == "none":
             description = "Let me take a look at what you've got there. Maybe we can strike a deal."
         elif state == "sellEquipmentScreen" or state == "sellInventoryScreen" and substate == "purchased":
@@ -1042,7 +1022,7 @@ class BlackMarket(Shop):
                 item = self.player.party.equipment[self.targetItem]
             if self.substate == "inventory":
                 item = self.player.party.inventory[self.targetItem]
-            description = "Hmm... I'll give ya " + str(self.calculateSellValue(item)) + " for the " + self.game.directory.getItemName(item) + ", how's that?"
+            description = "Hmm... I'll give ya " + str(self.calculateSellValue(item)) + " for the " + self.directory.getItemName(item) + ", how's that?"
         return description
 
     def getTargetInventory(self):
@@ -1051,7 +1031,7 @@ class BlackMarket(Shop):
     def fillShopInventory(self):
         burnout = 0
         for i in range(5):
-            item = self.game.directory.rollForLoot(self.level,LootRarity.Rare,[Type.Weapon,Type.Armor,Type.Accessory,Type.AtkSpell,Type.SptSpell])
+            item = self.directory.rollForLoot(self.level,LootRarity.Rare,[Type.Weapon,Type.Armor,Type.Accessory,Type.AtkSpell,Type.SptSpell])
             if item not in self.shopInventory:
                 self.shopInventory.append(item)
             else:
@@ -1061,15 +1041,15 @@ class BlackMarket(Shop):
                 return
     
     def calculateCost(self, item):
-        return round(20 * (self.game.directory.getItemRarity(item) ** 1.8))
+        return round(20 * (self.directory.getItemRarity(item) ** 1.8))
 
     def calculateSellValue(self, item):
-        return round(15 * (self.game.directory.getItemRarity(item) ** .8))
+        return round(15 * (self.directory.getItemRarity(item) ** .8))
         
     def canAddItem(self,item):
         if type(item) != int:
             item = item.id
-        itemType = self.game.directory.getItemType(item)
+        itemType = self.directory.getItemType(item)
         if itemType == Type.Weapon or itemType == Type.Armor or itemType == Type.Accessory:
             return len(self.player.party.equipment) < MAX_INVENTORY_SIZE
         elif itemType == Type.Potion:
@@ -1081,27 +1061,27 @@ class Bazaar(Building):
     def __init__(self,row,col,level):
         Building.__init__(self,row,col,level)
 
-    def getInput(self):
+    def getInput(self,game):
         if self.delay > 0:
             self.delay -= 1
             return
-        if self.game.UP:
+        if game.UP:
             print("UP")
-        if self.game.DOWN:
+        if game.DOWN:
             print("DOWN")
-        if self.game.A:
+        if game.A:
             print("A")
-        if self.game.B:
+        if game.B:
             print("B")
-        if self.game.X:
+        if game.X:
             print("X")
-        if self.game.Y:
+        if game.Y:
             print("Y")
 
-    def drawScreen(self):
-        self.game.screen.fill((0,0,0))
+    def drawScreen(self,game):
+        game.screen.fill((0,0,0))
         screenOutline = pygame.Rect(self.left,self.top,self.right,self.bottom)
-        pygame.draw.rect(self.game.screen,self.game.white,screenOutline,2)
+        pygame.draw.rect(game.screen,game.white,screenOutline,2)
 
 
 class Inn(Building):
@@ -1111,33 +1091,33 @@ class Inn(Building):
         self.foodList = []
         self.pageModifier = 0
 
-    def initializeOnEnter(self):
+    def initializeOnEnter(self, game):
         if len(self.foodList) == 0:
             self.fillMenu()
 
-    def getInput(self):
+    def getInput(self,game):
         if self.delay > 0:
             self.delay -= 1
             return
-        if self.game.UP:
+        if game.UP:
             print("UP")
             if self.state == "menu":
                 if self.cursorPos == 1 and self.pageModifier > 0:
                     self.pageModifier -= 1
                 elif self.cursorPos > 0:
                     self.cursorPos -= 1
-        if self.game.DOWN:
+        if game.DOWN:
             print("DOWN")
             if self.state == "menu":
                 if self.cursorPos == 3 and (self.pageModifier+5 < len(self.foodList)):
                     self.pageModifier += 1
                 elif self.cursorPos < 4 and self.cursorPos < len(self.foodList)-1:
                     self.cursorPos += 1
-        if self.game.A:
+        if game.A:
             print("A")
             if self.state == "main":
                 self.player.party.fullRestore()
-                self.game.save()
+                game.save()
                 self.substate = "rested"
             elif self.state == "menu":
                 if self.player.gold > self.calculateCost(self.foodList[self.cursorPos+self.pageModifier]):
@@ -1148,10 +1128,10 @@ class Inn(Building):
             elif self.state == "confirmFood":
                 self.player.gold -= self.calculateCost(self.targetItem)
                 print(self.targetItem.name)
-                self.player.party.addFoodEffect(self.targetItem,self.game.directory)
+                self.player.party.addFoodEffect(self.targetItem,self.directory)
                 self.state = "menu"
                 self.substate = "purchased"
-        if self.game.B:
+        if game.B:
             print("B")
             if self.state == "main":
                 self.inMenu = False
@@ -1161,34 +1141,34 @@ class Inn(Building):
             elif self.state == "confirmFood":
                 self.state = "menu"
                 self.substate = "none"
-        if self.game.X:
+        if game.X:
             print("X")
-            if self.state == "main":
-                Hostel(self.game)
-        if self.game.Y:
+            #if self.state == "main":
+            #    Hostel(game)
+        if game.Y:
             print("Y")
             if self.state == "main":
                 self.state = "menu"
                 self.substate = "none"
 
-    def drawScreen(self):
-        self.game.screen.fill((0,0,0))
+    def drawScreen(self,game):
+        game.screen.fill((0,0,0))
         screenOutline = pygame.Rect(self.left,self.top,self.right,self.bottom)
-        pygame.draw.line(self.game.screen,self.game.white,(self.left,300),(self.right+9,300),2)
-        pygame.draw.line(self.game.screen,self.game.white,(self.right-self.left-180,300),(self.right-self.left-180,self.bottom+8),2)
-        pygame.draw.rect(self.game.screen,self.game.white,screenOutline,2)
+        pygame.draw.line(game.screen,game.white,(self.left,300),(self.right+9,300),2)
+        pygame.draw.line(game.screen,game.white,(self.right-self.left-180,300),(self.right-self.left-180,self.bottom+8),2)
+        pygame.draw.rect(game.screen,game.white,screenOutline,2)
         description = self.getDescription(self.state, self.substate)
-        wrapWrite(self.game, 20, description, self.right-self.left-15)
+        wrapWrite(game, 20, description, self.right-self.left-15)
 
         if self.state == "main":
-            write(self.game, 20,self.right-155,self.top+310,"A) Rest")
-            write(self.game, 20,self.right-155,self.top+340,"X) Hostel")
-            write(self.game, 20,self.right-155,self.top+370,"Y) Eat")
-            write(self.game, 20,self.right-155,self.top+400,"B) Leave")
+            write(game, 20,self.right-155,self.top+310,"A) Rest")
+            write(game, 20,self.right-155,self.top+340,"X) Hostel")
+            write(game, 20,self.right-155,self.top+370,"Y) Eat")
+            write(game, 20,self.right-155,self.top+400,"B) Leave")
 
         elif self.state == "menu":
-            write(self.game, 25,self.right-150,self.top+340,"A) Buy")
-            write(self.game, 25,self.right-150,self.top+390,"B) Back")
+            write(game, 25,self.right-150,self.top+340,"A) Buy")
+            write(game, 25,self.right-150,self.top+390,"B) Back")
             shopDisplay = []
             for i in range(5):
                 if i + self.pageModifier >= len(self.foodList):
@@ -1197,16 +1177,16 @@ class Inn(Building):
                     shopDisplay.append(self.foodList[i + self.pageModifier])
             for i in range(5):
                 if shopDisplay[i] == "None":
-                    write(self.game, 20, self.left+35, (self.top+310)+(25*i), str(i+1+self.pageModifier) + ")")
+                    write(game, 20, self.left+35, (self.top+310)+(25*i), str(i+1+self.pageModifier) + ")")
                 else:
-                    write(self.game, 20, self.left+35, (self.top+310)+(25*i), str(i+1+self.pageModifier) + ") " + self.game.directory.getItemName(shopDisplay[i]))
-                    writeOrientation(self.game, 20, self.right-self.left-200, (self.top+310)+(25*i), "40g", "R")
-            write(self.game, 20,self.left+20,(self.top+310)+(25*self.cursorPos),">")
+                    write(game, 20, self.left+35, (self.top+310)+(25*i), str(i+1+self.pageModifier) + ") " + self.directory.getItemName(shopDisplay[i]))
+                    writeOrientation(game, 20, self.right-self.left-200, (self.top+310)+(25*i), "40g", "R")
+            write(game, 20,self.left+20,(self.top+310)+(25*self.cursorPos),">")
 
         elif self.state == "confirmFood":
-            write(self.game, 25,self.right-150,self.top+340,"A) Confirm")
-            write(self.game, 25,self.right-150,self.top+390,"B) Cancel")
-            self.printStatBlock(self.targetItem)
+            write(game, 25,self.right-150,self.top+340,"A) Confirm")
+            write(game, 25,self.right-150,self.top+390,"B) Cancel")
+            self.printStatBlock(self.targetItem,game)
 
     def getDescription(self,state,substate):
         description = ""
@@ -1226,10 +1206,10 @@ class Inn(Building):
             description = "'Ah, the " + self.targetItem.name + "? Great choice, that'll be 40 gold.'"
         return description
     
-    def printStatBlock(self,item):
-        write(self.game, 15, self.left + 10, 315, item.name)
-        wrapWrite(self.game, 15, item.description, self.right - self.left - 190, self.left + 10, 370)
-        writeOrientation(self.game, 15, self.right - self.left - 185, 315, "Rarity " + str(item.rarity) + " Food", "R")
+    def printStatBlock(self,item,game):
+        write(game, 15, self.left + 10, 315, item.name)
+        wrapWrite(game, 15, item.description, self.right - self.left - 190, self.left + 10, 370)
+        writeOrientation(game, 15, self.right - self.left - 185, 315, "Rarity " + str(item.rarity) + " Food", "R")
         buffString = ""
         commaString = ""
         if item.buff[0] > 0:
@@ -1268,10 +1248,10 @@ class Inn(Building):
         elif item.buff[11] > 0:
             buffString += commaString + "HPG +" + str(item.buff[11])
             commaString = ", "
-        write(self.game, 15, self.left + 10, 345, "Provides " + buffString + " to entire party.")
+        write(game, 15, self.left + 10, 345, "Provides " + buffString + " to entire party.")
     
     def fillMenu(self):
-        self.foodList = self.game.directory.getRandomFood(8)
+        self.foodList = self.directory.getRandomFood(8)
 
     def calculateCost(self,item):
         return 40

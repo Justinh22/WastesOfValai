@@ -44,12 +44,12 @@ class VillageDatabase():
             print(f'{entry}: {self.villages[entry].villageType.name}')
 
     def getVillageType(self):
-        randomNum = random.randint(1,3)
-        if randomNum == 1:
+        randomNum = random.randint(1,6)
+        if randomNum <= 3:
             return VillageType.Village
-        elif randomNum == 2:
+        elif randomNum <= 5:
             return VillageType.Town
-        elif randomNum == 3:
+        elif randomNum == 6:
             return VillageType.City
 
 
@@ -67,15 +67,15 @@ class VillageMap():
         self.firstPriorityBuildings = [VillageBuildings.Inn, VillageBuildings.BlackMarket, VillageBuildings.Forge]
         self.shopBuildings = [VillageBuildings.Weaponsmith, VillageBuildings.Armory, VillageBuildings.GeneralStore, VillageBuildings.Library, VillageBuildings.Temple]
         if self.villageType is VillageType.Village:
-            self.setBuildingNumberRange(4,6)
+            self.setBuildingNumberRange(3,4)
             self.maxRows = VILLAGE_DIM
             self.maxCols = VILLAGE_DIM
         elif self.villageType is VillageType.Town:
-            self.setBuildingNumberRange(7,9)
+            self.setBuildingNumberRange(5,6)
             self.maxRows = TOWN_DIM
             self.maxCols = TOWN_DIM
         else:
-            self.setBuildingNumberRange(10,12)
+            self.setBuildingNumberRange(7,9)
             self.maxRows = CITY_DIM
             self.maxCols = CITY_DIM
         self.buildingBuffer = 3

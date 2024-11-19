@@ -141,7 +141,7 @@ class Overworld():
                         color = self.game.tan
                     elif mapChar == PATH_CHAR: # Path
                         color = self.game.orange
-                    elif self.game.roomDB.doesExist((r,c)) or self.game.dungeonDB.doesExist((r,c)):
+                    elif self.game.roomDB.doesExist((r,c)) or self.game.dungeonDB.doesExist((r,c)) or self.game.villageDB.doesExist((r,c)):
                         color = self.game.gray
                 text = self.font.render(mapChar,True,color)
                 textWidth, textHeight = self.font.size(mapChar)
@@ -179,8 +179,8 @@ class Overworld():
         # self.game.stir()
         if self.game.WorldMap.map[r][c] != FOREST_CHAR and self.game.WorldMap.map[r][c] != PLAINS_CHAR and self.game.WorldMap.map[r][c] != DESERT_CHAR and self.game.WorldMap.map[r][c] != PATH_CHAR:
             self.steps += 1
-            if self.game.WorldMap.map[r][c] == HAVEN_CHAR:
-                if not (self.game.roomDB.doesExist((r,c))):
+            if self.game.WorldMap.map[r][c] == HAVEN_CHAR or self.game.WorldMap.map[r][c] == VILLAGE_CHAR:
+                if (not (self.game.roomDB.doesExist((r,c))) and self.game.WorldMap.map[r][c] == HAVEN_CHAR) or (not (self.game.villageDB.doesExist((r,c))) and self.game.WorldMap.map[r][c] == VILLAGE_CHAR):
                     if self.game.player.lastCheckpoint != (0,0):
                         pathfinder = Pathfinder(self.game.player.lastCheckpoint,(r,c),self.game.WorldMap.map)
                         path = pathfinder.calculatePath()
@@ -242,7 +242,7 @@ class Overworld():
         biomeRankings = {Biome.Forest: 0, Biome.Plains: 0, Biome.Desert: 0}
         for mod in checklist:
             biome = self.getBiome(r+mod[0],c+mod[1])
-            if biome is not Biome.Other:
+            if biome is not Biome.Other and biome is not Biome.Path:
                 biomeRankings[biome] += 1
         return max(biomeRankings, key=biomeRankings.get)
 
