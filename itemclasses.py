@@ -30,6 +30,15 @@ class Weapon(Item):
         self.accRefine = newRefineValues[1]
         self.crtRefine = newRefineValues[2]
         print(f'Refined! +{self.atkRefine}/+{self.accRefine}/+{self.crtRefine}')
+    def reforge(self,newWeapon):
+        self.name = newWeapon.name
+        self.description = newWeapon.description
+        self.id = newWeapon.id
+        self.attack = newWeapon.attack
+        self.accuracy = newWeapon.accuracy
+        self.critrate = newWeapon.critrate
+        self.amplifier = newWeapon.amplifier
+        self.type = newWeapon.type
 
 class Armor(Item):
     def __init__(self,nm="NULL",desc="NULL",rar=-1,i=-1,df=0,ddg=0,mpr=0,typ=ArmorType.Medium):
@@ -48,6 +57,14 @@ class Armor(Item):
         self.defRefine = newRefineValues[0]
         self.ddgRefine = newRefineValues[1]
         print(f'Refined! +{self.defRefine}/+{self.ddgRefine}')
+    def reforge(self,newArmor):
+        self.name = newArmor.name
+        self.description = newArmor.description
+        self.id = newArmor.id
+        self.defense = newArmor.defense
+        self.dodge = newArmor.dodge
+        self.manaregen = newArmor.manaregen
+        self.type = newArmor.type
 
 class Potion(Item):
     def __init__(self,nm,desc,rar,i,hpg,mpg):

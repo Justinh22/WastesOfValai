@@ -124,6 +124,7 @@ class Forge(Building):
         self.color = (0,0,255) # Blue
         self.itemType = "none"
         self.targetItem = None
+        self.reforgeTarget = None
         self.currentRefineLevel = []
         self.tentativeRefineLevel = []
         self.refinementStatCurrentValues = []
@@ -137,6 +138,7 @@ class Forge(Building):
         self.tentativeRefineLevel = []
         self.refinementStatCurrentValues = []
         self.refinementStatTentativeValues = []
+        self.reforgeableItems = []
         self.pageModifer = 0
 
     def getInput(self,game):
@@ -162,6 +164,10 @@ class Forge(Building):
                 self.cursorPos -= 1
                 if self.cursorPos < 0:
                     self.cursorPos = 1
+            if self.state == "reforge":
+                self.cursorPos -= 1
+                if self.cursorPos < 0:
+                    self.cursorPos = len(self.reforgeableItems)-1
         if game.DOWN:
             print("DOWN")
             if self.state == "selectItem":
@@ -180,6 +186,10 @@ class Forge(Building):
             if self.state == "armorRefinement":
                 self.cursorPos += 1
                 if self.cursorPos > 1:
+                    self.cursorPos = 0
+            if self.state == "reforge":
+                self.cursorPos += 1
+                if self.cursorPos > len(self.reforgeableItems)-1:
                     self.cursorPos = 0
         if game.LEFT:
             if self.state == "weaponRefinement" or self.state == "armorRefinement":
@@ -216,6 +226,15 @@ class Forge(Building):
                     self.currentRefineLevel = [self.targetItem.defRefine,self.targetItem.ddgRefine]
                     self.tentativeRefineLevel = [self.targetItem.defRefine,self.targetItem.ddgRefine]
                     self.state = "armorRefinement"
+                elif self.substate == "reforge":
+                    if self.itemType == "weapon":
+                        self.itemType = Type.Weapon
+                    elif self.itemType == "armor":
+                        self.itemType = Type.Armor
+                    print(self.itemType)
+                    self.fillReforgeList()
+                    self.state = "reforge"
+                    self.cursorPos = 0
                 self.substate = "selectItem"
             elif self.state == "partySelect":
                 if self.substate == "refine" and self.itemType == "weapon":
@@ -228,6 +247,16 @@ class Forge(Building):
                     self.currentRefineLevel = [self.targetItem.defRefine,self.targetItem.ddgRefine]
                     self.tentativeRefineLevel = [self.targetItem.defRefine,self.targetItem.ddgRefine]
                     self.state = "armorRefinement"
+                elif self.substate == "reforge":
+                    if self.itemType == "weapon":
+                        self.itemType = Type.Weapon
+                        self.targetItem = game.player.party.members[self.cursorPos].eqpWpn
+                    elif self.itemType == "armor":
+                        self.itemType = Type.Armor
+                        self.targetItem = game.player.party.members[self.cursorPos].eqpAmr
+                    self.fillReforgeList()
+                    self.state = "reforge"
+                    self.cursorPos = 0
                 self.substate = "partySelect"
             elif self.state == "weaponRefinement":
                 self.state = "confirmWeaponRefine"
@@ -241,6 +270,16 @@ class Forge(Building):
                     self.currentRefineLevel = self.tentativeRefineLevel[:]
                     self.state = self.substate
                     self.substate = "refine"
+            elif self.state == "reforge":
+                if self.player.gold >= self.calculateReforgePrice(self.targetItem):
+                    self.reforgeTarget = self.reforgeableItems[self.cursorPos]
+                    self.state = "confirmReforge"
+            elif self.state == "confirmReforge":
+                self.player.gold -= self.calculateReforgePrice(self.targetItem)
+                self.targetItem.reforge(self.reforgeTarget)
+                self.state = self.substate
+                self.substate = "reforge"
+                self.cursorPos = 0
         if game.B:
             print("B")
             if self.state == "main":
@@ -261,6 +300,12 @@ class Forge(Building):
                 self.cursorPos = 0
                 self.state = self.substate
                 self.substate = "refine"
+            elif self.state == "reforge":
+                self.cursorPos = 0
+                self.state = self.substate
+                self.substate = "reforge"
+            elif self.state == "confirmReforge":
+                self.state = "reforge"
         if game.X:
             print("X")
             if self.state == "main":
@@ -295,12 +340,15 @@ class Forge(Building):
             write(game, 25,self.right-150,self.top+360,"X) Reforge")
             write(game, 25,self.right-150,self.top+410,"B) Leave")
 
-        elif self.state == "chooseInventory" or self.state == "selectItem":
+        elif self.state == "chooseInventory":
             write(game, 25,self.right-150,self.top+310,"A) Equipped")
             write(game, 25,self.right-150,self.top+360,"X) Inventory")
             write(game, 25,self.right-150,self.top+410,"B) Back")
-            if self.state == "selectItem":
-                self.printEquipment(game)
+
+        elif self.state == "selectItem":
+            write(game, 25,self.right-150,self.top+340,"A) Select")
+            write(game, 25,self.right-150,self.top+390,"B) Back")
+            self.printEquipment(game)
 
         elif self.state == "chooseItemType":
             write(game, 25,self.right-150,self.top+310,"A) Weapon")
@@ -354,6 +402,17 @@ class Forge(Building):
                 write(game, 25,self.right-150,self.top+340,"A) Confirm")
                 write(game, 25,self.right-150,self.top+390,"B) Cancel")
 
+        elif self.state == "reforge" or self.state == "confirmReforge":
+            write(game, 25,self.right-150,self.top+340,"A) Confirm")
+            write(game, 25,self.right-150,self.top+390,"B) Cancel")
+            for i in range(len(self.reforgeableItems)):
+                if self.reforgeableItems[i] == "None":
+                    write(game, 20, self.left+35, (self.top+320)+(25*i), str(i+1) + ")")
+                else:
+                    write(game, 20, self.left+35, (self.top+320)+(25*i), str(i+1) + ") " + self.directory.getItemName(self.reforgeableItems[i]))
+                    writeOrientation(game, 20, self.right-self.left-200, (self.top+320)+(25*i), str(self.calculateReforgePrice(self.targetItem)) + "g", "R")
+            write(game, 20, self.left+300, (self.top+323) + (self.cursorPos*25), "<-")
+
     def getDescription(self,state,substate):
         description = ""
         if state == "main":
@@ -361,12 +420,16 @@ class Forge(Building):
         elif state == "chooseInventory" or state == "selectItem" or state == "chooseItemType" or state == "partySelect":
             description = "'Take your time. I can bend and refine metal at your command.'"
         elif state == "weaponRefinement" or state == "armorRefinement":
-            description = "'People, we're stubborn. But metal... with a bit of convincing, can become anything.'"
+            description = "'Show me a blade, and I can show you its true potential. For the right price, of course.'"
         elif state == "confirmWeaponRefine" or state == "confirmArmorRefine":
             description = "'Alright, so you want me to refine your " + self.targetItem.name + " to "
             for entry in self.tentativeRefineLevel:
                 description += "+" + str(entry) + "/"
             description += "? That'll just be " + str(self.calculateCost(self.targetItem.rarity,self.currentRefineLevel,self.tentativeRefineLevel)) + " gold, please.'"
+        elif state == "reforge":
+            description = "'People, we're stubborn. But metal... with a bit of convincing, it can become anything.'"
+        elif state == "confirmReforge":
+            description = "'So you'd like to turn your " + self.targetItem.name + " into a " + self.reforgeTarget.name + "? That'll cost you " + str(self.calculateReforgePrice(self.targetItem)) + " gold.'"
         return description
 
     def calculateCost(self,rarity,currentLevel,tentativeLevel):
@@ -375,6 +438,9 @@ class Forge(Building):
             for j in range(currentLevel[i]+1,tentativeLevel[i]+1):
                 totalCost += 20 * rarity * j
         return totalCost
+    
+    def calculateReforgePrice(self,item):
+        return 10 * round(item.rarity ** 1.5)
 
     def printEquipment(self,game):
         list = game.player.party.equipment
@@ -384,6 +450,25 @@ class Forge(Building):
             else:
                 write(game, 20, self.left+35, (self.top+310)+(25*i), str(i+1+self.pageModifer) + ")")
         write(game, 15, self.left+300, (self.top+310)+(25*self.cursorPos), "<-")
+
+    def fillReforgeList(self):
+        self.reforgeableItems = []
+        rarity = self.targetItem.rarity
+        if self.itemType == Type.Weapon:
+            print(len(self.directory.weaponDirectory))
+            for item in self.directory.weaponDirectory:
+                print(self.directory.getItemName(item))
+                if item.rarity == rarity and item.id != self.targetItem.id:
+                    self.reforgeableItems.append(self.directory.getWeapon(item.id))
+        elif self.itemType == Type.Armor:
+            print(len(self.directory.armorDirectory))
+            for item in self.directory.armorDirectory:
+                print(self.directory.getItemName(item))
+                if item.rarity == rarity and item.id != self.targetItem.id:
+                    self.reforgeableItems.append(self.directory.getArmor(item.id))
+        print("The reforge list is: ")
+        for item in self.reforgeableItems:
+            print(self.directory.getItemName(item))
 
 
 class Shop(Building):
@@ -497,7 +582,7 @@ class Shop(Building):
             item = self.directory.getItem(item)
         itemType = self.directory.getItemType(item)
         write(game, 15, self.left + 10, 315, item.name)
-        wrapWrite(game, 15, item.description, self.right - self.left - 190, self.left + 10, 370)
+        wrapWrite(game, 15, item.description, self.right - self.left - 200, self.left + 10, 370)
         if itemType == Type.AtkSpell or itemType == Type.SptSpell:
             spelltype = "Attack" if item.type == SpellType.Attack or item.type == SpellType.Debuff else "Support"
             writeOrientation(game, 15, self.right - self.left - 185, 315, "Level "+str(item.rarity)+" "+spelltype+" Spell | "+str(item.manacost) + " MP", "R")
@@ -947,7 +1032,7 @@ class BlackMarket(Shop):
             write(game, 25,self.right-150,self.top+410,"B) Leave")
 
         elif self.state == "shopScreen":
-            self.printShopInventory()
+            self.printShopInventory(game)
             write(game, 25,self.right-150,self.top+340,"A) Buy")
             write(game, 25,self.right-150,self.top+390,"B) Back")
 
