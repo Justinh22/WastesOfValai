@@ -509,7 +509,7 @@ def getRandomDungeonName(type):
                     "Kobolds",
                     "Dragon",
                     "Bandits",
-                    "Mistake",
-                    "Taboo"]
+                    "Mistakes",
+                    "Curses"]
             dungeonNameString += random.choice(noun)
     return dungeonNameString
