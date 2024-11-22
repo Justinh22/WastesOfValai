@@ -117,6 +117,7 @@ class Crawler():
         self.game.screen.fill((0,0,0))
         floorInfo = "Floor " + str(self.dungeonMap.floor) + "/" + str(self.dungeonMap.maxFloors)
         write(self.game,15,self.width-80,self.height+10,"ST) Pause")
+        write(self.game,15,30,self.height+10,self.dungeon.name)
         write(self.game,15,self.width-80,self.height+30,floorInfo)
         for x in range(30, self.width, blockSize):
             for y in range(30, self.height, blockSize):
@@ -149,13 +150,13 @@ class Crawler():
         if self.state == "lootSummary":
             text = "Inside the chest is a " + self.game.directory.getItemName(self.lootLookup().loot,True)
             self.messageTimer = 0
-            write(self.game, 20, 30,self.height+10,text)
+            write(self.game, 15, 30,self.height+30,text)
         if self.state == "wandererSummary":
             text = "A wanderer lies on the ground, unconscious."
             self.messageTimer = 0
-            write(self.game, 20, 30,self.height+10,text)
+            write(self.game, 15, 30,self.height+30,text)
         if self.messageTimer > 0:
-            write(self.game, 20, 30,self.height+10,self.message)
+            write(self.game, 15, 30,self.height+30,self.message)
             self.messageTimer -= 1
 
     def nextFloor(self):

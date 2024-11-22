@@ -44,6 +44,7 @@ class DungeonDatabase():
 
 class Dungeon():
     def __init__(self,coords,type,level,floors):
+        self.name = getRandomDungeonName(type)
         self.coords = coords
         self.dungeonType = type
         self.dungeonLevel = level
@@ -429,3 +430,86 @@ class DungeonLoot():
     def rollItem(self,dir):
         return dir.rollForLoot(self.level,self.rarity,self.types)
         
+def getRandomDungeonName(type):
+    #
+    # D - Dungeon Word
+    # o - of
+    # A - Adjective
+    # t - the
+    # N - Noun
+    #
+    nameFormats = ["DotAN","AD","DoN","DotN","tDoN","tDoAN","tAD"]
+    dungeonNameString = ""
+    nameFormat = random.choice(nameFormats)
+    for char in nameFormat:
+        if dungeonNameString != "":
+            dungeonNameString += " "
+        if char == "D":
+            dungeonword = []
+            if type == DungeonType.Well:
+                dungeonword += ["Tunnels",
+                                "Well",
+                                "Catacombs",
+                                "City"]
+            elif type == DungeonType.Pyramid:
+                dungeonword += ["Tomb",
+                                "Pyramid",
+                                "Labyrinth"]
+            elif type == DungeonType.BanditCamp:
+                dungeonword += ["Camp",
+                                "Stronghold",
+                                "Hideout",
+                                "Lair"]
+            elif type == DungeonType.Cave:
+                dungeonword += ["Tunnels",
+                                "Cavern",
+                                "Cave",
+                                "Hive",
+                                "Pit"]
+            elif type == DungeonType.Ruins:
+                dungeonword += ["Ruins",
+                                "City",
+                                "Wreckage",
+                                "Fortress"]
+            elif type == DungeonType.Treehouse:
+                dungeonword += ["Treehouse",
+                                "Canopy",
+                                "Lair",
+                                "Treetops"]
+            dungeonNameString += random.choice(dungeonword)
+        elif char == "o":
+            dungeonNameString += "of"
+        elif char == "A":
+            adjective = ["Flaming",
+                         "Lost",
+                         "Arcane",
+                         "Archmage's",
+                         "Dead King's",
+                         "Twisted",
+                         "Frigid",
+                         "Vacant",
+                         "Old",
+                         "Dead Queen's",
+                         "Familiar",
+                         "Overgrown",
+                         "Crumbling"]
+            dungeonNameString += random.choice(adjective)
+        elif char == "t":
+            if dungeonNameString == "":
+                dungeonNameString += "The"
+            else:
+                dungeonNameString += "the"
+        elif char == "N":
+            noun = ["Souls",
+                    "Bones",
+                    "Skulls",
+                    "Killers",
+                    "Decayed",
+                    "Fae",
+                    "Kobolds",
+                    "Dragon",
+                    "Bandits",
+                    "Mistake",
+                    "Taboo"]
+            dungeonNameString += random.choice(noun)
+    return dungeonNameString
