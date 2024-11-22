@@ -8,6 +8,7 @@ MAX_POTION_RARITY = 5
 MAX_ATKSPELL_RARITY = 5
 MAX_SPTSPELL_RARITY = 5
 MAX_ACCESSORY_RARITY = 3
+MAX_CONSUMABLE_RARITY = 5
 MAX_INVENTORY_SIZE = 10
 
 LANDMARK_COUNT = 300
@@ -60,8 +61,9 @@ class Type(Enum):
     Talent = 6
     Accessory = 7
     Food = 8
-    Creature = 9
-    Class = 10
+    Consumable = 9
+    Creature = 10
+    Class = 11
 
 class LootOdds(Enum):
     Impossible = 0
@@ -167,6 +169,9 @@ class Timing(Enum):
     Universal = 4
     InTurn = 5
     Ordering = 6
+    Anytime = 7
+    Peacetime = 9
+    OnDeath = 10
 
 class VillageBuildings(Enum):
     Forge = 0
@@ -177,3 +182,10 @@ class VillageBuildings(Enum):
     Temple = 5
     BlackMarket = 6
     Inn = 7
+
+class ConsumableTiming(Enum):
+    Anytime = 0
+    CombatInturn = 1
+    CombatInstant = 2
+    OnDeath = 3
+    Peacetime = 4

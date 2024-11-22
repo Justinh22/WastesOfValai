@@ -713,6 +713,8 @@ class PauseMenu():
             elif self.game.directory.getItemType(self.game.player.party.inventory[targetElement]) == Type.AtkSpell or self.game.directory.getItemType(self.game.player.party.inventory[targetElement]) == Type.SptSpell:
                 if self.game.player.party.members[targetPartyMember].checkProficiency(self.game.player.party.inventory[targetElement],self.game.directory):
                     self.game.player.party.learnSpell(targetPartyMember, targetElement)
+            elif self.game.directory.getItemType(self.game.player.party.inventory[targetElement]) == Type.Consumable and (self.game.directory.getItem(self.game.player.party.inventory[targetElement]).timing == Timing.Peacetime or self.game.directory.getItem(self.game.player.party.inventory[targetElement]).timing == Timing.Anytime):
+                self.game.player.party.useConsumable(targetPartyMember,targetElement,self.game.directory)
         elif action == "cast":
             if self.game.player.party.members[targetPartyMember].canCast(targetElement,self.game.directory):
                 self.game.player.party.members[targetPartyMember].expendMana(targetElement,self.game.directory)

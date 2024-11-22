@@ -146,8 +146,16 @@ class Character():
         self.hp += val
         if self.hp > self.getMaxHP():
             self.hp = self.getMaxHP()
+    def setHP(self,val):
+        self.hp = val
+        if self.hp > self.getMaxHP():
+            self.hp = self.getMaxHP()
     def gainMP(self,val):
         self.mp += val
+        if self.mp > self.getMaxMP():
+            self.mp = self.getMaxMP()
+    def setMP(self,val):
+        self.mp = val
         if self.mp > self.getMaxMP():
             self.mp = self.getMaxMP()
     def gainXP(self,val):
@@ -398,6 +406,7 @@ class Party():
         self.inventory = []         # List of int : Contains id of all items in inventory
         self.equipment = []         # List of int : Contains all equipment in inventory
         self.activeFood = None
+        self.callaretsCompact = False
     def printContents(self):
         for member in self.members:
             print(member.name)
@@ -435,6 +444,18 @@ class Party():
     def usePotion(self,member,index,dir):
         self.members[member].gainHP(dir.getPotion(self.inventory[index]).hpGain)
         self.members[member].gainMP(dir.getPotion(self.inventory[index]).mpGain)
+        self.inventory.pop(index)
+    def useConsumable(self,member,index,dir):
+        consumable = dir.getItem(self.inventory[index])
+        print(consumable.name)
+        if consumable.name == "Campfire Kit":
+            for member in self.members:
+                member.hp = member.getMaxHP()
+        elif consumable.name == "Spirit Vapor":
+            for member in self.members:
+                member.mp = member.getMaxMP()
+        elif consumable.name == "Callaret's Compact":
+            self.callaretsCompact = True
         self.inventory.pop(index)
     def getPower(self):
         power = 0

@@ -88,6 +88,8 @@ class Overworld():
             print("Y")
         if self.game.START:
             self.pausemenu.pause(self.game.player.currentPos)
+            if self.game.player.party.callaretsCompact:
+                self.game.player.currentPos = list(self.game.player.lastCheckpoint)
 
     def drawScreen(self):
         blockSize = 30 #Set the size of the grid block

@@ -13,18 +13,19 @@ import copy
 
 class Directory():
     def __init__(self):
-        self.weaponDirectory = initWeaponDirectory()        # 0 - 99
-        self.armorDirectory = initArmorDirectory()          # 100 - 199
-        self.potionDirectory = initPotionDirectory()        # 200 - 299
-        self.atkSpellDirectory = initAtkSpellDirectory()    # 300 - 399
-        self.sptSpellDirectory = initSptSpellDirectory()    # 400 - 499
-        self.talentDirectory = initTalentDirectory()        # 500 - 599
-        self.accessoryDirectory = initAccessoryDirectory()  # 600 - 699
-        self.foodDirectory = initFoodDirectory()            # 700 - 799
-        self.customDirectory = []                           # 800 - 899
-        self.classDirectory = initClassDirectory()          # 0 - 99
-        self.creatureDirectory = initCreatureDirectory()    # 0 - 99
-        self.nameDirectory = initNameDirectory()            # 0 - 99
+        self.weaponDirectory = initWeaponDirectory()            # 0 - 99
+        self.armorDirectory = initArmorDirectory()              # 100 - 199
+        self.potionDirectory = initPotionDirectory()            # 200 - 299
+        self.atkSpellDirectory = initAtkSpellDirectory()        # 300 - 399
+        self.sptSpellDirectory = initSptSpellDirectory()        # 400 - 499
+        self.talentDirectory = initTalentDirectory()            # 500 - 599
+        self.accessoryDirectory = initAccessoryDirectory()      # 600 - 699
+        self.foodDirectory = initFoodDirectory()                # 700 - 799
+        self.consumableDirectory = initConsumableDirectory()    # 800 - 899
+        self.customDirectory = []                               # 900 - 999
+        self.classDirectory = initClassDirectory()              # 0 - 99
+        self.creatureDirectory = initCreatureDirectory()        # 0 - 99
+        self.nameDirectory = initNameDirectory()                # 0 - 99
 
     def getItem(self,id):
         item = Item()
@@ -44,6 +45,8 @@ class Directory():
             item = self.getAccessory(id)
         elif id < 800:
             item = self.getFood(id)
+        elif id < 900:
+            item = self.getConsumable(id)
         return item
 
     def getItemName(self,id,scroll=False):
@@ -70,6 +73,8 @@ class Directory():
             name = self.accessoryDirectory[id-600].name
         elif id < 800:
             name = self.foodDirectory[id-700].name
+        elif id < 900:
+            name = self.consumableDirectory[id-800].name
         return name
 
     def getItemDesc(self,id):
@@ -92,6 +97,8 @@ class Directory():
             desc = self.accessoryDirectory[id-600].description
         elif id < 800:
             desc = self.foodDirectory[id-700].description
+        elif id < 900:
+            desc = self.consumableDirectory[id-800].description
         return desc
 
     def getItemRarity(self,id):
@@ -114,6 +121,8 @@ class Directory():
             rarity = self.accessoryDirectory[id-600].rarity
         elif id < 800:
             rarity = self.foodDirectory[id-700].rarity
+        elif id < 900:
+            rarity = self.consumableDirectory[id-800].rarity
         return rarity
     
     def getItemType(self,id):
@@ -138,6 +147,8 @@ class Directory():
             itemType = Type.Accessory
         elif id < 800:
             itemType = Type.Food
+        elif id < 900:
+            itemType = Type.Consumable
         return itemType
 
     def getSpellTarget(self,id):
@@ -149,6 +160,9 @@ class Directory():
     
     def getTalentTarget(self,id):
         return self.talentDirectory[id-500].target
+    
+    def getConsumableTarget(self,id):
+        return self.consumableDirectory[id-800].target
 
     def getManaCost(self,id):
         if id < 400:
@@ -182,6 +196,9 @@ class Directory():
     
     def getFood(self,id):
         return self.copy(self.foodDirectory[id-700])
+    
+    def getConsumable(self,id):
+        return self.copy(self.consumableDirectory[id-800])
 
     def getItemByRarity(self,type,rarity):
         print(f'Fetching {type} of rarity {rarity}...')
@@ -216,6 +233,10 @@ class Directory():
                     options.append(item.id)
         elif type == Type.Food:
             for item in self.foodDirectory:
+                if item.rarity == rarity:
+                    options.append(item.id)
+        elif type == Type.Consumable:
+            for item in self.consumableDirectory:
                 if item.rarity == rarity:
                     options.append(item.id)
         elif type == Type.Creature:
@@ -297,6 +318,11 @@ class Directory():
                 for rarity in range(rarityA,rarityB+1):
                     if item.rarity == rarity:
                         options.append(item.id)
+        elif type == Type.Consumable:
+            for item in self.consumableDirectory:
+                for rarity in range(rarityA,rarityB+1):
+                    if item.rarity == rarity:
+                        options.append(item.id)
         elif type == Type.Creature:
             for item in self.creatureDirectory:
                 for rarity in range(rarityA,rarityB+1):
@@ -330,6 +356,9 @@ class Directory():
         if type == Type.Accessory:
             divVal = MAX_DIFFICULTY / MAX_ACCESSORY_RARITY
             lootRarity = math.ceil(rarity / divVal)
+        if type == Type.Consumable:
+            divVal = MAX_DIFFICULTY / MAX_CONSUMABLE_RARITY
+            lootRarity = math.ceil(rarity / divVal)
         return lootRarity
     
     def getLootRarityForCharacter(self,level,type):
@@ -349,6 +378,9 @@ class Directory():
             divVal = MAX_LEVEL / MAX_SPTSPELL_RARITY
             lootRarity = math.ceil(level / divVal)
         if type == Type.Accessory:
+            divVal = MAX_LEVEL / MAX_ACCESSORY_RARITY
+            lootRarity = math.ceil(level / divVal)
+        if type == Type.Consumable:
             divVal = MAX_LEVEL / MAX_ACCESSORY_RARITY
             lootRarity = math.ceil(level / divVal)
         return lootRarity
