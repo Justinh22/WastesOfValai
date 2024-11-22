@@ -686,45 +686,45 @@ def initConsumableDirectory():
     FireArrow = Consumable("Fire Arrow","A small, pre-loaded dart shooter, loaded with an arrow that bursts into flames on impact. Deals 50 damage to one target.",1,801,Target.Single,Timing.InTurn,50)
     consumableDirectory.append(FireArrow)
     # Blast Arrow - 150dmg to one target
-    BlastArrow = Consumable("Blast Arrow","A small, pre-loaded dart shooter, loaded with an arrow that explodes on impact. Deals 150 damage to one target.",1,802,Target.Single,Timing.InTurn,150)
+    BlastArrow = Consumable("Blast Arrow","A small, pre-loaded dart shooter, loaded with an arrow that explodes on impact. Deals 150 damage to one target.",2,802,Target.Single,Timing.InTurn,150)
     consumableDirectory.append(BlastArrow)
     # Nova Arrow - 300dmg to one target
-    NovaArrow = Consumable("Nova Arrow","A small, pre-loaded dart shooter, loaded with an arrow that releases an explosion of magical energy on impact. Deals 300 damage to one target.",1,803,Target.Single,Timing.InTurn,300)
+    NovaArrow = Consumable("Nova Arrow","A small, pre-loaded dart shooter, loaded with an arrow that releases an explosion of magical energy on impact. Deals 300 damage to one target.",3,803,Target.Single,Timing.InTurn,300)
     consumableDirectory.append(NovaArrow)
     # Fire Bomb - 50dmg to all enemies
-    FireBomb = Consumable("Fire Bomb","A small leather satchel, with a fuse coming out of the top. On use, it releases a burst of flames and deals 50 damage to all enemies.",1,804,Target.All,Timing.InTurn,50)
+    FireBomb = Consumable("Fire Bomb","A small leather satchel, with a fuse coming out of the top. On use, it releases a burst of flames and deals 50 damage to all enemies.",2,804,Target.All,Timing.InTurn,50)
     consumableDirectory.append(FireBomb)
     # Blast Bomb - 150dmg to all enemies
-    BlastBomb = Consumable("Blast Bomb","A small glass flask, with a fuse coming out of the top. On use, it explodes and deals 150 damage to all enemies.",1,805,Target.All,Timing.InTurn,150)
+    BlastBomb = Consumable("Blast Bomb","A small glass flask, with a fuse coming out of the top. On use, it explodes and deals 150 damage to all enemies.",3,805,Target.All,Timing.InTurn,150)
     consumableDirectory.append(BlastBomb)
     # Nova Bomb - 300dmg to all enemies
-    NovaBomb = Consumable("Nova Bomb","A small steel sphere, glowing with violet light. When activated, it releases an explosion of magical energy and deals 300 damage to all enemies.",1,806,Target.All,Timing.InTurn,300)
+    NovaBomb = Consumable("Nova Bomb","A small steel sphere, glowing with violet light. When activated, it releases an explosion of magical energy and deals 300 damage to all enemies.",4,806,Target.All,Timing.InTurn,300)
     consumableDirectory.append(NovaBomb)
     # Smoke Capsule - Instantly escape from combat
     SmokeCapsule = Consumable("Smoke Capsule","A glass orb, filled with smoke. When shattered, it allows for automatic escape from any non-boss combat.",1,807,Target.Party,Timing.InTurn,0)
     consumableDirectory.append(SmokeCapsule)
     # Pyrilic Venom - Apply a poison to a weapon that increases in damage over time
-    PyrilicVenom = Consumable("Pyrilic Venom","A venom that increases in potency over time. When applied to a weapon, it increases the damage dealt by a character by 5 every round of combat.",1,808,Target.Ally,Timing.DamageDealt,5)
+    PyrilicVenom = Consumable("Pyrilic Venom","A venom that increases in potency over time. When applied to a weapon, it increases the damage dealt by a character by 5 every round of combat.",2,808,Target.Ally,Timing.DamageDealt,5)
     consumableDirectory.append(PyrilicVenom)
     # Rendai's Veil - Makes a party member immune to damage for a short time
-    RendaisVeil = Consumable("Rendai's Veil","A scrap of golden cloth. When torn, it protects the user from any damage for 3 rounds of combat.",1,809,Target.Ally,Timing.DamageTaken,4)
+    RendaisVeil = Consumable("Rendai's Veil","A scrap of golden cloth. When torn, it protects the user from any damage for 3 rounds of combat.",3,809,Target.Ally,Timing.DamageTaken,4)
     consumableDirectory.append(RendaisVeil)
     # Callaret's Grace - Makes the party immune to magic damage for a short time
-    CallaretsGrace = Consumable("Callaret's Grace","A small stone disk inscribed with the runes of Callaret, the God of Magic. When activated, it protects the party from magic damage and effects for 3 rounds of combat.",1,810,Target.Party,Timing.DamageTaken,4)
+    CallaretsGrace = Consumable("Callaret's Grace","A small stone disk inscribed with the runes of Callaret, the God of Magic. When activated, it protects the party from magic damage and effects for 3 rounds of combat.",3,810,Target.Party,Timing.DamageTaken,4)
     consumableDirectory.append(CallaretsGrace)
     # Second Soul - Immediately raises the next fallen party member with full HP and MP
-    SecondSoul = Consumable("Second Soul","A floating golden light in a jar. Whenever the next party member falls, the soul will burst from the jar and restore them to full HP and MP.",1,811,Target.Ally,Timing.OnDeath,0)
+    SecondSoul = Consumable("Second Soul","A floating golden light in a jar. Whenever the next party member falls, the soul will burst from the jar and restore them to full HP and MP.",4,811,Target.Ally,Timing.OnDeath,0)
     consumableDirectory.append(SecondSoul)
 
     # Peacetime
     # Campfire Kit - Fully restores the party's HP
-    CampfireKit = Consumable("Campfire Kit","A handy pack full of everything you need to set up camp for the night. Fully restores the party's HP.",1,812,Target.Party,Timing.Peacetime,0)
+    CampfireKit = Consumable("Campfire Kit","A handy pack full of everything you need to set up camp for the night. Fully restores the party's HP.",2,812,Target.Party,Timing.Peacetime,0)
     consumableDirectory.append(CampfireKit)
     # Spirit Vapor - Fully restores the party's MP
-    SpiritVapor = Consumable("Spirit Vapor","A small block of ice frozen from Lake Torren. When heated over a fire, it releases a vapor that fully restores the party's MP.",1,813,Target.Party,Timing.Peacetime,0)
+    SpiritVapor = Consumable("Spirit Vapor","A small block of ice frozen from Lake Torren. When heated over a fire, it releases a vapor that fully restores the party's MP.",2,813,Target.Party,Timing.Peacetime,0)
     consumableDirectory.append(SpiritVapor)
     # Callaret's Compact - Returns the party to the last haven/village visited
-    CallaretsCompact = Consumable("Callaret's Compact","A gold inlaid compact mirror that hums gently. When looked into, it teleports the party to the last haven or village that they visited.",1,814,Target.Party,Timing.Peacetime,0)
+    CallaretsCompact = Consumable("Callaret's Compact","A gold inlaid compact mirror that hums gently. When looked into, it teleports the party to the last haven or village that they visited.",3,814,Target.Party,Timing.Peacetime,0)
     consumableDirectory.append(CallaretsCompact)
 
     return consumableDirectory

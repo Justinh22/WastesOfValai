@@ -351,7 +351,7 @@ class DungeonMap():
 
     def getLootTypesFromDungeonType(self):
         # As of now, all dungeons are capable of containing the same loot
-        return [Type.Weapon, Type.Weapon, Type.Armor, Type.Armor, Type.Potion, Type.AtkSpell, Type.SptSpell]
+        return [Type.Weapon, Type.Weapon, Type.Armor, Type.Armor, Type.Potion, Type.Consumable, Type.AtkSpell, Type.SptSpell]
 
 
 class DungeonRoom():

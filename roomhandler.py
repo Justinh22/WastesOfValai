@@ -154,7 +154,7 @@ class RoomHandler():
                 self.room.features[index].lootStatus = LootStatus.Taken
             else:
                 return False
-        elif type == Type.Potion:
+        elif type == Type.Potion or type == Type.Consumable:
             if self.game.player.party.addItem(id):
                 self.room.features[index].lootStatus = LootStatus.Taken
             else:

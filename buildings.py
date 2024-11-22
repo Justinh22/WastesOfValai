@@ -810,6 +810,9 @@ class GeneralStore(Shop):
         for item in self.directory.potionDirectory:
             if item.rarity <= self.directory.getLootRarity(self.level, Type.Potion)+1:
                 self.shopInventory.append(item)
+        for item in self.directory.consumableDirectory:
+            if item.rarity <= self.directory.getLootRarity(self.level, Type.Consumable)+1:
+                self.shopInventory.append(item)
 
     def calculateCost(self, item):
         return 20 * item.rarity
@@ -1115,7 +1118,7 @@ class BlackMarket(Shop):
 
     def fillShopInventory(self):
         burnout = 0
-        for i in range(5):
+        for i in range(8):
             item = self.directory.rollForLoot(self.level,LootRarity.Rare,[Type.Weapon,Type.Armor,Type.Accessory,Type.AtkSpell,Type.SptSpell])
             if item not in self.shopInventory:
                 self.shopInventory.append(item)
@@ -1179,6 +1182,8 @@ class Inn(Building):
     def initializeOnEnter(self, game):
         if len(self.foodList) == 0:
             self.fillMenu()
+        self.state = "main"
+        self.substate = "none"
 
     def getInput(self,game):
         if self.delay > 0:
@@ -1228,8 +1233,8 @@ class Inn(Building):
                 self.substate = "none"
         if game.X:
             print("X")
-            #if self.state == "main":
-            #    Hostel(game)
+            if self.state == "main":
+                Hostel(game)
         if game.Y:
             print("Y")
             if self.state == "main":
