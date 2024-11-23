@@ -56,6 +56,7 @@ class VillageDatabase():
 class VillageMap():
     def __init__(self,coords,level,typ,biome):
         self.map = []
+        self.name = getRandomVillageName(typ)
         self.coords = coords        # Coords         : Duple containing (row,col) of where the village is located in the world
         self.buildings = []         # Buildings      : List of Buildings
         self.visited = []
@@ -219,3 +220,35 @@ class VillageMap():
 
     def addEntrance(self):
         return (random.randint(0,self.maxRows),0)
+    
+def getRandomVillageName(type):
+    villageNameString = ""
+    villageNames = [
+        "Coalfell",
+        "Windemire",
+        "Brightflower",
+        "Axton",
+        "Plonerro",
+        "Waxon",
+        "Flestigo",
+        "Rhythagon",
+        "Barkstead",
+        "Wirecross",
+        "Fhestinom",
+        "Khilrow",
+        "Refuge",
+        "Mayrest",
+        "Buerathey",
+        "Chapelside",
+        "Khantegos",
+        "Road's End",
+        "Callarnock",
+        "Arton",
+        "Greyhand",
+        "Wommiwool",
+        "Tallirite",
+        "Ulvo",
+        "Zyxic"
+    ]
+    villageNameString += random.choice(villageNames) + " " + type.name
+    return villageNameString

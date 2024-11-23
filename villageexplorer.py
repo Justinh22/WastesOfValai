@@ -66,6 +66,7 @@ class Explorer():
     def drawScreen(self):
         blockSize = 30 #Set the size of the grid block
         self.game.screen.fill((0,0,0))
+        write(self.game,15,30,self.height+10,self.village.name)
         write(self.game,15,self.width-80,self.height+10,"ST) Pause")
         for x in range(30, self.width, blockSize):
             for y in range(30, self.height, blockSize):
