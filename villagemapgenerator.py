@@ -65,7 +65,7 @@ class VillageMap():
         self.groundChar = self.getGroundChar(biome)
         self.minBuildings = 0
         self.maxBuildings = 0
-        self.firstPriorityBuildings = [VillageBuildings.Inn, VillageBuildings.BlackMarket, VillageBuildings.Forge]
+        self.firstPriorityBuildings = [VillageBuildings.Inn, VillageBuildings.BlackMarket, VillageBuildings.Forge, VillageBuildings.RuneCarver]
         self.shopBuildings = [VillageBuildings.Weaponsmith, VillageBuildings.Armory, VillageBuildings.GeneralStore, VillageBuildings.Library, VillageBuildings.Temple]
         if self.villageType is VillageType.Village:
             self.setBuildingNumberRange(3,4)
@@ -167,6 +167,8 @@ class VillageMap():
                     self.buildings.append(BlackMarket(testRow,testCol,self.villageLevel))
                 elif chance == VillageBuildings.Inn:
                     self.buildings.append(Inn(testRow,testCol,self.villageLevel))
+                elif chance == VillageBuildings.RuneCarver:
+                    self.buildings.append(RuneCarver(testRow,testCol,self.villageLevel))
                 self.placeBuilding(testRow,testCol)
                 break
             

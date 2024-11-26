@@ -55,9 +55,45 @@ class Combat():
         self.deathWish = []
         self.pyrilicVenom = {}
 
-    def initialize(self,encounter):
+    def reset(self):
+        self.combatOrder = []
         self.currentTurn = 0
+        self.actions = []
+        self.activeEffects = []
+        self.scheduledManaCosts = []
+        self.actionVal = -1
+        self.state = "mainWindow"
+        self.delay = 0
+        self.ex = False
         self.exTurn = 0
+        self.timeStart = 0
+        self.dmg = 0
+        self.heal = 0
+        self.miss = False
+        self.crit = False
+        self.waitFlag = False
+        self.cursorPos = -1
+        self.menuTop = -1
+        self.itemID = -1
+        self.spellID = -1
+        self.talentID = -1
+        self.lowMana = False
+        self.buffs = []
+        self.duration = 0
+        self.combatDialogue = ""
+        self.defeat = False
+        self.showElementalEffectivenessColorsTo = None
+        
+        self.hitAll = False
+        self.immune = False
+        self.manaspent = False
+        self.risen = False
+        self.curse = []
+        self.deathWish = []
+        self.pyrilicVenom = {}
+
+    def initialize(self,encounter):
+        self.reset()
         for i in range(0,len(self.game.player.party.members)):
             print(f'{self.game.player.party.members[i].name}, {self.game.player.party.members[i].type.name}, {self.game.player.party.members[i].level} (ID {self.game.player.party.members[i].id}) - WPN: {self.game.player.party.members[i].eqpWpn.name}, AMR: {self.game.player.party.members[i].eqpAmr.name}, HP: {self.game.player.party.members[i].getMaxHP()}, MP: {self.game.player.party.members[i].getMaxMP()}, ATK: {self.game.player.party.members[i].attack}, CRT: {self.game.player.party.members[i].critrate}, DEF: {self.game.player.party.members[i].defense}, DDG: {self.game.player.party.members[i].dodge}, LCK: {self.game.player.party.members[i].luck}, SPD: {self.game.player.party.members[i].speed}, PRS: {self.game.player.party.members[i].personality}, SPELLS: {self.game.player.party.members[i].spells}')
         self.encounter = encounter
@@ -105,6 +141,9 @@ class Combat():
                 if member.eqpAcc.timing is not Timing.Universal:
                     print(f'Effect of {member.eqpAcc.name} in play!')
                     self.activeEffects.append(ActiveEffect(member.eqpAcc.id,("Party",i),-1,100))
+            if member.eqpWpn.rune is not None:
+                print(f'Effect of {member.eqpWpn.rune.name} in play!')
+                self.activeEffects.append(ActiveEffect(member.eqpWpn.rune.id,("Party",i),-1,100))
 
         self.inCombat = True
         self.state = "mainWindow"
@@ -233,10 +272,6 @@ class Combat():
                 if self.game.player.party.inventory[self.itemID] >= 200 and self.game.player.party.inventory[self.itemID] < 300:
                     self.actionVal = self.game.player.party.inventory[self.itemID]
                     self.state = "targetSelect"
-                    if self.game.player.party.members[self.combatOrder[self.currentTurn][1]].status == Status.Shocked and random.randint(0,1)==0:
-                        self.actionVal = -2
-                    elif self.game.player.party.members[self.combatOrder[self.currentTurn][1]].status == Status.Freezing and random.randint(0,1)==0:
-                        self.actionVal = -3
                     self.cursorPos = 0
                     self.enterTargetSelect()
                     print("ITEM")
@@ -1346,15 +1381,17 @@ class Combat():
                 accessory = self.game.directory.getAccessory(effect.id)
                 #print(f'Checking for usage of {accessory.name} at {timing.name}...')
                 if timing == accessory.timing:
-                    if accessory.type == AccessoryType.Passive:
+                    if accessory.type == ActivationType.Passive:
                         self.accessoryPassiveEffectHandler(effect,action)
-                    if accessory.type == AccessoryType.Active:
+                    if accessory.type == ActivationType.Active:
                         self.accessoryActiveEffectHandler(effect,action)
             elif self.game.directory.getItemType(effect.id) is Type.Consumable:
-                print("Consumable effect check...")
                 consumable = self.game.directory.getConsumable(effect.id)
                 if timing == consumable.timing:
                     self.consumableEffectHandler(effect,action)
+            elif self.game.directory.getItemType(effect.id) is Type.Rune and timing == Timing.DamageDealt and effect.source == action.source:
+                self.runeEffectHandler(effect,action)
+
 
     def checkAccessoryEffectTiming(self,action,timing):
         for effect in self.activeEffects:
@@ -1362,10 +1399,11 @@ class Combat():
                 accessory = self.game.directory.getAccessory(effect.id)
                 #print(f'Checking for usage of {accessory.name} at {timing.name}...')
                 if timing == accessory.timing:
-                    if accessory.type == AccessoryType.Passive:
+                    if accessory.type == ActivationType.Passive:
                         self.accessoryPassiveEffectHandler(effect,action)
-                    if accessory.type == AccessoryType.Active:
+                    if accessory.type == ActivationType.Active:
                         self.accessoryActiveEffectHandler(effect,action)
+
 
     def talentOrderingEffectHandler(self,effect):
         talent = self.game.directory.getTalent(effect.id)
@@ -1939,6 +1977,61 @@ class Combat():
                         print(f'{accessory.name} triggered!')
                         self.dmg = self.game.player.party.members[effect.source[1]].getHP() - 1
 
+
+    def runeEffectHandler(self,effect,action):
+        rune = self.game.directory.getRune(effect.id)
+        chance = random.randint(1,100)
+        print(f'{rune.name} effect activated!')
+
+        if rune.name == "Rune of Power":
+            self.dmg += round((self.dmg)*float((rune.level*rune.data)/100))
+
+        elif rune.name == "Rune of Surging":
+            roll = self.game.player.party.members[effect.source[1]].getLuck() + (rune.level*rune.data)
+            if roll >= chance:
+                self.dmg *= 2
+
+        elif rune.name == "Rune of Piercing":
+            roll = self.game.player.party.members[effect.source[1]].getLuck() + (rune.level*rune.data)
+            if roll >= chance:
+                self.dmg = self.game.player.party.members[action.source[1]].getAttack() - round(self.encounter[action.target].defense/2)
+
+        elif rune.name == "Rune of Flames":
+            roll = self.game.player.party.members[effect.source[1]].getLuck() + (rune.level*rune.data)
+            if roll >= chance:
+                self.encounter[action.target].status = Status.Ablaze
+                self.encounter[action.target].statusCount = 3
+
+        elif rune.name == "Rune of Sparks":
+            roll = self.game.player.party.members[effect.source[1]].getLuck() + (rune.level*rune.data)
+            if roll >= chance:
+                self.encounter[action.target].status = Status.Shocked
+                self.encounter[action.target].statusCount = 3
+
+        elif rune.name == "Rune of Freezing":
+            roll = self.game.player.party.members[effect.source[1]].getLuck() + (rune.level*rune.data)
+            if roll >= chance:
+                self.encounter[action.target].status = Status.Freezing
+                self.encounter[action.target].statusCount = 3
+
+        elif rune.name == "Rune of Siphoning":
+            self.game.player.party.members[effect.source[1]].gainMP(round(self.dmg*(rune.level*rune.data/100)))
+
+        elif rune.name == "Rune of Blood":
+            self.game.player.party.members[effect.source[1]].gainHP(round(self.dmg*(rune.level*rune.data/100)))
+
+        elif rune.name == "Rune of Corruption":
+            self.dmg += round((self.dmg)*float(rune.level*rune.data*2/100))
+            self.game.player.party.members[effect.source[1]].gainHP(-round((self.dmg)*float(rune.level*rune.data/100)))
+
+        elif rune.name == "Rune of Channeling":
+            if self.game.player.party.members[effect.source[1]].getMP() > 0:
+                self.dmg += round((self.dmg)*float(rune.level*rune.data*2/100))
+                self.game.player.party.members[effect.source[1]].changeMana(-round((self.dmg)*float(rune.level*rune.data/100)))
+
+        elif rune.name == "Rune of Expertise":
+            if self.crit:
+                self.dmg *= 1 + round(rune.level*rune.data/100)
 
     def onDeathEffectHandler(self, member):
         # Second Soul

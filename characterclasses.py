@@ -423,7 +423,10 @@ class Party():
             self.addItem(dir.getItemByRarities(Type.Potion,1,5))
     def add(self,id,dir):
         if dir.getItemType(id) == Type.Weapon or dir.getItemType(id) == Type.Armor or dir.getItemType(id) == Type.Accessory:
-            return self.addEquipment(dir.getItem(id))
+            if type(id) != int:
+                return self.addEquipment(id)
+            else:
+                return self.addEquipment(dir.getItem(id))
         else:
             return self.addItem(id)
     def addItem(self,id):

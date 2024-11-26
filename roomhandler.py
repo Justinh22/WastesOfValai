@@ -60,6 +60,7 @@ class RoomHandler():
                         self.takeItem(self.cursorPos)
                 if self.room.type == "haven" and self.room.features[self.cursorPos].name == "Beds":
                     self.game.player.party.fullRestore()
+                    self.game.player.party.removeFoodEffect(self.game.directory)
                     self.game.save()
                     self.slept = True
                 if self.room.type == "haven" and self.room.features[self.cursorPos].name == "Wanderer":

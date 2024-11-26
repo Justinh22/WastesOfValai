@@ -408,7 +408,10 @@ class DungeonLoot():
         self.maxFloors = maxFloors
         self.checkForAccessories(floor/maxFloors)
         self.rarity = self.getRarity(floor/maxFloors)
-        self.loot = self.rollItem(directory)
+        if self.rarity == LootRarity.Rare and random.randint(1,5) == 5:
+            self.loot = directory.getMagicWeapon(self.level)
+        else:
+            self.loot = self.rollItem(directory)
 
     def checkForAccessories(self,ratio):
         if ratio >= (1/2) and self.maxFloors >= 2:

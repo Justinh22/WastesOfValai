@@ -104,9 +104,9 @@ class PauseMenu():
             accessory = self.game.player.party.members[self.targetPartyMember].eqpAcc
             if accessory.id == -1:
                 write(self.game, 12, 250, 179, "Accessory: None")
-            elif accessory.type == AccessoryType.Passive:
+            elif accessory.type == ActivationType.Passive:
                 write(self.game, 12, 250, 179, "Accessory: " + accessory.name)
-            elif accessory.type == AccessoryType.Active:
+            elif accessory.type == ActivationType.Active:
                 write(self.game, 12, 250, 179, "Accessory: " + accessory.name + " (" + str(accessory.activationRate) + " LCK)")
 
             if self.state == "partyMember":
@@ -194,12 +194,18 @@ class PauseMenu():
                     tgt = self.game.player.party.members[self.targetPartyMember].eqpAcc
                 statText = ""
                 itemType = self.game.directory.getItemType(tgt.id)
-                self.itemName = self.game.directory.getItemName(tgt.id,True)
+                self.itemName = tgt.name
                 write(self.game, 20, 60, 220, self.itemName)
                 if itemType == Type.Weapon:
                     writeOrientation(self.game, 15, self.right-40, 220, "Level "+str(tgt.rarity)+" "+tgt.type.name, "R")
+                    modifierText = ""
+                    if tgt.rune != None:
+                        modifierText += tgt.rune.name + " " + tgt.rune.getRuneLevelString()
                     if tgt.atkRefine > 0 or tgt.accRefine > 0 or tgt.crtRefine > 0:
-                        writeOrientation(self.game, 15, self.right-40, 245, "+" + str(tgt.atkRefine) + "/+" + str(tgt.accRefine) + "/+" + str(tgt.crtRefine), "R")
+                        if modifierText != "":
+                            modifierText += " | "
+                        modifierText += "+" + str(tgt.atkRefine) + "/+" + str(tgt.accRefine) + "/+" + str(tgt.crtRefine)
+                    writeOrientation(self.game, 15, self.right-40, 245, modifierText, "R")
                     statText = "ATK " + str(tgt.getAttack()) + " | ACC " + str(tgt.getAccuracy()) + " | CRT " + str(tgt.getCritrate()) + " | AMP " + str(tgt.amplifier)
                 elif itemType == Type.Armor:
                     writeOrientation(self.game, 15, self.right-40, 220, "Level "+str(tgt.rarity)+" "+tgt.type.name+" Armor", "R")

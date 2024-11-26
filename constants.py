@@ -9,6 +9,7 @@ MAX_ATKSPELL_RARITY = 5
 MAX_SPTSPELL_RARITY = 5
 MAX_ACCESSORY_RARITY = 3
 MAX_CONSUMABLE_RARITY = 4
+MAX_RUNE_RARITY = 1
 MAX_INVENTORY_SIZE = 10
 
 LANDMARK_COUNT = 300
@@ -24,7 +25,7 @@ DUNGEON_ENEMY_SPEED = 120
 VILLAGE_DIM = 30
 TOWN_DIM = 40
 CITY_DIM = 50
-BUILDING_TYPES = 8
+BUILDING_TYPES = 9
 
 FOREST_CHAR = '#'
 PLAINS_CHAR = ';'
@@ -62,8 +63,9 @@ class Type(Enum):
     Accessory = 7
     Food = 8
     Consumable = 9
-    Creature = 10
-    Class = 11
+    Rune = 10
+    Creature = 11
+    Class = 12
 
 class LootOdds(Enum):
     Impossible = 0
@@ -156,7 +158,7 @@ class Personality(Enum):
     Headstrong = 4
     Lazy = 5
 
-class AccessoryType(Enum):
+class ActivationType(Enum):
     Passive = 0
     Active = 1
 
@@ -182,6 +184,7 @@ class VillageBuildings(Enum):
     Temple = 5
     BlackMarket = 6
     Inn = 7
+    RuneCarver = 8
 
 class ConsumableTiming(Enum):
     Anytime = 0

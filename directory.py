@@ -22,7 +22,7 @@ class Directory():
         self.accessoryDirectory = initAccessoryDirectory()      # 600 - 699
         self.foodDirectory = initFoodDirectory()                # 700 - 799
         self.consumableDirectory = initConsumableDirectory()    # 800 - 899
-        self.customDirectory = []                               # 900 - 999
+        self.runeDirectory = initRuneDirectory()                # 900 - 999
         self.classDirectory = initClassDirectory()              # 0 - 99
         self.creatureDirectory = initCreatureDirectory()        # 0 - 99
         self.nameDirectory = initNameDirectory()                # 0 - 99
@@ -47,11 +47,13 @@ class Directory():
             item = self.getFood(id)
         elif id < 900:
             item = self.getConsumable(id)
+        elif id < 1000:
+            item = self.getRune(id)
         return item
 
     def getItemName(self,id,scroll=False):
         if type(id) != int:
-            id = id.id
+            return id.name
         name = "NULL"
         if id < 100:
             name = self.weaponDirectory[id].name
@@ -75,6 +77,8 @@ class Directory():
             name = self.foodDirectory[id-700].name
         elif id < 900:
             name = self.consumableDirectory[id-800].name
+        elif id < 1000:
+            name = self.runeDirectory[id-900].name
         return name
 
     def getItemDesc(self,id):
@@ -99,6 +103,8 @@ class Directory():
             desc = self.foodDirectory[id-700].description
         elif id < 900:
             desc = self.consumableDirectory[id-800].description
+        elif id < 1000:
+            desc = self.runeDirectory[id-900].description
         return desc
 
     def getItemRarity(self,id):
@@ -123,6 +129,8 @@ class Directory():
             rarity = self.foodDirectory[id-700].rarity
         elif id < 900:
             rarity = self.consumableDirectory[id-800].rarity
+        elif id < 1000:
+            rarity = self.runeDirectory[id-900].rarity
         return rarity
     
     def getItemType(self,id):
@@ -149,6 +157,8 @@ class Directory():
             itemType = Type.Food
         elif id < 900:
             itemType = Type.Consumable
+        elif id < 1000:
+            itemType = Type.Rune
         return itemType
 
     def getSpellTarget(self,id):
@@ -199,6 +209,9 @@ class Directory():
     
     def getConsumable(self,id):
         return self.copy(self.consumableDirectory[id-800])
+    
+    def getRune(self,id):
+        return self.copy(self.runeDirectory[id-900])
 
     def getItemByRarity(self,type,rarity):
         print(f'Fetching {type} of rarity {rarity}...')
@@ -237,6 +250,10 @@ class Directory():
                     options.append(item.id)
         elif type == Type.Consumable:
             for item in self.consumableDirectory:
+                if item.rarity == rarity:
+                    options.append(item.id)
+        elif type == Type.Rune:
+            for item in self.runeDirectory:
                 if item.rarity == rarity:
                     options.append(item.id)
         elif type == Type.Creature:
@@ -323,6 +340,11 @@ class Directory():
                 for rarity in range(rarityA,rarityB+1):
                     if item.rarity == rarity:
                         options.append(item.id)
+        elif type == Type.Rune:
+            for item in self.runeDirectory:
+                for rarity in range(rarityA,rarityB+1):
+                    if item.rarity == rarity:
+                        options.append(item.id)
         elif type == Type.Creature:
             for item in self.creatureDirectory:
                 for rarity in range(rarityA,rarityB+1):
@@ -359,6 +381,9 @@ class Directory():
         if type == Type.Consumable:
             divVal = MAX_DIFFICULTY / MAX_CONSUMABLE_RARITY
             lootRarity = math.ceil(rarity / divVal)
+        if type == Type.Rune:
+            divVal = MAX_DIFFICULTY / MAX_RUNE_RARITY
+            lootRarity = math.ceil(rarity / divVal)
         return lootRarity
     
     def getLootRarityForCharacter(self,level,type):
@@ -381,6 +406,9 @@ class Directory():
             divVal = MAX_LEVEL / MAX_ACCESSORY_RARITY
             lootRarity = math.ceil(level / divVal)
         if type == Type.Consumable:
+            divVal = MAX_LEVEL / MAX_RUNE_RARITY
+            lootRarity = math.ceil(level / divVal)
+        if type == Type.Rune:
             divVal = MAX_LEVEL / MAX_ACCESSORY_RARITY
             lootRarity = math.ceil(level / divVal)
         return lootRarity
@@ -426,6 +454,187 @@ class Directory():
             if burnout >= 50:
                 break
         return list
+    
+    def getMagicWeapon(self,diff):
+        weapon = self.getWeapon(self.rollForLoot(diff,LootRarity.Rare,[Type.Weapon]))
+        rune = self.getRune(self.getItemByRarity(Type.Rune,1))
+        weapon.etchRune(rune)
+        weapon.name = self.getMagicWeaponName(weapon)
+        return weapon
+    
+    def getMagicWeaponName(self,weapon):
+        #
+        # W - Weapon
+        # o - of
+        # N - Noun
+        # D - Describer
+        # t - The
+        #
+        nameFormats = ["WotN","NW","DW","tNW","tDW"]
+        nameFormat = random.choice(nameFormats)
+        weaponName = ""
+        for char in nameFormat:
+            if weaponName != "":
+                weaponName += " "
+            if char == "W":
+                if weapon.type == WeaponType.Axe:
+                    weaponWord = [
+                        "Axe",
+                        "Hatchet",
+                        "Greataxe",
+                        "Battleaxe"
+                    ]
+                elif weapon.type == WeaponType.Sword:
+                    weaponWord = [
+                        "Sword",
+                        "Blade",
+                        "Greatsword",
+                        "Broadsword"
+                    ]
+                elif weapon.type == WeaponType.Spear:
+                    weaponWord = [
+                        "Spear",
+                        "Lance",
+                        "Javelin",
+                        "Trident"
+                    ]
+                elif weapon.type == WeaponType.Dagger:
+                    weaponWord = [
+                        "Dagger",
+                        "Knife",
+                        "Shortsword",
+                        "Dirk"
+                    ]
+                elif weapon.type == WeaponType.Staff:
+                    weaponWord = [
+                        "Staff",
+                        "Rod",
+                        "Sceptre",
+                        "Wand"
+                    ]
+                weaponName += random.choice(weaponWord)
+            elif char == "o":
+                weaponName += "of"
+            elif char == "N":
+                if weapon.rune.name == "Rune of Power":
+                    nounWord = [
+                        "Sun",
+                        "Bear"
+                    ]
+                elif weapon.rune.name == "Rune of Surging":
+                    nounWord = [
+                        "Wave",
+                        "Moon"
+                    ]
+                elif weapon.rune.name == "Rune of Piercing":
+                    nounWord = [
+                        "Fang",
+                        "Drill"
+                    ]
+                elif weapon.rune.name == "Rune of Flames":
+                    nounWord = [
+                        "Inferno",
+                        "Flame"
+                    ]
+                elif weapon.rune.name == "Rune of Sparks":
+                    nounWord = [
+                        "Spark",
+                        "Thunder"
+                    ]
+                elif weapon.rune.name == "Rune of Freezing":
+                    nounWord = [
+                        "Frost",
+                        "Winter"
+                    ]
+                elif weapon.rune.name == "Rune of Siphoning":
+                    nounWord = [
+                        "Archmage",
+                        "Siphon"
+                    ]
+                elif weapon.rune.name == "Rune of Blood":
+                    nounWord = [
+                        "Blood",
+                        "Vampire"
+                    ]
+                elif weapon.rune.name == "Rune of Corruption":
+                    nounWord = [
+                        "Curse",
+                        "Demon"
+                    ]
+                elif weapon.rune.name == "Rune of Channeling":
+                    nounWord = [
+                        "Wild",
+                        "Tome"
+                    ]
+                elif weapon.rune.name == "Rune of Expertise":
+                    nounWord = [
+                        "Eye",
+                        "Critical"
+                    ]
+                weaponName += random.choice(nounWord)
+            elif char == "D":
+                if weapon.rune.name == "Rune of Power":
+                    descriptorWord = [
+                        "Power",
+                        "Solar"
+                    ]
+                elif weapon.rune.name == "Rune of Surging":
+                    descriptorWord = [
+                        "Raging",
+                        "Lunar"
+                    ]
+                elif weapon.rune.name == "Rune of Piercing":
+                    descriptorWord = [
+                        "Piercing",
+                        "Slicing"
+                    ]
+                elif weapon.rune.name == "Rune of Flames":
+                    descriptorWord = [
+                        "Burning",
+                        "Flaming"
+                    ]
+                elif weapon.rune.name == "Rune of Sparks":
+                    descriptorWord = [
+                        "Electric",
+                        "Charged"
+                    ]
+                elif weapon.rune.name == "Rune of Freezing":
+                    descriptorWord = [
+                        "Frigid",
+                        "Cold"
+                    ]
+                elif weapon.rune.name == "Rune of Siphoning":
+                    descriptorWord = [
+                        "Siphoning",
+                        "Absorption"
+                    ]
+                elif weapon.rune.name == "Rune of Blood":
+                    descriptorWord = [
+                        "Draining",
+                        "Bloody"
+                    ]
+                elif weapon.rune.name == "Rune of Corruption":
+                    descriptorWord = [
+                        "Corrupted",
+                        "Tainted"
+                    ]
+                elif weapon.rune.name == "Rune of Channeling":
+                    descriptorWord = [
+                        "Channeling",
+                        "Magic"
+                    ]
+                elif weapon.rune.name == "Rune of Expertise":
+                    descriptorWord = [
+                        "Master",
+                        "Warrior's"
+                    ]
+                weaponName += random.choice(descriptorWord)
+            elif char == "t":
+                if weaponName == "":
+                    weaponName += "The"
+                else:
+                    weaponName += "the"
+        return weaponName
     
     def buildCharacter(self,level,members,id,cls=-1):
         if cls == -1:

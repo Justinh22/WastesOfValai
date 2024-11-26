@@ -129,7 +129,7 @@ class Forge(Building):
         self.tentativeRefineLevel = []
         self.refinementStatCurrentValues = []
         self.refinementStatTentativeValues = []
-        self.pageModifer = 0
+        self.pageModifier = 0
 
     def initializeOnEnter(self, game):
         self.itemType = "none"
@@ -139,7 +139,7 @@ class Forge(Building):
         self.refinementStatCurrentValues = []
         self.refinementStatTentativeValues = []
         self.reforgeableItems = []
-        self.pageModifer = 0
+        self.pageModifier = 0
 
     def getInput(self,game):
         if self.delay > 0:
@@ -148,8 +148,8 @@ class Forge(Building):
         if game.UP:
             print("UP")
             if self.state == "selectItem":
-                if self.cursorPos == 1 and self.pageModifer > 0:
-                    self.pageModifer -= 1
+                if self.cursorPos == 1 and self.pageModifier > 0:
+                    self.pageModifier -= 1
                 elif self.cursorPos > 0:
                     self.cursorPos -= 1
             if self.state == "partySelect":
@@ -171,8 +171,8 @@ class Forge(Building):
         if game.DOWN:
             print("DOWN")
             if self.state == "selectItem":
-                if self.cursorPos == 3 and (self.pageModifer+5 < len(self.player.party.equipment)):
-                    self.pageModifer += 1
+                if self.cursorPos == 3 and (self.pageModifier+5 < len(self.player.party.equipment)):
+                    self.pageModifier += 1
                 elif self.cursorPos < 4 and self.cursorPos < len(self.player.party.equipment)-1:
                     self.cursorPos += 1
             if self.state == "partySelect":
@@ -238,11 +238,13 @@ class Forge(Building):
                 self.substate = "selectItem"
             elif self.state == "partySelect":
                 if self.substate == "refine" and self.itemType == "weapon":
+                    self.cursorPos = 0
                     self.targetItem = game.player.party.members[self.cursorPos].eqpWpn
                     self.currentRefineLevel = [self.targetItem.atkRefine,self.targetItem.accRefine,self.targetItem.crtRefine]
                     self.tentativeRefineLevel = [self.targetItem.atkRefine,self.targetItem.accRefine,self.targetItem.crtRefine]
                     self.state = "weaponRefinement"
                 elif self.substate == "refine" and self.itemType == "armor":
+                    self.cursorPos = 0
                     self.targetItem = game.player.party.members[self.cursorPos].eqpAmr
                     self.currentRefineLevel = [self.targetItem.defRefine,self.targetItem.ddgRefine]
                     self.tentativeRefineLevel = [self.targetItem.defRefine,self.targetItem.ddgRefine]
@@ -393,7 +395,7 @@ class Forge(Building):
             cursorXVal = 0
             for i in range(len(refinementStat)):
                 cursorXVal, _ = write(game, 20, self.left+35, (self.top+340) + (i*25), refinementStat[i] + ": " + refinementString[i] + " - " + str(refinementStatCurrentValues[i]) + " -> " + str(refinementStatTentativeValues[i]))
-            write(game, 20, self.left+300, (self.top+340) + (self.cursorPos*25), "<-")
+            write(game, 20, self.left+320, (self.top+340) + (self.cursorPos*25), "<-")
             if self.state == "weaponRefinement" or self.state == "armorRefinement":
                 write(game, 20, self.left+35, 430, "Cost: " + str(self.calculateCost(self.targetItem.rarity,self.currentRefineLevel,self.tentativeRefineLevel)) + " (You have: " + str(self.player.gold) + ")")
                 write(game, 25,self.right-150,self.top+340,"A) Refine")
@@ -446,9 +448,9 @@ class Forge(Building):
         list = game.player.party.equipment
         for i in range(5):
             if i < len(list):
-                write(game, 20, self.left+35, (self.top+310)+(25*i), str(i+1+self.pageModifer) + ") " + self.directory.getItemName(list[i]))
+                write(game, 20, self.left+35, (self.top+310)+(25*i), str(i+1+self.pageModifier) + ") " + self.directory.getItemName(list[i]))
             else:
-                write(game, 20, self.left+35, (self.top+310)+(25*i), str(i+1+self.pageModifer) + ")")
+                write(game, 20, self.left+35, (self.top+310)+(25*i), str(i+1+self.pageModifier) + ")")
         write(game, 15, self.left+300, (self.top+310)+(25*self.cursorPos), "<-")
 
     def fillReforgeList(self):
@@ -1206,6 +1208,7 @@ class Inn(Building):
         if game.A:
             print("A")
             if self.state == "main":
+                self.player.party.removeFoodEffect()
                 self.player.party.fullRestore()
                 game.save()
                 self.substate = "rested"
@@ -1345,3 +1348,256 @@ class Inn(Building):
 
     def calculateCost(self,item):
         return 40
+
+
+class RuneCarver(Building):
+    def __init__(self,row,col,level):
+        Building.__init__(self,row,col,level)
+        self.color = (173, 0, 0) # Maroon
+        self.usage = "none"
+        self.targetItem = None
+        self.targetRune = None
+        self.pageModifier = 0
+        self.runeList = []
+
+    def initializeOnEnter(self, game):
+        self.runeList = []
+        self.fillRuneList()
+        self.usage = "none"
+        self.targetItem = None
+        self.targetRune = None
+        self.pageModifier = 0
+
+    def getInput(self,game):
+        if self.delay > 0:
+            self.delay -= 1
+            return
+        if game.UP:
+            print("UP")
+            if self.state == "selectItem":
+                if self.cursorPos == 1 and self.pageModifier > 0:
+                    self.pageModifier -= 1
+                elif self.cursorPos > 0:
+                    self.cursorPos -= 1
+            if self.state == "partySelect":
+                self.cursorPos -= 1
+                if self.cursorPos < 0:
+                    self.cursorPos = len(game.player.party.members)-1
+            if self.state == "runeEtching":
+                if self.cursorPos == 1 and self.pageModifier > 0:
+                    self.pageModifier -= 1
+                elif self.cursorPos > 0:
+                    self.cursorPos -= 1
+        if game.DOWN:
+            print("DOWN")
+            if self.state == "selectItem":
+                if self.cursorPos == 3 and (self.pageModifier+5 < len(self.player.party.equipment)):
+                    self.pageModifier += 1
+                elif self.cursorPos < 4 and self.cursorPos < len(self.player.party.equipment)-1:
+                    self.cursorPos += 1
+            if self.state == "partySelect":
+                self.cursorPos += 1
+                if self.cursorPos > len(game.player.party.members)-1:
+                    self.cursorPos = 0
+            if self.state == "runeEtching":
+                if self.cursorPos == 3 and (self.pageModifier+5 < len(self.runeList)):
+                    self.pageModifier += 1
+                elif self.cursorPos < 4 and self.cursorPos < len(self.runeList)-1:
+                    self.cursorPos += 1
+        if game.A:
+            print("A")
+            if self.state == "main":
+                self.usage = "etch"
+                self.state = "chooseInventory"
+                self.cursorPos = 0
+            elif self.state == "chooseInventory":
+                self.state = "partySelect"
+                self.cursorPos = 0
+            elif self.state == "selectItem":
+                self.cursorPos = 0
+                self.targetItem = game.player.party.equipment[self.cursorPos]
+                if self.usage == "etch":
+                    self.state = "runeEtching"
+                elif self.usage == "enhance":
+                    self.state = "runeEnhancement"
+                self.substate = "selectItem"
+            elif self.state == "partySelect":
+                self.cursorPos = 0
+                self.targetItem = game.player.party.members[self.cursorPos].eqpWpn
+                if self.usage == "etch":
+                    self.state = "runeEtching"
+                elif self.usage == "enhance":
+                    self.state = "runeEnhancement"
+                self.substate = "partySelect"
+            elif self.state == "runeEtching":
+                if self.player.gold >= self.calculateEtchPrice(self.targetItem):
+                    self.targetRune = self.runeList[self.cursorPos+self.pageModifier]
+                    self.state = "confirmEtch"
+                else:
+                    self.substate = "tooExpensive"
+            elif self.state == "confirmEtch":
+                self.player.gold -= self.calculateEtchPrice(self.targetItem)
+                self.targetItem.etchRune(self.targetRune)
+                self.state = self.substate
+                self.substate = "none"
+                self.cursorPos = 0
+            elif self.state == "runeEnhancement":
+                if self.targetItem.rune.level < 3:
+                    if self.player.gold >= self.calculateEnhancePrice(self.targetItem) :
+                        self.state = "confirmEnhancement"
+                    else:
+                        self.substate = "tooExpensive"
+            elif self.state == "confirmEnhancement":
+                self.player.gold -= self.calculateEnhancePrice(self.targetItem)
+                self.targetItem.rune.level += 1
+                self.state = self.substate
+                self.substate = "none"
+                self.cursorPos = 0
+        if game.B:
+            print("B")
+            if self.state == "main":
+                self.inMenu = False
+            elif self.state == "chooseInventory":
+                self.cursorPos = 0
+                self.state = "main"
+            elif self.state == "selectItem":
+                self.cursorPos = 0
+                self.state = "chooseInventory"
+            elif self.state == "partySelect":
+                self.cursorPos = 0
+                self.state = "chooseInventory"
+            elif self.state == "runeEtching":
+                self.cursorPos = 0
+                self.state = self.substate
+                self.substate = None
+            elif self.state == "confirmEtch":
+                self.state = "runeEtching"
+            elif self.state == "runeEnhancement":
+                self.cursorPos = 0
+                self.state = self.substate
+                self.substate = None
+            elif self.state == "confirmEnhancement":
+                self.state = "runeEnhancement"
+        if game.X:
+            print("X")
+            if self.state == "main":
+                self.usage = "enhance"
+                self.state = "chooseInventory"
+                self.cursorPos = 0
+            elif self.state == "chooseInventory":
+                self.state = "selectItem"
+                self.cursorPos = 0
+        if game.Y:
+            print("Y")
+        if game.START:
+            print("START")
+            self.inMenu = False
+
+    def drawScreen(self,game):
+        game.screen.fill((0,0,0))
+        screenOutline = pygame.Rect(self.left,self.top,self.right,self.bottom)
+        pygame.draw.line(game.screen,game.white,(self.left,300),(self.right+9,300),2)
+        pygame.draw.line(game.screen,game.white,(self.right-self.left-180,300),(self.right-self.left-180,self.bottom+8),2)
+        pygame.draw.rect(game.screen,game.white,screenOutline,2)
+        description = self.getDescription(self.state, self.substate)
+        wrapWrite(game, 20, description, self.right-self.left-25)
+
+        if self.state == "main":
+            write(game, 30, self.left+10, self.top+305,"Rune Carver")
+            write(game, 25,self.right-150,self.top+310,"A) Etch")
+            write(game, 25,self.right-150,self.top+360,"X) Enhance")
+            write(game, 25,self.right-150,self.top+410,"B) Back")
+
+        elif self.state == "chooseInventory":
+            write(game, 25,self.right-150,self.top+310,"A) Equipped")
+            write(game, 25,self.right-150,self.top+360,"X) Inventory")
+            write(game, 25,self.right-150,self.top+410,"B) Back")
+
+        elif self.state == "selectItem":
+            write(game, 25,self.right-150,self.top+340,"A) Select")
+            write(game, 25,self.right-150,self.top+390,"B) Back")
+            self.printEquipment(game)
+
+        elif self.state == "partySelect":
+            write(game, 25,self.right-150,self.top+340,"A) Select")
+            write(game, 25,self.right-150,self.top+390,"B) Back")
+            write(game, 15, self.left+300, (self.top+310)+(25*self.cursorPos), "<-")
+            for i, member in enumerate(self.player.party.members):
+                write(game, 20, self.left+35, (self.top+310)+(25*i), str(i+1) + ") " + member.name)
+
+        elif self.state == "runeEtching":
+            write(game, 25,self.right-150,self.top+340,"A) Select")
+            write(game, 25,self.right-150,self.top+390,"B) Cancel")
+            for i in range(len(self.runeList)):
+                if self.runeList[i] == "None":
+                    write(game, 20, self.left+35, (self.top+320)+(25*i), str(i+1) + ")")
+                else:
+                    write(game, 20, self.left+35, (self.top+320)+(25*i), str(i+1) + ") " + self.directory.getItemName(self.runeList[i]))
+                    writeOrientation(game, 20, self.right-self.left-200, (self.top+320)+(25*i), str(self.calculateEtchPrice(self.targetItem)) + "g", "R")
+            write(game, 20, self.left+300, (self.top+323) + (self.cursorPos*25), "<-")
+
+        elif self.state == "confirmEtch":
+            write(game, 25,self.right-150,self.top+340,"A) Confirm")
+            write(game, 25,self.right-150,self.top+390,"B) Cancel")
+            self.printStatBlock(self.targetRune, game)
+
+        elif self.state == "runeEnhancement" or self.state == "confirmEnhancement":
+            write(game, 25,self.right-150,self.top+340,"A) Select")
+            write(game, 25,self.right-150,self.top+390,"B) Cancel")
+            write(game, 20, self.left+35, self.top+320, self.targetItem.rune.name + " " + self.targetItem.rune.getRuneLevelString() + " -> " + self.targetItem.rune.getRuneLevelString(self.targetItem.rune.level+1))
+            write(game, 20, self.left+35, self.top+345, "Enchancement cost: " + str(self.calculateEnhancePrice(self.targetItem)) + "g")
+
+    def getDescription(self,state,substate):
+        description = ""
+        if state == "main":
+            description = "The building is cold, all of the walls being made of solid stone. Small slips of paper with ancient text on them hand from the ceiling. \
+                A massive, burly man sits cross-legged on the floor in front of a small stone table. 'I study runes. With right price, I carve runes. Hold out your weapon.'"
+        elif state == "chooseInventory" or state == "selectItem" or state == "partySelect":
+            description = "'Hold out your weapon.'"
+        elif state == "runeEtching":
+            description = "'Different runes... different effects. Bend the barrier between magical realm and ours.'"
+        elif state == "runeEtching" and substate == "tooExpensive":
+            description = "'Bring more gold.'"
+        elif state == "confirmEtch": 
+            description = "'I will etch " + self.targetItem.name + " with " + self.targetRune.name + "?"
+        elif state == "runeEnhancement":
+            description = "'More intricate runes... more potent effects.'"
+        elif state == "runeEnhancement" and substate == "tooExpensive":
+            description = "'Bring more gold.'"
+        elif state == "confirmEnhancement":
+            description = "'I will enhance your " + self.targetItem.name + "'s rune from " + self.targetItem.rune.getRuneLevelString() + " to " + self.targetItem.rune.getRuneLevelString(self.targetItem.rune.level+1) + "'?"
+        return description
+
+    def calculateEtchPrice(self,item):
+        return 200
+    
+    def calculateEnhancePrice(self,item):
+        if item.rune.level == 1:
+            return 500
+        elif item.rune.level == 2:
+            return 1000
+
+    def printEquipment(self,game):
+        list = game.player.party.equipment
+        for i in range(5):
+            if i < len(list):
+                write(game, 20, self.left+35, (self.top+310)+(25*i), str(i+1+self.pageModifier) + ") " + self.directory.getItemName(list[i]))
+            else:
+                write(game, 20, self.left+35, (self.top+310)+(25*i), str(i+1+self.pageModifier) + ")")
+        write(game, 15, self.left+300, (self.top+310)+(25*self.cursorPos), "<-")
+
+    def fillRuneList(self):
+        self.runeList = []
+        tempRuneList = []
+        for item in self.directory.runeDirectory:
+            tempRuneList.append(self.directory.getRune(item.id))
+        random.shuffle(tempRuneList)
+        self.runeList = tempRuneList[0:4]
+        for item in self.runeList:
+            print(self.directory.getItemName(item))
+    
+    def printStatBlock(self,item,game):
+        write(game, 15, self.left + 10, 315, item.name)
+        wrapWrite(game, 15, item.description, self.right - self.left - 210, self.left + 10, 370)
+        writeOrientation(game, 15, self.right - self.left - 185, 315, "Level " + item.getRuneLevelString() + " Rune", "R")
+        

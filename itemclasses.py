@@ -16,6 +16,7 @@ class Weapon(Item):
         self.critrate = crt
         self.amplifier = amp
         self.type = typ
+        self.rune = None
         self.atkRefine = 0
         self.accRefine = 0
         self.crtRefine = 0
@@ -39,6 +40,8 @@ class Weapon(Item):
         self.critrate = newWeapon.critrate
         self.amplifier = newWeapon.amplifier
         self.type = newWeapon.type
+    def etchRune(self,rune):
+        self.rune = rune
 
 class Armor(Item):
     def __init__(self,nm="NULL",desc="NULL",rar=-1,i=-1,df=0,ddg=0,mpr=0,typ=ArmorType.Medium):
@@ -83,7 +86,7 @@ class Consumable(Item):
         self.type = Type.Consumable
 
 class Accessory(Item):
-    def __init__(self,nm="NULL",desc="NULL",rar=-1,i=-1,ar=0,typ=AccessoryType.Passive,tmg=Timing.Universal,data=0):
+    def __init__(self,nm="NULL",desc="NULL",rar=-1,i=-1,ar=0,typ=ActivationType.Passive,tmg=Timing.Universal,data=0):
         Item.__init__(self,nm,desc,rar,i)
         self.activationRate = ar
         self.type = typ
@@ -121,3 +124,17 @@ class Food(Item):
     def __init__(self,nm,desc,rar,i,buff):
         Item.__init__(self,nm,desc,rar,i)
         self.buff = buff # List of size 12: [HP,MP,ACC,CRT,DEF,ATK,LCK,MPG,AMP,DDG,SPD,HPG]
+
+class Rune(Item):
+    def __init__(self,nm,desc,rar,i,type,data=0,lvl=1):
+        Item.__init__(self,nm,desc,rar,i)
+        self.type = type
+        self.data = data
+        self.level = lvl
+    def getRuneLevelString(self,lvl=-1):
+        if lvl == -1:
+            lvl = self.level
+        levelString = ""
+        for i in range(lvl):
+            levelString += "I"
+        return levelString
