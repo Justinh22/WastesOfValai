@@ -1745,7 +1745,6 @@ class Combat():
         elif consumable.name == "Smoke Capsule":
             self.inCombat = False
             self.timeStart = pygame.time.get_ticks()
-            self.exTurn = 10
             self.timeStart -= 1000
 
         elif consumable.name == "Honna Tear":

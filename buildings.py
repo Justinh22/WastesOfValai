@@ -238,14 +238,14 @@ class Forge(Building):
                 self.substate = "selectItem"
             elif self.state == "partySelect":
                 if self.substate == "refine" and self.itemType == "weapon":
-                    self.cursorPos = 0
                     self.targetItem = game.player.party.members[self.cursorPos].eqpWpn
+                    self.cursorPos = 0
                     self.currentRefineLevel = [self.targetItem.atkRefine,self.targetItem.accRefine,self.targetItem.crtRefine]
                     self.tentativeRefineLevel = [self.targetItem.atkRefine,self.targetItem.accRefine,self.targetItem.crtRefine]
                     self.state = "weaponRefinement"
                 elif self.substate == "refine" and self.itemType == "armor":
-                    self.cursorPos = 0
                     self.targetItem = game.player.party.members[self.cursorPos].eqpAmr
+                    self.cursorPos = 0
                     self.currentRefineLevel = [self.targetItem.defRefine,self.targetItem.ddgRefine]
                     self.tentativeRefineLevel = [self.targetItem.defRefine,self.targetItem.ddgRefine]
                     self.state = "armorRefinement"
@@ -425,8 +425,11 @@ class Forge(Building):
             description = "'Show me a blade, and I can show you its true potential. For the right price, of course.'"
         elif state == "confirmWeaponRefine" or state == "confirmArmorRefine":
             description = "'Alright, so you want me to refine your " + self.targetItem.name + " to "
+            divider = ""
             for entry in self.tentativeRefineLevel:
-                description += "+" + str(entry) + "/"
+                description += divider + "+" + str(entry)
+                if divider == "":
+                    divider += "/"
             description += "? That'll just be " + str(self.calculateCost(self.targetItem.rarity,self.currentRefineLevel,self.tentativeRefineLevel)) + " gold, please.'"
         elif state == "reforge":
             description = "'People, we're stubborn. But metal... with a bit of convincing, it can become anything.'"
@@ -1208,7 +1211,7 @@ class Inn(Building):
         if game.A:
             print("A")
             if self.state == "main":
-                self.player.party.removeFoodEffect()
+                self.player.party.removeFoodEffect(self.directory)
                 self.player.party.fullRestore()
                 game.save()
                 self.substate = "rested"
@@ -1418,17 +1421,17 @@ class RuneCarver(Building):
                 self.targetItem = game.player.party.equipment[self.cursorPos]
                 if self.usage == "etch":
                     self.state = "runeEtching"
-                elif self.usage == "enhance":
+                elif self.usage == "enhance" and self.targetItem.rune != None:
                     self.state = "runeEnhancement"
                 self.substate = "selectItem"
             elif self.state == "partySelect":
-                self.cursorPos = 0
                 self.targetItem = game.player.party.members[self.cursorPos].eqpWpn
                 if self.usage == "etch":
                     self.state = "runeEtching"
-                elif self.usage == "enhance":
+                elif self.usage == "enhance" and self.targetItem.rune != None:
                     self.state = "runeEnhancement"
                 self.substate = "partySelect"
+                self.cursorPos = 0
             elif self.state == "runeEtching":
                 if self.player.gold >= self.calculateEtchPrice(self.targetItem):
                     self.targetRune = self.runeList[self.cursorPos+self.pageModifier]
