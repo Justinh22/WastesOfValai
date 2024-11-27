@@ -327,9 +327,9 @@ class PauseMenu():
                     #c = int(((x / blockSize)-math.ceil(gridWidth/2))+self.mapPos[1])
                     mapChar = '_'
                     if r < 0 or r >= self.game.WorldMap.sizeR:
-                        mapChar = OCEAN_CHAR
+                        mapChar = " "
                     if c < 0 or c >= self.game.WorldMap.sizeC:
-                        mapChar = OCEAN_CHAR
+                        mapChar = " "
                     if r == self.currentPos[0] and c == self.currentPos[1]:
                         mapChar = '@'
                     if mapChar == '_':
@@ -344,8 +344,10 @@ class PauseMenu():
                                     color = self.game.lightgreen
                                 elif mapChar == DESERT_CHAR: # Desert
                                     color = self.game.tan
-                            elif self.mapMode == "difficulty" and mapChar != OCEAN_CHAR and mapChar != BORDER_CHAR and mapChar != PATH_CHAR:
-                                if mapChar == FOREST_CHAR or mapChar == PLAINS_CHAR or mapChar == DESERT_CHAR:
+                                elif mapChar == OCEAN_CHAR: # Desert
+                                    color = self.game.blue
+                            elif self.mapMode == "difficulty" and mapChar != BORDER_CHAR and mapChar != PATH_CHAR:
+                                if mapChar == FOREST_CHAR or mapChar == PLAINS_CHAR or mapChar == DESERT_CHAR or mapChar == OCEAN_CHAR:
                                     diff = self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c])
                                     power = math.ceil(self.game.player.party.getPower()/2)
                                     difficultyDiff = abs(diff-power)
@@ -357,6 +359,8 @@ class PauseMenu():
                                         color = (255 - (difficultyDiff * 85), 255, 255 - (difficultyDiff * 85))
                                     else:
                                         color = self.game.white
+                                    if mapChar == OCEAN_CHAR:
+                                        color = self.game.blue
                         else:
                             if self.game.WorldMap.map[r][c] == BORDER_CHAR:
                                 mapChar = self.game.WorldMap.map[r][c]

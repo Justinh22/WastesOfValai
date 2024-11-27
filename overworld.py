@@ -143,6 +143,8 @@ class Overworld():
                         color = self.game.tan
                     elif mapChar == PATH_CHAR: # Path
                         color = self.game.orange
+                    elif mapChar == OCEAN_CHAR: # Path
+                        color = self.game.blue
                     elif self.game.roomDB.doesExist((r,c)) or self.game.dungeonDB.doesExist((r,c)) or self.game.villageDB.doesExist((r,c)):
                         color = self.game.gray
                 text = self.font.render(mapChar,True,color)
