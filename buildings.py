@@ -1562,7 +1562,7 @@ class RuneCarver(Building):
         elif state == "runeEtching" and substate == "tooExpensive":
             description = "'Bring more gold.'"
         elif state == "confirmEtch": 
-            description = "'I will etch " + self.targetItem.name + " with " + self.targetRune.name + "?"
+            description = "'I will etch " + self.targetItem.name + " with " + self.targetRune.name + "'?"
         elif state == "runeEnhancement":
             description = "'More intricate runes... more potent effects.'"
         elif state == "runeEnhancement" and substate == "tooExpensive":
@@ -1572,13 +1572,13 @@ class RuneCarver(Building):
         return description
 
     def calculateEtchPrice(self,item):
-        return 200
+        return 500
     
     def calculateEnhancePrice(self,item):
         if item.rune.level == 1:
-            return 500
-        elif item.rune.level == 2:
             return 1000
+        elif item.rune.level == 2:
+            return 2000
 
     def printEquipment(self,game):
         list = game.player.party.equipment

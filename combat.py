@@ -25,6 +25,7 @@ class Combat():
         self.activeEffects = []
         self.scheduledManaCosts = []
         self.actionVal = -1
+        self.ranAway = False
         self.state = "mainWindow"
         self.delay = 0
         self.ex = False
@@ -62,6 +63,7 @@ class Combat():
         self.activeEffects = []
         self.scheduledManaCosts = []
         self.actionVal = -1
+        self.ranAway = False
         self.state = "mainWindow"
         self.delay = 0
         self.ex = False
@@ -361,7 +363,9 @@ class Combat():
             if self.state == "mainWindow":
                 self.state = "mainWindow"
                 print("RUN")
-                self.inCombat = False
+                self.writeAction(self.combatOrder[self.currentTurn],-1,-5) # Run away
+                self.next()
+                # self.inCombat = False
         if self.game.UP:
             if self.state == "targetSelect" and self.cursorPos > 0:
                 tgtList = self.encounter if self.actionVal < 200 else self.game.player.party.members
@@ -594,6 +598,8 @@ class Combat():
         if self.state == "execute":
             pygame.draw.line(self.game.screen,self.game.white,(self.left,350),(self.right+9,350),2)
             combatStr = ""
+            if self.actions[self.exTurn-1].action == -5: # Run Away
+                combatStr = self.game.player.party.members[self.actions[self.exTurn-1].source[1]].name + " attempted to flee!"
             if self.actions[self.exTurn-1].action == 0:
                 if self.actions[self.exTurn-1].source[0] == "Encounter":
                     if self.miss:
@@ -697,6 +703,13 @@ class Combat():
                 self.inCombat = False
                 self.defeat = True
                 self.game.load()
+
+        if self.state == "ranAway":
+            pygame.draw.line(self.game.screen,self.game.white,(self.left,350),(self.right+9,350),2)
+            write(self.game, 20, self.left+15, 325, "Ran away successfully!")
+            if pygame.time.get_ticks() - self.timeStart >= 3000:
+                self.combatTeardown()
+                self.inCombat = False
 
     def combatInfo(self):
         self.game.screen.fill(self.game.black)
@@ -815,7 +828,7 @@ class Combat():
         else:
             self.skip()
             self.gameStatus()
-            if self.state == "lose" or self.state == "win":
+            if self.state == "lose" or self.state == "win" or self.state == "ranAway":
                 return
             if self.currentTurn >= len(self.combatOrder):
                 self.startExecute()
@@ -1122,6 +1135,8 @@ class Combat():
                         self.endExecute()
                         return
                 print(f'Action: {self.actions[self.exTurn].source} -> {self.actions[self.exTurn].target}, {self.actions[self.exTurn].action} (exTurn {self.exTurn})')
+                if self.actions[self.exTurn].action == -5: # Run Away
+                    self.ranAway = self.runAway(self.actions[self.exTurn].source)
                 self.checkEffectTiming(self.actions[self.exTurn],Timing.PreAttack)
                 if self.actions[self.exTurn].action == 0:
                     self.attack(self.actions[self.exTurn])
@@ -1241,7 +1256,7 @@ class Combat():
                 return
 
     def gameStatus(self):
-        if self.state == "lose" or self.state == "win":
+        if self.state == "lose" or self.state == "win" or self.state == "ranAway":
             return
         encFlag = False
         ptyFlag = False
@@ -1272,6 +1287,13 @@ class Combat():
             self.state = "win"
             self.timeStart = pygame.time.get_ticks()
             print("Win!")
+            self.exTurn = 10
+            self.timeStart -= 1000
+            return True
+        if self.ranAway == True:
+            self.state = "ranAway"
+            self.timeStart = pygame.time.get_ticks()
+            print("Ran away successfully!")
             self.exTurn = 10
             self.timeStart -= 1000
             return True
@@ -1363,6 +1385,11 @@ class Combat():
                 return "Resistance"
         print("ERROR: Elemental Effectiveness Not Found")
         return "Neutral"
+    
+    def runAway(self,source):
+        chance = random.randint(1,100)
+        threshold = 20 + self.tupleToMember(source).getLuck()
+        return threshold >= chance
         
         
     def checkEffectTiming(self,action,timing):
