@@ -1200,8 +1200,10 @@ class Combat():
 
     def endExecute(self):
         for i in range(len(self.combatOrder)):
-            if self.isAlive(self.combatOrder[i]) == False and self.combatOrder[i][0] == 'Party':
-                self.onDeathEffectHandler(self.combatOrder[i])
+            if self.isAlive(self.combatOrder[i]) == False:
+                self.tupleToMember(self.combatOrder[i]).resetStatus()
+                if self.combatOrder[i][0] == 'Party':
+                    self.onDeathEffectHandler(self.combatOrder[i])
         for i in range(len(self.combatOrder)-1,-1,-1):
             if self.isAlive(self.combatOrder[i]) == False:
                 self.combatOrder.pop(i)
