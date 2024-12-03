@@ -1257,6 +1257,7 @@ class Inn(Building):
         wrapWrite(game, 20, description, self.right-self.left-15)
 
         if self.state == "main":
+            write(game, 30, self.left+10, self.top+305, "Inn")
             write(game, 20,self.right-155,self.top+310,"A) Rest")
             write(game, 20,self.right-155,self.top+340,"X) Hostel")
             write(game, 20,self.right-155,self.top+370,"Y) Eat")

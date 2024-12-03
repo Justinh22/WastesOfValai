@@ -43,27 +43,27 @@ class CharacterSwap():
         if self.delay > 0:
             self.delay -= 1
             return
-        if self.game.UP:
+        if self.game.keys["UP"]:
             self.cursorPos -= 1
             self.cursorPos %= 4
-        if self.game.DOWN:
+        if self.game.keys["DOWN"]:
             self.cursorPos += 1
             self.cursorPos %= 4
-        if self.game.A:
+        if self.game.keys["A"]:
             print("A")
             self.game.player.hostel.append(self.game.player.party.members[self.cursorPos])
             self.game.player.party.members.pop(self.cursorPos)
             self.game.player.party.members.append(self.newChar)
             self.inMenu = False
-        if self.game.B:
+        if self.game.keys["B"]:
             print("B")
             self.game.player.hostel.append(self.newChar)
             self.inMenu = False
-        if self.game.X:
+        if self.game.keys["X"]:
             print("X")
-        if self.game.Y:
+        if self.game.keys["Y"]:
             print("Y")
-        if self.game.START:
+        if self.game.keys["START"]:
             self.pausemenu.pause(self.game.player.currentPos)
 
     def drawScreen(self):
@@ -151,7 +151,7 @@ class Hostel():
         if self.delay > 0:
             self.delay -= 1
             return
-        if self.game.UP:
+        if self.game.keys["UP"]:
             if len(self.game.player.hostel) > 0:
                 self.cursorPos -= 1
                 self.cursorPos %= len(self.game.player.hostel)
@@ -161,7 +161,7 @@ class Hostel():
                 if self.cursorPos >= self.listBottom:
                     self.listBottom = self.cursorPos + 1
                     self.listTop = self.listBottom - 7
-        if self.game.DOWN:
+        if self.game.keys["DOWN"]:
             if len(self.game.player.hostel) > 0:
                 self.cursorPos += 1
                 self.cursorPos %= len(self.game.player.hostel)
@@ -171,18 +171,18 @@ class Hostel():
                 if self.cursorPos >= self.listBottom:
                     self.listBottom += 1
                     self.listTop += 1
-        if self.game.A:
+        if self.game.keys["A"]:
             print("A")
             CharacterSwap(self.game, self.game.player.hostel[self.cursorPos], True)
             self.game.player.hostel.pop(self.cursorPos)
-        if self.game.B:
+        if self.game.keys["B"]:
             print("B")
             self.inMenu = False
-        if self.game.X:
+        if self.game.keys["X"]:
             print("X")
-        if self.game.Y:
+        if self.game.keys["Y"]:
             print("Y")
-        if self.game.START:
+        if self.game.keys["START"]:
             self.pausemenu.pause(self.game.player.currentPos)
 
     def drawScreen(self):
@@ -269,15 +269,15 @@ class LevelUp():
         if self.delay > 0:
             self.delay -= 1
             return
-        if self.game.A:
+        if self.game.keys["A"]:
             print("A")
             self.inMenu = False
-        if self.game.B:
+        if self.game.keys["B"]:
             print("B")
             self.inMenu = False
-        if self.game.X:
+        if self.game.keys["X"]:
             print("X")
-        if self.game.Y:
+        if self.game.keys["Y"]:
             print("Y")
 
     def drawScreen(self):

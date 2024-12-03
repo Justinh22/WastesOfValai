@@ -55,38 +55,42 @@ class Overworld():
         self.blitScreen()
 
     def getInput(self):
-        if self.game.UP:
+        if self.game.keys["UP"]:
+            print("UP")
             if self.game.WorldMap.map[self.game.player.currentPos[0]-1][self.game.player.currentPos[1]] != OCEAN_CHAR and self.game.WorldMap.map[self.game.player.currentPos[0]-1][self.game.player.currentPos[1]] != 'X':
                 self.game.player.currentPos[0] -= 1
                 self.stepTo(self.game.player.currentPos[0],self.game.player.currentPos[1])
             self.drawScreen()
-        if self.game.RIGHT:
+        if self.game.keys["RIGHT"]:
+            print("RIGHT")
             if self.game.WorldMap.map[self.game.player.currentPos[0]][self.game.player.currentPos[1]+1] != OCEAN_CHAR and self.game.WorldMap.map[self.game.player.currentPos[0]][self.game.player.currentPos[1]+1] != 'X':
                 self.game.player.currentPos[1] += 1
                 self.stepTo(self.game.player.currentPos[0],self.game.player.currentPos[1])
             self.drawScreen()
-        if self.game.DOWN:
+        if self.game.keys["DOWN"]:
+            print("DOWN")
             if self.game.WorldMap.map[self.game.player.currentPos[0]+1][self.game.player.currentPos[1]] != OCEAN_CHAR and self.game.WorldMap.map[self.game.player.currentPos[0]+1][self.game.player.currentPos[1]] != 'X':
                 self.game.player.currentPos[0] += 1
                 self.stepTo(self.game.player.currentPos[0],self.game.player.currentPos[1])
             self.drawScreen()
-        if self.game.LEFT:
+        if self.game.keys["LEFT"]:
+            print("LEFT")
             if self.game.WorldMap.map[self.game.player.currentPos[0]][self.game.player.currentPos[1]-1] != OCEAN_CHAR and self.game.WorldMap.map[self.game.player.currentPos[0]][self.game.player.currentPos[1]-1] != 'X':
                 self.game.player.currentPos[1] -= 1
                 self.stepTo(self.game.player.currentPos[0],self.game.player.currentPos[1])
             self.drawScreen()
-        if self.game.A:
+        if self.game.keys["A"]:
             print("A")
-        if self.game.B:
+        if self.game.keys["B"]:
             if self.game.debug_manualEncounters:
                 encounter = []
                 encounter = self.game.directory.buildEncounter(self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[self.game.player.currentPos[0]][self.game.player.currentPos[1]]),self.getBiome(self.game.player.currentPos[0],self.game.player.currentPos[1]))
                 self.combat.initialize(encounter)
-        if self.game.X:
+        if self.game.keys["X"]:
             print("X")
-        if self.game.Y:
+        if self.game.keys["Y"]:
             print("Y")
-        if self.game.START:
+        if self.game.keys["START"]:
             self.pausemenu.pause(self.game.player.currentPos)
             if self.game.player.party.callaretsCompact:
                 self.game.player.currentPos = list(self.game.player.lastCheckpoint)

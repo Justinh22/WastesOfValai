@@ -46,7 +46,7 @@ class RoomHandler():
         if self.delay > 0:
             self.delay -= 1
             return
-        if self.game.A:
+        if self.game.keys["A"]:
             if self.state == "main":
                 self.state = "lookList"
                 self.delay = 5
@@ -78,7 +78,7 @@ class RoomHandler():
                     self.room.featureLen -= 1
                     self.room.wanderer = False
             print("A")
-        if self.game.B:
+        if self.game.keys["B"]:
             if self.state == "main":
                 self.inRoom = False
             elif self.state == "lookList":
@@ -88,28 +88,28 @@ class RoomHandler():
                 self.delay = 5
                 self.state = "lookList"
             print("B")
-        if self.game.X:
+        if self.game.keys["X"]:
             print("X")
             if self.state == "main" and self.room.type == "haven" and len(self.game.player.hostel) > 0:
                 print("Hostel")
                 Hostel(self.game)
-        if self.game.Y:
+        if self.game.keys["Y"]:
             print("Y")
-        if self.game.UP:
+        if self.game.keys["UP"]:
             if self.state == "lookList":
                 self.cursorPos -= 1
                 if self.cursorPos < 0:
                     self.cursorPos = self.room.featureLen-1
             print("UP")
-        if self.game.DOWN:
+        if self.game.keys["DOWN"]:
             if self.state == "lookList":
                 self.cursorPos += 1
                 if self.cursorPos > self.room.featureLen-1:
                        self.cursorPos = 0
             print("DOWN")
-        if self.game.LEFT:
+        if self.game.keys["LEFT"]:
             print("LEFT")
-        if self.game.RIGHT:
+        if self.game.keys["RIGHT"]:
             print("RIGHT")
 
     def drawScreen(self):

@@ -172,7 +172,7 @@ class Character():
         if self.level != 10:
             self.level += 1
         self.xp = 0
-        self.nextLevel += self.level*100
+        self.nextLevel += (self.level*100)/2
         growth = self.type.getGrowths()
         self.hpMax += growth[0]
         self.mpMax += growth[1]
@@ -291,8 +291,12 @@ class Character():
             accessory = effect
             if accessory.id == 600: # Solar Band
                 self.universalEffects.hp += accessory.data * mod
+                if self.getHP() > self.getMaxHP():
+                    self.hp = self.getMaxHP()
             elif accessory.id == 601: # Lunar Band
                 self.universalEffects.mp += accessory.data * mod
+                if self.getMP() > self.getMaxMP():
+                    self.mp = self.getMaxMP()
             elif accessory.id == 602: # Mercury Band
                 self.universalEffects.accuracy += accessory.data * mod
             elif accessory.id == 603: # Venus Band
@@ -448,17 +452,23 @@ class Party():
         self.members[member].gainHP(dir.getPotion(self.inventory[index]).hpGain)
         self.members[member].gainMP(dir.getPotion(self.inventory[index]).mpGain)
         self.inventory.pop(index)
-    def useConsumable(self,member,index,dir):
+    def useConsumable(self,member,index,dir,inDungeon):
         consumable = dir.getItem(self.inventory[index])
         print(consumable.name)
-        if consumable.name == "Campfire Kit":
+        if consumable.name == "Campfire Kit" and not inDungeon:
             for member in self.members:
                 member.hp = member.getMaxHP()
-        elif consumable.name == "Spirit Vapor":
+        elif consumable.name == "Spirit Vapor" and not inDungeon:
             for member in self.members:
                 member.mp = member.getMaxMP()
         elif consumable.name == "Callaret's Compact":
             self.callaretsCompact = True
+        elif consumable.name == "Honna Tear":
+            if member.getHP() == 0:
+                member.hp = round(member.getMaxHP())
+                member.mp = round(member.getMaxMP())
+            else:
+                return
         self.inventory.pop(index)
     def getPower(self):
         power = 0

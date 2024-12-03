@@ -181,7 +181,7 @@ class Combat():
         if self.delay > 0:
             self.delay -= 1
             return
-        if self.game.A:
+        if self.game.keys["A"]:
             if self.state == "mainWindow":
                 self.cursorPos = 0
                 self.actionVal = 0
@@ -322,7 +322,7 @@ class Combat():
                     self.lowMana = True
             elif self.state == "execute":
                 self.timeStart -= 2000
-        if self.game.B:
+        if self.game.keys["B"]:
             if self.state == "mainWindow":
                 self.state = "useMenu"
                 self.cursorPos = 0
@@ -354,19 +354,19 @@ class Combat():
             elif self.state == "talentSummary":
                 self.state = "talentList"
                 print("BACK")
-        if self.game.X:
+        if self.game.keys["X"]:
             if self.state == "mainWindow":
                 self.state = "mainWindow"
                 print("CANCEL")
                 self.prev()
-        if self.game.Y:
+        if self.game.keys["Y"]:
             if self.state == "mainWindow":
                 self.state = "mainWindow"
                 print("RUN")
                 self.writeAction(self.combatOrder[self.currentTurn],-1,-5) # Run away
                 self.next()
                 # self.inCombat = False
-        if self.game.UP:
+        if self.game.keys["UP"]:
             if self.state == "targetSelect" and self.cursorPos > 0:
                 tgtList = self.encounter if self.actionVal < 200 else self.game.player.party.members
                 if self.actionVal >= 500:
@@ -388,7 +388,7 @@ class Combat():
                         self.menuTop -= 2
                 else:
                     self.cursorPos -= 2
-        if self.game.DOWN:
+        if self.game.keys["DOWN"]:
             if self.state == "targetSelect":
                 tgtList = self.encounter if self.actionVal < 200 or (self.actionVal >= 300 and self.actionVal < 400) else self.game.player.party.members
                 if self.actionVal >= 500:
@@ -423,14 +423,14 @@ class Combat():
                         self.menuTop += 2
                 else:
                     self.cursorPos += 2
-        if self.game.LEFT:
+        if self.game.keys["LEFT"]:
             if self.state == "spellList" or self.state == "itemList" or self.state == "talentList":
                 if self.cursorPos == 1 or self.cursorPos == 3:
                     self.cursorPos -= 1
             elif self.state == "useMenu":
                 if self.cursorPos > 0:
                     self.cursorPos -= 1
-        if self.game.RIGHT:
+        if self.game.keys["RIGHT"]:
             if self.state == "spellList" or self.state == "itemList" or self.state == "talentList":
                 if self.cursorPos == 0 or self.cursorPos == 2:
                     self.cursorPos += 1
@@ -856,6 +856,7 @@ class Combat():
 
 
     def enemyAction(self,source):
+        move = random.randint(0,len(self.encounter[self.combatOrder[self.currentTurn][1]].knownSpells))
         if not self.isAlive(source):
             self.writeAction(source,0,-1)
             print(f'Action writing for {source}, length {len(self.actions)}')
@@ -864,7 +865,7 @@ class Combat():
             self.writeAction(source,0,-2)
             print(f'Action writing for {source}, length {len(self.actions)}')
             return
-        elif self.encounter[self.combatOrder[self.currentTurn][1]].status == Status.Freezing and random.randint(0,1)==0:
+        elif self.encounter[self.combatOrder[self.currentTurn][1]].status == Status.Freezing and (random.randint(0,1)==0 or (move != 0 and self.encounter[self.combatOrder[self.currentTurn][1]].spellCooldown == 0)):
             self.writeAction(source,0,-3)
             print(f'Action writing for {source}, length {len(self.actions)}')
             return
@@ -874,7 +875,6 @@ class Combat():
         while self.game.player.party.members[target].hp <= 0 and timeout < 20:
             target = random.randint(0,len(self.game.player.party.members)-1)
             timeout += 1
-        move = random.randint(0,len(self.encounter[self.combatOrder[self.currentTurn][1]].knownSpells))
         if move == 0 or self.encounter[self.combatOrder[self.currentTurn][1]].spellCooldown > 0:
             self.writeAction(source, target, 0)
             if self.encounter[self.combatOrder[self.currentTurn][1]].spellCooldown > 0:
@@ -1416,7 +1416,7 @@ class Combat():
                 consumable = self.game.directory.getConsumable(effect.id)
                 if timing == consumable.timing:
                     self.consumableEffectHandler(effect,action)
-            elif self.game.directory.getItemType(effect.id) is Type.Rune and timing == Timing.DamageDealt and effect.source == action.source:
+            elif self.game.directory.getItemType(effect.id) is Type.Rune and timing == Timing.DamageDealt and effect.source == action.source and (action.action == 0 or self.game.directory.getItemType(action.action) == Type.Talent):
                 self.runeEffectHandler(effect,action)
 
 

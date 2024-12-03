@@ -52,35 +52,35 @@ class Crawler():
         self.blitScreen()
 
     def getInput(self):
-        if self.game.UP:
+        if self.game.keys["UP"]:
             if self.dungeonMap.map[self.dungeonPos[0]-1][self.dungeonPos[1]] != self.dungeonMap.wallChar:
                 self.dungeonPos[0] -= 1
                 self.stepTo(self.dungeonPos[0],self.dungeonPos[1])
             self.drawScreen()
             if self.state == "lootSummary":
                 self.state == "main"
-        if self.game.RIGHT:
+        if self.game.keys["RIGHT"]:
             if self.dungeonMap.map[self.dungeonPos[0]][self.dungeonPos[1]+1] != self.dungeonMap.wallChar:
                 self.dungeonPos[1] += 1
                 self.stepTo(self.dungeonPos[0],self.dungeonPos[1])
             self.drawScreen()
             if self.state == "lootSummary":
                 self.state == "main"
-        if self.game.DOWN:
+        if self.game.keys["DOWN"]:
             if self.dungeonMap.map[self.dungeonPos[0]+1][self.dungeonPos[1]] != self.dungeonMap.wallChar:
                 self.dungeonPos[0] += 1
                 self.stepTo(self.dungeonPos[0],self.dungeonPos[1])
             self.drawScreen()
             if self.state == "lootSummary":
                 self.state == "main"
-        if self.game.LEFT:
+        if self.game.keys["LEFT"]:
             if self.dungeonMap.map[self.dungeonPos[0]][self.dungeonPos[1]-1] != self.dungeonMap.wallChar:
                 self.dungeonPos[1] -= 1
                 self.stepTo(self.dungeonPos[0],self.dungeonPos[1])
             self.drawScreen()
             if self.state == "lootSummary":
                 self.state == "main"
-        if self.game.A:
+        if self.game.keys["A"]:
             print("A")
             if self.state == "lootSummary":
                 if self.game.player.party.add(self.lootLookup().loot,self.game.directory):
@@ -103,13 +103,13 @@ class Crawler():
                 self.dungeonMap.map[self.dungeonPos[0]][self.dungeonPos[1]] = FLOOR_CHAR
                 self.messageTimer = 1000
                 self.state = "main"
-        if self.game.B:
+        if self.game.keys["B"]:
             print("B")
-        if self.game.X:
+        if self.game.keys["X"]:
             print("X")
             #self.inDungeon = False
             #self.game.inGame = False
-        if self.game.START:
+        if self.game.keys["START"]:
             self.pausemenu.pause(self.game.player.currentPos)
 
     def drawScreen(self):

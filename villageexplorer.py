@@ -42,25 +42,25 @@ class Explorer():
         self.blitScreen()
 
     def getInput(self):
-        if self.game.UP:
+        if self.game.keys["UP"]:
             self.stepTo(-1,0)
             self.drawScreen()
-        if self.game.RIGHT:
+        if self.game.keys["RIGHT"]:
             self.stepTo(0,+1)
             self.drawScreen()
-        if self.game.DOWN:
+        if self.game.keys["DOWN"]:
             self.stepTo(+1,0)
             self.drawScreen()
-        if self.game.LEFT:
+        if self.game.keys["LEFT"]:
             self.stepTo(0,-1)
             self.drawScreen()
-        if self.game.A:
+        if self.game.keys["A"]:
             print("A")
-        if self.game.B:
+        if self.game.keys["B"]:
             print("B")
-        if self.game.X:
+        if self.game.keys["X"]:
             print("X")
-        if self.game.START:
+        if self.game.keys["START"]:
             self.pausemenu.pause(self.game.player.currentPos)
 
     def drawScreen(self):

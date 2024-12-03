@@ -383,7 +383,7 @@ class PauseMenu():
         if self.delay > 0:
             self.delay -=  1
             return
-        if self.game.A:
+        if self.game.keys["A"]:
             if self.state == "main":
                 if self.cursorPos == 0:
                     print("RESUME")
@@ -488,7 +488,7 @@ class PauseMenu():
                     self.substate = "none"
                     self.spellTarget = -1
                     self.cursorPos = 0
-        if self.game.B:
+        if self.game.keys["B"]:
             if self.state == "partySelect":
                 self.state = "main"
                 self.cursorPos = 1
@@ -515,13 +515,13 @@ class PauseMenu():
                 self.cursorPos = self.targetElement - (self.spellPageMod*2)
                 self.state = self.substate
                 self.substate = "none"
-        if self.game.X:
+        if self.game.keys["X"]:
             if self.state == "equipment":
                 if self.game.player.party.members[self.targetPartyMember].eqpAcc.id != -1:
                     self.action = "removeAcc"
                     self.state = "confirmAction"
                     self.substate = "equipment"
-        if self.game.UP:
+        if self.game.keys["UP"]:
             if self.state == "main":
                 self.cursorPos -= 1
                 if self.cursorPos < 0:
@@ -547,7 +547,7 @@ class PauseMenu():
                         self.spellPageMod -= 1
                 else:
                     self.cursorPos -= 2
-        if self.game.DOWN:
+        if self.game.keys["DOWN"]:
             if self.state == "main":
                 self.cursorPos += 1
                 if self.cursorPos > 3:
@@ -573,7 +573,7 @@ class PauseMenu():
                         self.spellPageMod += 1
                 else:
                     self.cursorPos += 2
-        if self.game.LEFT:
+        if self.game.keys["LEFT"]:
             if self.state == "map":
                 self.mapPos[1] -= self.panMap()
             elif self.state == "partyMember":
@@ -592,7 +592,7 @@ class PauseMenu():
                         self.cursorPos = 1
                 elif self.substate == "spellbook":
                     self.cursorPos = 0
-        if self.game.RIGHT:
+        if self.game.keys["RIGHT"]:
             if self.state == "map":
                 self.mapPos[1] += self.panMap()
             elif self.state == "partyMember":
@@ -611,9 +611,9 @@ class PauseMenu():
                         self.cursorPos = 0
                 elif self.substate == "spellbook":
                     self.cursorPos = 0
-        if self.game.START:
+        if self.game.keys["START"]:
             self.paused = False
-        if self.game.L:
+        if self.game.keys["L"]:
             if self.state == "map":
                 print("ZOOMOUT")
                 if self.mapZoomSize > 10:
@@ -622,7 +622,7 @@ class PauseMenu():
                     self.mapZoomSize -= 2
             if self.state == "partyMember":
                 characterpopups.LevelUp(self.game, self.game.player.party.members[self.targetPartyMember])
-        if self.game.R:
+        if self.game.keys["R"]:
             if self.state == "map":
                 print("ZOOMIN")
                 if self.mapZoomSize < 40 and self.mapZoomSize >= 10:
@@ -724,7 +724,7 @@ class PauseMenu():
                 if self.game.player.party.members[targetPartyMember].checkProficiency(self.game.player.party.inventory[targetElement],self.game.directory):
                     self.game.player.party.learnSpell(targetPartyMember, targetElement)
             elif self.game.directory.getItemType(self.game.player.party.inventory[targetElement]) == Type.Consumable and (self.game.directory.getItem(self.game.player.party.inventory[targetElement]).timing == Timing.Peacetime or self.game.directory.getItem(self.game.player.party.inventory[targetElement]).timing == Timing.Anytime):
-                self.game.player.party.useConsumable(targetPartyMember,targetElement,self.game.directory)
+                self.game.player.party.useConsumable(targetPartyMember,targetElement,self.game.directory,self.game.overworld.inDungeon)
         elif action == "cast":
             if self.game.player.party.members[targetPartyMember].canCast(targetElement,self.game.directory):
                 self.game.player.party.members[targetPartyMember].expendMana(targetElement,self.game.directory)

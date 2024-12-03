@@ -45,7 +45,7 @@ class MainMenu():
 
     def getInput(self):
         self.cursorHandler()
-        if self.game.A:
+        if self.game.keys["A"]:
             if self.cursorState == "Start":
                 self.game.inGame = True
                 self.displayRunning = False
@@ -73,38 +73,38 @@ class MainMenu():
                 print("Quit!")
                 pygame.quit()
                 sys.exit()
-        if self.game.X:
+        if self.game.keys["X"]:
             if "StartClass" not in self.debugOps:
                 print("StartClass")
                 self.debugOps.append("StartClass")
-        if self.game.Y:
+        if self.game.keys["Y"]:
             if "StartLevel" not in self.debugOps:
                 print("StartLevel")
                 self.debugOps.append("StartLevel")
-        if self.game.L:
+        if self.game.keys["L"]:
             if "ManualEncounters" not in self.debugOps:
                 print("ManualEncounters")
                 self.debugOps.append("ManualEncounters")
-        if self.game.R:
+        if self.game.keys["R"]:
             if "ManualLevelUp" not in self.debugOps:
                 print("ManualLevelUp")
                 self.debugOps.append("ManualLevelUp")
-        if self.game.START:
+        if self.game.keys["START"]:
             if "StartingItems" not in self.debugOps:
                 print("StartingItems")
                 self.debugOps.append("StartingItems")
-        if self.game.SELECT:
+        if self.game.keys["SELECT"]:
             if "StartingZone" not in self.debugOps:
                 print("StartingZone")
                 self.debugOps.append("StartingZone")
-        if self.game.B:
+        if self.game.keys["B"]:
             if "StartingGold" not in self.debugOps:
                 print("StartingGold")
                 self.debugOps.append("StartingGold")
 
 
     def cursorHandler(self):
-        if self.game.DOWN:
+        if self.game.keys["DOWN"]:
             if self.cursorState == "Start":
                 self.cursor.midtop = (self.loadPos[0]-100, self.loadPos[1])
                 self.cursorState = "Load"
@@ -114,7 +114,7 @@ class MainMenu():
             elif self.cursorState == "Quit":
                 self.cursor.midtop = (self.startPos[0]-100, self.startPos[1])
                 self.cursorState = "Start"
-        elif self.game.UP:
+        elif self.game.keys["UP"]:
             if self.cursorState == "Start":
                 self.cursor.midtop = (self.quitPos[0]-100, self.quitPos[1])
                 self.cursorState = "Quit"

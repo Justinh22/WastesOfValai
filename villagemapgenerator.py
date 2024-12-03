@@ -7,11 +7,6 @@ from constants import *
 from buildings import *
 
 PATH_FREQUENCY = 2
-PATH_CHAR = '%'
-
-FOREST_CHAR = '#'
-PLAINS_CHAR = ';'
-DESERT_CHAR = '.'
 
 VILLAGE_PATH_BRANCHES = 4
 TOWN_PATH_BRANCHES = 7
