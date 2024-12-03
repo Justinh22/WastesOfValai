@@ -469,6 +469,23 @@ class Party():
                 member.mp = round(member.getMaxMP())
             else:
                 return
+        elif consumable.name == "Wommi Tuft":
+            self.members[member].resetStatus()
+        elif consumable.name == "Sun Sponge":
+            if self.members[member].status == Status.Ablaze:
+                self.members[member].resetStatus()
+            else:
+                return
+        elif consumable.name == "Pulse Regulator":
+            if self.members[member].status == Status.Shocked:
+                self.members[member].resetStatus()
+            else:
+                return
+        elif consumable.name == "Shaking Stone":
+            if self.members[member].status == Status.Freezing:
+                self.members[member].resetStatus()
+            else:
+                return
         self.inventory.pop(index)
     def getPower(self):
         power = 0

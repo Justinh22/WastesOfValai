@@ -96,17 +96,17 @@ class Building():
         if self.delay > 0:
             self.delay -= 1
             return
-        if game.UP:
+        if game.keys["UP"]:
             print("UP")
-        if game.DOWN:
+        if game.keys["DOWN"]:
             print("DOWN")
-        if game.A:
+        if game.keys["A"]:
             print("A")
-        if game.B:
+        if game.keys["B"]:
             print("B")
-        if game.X:
+        if game.keys["X"]:
             print("X")
-        if game.Y:
+        if game.keys["Y"]:
             print("Y")
 
     def drawScreen(self,game):
@@ -145,7 +145,7 @@ class Forge(Building):
         if self.delay > 0:
             self.delay -= 1
             return
-        if game.UP:
+        if game.keys["UP"]:
             print("UP")
             if self.state == "selectItem":
                 if self.cursorPos == 1 and self.pageModifier > 0:
@@ -168,7 +168,7 @@ class Forge(Building):
                 self.cursorPos -= 1
                 if self.cursorPos < 0:
                     self.cursorPos = len(self.reforgeableItems)-1
-        if game.DOWN:
+        if game.keys["DOWN"]:
             print("DOWN")
             if self.state == "selectItem":
                 if self.cursorPos == 3 and (self.pageModifier+5 < len(self.player.party.equipment)):
@@ -191,15 +191,15 @@ class Forge(Building):
                 self.cursorPos += 1
                 if self.cursorPos > len(self.reforgeableItems)-1:
                     self.cursorPos = 0
-        if game.LEFT:
+        if game.keys["LEFT"]:
             if self.state == "weaponRefinement" or self.state == "armorRefinement":
                 if self.tentativeRefineLevel[self.cursorPos] > self.currentRefineLevel[self.cursorPos]:
                     self.tentativeRefineLevel[self.cursorPos] -= 1
-        if game.RIGHT:
+        if game.keys["RIGHT"]:
             if self.state == "weaponRefinement" or self.state == "armorRefinement":
                 if self.tentativeRefineLevel[self.cursorPos] < MAX_REFINE_LEVEL:
                     self.tentativeRefineLevel[self.cursorPos] += 1
-        if game.A:
+        if game.keys["A"]:
             print("A")
             if self.state == "main":
                 self.state = "chooseInventory"
@@ -282,7 +282,7 @@ class Forge(Building):
                 self.state = self.substate
                 self.substate = "reforge"
                 self.cursorPos = 0
-        if game.B:
+        if game.keys["B"]:
             print("B")
             if self.state == "main":
                 self.inMenu = False
@@ -308,7 +308,7 @@ class Forge(Building):
                 self.substate = "reforge"
             elif self.state == "confirmReforge":
                 self.state = "reforge"
-        if game.X:
+        if game.keys["X"]:
             print("X")
             if self.state == "main":
                 self.state = "chooseInventory"
@@ -321,9 +321,9 @@ class Forge(Building):
                 self.state = "partySelect"
                 self.itemType = "armor"
                 self.cursorPos = 0
-        if game.Y:
+        if game.keys["Y"]:
             print("Y")
-        if game.START:
+        if game.keys["START"]:
             print("START")
             self.inMenu = False
 
@@ -495,21 +495,21 @@ class Shop(Building):
         if self.delay > 0:
             self.delay -= 1
             return
-        if game.UP:
+        if game.keys["UP"]:
             print("UP")
             if self.state == "shopScreen":
                 if self.cursorPos == 1 and self.shopPageModifier > 0:
                     self.shopPageModifier -= 1
                 elif self.cursorPos > 0:
                     self.cursorPos -= 1
-        if game.DOWN:
+        if game.keys["DOWN"]:
             print("DOWN")
             if self.state == "shopScreen":
                 if self.cursorPos == 3 and (self.shopPageModifier+5 < len(self.shopInventory)):
                     self.shopPageModifier += 1
                 elif self.cursorPos < 4 and self.cursorPos < len(self.shopInventory)-1:
                     self.cursorPos += 1
-        if game.A:
+        if game.keys["A"]:
             print("A")
             if self.state == "main":
                 self.state = "shopScreen"
@@ -528,7 +528,7 @@ class Shop(Building):
                 self.player.party.add(self.targetItem.id,self.directory)
                 self.state = "shopScreen"
                 self.substate = "purchased"
-        if game.B:
+        if game.keys["B"]:
             print("B")
             if self.state == "main":
                 self.inMenu = False
@@ -538,9 +538,9 @@ class Shop(Building):
             elif self.state == "confirmPurchase":
                 self.state = "shopScreen"
                 self.substate = "none"
-        if game.X:
+        if game.keys["X"]:
             print("X")
-        if game.Y:
+        if game.keys["Y"]:
             print("Y")
 
     def drawScreen(self,game):
@@ -920,21 +920,21 @@ class BlackMarket(Shop):
         if self.delay > 0:
             self.delay -= 1
             return
-        if game.UP:
+        if game.keys["UP"]:
             print("UP")
             if self.state == "shopScreen" or self.state == "sellEquipmentScreen" or self.state == "sellInventoryScreen":
                 if self.cursorPos == 1 and self.shopPageModifier > 0:
                     self.shopPageModifier -= 1
                 elif self.cursorPos > 0:
                     self.cursorPos -= 1
-        if game.DOWN:
+        if game.keys["DOWN"]:
             print("DOWN")
             if self.state == "shopScreen" or self.state == "sellEquipmentScreen" or self.state == "sellInventoryScreen":
                 if self.cursorPos == 3 and (self.shopPageModifier+5 < len(self.shopInventory)):
                     self.shopPageModifier += 1
                 elif self.cursorPos < 4 and self.cursorPos < len(self.shopInventory)-1:
                     self.cursorPos += 1
-        if game.A:
+        if game.keys["A"]:
             print("A")
             if self.state == "main":
                 self.state = "shopScreen"
@@ -989,7 +989,7 @@ class BlackMarket(Shop):
                     self.player.gold += self.calculateSellValue(item)
                     self.player.party.inventory.pop(self.targetItem)
                 self.substate = "purchased"
-        if game.B:
+        if game.keys["B"]:
             print("B")
             if self.state == "main":
                 self.inMenu = False
@@ -1011,7 +1011,7 @@ class BlackMarket(Shop):
                 elif self.substate == "inventory":
                     self.state = "sellInventoryScreen"
                 self.substate = "none"
-        if game.X:
+        if game.keys["X"]:
             print("X")
             if self.state == "main":
                 self.state = "sellInventorySelect"
@@ -1021,7 +1021,7 @@ class BlackMarket(Shop):
                 self.substate = "none"
                 self.cursorPos = 0
                 self.shopPageModifier = 0
-        if game.Y:
+        if game.keys["Y"]:
             print("Y")
 
     def drawScreen(self,game):
@@ -1134,7 +1134,10 @@ class BlackMarket(Shop):
                 return
     
     def calculateCost(self, item):
-        return round(20 * (self.directory.getItemRarity(item) ** 1.8))
+        if self.directory.getItemType(item) != Type.Accessory:
+            return round(20 * (self.directory.getItemRarity(item) ** 1.8))
+        else:
+            return round(50 * ((self.directory.getItemRarity(item)*2) ** 2))
 
     def calculateSellValue(self, item):
         return round(15 * (self.directory.getItemRarity(item) ** .8))
@@ -1158,17 +1161,17 @@ class Bazaar(Building):
         if self.delay > 0:
             self.delay -= 1
             return
-        if game.UP:
+        if game.keys["UP"]:
             print("UP")
-        if game.DOWN:
+        if game.keys["DOWN"]:
             print("DOWN")
-        if game.A:
+        if game.keys["A"]:
             print("A")
-        if game.B:
+        if game.keys["B"]:
             print("B")
-        if game.X:
+        if game.keys["X"]:
             print("X")
-        if game.Y:
+        if game.keys["Y"]:
             print("Y")
 
     def drawScreen(self,game):
@@ -1194,21 +1197,21 @@ class Inn(Building):
         if self.delay > 0:
             self.delay -= 1
             return
-        if game.UP:
+        if game.keys["UP"]:
             print("UP")
             if self.state == "menu":
                 if self.cursorPos == 1 and self.pageModifier > 0:
                     self.pageModifier -= 1
                 elif self.cursorPos > 0:
                     self.cursorPos -= 1
-        if game.DOWN:
+        if game.keys["DOWN"]:
             print("DOWN")
             if self.state == "menu":
                 if self.cursorPos == 3 and (self.pageModifier+5 < len(self.foodList)):
                     self.pageModifier += 1
                 elif self.cursorPos < 4 and self.cursorPos < len(self.foodList)-1:
                     self.cursorPos += 1
-        if game.A:
+        if game.keys["A"]:
             print("A")
             if self.state == "main":
                 self.player.party.removeFoodEffect(self.directory)
@@ -1227,7 +1230,7 @@ class Inn(Building):
                 self.player.party.addFoodEffect(self.targetItem,self.directory)
                 self.state = "menu"
                 self.substate = "purchased"
-        if game.B:
+        if game.keys["B"]:
             print("B")
             if self.state == "main":
                 self.inMenu = False
@@ -1237,11 +1240,11 @@ class Inn(Building):
             elif self.state == "confirmFood":
                 self.state = "menu"
                 self.substate = "none"
-        if game.X:
+        if game.keys["X"]:
             print("X")
             if self.state == "main":
                 Hostel(game)
-        if game.Y:
+        if game.keys["Y"]:
             print("Y")
             if self.state == "main":
                 self.state = "menu"
@@ -1376,7 +1379,7 @@ class RuneCarver(Building):
         if self.delay > 0:
             self.delay -= 1
             return
-        if game.UP:
+        if game.keys["UP"]:
             print("UP")
             if self.state == "selectItem":
                 if self.cursorPos == 1 and self.pageModifier > 0:
@@ -1392,7 +1395,7 @@ class RuneCarver(Building):
                     self.pageModifier -= 1
                 elif self.cursorPos > 0:
                     self.cursorPos -= 1
-        if game.DOWN:
+        if game.keys["DOWN"]:
             print("DOWN")
             if self.state == "selectItem":
                 if self.cursorPos == 3 and (self.pageModifier+5 < len(self.player.party.equipment)):
@@ -1408,7 +1411,7 @@ class RuneCarver(Building):
                     self.pageModifier += 1
                 elif self.cursorPos < 4 and self.cursorPos < len(self.runeList)-1:
                     self.cursorPos += 1
-        if game.A:
+        if game.keys["A"]:
             print("A")
             if self.state == "main":
                 self.usage = "etch"
@@ -1457,7 +1460,7 @@ class RuneCarver(Building):
                 self.state = self.substate
                 self.substate = "none"
                 self.cursorPos = 0
-        if game.B:
+        if game.keys["B"]:
             print("B")
             if self.state == "main":
                 self.inMenu = False
@@ -1482,7 +1485,7 @@ class RuneCarver(Building):
                 self.substate = None
             elif self.state == "confirmEnhancement":
                 self.state = "runeEnhancement"
-        if game.X:
+        if game.keys["X"]:
             print("X")
             if self.state == "main":
                 self.usage = "enhance"
@@ -1491,9 +1494,9 @@ class RuneCarver(Building):
             elif self.state == "chooseInventory":
                 self.state = "selectItem"
                 self.cursorPos = 0
-        if game.Y:
+        if game.keys["Y"]:
             print("Y")
-        if game.START:
+        if game.keys["START"]:
             print("START")
             self.inMenu = False
 

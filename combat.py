@@ -1795,6 +1795,27 @@ class Combat():
             effect = ActiveEffect(consumable.id, source, target, consumable.data)
             self.activeEffects.insert(0,effect)
 
+        elif consumable.name == "Wommi Tuft":
+            self.game.player.party.members[target].resetStatus()
+
+        elif consumable.name == "Sun Sponge":
+            if self.game.player.party.members[target].status == Status.Ablaze:
+                self.game.player.party.members[target].resetStatus()
+            else:
+                return
+
+        elif consumable.name == "Pulse Regulator":
+            if self.game.player.party.members[target].status == Status.Shocked:
+                self.game.player.party.members[target].resetStatus()
+            else:
+                return
+
+        elif consumable.name == "Shaking Stone":
+            if self.game.player.party.members[target].status == Status.Freezing:
+                self.game.player.party.members[target].resetStatus()
+            else:
+                return
+
         self.game.player.party.inventory.remove(consumable.id)
 
 

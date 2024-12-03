@@ -676,12 +676,9 @@ def initFoodDirectory():
 def initConsumableDirectory():
     consumableDirectory = []
 
-    # Anytime
     # Honna Tear - Raises a party member with half HP and MP
     HonnaTear = Consumable("Honna Tear","A small glass vial containing a tear from the rare Honna Falcon, said to be a messenger of Rendai. Raises a fallen party member with half HP and MP.",3,800,Target.Ally,Timing.Anytime,0)
     consumableDirectory.append(HonnaTear)
-
-    # Combat
     # Fire Arrow - 50dmg to one target
     FireArrow = Consumable("Fire Arrow","A small, pre-loaded dart shooter, loaded with an arrow that bursts into flames on impact. Deals 50 damage to one target.",1,801,Target.Single,Timing.InTurn,50)
     consumableDirectory.append(FireArrow)
@@ -715,8 +712,6 @@ def initConsumableDirectory():
     # Second Soul - Immediately raises the next fallen party member with full HP and MP
     SecondSoul = Consumable("Second Soul","A floating golden light in a jar. Whenever the next party member falls, the soul will burst from the jar and restore them to full HP and MP.",4,811,Target.Ally,Timing.OnDeath,0)
     consumableDirectory.append(SecondSoul)
-
-    # Peacetime
     # Campfire Kit - Fully restores the party's HP
     CampfireKit = Consumable("Campfire Kit","A handy pack full of everything you need to set up camp for the night. Fully restores the party's HP.",2,812,Target.Party,Timing.Peacetime,0)
     consumableDirectory.append(CampfireKit)
@@ -726,6 +721,18 @@ def initConsumableDirectory():
     # Callaret's Compact - Returns the party to the last haven/village visited
     CallaretsCompact = Consumable("Callaret's Compact","A gold inlaid compact mirror that hums gently. When looked into, it teleports the party to the last haven or village that they visited.",3,814,Target.Party,Timing.Peacetime,0)
     consumableDirectory.append(CallaretsCompact)
+    # Wommi Tuft - Cures an ally of any status effect
+    WommiTuft = Consumable("Wommi Tuft","A tuft of wool from a Wommi. When rubbed on skin, it cures the target of any negative status effects.",2,815,Target.Ally,Timing.Anytime,0)
+    consumableDirectory.append(WommiTuft)
+    # Sun Sponge - Cures an ally of Ablaze
+    SunSponge = Consumable("Sun Sponge","A soft sponge that is cool to the touch, known to draw in heat of anything touching it at an incredible rate. Cures an ally of Ablaze.",1,816,Target.Ally,Timing.Anytime,0)
+    consumableDirectory.append(SunSponge)
+    # Pulse Regulator - Cures an ally of any Shocked
+    PulseRegulator = Consumable("Pulse Regulator","A small needle that pulses with a steady rate, which can reset the nervous system of a patient when pierced with it. Cures an ally of Shocked.",1,817,Target.Ally,Timing.Anytime,0)
+    consumableDirectory.append(PulseRegulator)
+    # Shaking Stone - Cures an ally of Freezing
+    ShakingStone = Consumable("Shaking Stone","A small stone that vibrates rapidly, giving off heat. Cures an ally of Freezing.",1,818,Target.Ally,Timing.Anytime,0)
+    consumableDirectory.append(ShakingStone)
 
     return consumableDirectory
 
