@@ -68,6 +68,7 @@ class PauseMenu():
             write(self.game, 20, 60, 115, "Party")
             write(self.game, 20, 60, 140, "Map")
             write(self.game, 20, 60, 165, "Quit")
+            write(self.game, 20, 60, 430, "Gold: " + str(self.game.player.gold))
             if self.state == "main":
                 write(self.game, 20, 30, 87 + (self.cursorPos*25), "->")
             if self.state == "partySelect":
@@ -97,15 +98,15 @@ class PauseMenu():
             write(self.game, 20, 60, 165, "Spells")
             self.drawMinStatBlock(250, 45, self.game.player.party.members[self.targetPartyMember])
             weapon = self.game.player.party.members[self.targetPartyMember].eqpWpn
-            write(self.game, 12, 250, 145, "Weapon: " + weapon.name + " (" + str(weapon.attack) + " ATK, " + str(weapon.accuracy) + " ACC, " + str(weapon.critrate) + " CRT, " + str(weapon.amplifier) + " AMP)")
+            write(self.game, 12, 250, 145, "Weapon: " + weapon.name + " (" + str(weapon.getAttack()) + " ATK, " + str(weapon.getAccuracy()) + " ACC, " + str(weapon.getCritrate()) + " CRT, " + str(weapon.amplifier) + " AMP)")
             armor = self.game.player.party.members[self.targetPartyMember].eqpAmr
-            write(self.game, 12, 250, 162, "Armor: " + armor.name + " (" + str(armor.defense) + " DEF, " + str(armor.dodge) + " DDG, " + str(armor.manaregen) + " MPG)")
+            write(self.game, 12, 250, 162, "Armor: " + armor.name + " (" + str(armor.getDefense()) + " DEF, " + str(armor.getDodge()) + " DDG, " + str(armor.manaregen) + " MPG)")
             accessory = self.game.player.party.members[self.targetPartyMember].eqpAcc
             if accessory.id == -1:
                 write(self.game, 12, 250, 179, "Accessory: None")
-            elif accessory.type == AccessoryType.Passive:
+            elif accessory.type == ActivationType.Passive:
                 write(self.game, 12, 250, 179, "Accessory: " + accessory.name)
-            elif accessory.type == AccessoryType.Active:
+            elif accessory.type == ActivationType.Active:
                 write(self.game, 12, 250, 179, "Accessory: " + accessory.name + " (" + str(accessory.activationRate) + " LCK)")
 
             if self.state == "partyMember":
@@ -154,7 +155,7 @@ class PauseMenu():
                 spelltype = "Attack" if tgt.type == SpellType.Attack or tgt.type == SpellType.Debuff else "Support"
                 writeOrientation(self.game, 15, self.right-40, 220, "Level "+str(tgt.rarity)+" "+spelltype+" Spell | "+str(tgt.manacost) + " MP", "R")
                 if tgt.type == SpellType.Attack:
-                    write(self.game, 15, 60, 245, "Deals " + str(self.game.player.party.members[self.targetPartyMember].amplify(tgt.attack)) + " damage.")
+                    write(self.game, 15, 60, 245, "Deals " + str(self.game.player.party.members[self.targetPartyMember].amplify(tgt.getAttack())) + " damage.")
                 elif tgt.type == SpellType.Buff:
                     buffText = ""
                     commaSeparator = ""
@@ -188,19 +189,29 @@ class PauseMenu():
                     write(self.game, 22, 510 + (self.cursorPos*100), 417, "->")
             elif self.substate == "equipment":
                 if self.action != "removeAcc":
-                    tgt = self.game.directory.getItem(self.game.player.party.equipment[self.targetElement])
+                    tgt = self.game.player.party.equipment[self.targetElement]
                 else:
-                    tgt = self.game.directory.getItem(self.game.player.party.members[self.targetPartyMember].eqpAcc.id)
+                    tgt = self.game.player.party.members[self.targetPartyMember].eqpAcc
                 statText = ""
                 itemType = self.game.directory.getItemType(tgt.id)
-                self.itemName = self.game.directory.getItemName(tgt.id,True)
+                self.itemName = tgt.name
                 write(self.game, 20, 60, 220, self.itemName)
                 if itemType == Type.Weapon:
                     writeOrientation(self.game, 15, self.right-40, 220, "Level "+str(tgt.rarity)+" "+tgt.type.name, "R")
-                    statText = "ATK " + str(tgt.attack) + " | ACC " + str(tgt.accuracy) + " | CRT " + str(tgt.critrate) + " | AMP " + str(tgt.amplifier)
+                    modifierText = ""
+                    if tgt.rune != None:
+                        modifierText += tgt.rune.name + " " + tgt.rune.getRuneLevelString()
+                    if tgt.atkRefine > 0 or tgt.accRefine > 0 or tgt.crtRefine > 0:
+                        if modifierText != "":
+                            modifierText += " | "
+                        modifierText += "+" + str(tgt.atkRefine) + "/+" + str(tgt.accRefine) + "/+" + str(tgt.crtRefine)
+                    writeOrientation(self.game, 15, self.right-40, 245, modifierText, "R")
+                    statText = "ATK " + str(tgt.getAttack()) + " | ACC " + str(tgt.getAccuracy()) + " | CRT " + str(tgt.getCritrate()) + " | AMP " + str(tgt.amplifier)
                 elif itemType == Type.Armor:
                     writeOrientation(self.game, 15, self.right-40, 220, "Level "+str(tgt.rarity)+" "+tgt.type.name+" Armor", "R")
-                    statText = "DEF " + str(tgt.defense) + " | DDG " + str(tgt.dodge) + " | MPG " + str(tgt.manaregen)
+                    if tgt.defRefine > 0 or tgt.ddgRefine > 0:
+                        writeOrientation(self.game, 15, self.right-40, 245, "+" + str(tgt.defRefine) + "/+" + str(tgt.ddgRefine), "R")
+                    statText = "DEF " + str(tgt.getDefense()) + " | DDG " + str(tgt.getDodge()) + " | MPG " + str(tgt.manaregen)
                 write(self.game, 15, 60, 245, statText)
                 if self.state == "itemSummary":
                     write(self.game, 22, 440, 420, "Equip")
@@ -316,9 +327,9 @@ class PauseMenu():
                     #c = int(((x / blockSize)-math.ceil(gridWidth/2))+self.mapPos[1])
                     mapChar = '_'
                     if r < 0 or r >= self.game.WorldMap.sizeR:
-                        mapChar = OCEAN_CHAR
+                        mapChar = " "
                     if c < 0 or c >= self.game.WorldMap.sizeC:
-                        mapChar = OCEAN_CHAR
+                        mapChar = " "
                     if r == self.currentPos[0] and c == self.currentPos[1]:
                         mapChar = '@'
                     if mapChar == '_':
@@ -333,8 +344,10 @@ class PauseMenu():
                                     color = self.game.lightgreen
                                 elif mapChar == DESERT_CHAR: # Desert
                                     color = self.game.tan
-                            elif self.mapMode == "difficulty" and mapChar != OCEAN_CHAR and mapChar != BORDER_CHAR and mapChar != PATH_CHAR:
-                                if mapChar == FOREST_CHAR or mapChar == PLAINS_CHAR or mapChar == DESERT_CHAR:
+                                elif mapChar == OCEAN_CHAR: # Desert
+                                    color = self.game.blue
+                            elif self.mapMode == "difficulty" and mapChar != BORDER_CHAR and mapChar != PATH_CHAR:
+                                if mapChar == FOREST_CHAR or mapChar == PLAINS_CHAR or mapChar == DESERT_CHAR or mapChar == OCEAN_CHAR:
                                     diff = self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c])
                                     power = math.ceil(self.game.player.party.getPower()/2)
                                     difficultyDiff = abs(diff-power)
@@ -346,6 +359,8 @@ class PauseMenu():
                                         color = (255 - (difficultyDiff * 85), 255, 255 - (difficultyDiff * 85))
                                     else:
                                         color = self.game.white
+                                    if mapChar == OCEAN_CHAR:
+                                        color = self.game.blue
                         else:
                             if self.game.WorldMap.map[r][c] == BORDER_CHAR:
                                 mapChar = self.game.WorldMap.map[r][c]
@@ -368,7 +383,7 @@ class PauseMenu():
         if self.delay > 0:
             self.delay -=  1
             return
-        if self.game.A:
+        if self.game.keys["A"]:
             if self.state == "main":
                 if self.cursorPos == 0:
                     print("RESUME")
@@ -473,7 +488,7 @@ class PauseMenu():
                     self.substate = "none"
                     self.spellTarget = -1
                     self.cursorPos = 0
-        if self.game.B:
+        if self.game.keys["B"]:
             if self.state == "partySelect":
                 self.state = "main"
                 self.cursorPos = 1
@@ -500,13 +515,13 @@ class PauseMenu():
                 self.cursorPos = self.targetElement - (self.spellPageMod*2)
                 self.state = self.substate
                 self.substate = "none"
-        if self.game.X:
+        if self.game.keys["X"]:
             if self.state == "equipment":
                 if self.game.player.party.members[self.targetPartyMember].eqpAcc.id != -1:
                     self.action = "removeAcc"
                     self.state = "confirmAction"
                     self.substate = "equipment"
-        if self.game.UP:
+        if self.game.keys["UP"]:
             if self.state == "main":
                 self.cursorPos -= 1
                 if self.cursorPos < 0:
@@ -532,7 +547,7 @@ class PauseMenu():
                         self.spellPageMod -= 1
                 else:
                     self.cursorPos -= 2
-        if self.game.DOWN:
+        if self.game.keys["DOWN"]:
             if self.state == "main":
                 self.cursorPos += 1
                 if self.cursorPos > 3:
@@ -558,7 +573,7 @@ class PauseMenu():
                         self.spellPageMod += 1
                 else:
                     self.cursorPos += 2
-        if self.game.LEFT:
+        if self.game.keys["LEFT"]:
             if self.state == "map":
                 self.mapPos[1] -= self.panMap()
             elif self.state == "partyMember":
@@ -577,7 +592,7 @@ class PauseMenu():
                         self.cursorPos = 1
                 elif self.substate == "spellbook":
                     self.cursorPos = 0
-        if self.game.RIGHT:
+        if self.game.keys["RIGHT"]:
             if self.state == "map":
                 self.mapPos[1] += self.panMap()
             elif self.state == "partyMember":
@@ -596,9 +611,9 @@ class PauseMenu():
                         self.cursorPos = 0
                 elif self.substate == "spellbook":
                     self.cursorPos = 0
-        if self.game.START:
+        if self.game.keys["START"]:
             self.paused = False
-        if self.game.L:
+        if self.game.keys["L"]:
             if self.state == "map":
                 print("ZOOMOUT")
                 if self.mapZoomSize > 10:
@@ -607,7 +622,7 @@ class PauseMenu():
                     self.mapZoomSize -= 2
             if self.state == "partyMember":
                 characterpopups.LevelUp(self.game, self.game.player.party.members[self.targetPartyMember])
-        if self.game.R:
+        if self.game.keys["R"]:
             if self.state == "map":
                 print("ZOOMIN")
                 if self.mapZoomSize < 40 and self.mapZoomSize >= 10:
@@ -686,9 +701,9 @@ class PauseMenu():
 
     def actionHandler(self,tgtList,action,targetPartyMember,targetElement,spellTarget=-1):
         if action == "equip":
-            if self.game.player.party.members[targetPartyMember].checkProficiency(self.game.player.party.equipment[targetElement],self.game.directory):
+            if self.game.player.party.members[targetPartyMember].checkProficiency(self.game.player.party.equipment[targetElement].id,self.game.directory):
                 replace = self.game.player.party.members[targetPartyMember].equip(self.game.player.party.equipment[targetElement],self.game.directory)
-                if replace != -1:
+                if replace.id != -1:
                     print(f'Replace! Setting pos {targetElement} to {replace}')
                     self.game.player.party.equipment[targetElement] = replace
                 else:
@@ -699,7 +714,8 @@ class PauseMenu():
             elif tgtList == "equipment":
                 self.game.player.party.dropEquipment(targetElement)
         elif action == "removeAcc":
-            self.game.player.party.removeAccessory(targetPartyMember)
+            self.game.player.party.removeAccessory(targetPartyMember,self.game.directory)
+            self.action = "none"
             self.targetElement = 0
         elif action == "use":
             if self.game.directory.getItemType(self.game.player.party.inventory[targetElement]) == Type.Potion:
@@ -707,6 +723,8 @@ class PauseMenu():
             elif self.game.directory.getItemType(self.game.player.party.inventory[targetElement]) == Type.AtkSpell or self.game.directory.getItemType(self.game.player.party.inventory[targetElement]) == Type.SptSpell:
                 if self.game.player.party.members[targetPartyMember].checkProficiency(self.game.player.party.inventory[targetElement],self.game.directory):
                     self.game.player.party.learnSpell(targetPartyMember, targetElement)
+            elif self.game.directory.getItemType(self.game.player.party.inventory[targetElement]) == Type.Consumable and (self.game.directory.getItem(self.game.player.party.inventory[targetElement]).timing == Timing.Peacetime or self.game.directory.getItem(self.game.player.party.inventory[targetElement]).timing == Timing.Anytime):
+                self.game.player.party.useConsumable(targetPartyMember,targetElement,self.game.directory,self.game.overworld.inDungeon)
         elif action == "cast":
             if self.game.player.party.members[targetPartyMember].canCast(targetElement,self.game.directory):
                 self.game.player.party.members[targetPartyMember].expendMana(targetElement,self.game.directory)

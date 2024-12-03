@@ -5,6 +5,7 @@ from directory import *
 from roomhandler import *
 from writing import *
 from dungeoncrawler import *
+from villageexplorer import *
 from utility import *
 
 class Overworld():
@@ -12,6 +13,7 @@ class Overworld():
         self.game = game
         self.inWorld = True
         self.inDungeon = False
+        self.inVillage = False
         self.currentDungeon = 0
         self.width = self.game.width - 60
         self.height = self.game.height - 60
@@ -42,45 +44,52 @@ class Overworld():
                 self.currentDungeon.display()
                 if self.currentDungeon.inDungeon == False:
                     self.inDungeon = False
+            if self.inVillage:
+                self.game.screen.fill(self.game.black)
+                self.currentVillage.display()
+                if self.currentVillage.inVillage == False:
+                    self.inVillage = False
             self.drawScreen()
             self.blitScreen()
         self.game.screen.fill(self.game.black)
         self.blitScreen()
 
     def getInput(self):
-        if self.game.UP:
+        if self.game.keys["UP"]:
             if self.game.WorldMap.map[self.game.player.currentPos[0]-1][self.game.player.currentPos[1]] != OCEAN_CHAR and self.game.WorldMap.map[self.game.player.currentPos[0]-1][self.game.player.currentPos[1]] != 'X':
                 self.game.player.currentPos[0] -= 1
                 self.stepTo(self.game.player.currentPos[0],self.game.player.currentPos[1])
             self.drawScreen()
-        if self.game.RIGHT:
+        if self.game.keys["RIGHT"]:
             if self.game.WorldMap.map[self.game.player.currentPos[0]][self.game.player.currentPos[1]+1] != OCEAN_CHAR and self.game.WorldMap.map[self.game.player.currentPos[0]][self.game.player.currentPos[1]+1] != 'X':
                 self.game.player.currentPos[1] += 1
                 self.stepTo(self.game.player.currentPos[0],self.game.player.currentPos[1])
             self.drawScreen()
-        if self.game.DOWN:
+        if self.game.keys["DOWN"]:
             if self.game.WorldMap.map[self.game.player.currentPos[0]+1][self.game.player.currentPos[1]] != OCEAN_CHAR and self.game.WorldMap.map[self.game.player.currentPos[0]+1][self.game.player.currentPos[1]] != 'X':
                 self.game.player.currentPos[0] += 1
                 self.stepTo(self.game.player.currentPos[0],self.game.player.currentPos[1])
             self.drawScreen()
-        if self.game.LEFT:
+        if self.game.keys["LEFT"]:
             if self.game.WorldMap.map[self.game.player.currentPos[0]][self.game.player.currentPos[1]-1] != OCEAN_CHAR and self.game.WorldMap.map[self.game.player.currentPos[0]][self.game.player.currentPos[1]-1] != 'X':
                 self.game.player.currentPos[1] -= 1
                 self.stepTo(self.game.player.currentPos[0],self.game.player.currentPos[1])
             self.drawScreen()
-        if self.game.A:
+        if self.game.keys["A"]:
             print("A")
-        if self.game.B:
+        if self.game.keys["B"]:
             if self.game.debug_manualEncounters:
                 encounter = []
                 encounter = self.game.directory.buildEncounter(self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[self.game.player.currentPos[0]][self.game.player.currentPos[1]]),self.getBiome(self.game.player.currentPos[0],self.game.player.currentPos[1]))
                 self.combat.initialize(encounter)
-        if self.game.X:
+        if self.game.keys["X"]:
             print("X")
-        if self.game.Y:
+        if self.game.keys["Y"]:
             print("Y")
-        if self.game.START:
+        if self.game.keys["START"]:
             self.pausemenu.pause(self.game.player.currentPos)
+            if self.game.player.party.callaretsCompact:
+                self.game.player.currentPos = list(self.game.player.lastCheckpoint)
 
     def drawScreen(self):
         blockSize = 30 #Set the size of the grid block
@@ -117,8 +126,10 @@ class Overworld():
                 mapChar = '_'
                 if r < 0 or r >= self.game.WorldMap.sizeR:
                     mapChar = OCEAN_CHAR
+                    color = self.game.blue
                 if c < 0 or c >= self.game.WorldMap.sizeC:
                     mapChar = OCEAN_CHAR
+                    color = self.game.blue
                 if r == self.game.player.currentPos[0] and c == self.game.player.currentPos[1]:
                     mapChar = '@'
                 if mapChar == '_':
@@ -134,7 +145,9 @@ class Overworld():
                         color = self.game.tan
                     elif mapChar == PATH_CHAR: # Path
                         color = self.game.orange
-                    elif self.game.roomDB.doesExist((r,c)) or self.game.dungeonDB.doesExist((r,c)):
+                    elif mapChar == OCEAN_CHAR: # Path
+                        color = self.game.blue
+                    elif self.game.roomDB.doesExist((r,c)) or self.game.dungeonDB.doesExist((r,c)) or self.game.villageDB.doesExist((r,c)):
                         color = self.game.gray
                 text = self.font.render(mapChar,True,color)
                 textWidth, textHeight = self.font.size(mapChar)
@@ -172,8 +185,8 @@ class Overworld():
         # self.game.stir()
         if self.game.WorldMap.map[r][c] != FOREST_CHAR and self.game.WorldMap.map[r][c] != PLAINS_CHAR and self.game.WorldMap.map[r][c] != DESERT_CHAR and self.game.WorldMap.map[r][c] != PATH_CHAR:
             self.steps += 1
-            if self.game.WorldMap.map[r][c] == HAVEN_CHAR:
-                if not (self.game.roomDB.doesExist((r,c))):
+            if self.game.WorldMap.map[r][c] == HAVEN_CHAR or self.game.WorldMap.map[r][c] == VILLAGE_CHAR:
+                if (not (self.game.roomDB.doesExist((r,c))) and self.game.WorldMap.map[r][c] == HAVEN_CHAR) or (not (self.game.villageDB.doesExist((r,c))) and self.game.WorldMap.map[r][c] == VILLAGE_CHAR):
                     if self.game.player.lastCheckpoint != (0,0):
                         pathfinder = Pathfinder(self.game.player.lastCheckpoint,(r,c),self.game.WorldMap.map)
                         path = pathfinder.calculatePath()
@@ -189,11 +202,16 @@ class Overworld():
             if self.game.WorldMap.map[r][c] == ABANDONED_VILLAGE_CHAR or self.game.WorldMap.map[r][c] == HAVEN_CHAR or self.game.WorldMap.map[r][c] == SHACK_CHAR:
                 if self.game.WorldMap.map[r][c] == HAVEN_CHAR:
                     typ = "haven"
-                else:
+                elif self.game.WorldMap.map[r][c] == SHACK_CHAR or self.game.WorldMap.map[r][c] == ABANDONED_VILLAGE_CHAR:
                     typ = "room"
                 print(f'Type: {typ}')
                 newRoom = RoomHandler(self.game, self.game.roomDB.getRoom((r,c),self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]),typ))
                 newRoom.enter()
+            elif self.game.WorldMap.map[r][c] == VILLAGE_CHAR:
+                print("Das a village bay-be!")
+                self.currentVillage = Explorer(self.game,self.game.villageDB.getVillage((r,c),self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]), self.approximateBiome(r,c)))
+                self.currentVillage.inVillage = True
+                self.inVillage = True
             else:
                 self.currentDungeon = Crawler(self.game,self.game.dungeonDB.getDungeon((r,c),self.getDungeonType(r,c),self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c])))
                 self.currentDungeon.inDungeon = True
@@ -223,6 +241,16 @@ class Overworld():
                 encounter = self.game.directory.buildEncounter(self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]),self.getBiome(self.game.player.currentPos[0],self.game.player.currentPos[1]))
                 self.combat.initialize(encounter)
         self.lastDiff = self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c])
+
+
+    def approximateBiome(self,r,c):
+        checklist = [(-1,0),(0,1),(1,0),(0,-1)]
+        biomeRankings = {Biome.Forest: 0, Biome.Plains: 0, Biome.Desert: 0}
+        for mod in checklist:
+            biome = self.getBiome(r+mod[0],c+mod[1])
+            if biome is not Biome.Other and biome is not Biome.Path:
+                biomeRankings[biome] += 1
+        return max(biomeRankings, key=biomeRankings.get)
 
 
 class Pathfinder():

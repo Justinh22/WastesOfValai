@@ -556,83 +556,223 @@ def initTalentDirectory():
 def initAccessoryDirectory():
     accessoryDirectory = []
 
-    SolarBand = Accessory("Solar Band","Increases HP for the wearer by 10.",1,600,0,AccessoryType.Passive,Timing.Universal,10)
+    SolarBand = Accessory("Solar Band","Increases HP for the wearer by 10.",1,600,0,ActivationType.Passive,Timing.Universal,10)
     accessoryDirectory.append(SolarBand)
-    LunarBand = Accessory("Lunar Band","Increases MP for the wearer by 10.",1,601,0,AccessoryType.Passive,Timing.Universal,10)
+    LunarBand = Accessory("Lunar Band","Increases MP for the wearer by 10.",1,601,0,ActivationType.Passive,Timing.Universal,10)
     accessoryDirectory.append(LunarBand)
-    MercuryBand = Accessory("Mercury Band","Increases ACC for the wearer by 10.",1,602,0,AccessoryType.Passive,Timing.Universal,10)
+    MercuryBand = Accessory("Mercury Band","Increases ACC for the wearer by 10.",1,602,0,ActivationType.Passive,Timing.Universal,10)
     accessoryDirectory.append(MercuryBand)
-    VenusBand = Accessory("Venus Band","Increases CRT for the wearer by 5.",1,603,0,AccessoryType.Passive,Timing.Universal,5)
+    VenusBand = Accessory("Venus Band","Increases CRT for the wearer by 5.",1,603,0,ActivationType.Passive,Timing.Universal,5)
     accessoryDirectory.append(VenusBand)
-    EarthBand = Accessory("Earth Band","Increases DEF for the wearer by 5.",1,604,0,AccessoryType.Passive,Timing.Universal,5)
+    EarthBand = Accessory("Earth Band","Increases DEF for the wearer by 5.",1,604,0,ActivationType.Passive,Timing.Universal,5)
     accessoryDirectory.append(EarthBand)
-    MarsBand = Accessory("Mars Band","Increases ATK for the wearer by 5.",1,605,0,AccessoryType.Passive,Timing.Universal,5)
+    MarsBand = Accessory("Mars Band","Increases ATK for the wearer by 5.",1,605,0,ActivationType.Passive,Timing.Universal,5)
     accessoryDirectory.append(MarsBand)
-    JupiterBand = Accessory("Jupiter Band","Increases LCK for the wearer by 10.",1,606,0,AccessoryType.Passive,Timing.Universal,10)
+    JupiterBand = Accessory("Jupiter Band","Increases LCK for the wearer by 10.",1,606,0,ActivationType.Passive,Timing.Universal,10)
     accessoryDirectory.append(JupiterBand)
-    SaturnBand = Accessory("Saturn Band","Increases MPG for the wearer by 2.",1,607,0,AccessoryType.Passive,Timing.Universal,2)
+    SaturnBand = Accessory("Saturn Band","Increases MPG for the wearer by 2.",1,607,0,ActivationType.Passive,Timing.Universal,2)
     accessoryDirectory.append(SaturnBand)
-    UranusBand = Accessory("Uranus Band","Increases AMP for the wearer by 10.",1,608,0,AccessoryType.Passive,Timing.Universal,10)
+    UranusBand = Accessory("Uranus Band","Increases AMP for the wearer by 10.",1,608,0,ActivationType.Passive,Timing.Universal,10)
     accessoryDirectory.append(UranusBand)
-    NeptuneBand = Accessory("Neptune Band","Increases DDG for the wearer by 10.",1,609,0,AccessoryType.Passive,Timing.Universal,10)
+    NeptuneBand = Accessory("Neptune Band","Increases DDG for the wearer by 10.",1,609,0,ActivationType.Passive,Timing.Universal,10)
     accessoryDirectory.append(NeptuneBand)
-    PlutoBand = Accessory("Pluto Band","Increases SPD for the wearer by 5.",1,610,0,AccessoryType.Passive,Timing.Universal,5)
+    PlutoBand = Accessory("Pluto Band","Increases SPD for the wearer by 5.",1,610,0,ActivationType.Passive,Timing.Universal,5)
     accessoryDirectory.append(PlutoBand)
-    CrimsonScarf = Accessory("Crimson Scarf","Has a chance to regain HP to the wielder equal to half of damage dealt after a strike.",1,611,15,AccessoryType.Active,Timing.DamageDealt)
+    CrimsonScarf = Accessory("Crimson Scarf","Has a chance to regain HP to the wielder equal to half of damage dealt after a strike.",1,611,15,ActivationType.Active,Timing.DamageDealt)
     accessoryDirectory.append(CrimsonScarf)
-    CeruleanScarf = Accessory("Cerulean Scarf","Has a chance to regain MP to the wielder equal to half of damage dealt after a strike.",1,612,15,AccessoryType.Active,Timing.DamageDealt)
+    CeruleanScarf = Accessory("Cerulean Scarf","Has a chance to regain MP to the wielder equal to half of damage dealt after a strike.",1,612,15,ActivationType.Active,Timing.DamageDealt)
     accessoryDirectory.append(CeruleanScarf)
-    MarbleHeart = Accessory("Marble Heart","Restores 4 of wielder's health each turn.",1,613,0,AccessoryType.Passive,Timing.Universal,4)
+    MarbleHeart = Accessory("Marble Heart","Restores 4 of wielder's health each turn.",1,613,0,ActivationType.Passive,Timing.Universal,4)
     accessoryDirectory.append(MarbleHeart)
-    JadeBracer = Accessory("Jade Bracer","Has a chance to decrease physical damage taken by 50%.",1,614,15,AccessoryType.Active,Timing.DamageTaken)
+    JadeBracer = Accessory("Jade Bracer","Has a chance to decrease physical damage taken by 50%.",1,614,15,ActivationType.Active,Timing.DamageTaken)
     accessoryDirectory.append(JadeBracer)
-    BismuthAmulet = Accessory("Bismuth Amulet","Has a chance to negate magical damage.",1,615,15,AccessoryType.Active,Timing.DamageTaken)
+    BismuthAmulet = Accessory("Bismuth Amulet","Has a chance to negate magical damage.",1,615,15,ActivationType.Active,Timing.DamageTaken)
     accessoryDirectory.append(BismuthAmulet)
-    RubyCirclet = Accessory("Ruby Circlet","Grants immunity to Ablaze.",1,616,0,AccessoryType.Passive,Timing.DamageTaken)
+    RubyCirclet = Accessory("Ruby Circlet","Grants immunity to Ablaze.",1,616,0,ActivationType.Passive,Timing.DamageTaken)
     accessoryDirectory.append(RubyCirclet)
-    TopazCirclet = Accessory("Topaz Circlet","Grants immunity to Shock.",1,617,0,AccessoryType.Passive,Timing.DamageTaken)
+    TopazCirclet = Accessory("Topaz Circlet","Grants immunity to Shock.",1,617,0,ActivationType.Passive,Timing.DamageTaken)
     accessoryDirectory.append(TopazCirclet)
-    SapphireCirclet = Accessory("Sapphire Circlet","Grants immunity to Freezing.",1,618,0,AccessoryType.Passive,Timing.DamageTaken)
+    SapphireCirclet = Accessory("Sapphire Circlet","Grants immunity to Freezing.",1,618,0,ActivationType.Passive,Timing.DamageTaken)
     accessoryDirectory.append(SapphireCirclet)
-    OpalCirclet = Accessory("Opal Circlet","Has a chance to negate a status effect.",1,619,30,AccessoryType.Active,Timing.DamageTaken)
+    OpalCirclet = Accessory("Opal Circlet","Has a chance to negate a status effect.",1,619,30,ActivationType.Active,Timing.DamageTaken)
     accessoryDirectory.append(OpalCirclet)
-    GuardiansBelt = Accessory("Guardian's Belt","Whenever the wearer uses the Guard talent, blocks 80% of damage rather than half.",2,620,0,AccessoryType.Passive,Timing.DamageTaken)
+    GuardiansBelt = Accessory("Guardian's Belt","Whenever the wearer uses the Guard talent, blocks 80% of damage rather than half.",2,620,0,ActivationType.Passive,Timing.DamageTaken)
     accessoryDirectory.append(GuardiansBelt)
-    MagiciansTome = Accessory("Magician's Tome","Has a chance to allow the wielder to not consume mana upon casting a spell.",2,621,20,AccessoryType.Active,Timing.DamageDealt)
+    MagiciansTome = Accessory("Magician's Tome","Has a chance to allow the wielder to not consume mana upon casting a spell.",2,621,20,ActivationType.Active,Timing.DamageDealt)
     accessoryDirectory.append(MagiciansTome)
-    MastersTome = Accessory("Master's Tome","Has a chance to allow the wielder to not consume mana upon performing a talent.",2,622,20,AccessoryType.Active,Timing.DamageDealt)
+    MastersTome = Accessory("Master's Tome","Has a chance to allow the wielder to not consume mana upon performing a talent.",2,622,20,ActivationType.Active,Timing.DamageDealt)
     accessoryDirectory.append(MastersTome)
-    BlitzingBoots = Accessory("Blitzing Boots","Has a chance to allow the wielder strike twice.",2,623,15,AccessoryType.Active,Timing.PreAttack)
+    BlitzingBoots = Accessory("Blitzing Boots","Has a chance to allow the wielder strike twice.",2,623,15,ActivationType.Active,Timing.PreAttack)
     accessoryDirectory.append(BlitzingBoots)
-    MysticJournal = Accessory("Mystic Journal","Increases the wielder's SPT Magic Level by 1.",2,624,0,AccessoryType.Passive,Timing.Universal,1)
+    MysticJournal = Accessory("Mystic Journal","Increases the wielder's SPT Magic Level by 1.",2,624,0,ActivationType.Passive,Timing.Universal,1)
     accessoryDirectory.append(MysticJournal)
-    WickedJournal = Accessory("Wicked Journal","Increases the wielder's ATK Magic Level by 1.",2,625,0,AccessoryType.Passive,Timing.Universal,1)
+    WickedJournal = Accessory("Wicked Journal","Increases the wielder's ATK Magic Level by 1.",2,625,0,ActivationType.Passive,Timing.Universal,1)
     accessoryDirectory.append(WickedJournal)
-    WhirlwindCape = Accessory("Whirlwind Cape","Has a chance to allow the wielder's strike to target all enemies.",2,626,15,AccessoryType.Active,Timing.PreAttack)
+    WhirlwindCape = Accessory("Whirlwind Cape","Has a chance to allow the wielder's strike to target all enemies.",2,626,15,ActivationType.Active,Timing.PreAttack)
     accessoryDirectory.append(WhirlwindCape)
-    PlasmaRing = Accessory("Plasma Ring","Has a chance to double the potency of a spell.",2,627,15,AccessoryType.Active,Timing.DamageDealt)
+    PlasmaRing = Accessory("Plasma Ring","Has a chance to double the potency of a spell.",2,627,15,ActivationType.Active,Timing.DamageDealt)
     accessoryDirectory.append(PlasmaRing)
-    IvoryMirror = Accessory("Ivory Mirror","Has a chance to reflect damage against the wielder back at its source.",2,628,15,AccessoryType.Active,Timing.DamageTaken)
+    IvoryMirror = Accessory("Ivory Mirror","Has a chance to reflect damage against the wielder back at its source.",2,628,15,ActivationType.Active,Timing.DamageTaken)
     accessoryDirectory.append(IvoryMirror)
-    BrokenPocketwatch = Accessory("Broken Pocketwatch","All buffs cast by the wielder last two additional turns.",2,629,0,AccessoryType.Passive,Timing.DamageDealt)
+    BrokenPocketwatch = Accessory("Broken Pocketwatch","All buffs cast by the wielder last two additional turns.",2,629,0,ActivationType.Passive,Timing.DamageDealt)
     accessoryDirectory.append(BrokenPocketwatch)
-    TranslucentCowl = Accessory("Translucent Cowl","Enemies are less likely to target the wearer.",2,630,0,AccessoryType.Passive,Timing.Targeting)
+    TranslucentCowl = Accessory("Translucent Cowl","Enemies are less likely to target the wearer.",2,630,0,ActivationType.Passive,Timing.Targeting)
     accessoryDirectory.append(TranslucentCowl)
-    WarlordsEmblem = Accessory("Warlord's Emblem","Enemies are more likely to target the wearer.",2,631,0,AccessoryType.Passive,Timing.Targeting)
+    WarlordsEmblem = Accessory("Warlord's Emblem","Enemies are more likely to target the wearer.",2,631,0,ActivationType.Passive,Timing.Targeting)
     accessoryDirectory.append(WarlordsEmblem)
-    LightMagesDiadem = Accessory("Light Mage's Diadem","Taking damage depletes the wielder's MP before their HP.",3,632,0,AccessoryType.Passive,Timing.DamageTaken)
+    LightMagesDiadem = Accessory("Light Mage's Diadem","Taking damage depletes the wielder's MP before their HP.",3,632,0,ActivationType.Passive,Timing.DamageTaken)
     accessoryDirectory.append(LightMagesDiadem)
-    WarpedSunglasses = Accessory("Warped Sunglasses","Attack spells target random enemies, and deal 150% damage.",3,633,0,AccessoryType.Passive,Timing.DamageDealt)
+    WarpedSunglasses = Accessory("Warped Sunglasses","Attack spells target random enemies, and deal 150% damage.",3,633,0,ActivationType.Passive,Timing.DamageDealt)
     accessoryDirectory.append(WarpedSunglasses)
-    WarpedEyeglasses = Accessory("Warped Eyeglasses","Support spells target random allies, and are 150% as potent.",3,634,0,AccessoryType.Passive,Timing.DamageDealt)
+    WarpedEyeglasses = Accessory("Warped Eyeglasses","Support spells target random allies, and are 150% as potent.",3,634,0,ActivationType.Passive,Timing.DamageDealt)
     accessoryDirectory.append(WarpedEyeglasses)
-    EnchantedSeedling = Accessory("Enchanted Seedling","Buffs cast on the wielder are 150% as potent.",3,635,0,AccessoryType.Passive,Timing.DamageDealt)
+    EnchantedSeedling = Accessory("Enchanted Seedling","Buffs cast on the wielder are 150% as potent.",3,635,0,ActivationType.Passive,Timing.DamageDealt)
     accessoryDirectory.append(EnchantedSeedling)
-    MiracleBracelet = Accessory("Miracle Bracelet","Has a chance to keep the wielder from dying.",3,636,20,AccessoryType.Active,Timing.DamageTaken)
+    MiracleBracelet = Accessory("Miracle Bracelet","Has a chance to keep the wielder from dying.",3,636,20,ActivationType.Active,Timing.DamageTaken)
     accessoryDirectory.append(MiracleBracelet)
-    CursedBracer = Accessory("Cursed Bracer","Deals an additional damage for each subsequent hit without missing. Deals damage equal to its power and resets upon missing.",3,637,0,AccessoryType.Passive,Timing.DamageDealt)
+    CursedBracer = Accessory("Cursed Bracer","Deals an additional damage for each subsequent hit without missing. Deals damage equal to its power and resets upon missing.",3,637,0,ActivationType.Passive,Timing.DamageDealt)
     accessoryDirectory.append(CursedBracer)
-    CursedEarring = Accessory("Cursed Earring","Gains one permanent damage upon missing with a strike. Has a 50% chance to deal damage to its wielder equal to its power on a successful strike.",3,638,0,AccessoryType.Passive,Timing.DamageDealt)
+    CursedEarring = Accessory("Cursed Earring","Gains one permanent damage upon missing with a strike. Has a 50% chance to deal damage to its wielder equal to its power on a successful strike.",3,638,0,ActivationType.Passive,Timing.DamageDealt)
     accessoryDirectory.append(CursedEarring)
 
     return accessoryDirectory
+
+    ######### FOOD #########
+
+def initFoodDirectory():
+    foodDirectory = []
+
+    # Buff List: [HP,MP,ACC,CRT,DEF,ATK,LCK,MPG,AMP,DDG,SPD,HPG]
+
+    ReelerSteak = Food("Reeler Steak","Meat cut from a Reeler, a large mammal known for running backwards on all four legs when threatened. Increases max HP by 10.",1,700,[10,0,0,0,0,0,0,0,0,0,0,0])
+    foodDirectory.append(ReelerSteak)
+    SourberryTart = Food("Sourberry Tart","A small pastry filled with crushed sourberries, known for temporarily changing the eye color of whoever eats them. Increases max MP by 10.",1,701,[0,10,0,0,0,0,0,0,0,0,0,0])
+    foodDirectory.append(SourberryTart)
+    DriedBladeleaf = Food("Dried Bladeleaf","A dehydraded leaf from the bladeleaf bush. Unexpectedly filling, armies have been known to carry bushels to feed their soldiers. Increases accuracy by 10.",1,702,[0,0,10,0,0,0,0,0,0,0,0,0])
+    foodDirectory.append(DriedBladeleaf)
+    GrilledMyrkafruit = Food("Grilled Myrkafruit","Grilled fruit of the Myrka tree. Can be lethal if eaten raw. Increases crit rate by 5.",1,703,[0,0,0,5,0,0,0,0,0,0,0,0])
+    foodDirectory.append(GrilledMyrkafruit)
+    TalliriteFragment = Food("Tallirite Fragment","A small piece of gemstone from Tallirite Isle. Eons ago, an ancient civilization was said to have evolved to subsist on these stones to survive. Increases defense by 5.",1,704,[0,0,0,0,5,0,0,0,0,0,0,0])
+    foodDirectory.append(TalliriteFragment)
+    WommiMilk = Food("Wommi Milk","Milk from the domesticated Wommi. Wommi are said to produce more potent milk if their caretakers are unhappy, in an attempt to help them. Increases attack by 5.",1,705,[0,0,0,0,0,5,0,0,0,0,0,0])
+    foodDirectory.append(WommiMilk)
+    StarrySalad = Food("Starry Salad","Salad made from greens in close proximity to the crash site in Bentro Forest. Plants taken from the area of the meteor impact are said to have special properties and provide good fortune. Increases luck by 10.",1,706,[0,0,0,0,0,0,10,0,0,0,0,0])
+    foodDirectory.append(StarrySalad)
+    SpellpaperCookie = Food("Spellpaper Cookie","A tiny shortbread cookie with a piece of an archmage's spell tome cooked into it. Mage's tomes are said to absorb some of their magical ability over time, which eventually led to many spellcasters abandoning tomes. Increases mana regen by 2.",1,707,[0,0,0,0,0,0,0,2,0,0,0,0])
+    foodDirectory.append(SpellpaperCookie)
+    PrombolStew = Food("Prombol Stew","Stew cooked with fresh vegetables and Prombol meat. Prombols are small six-legged frogs, which inexplicably teleport on an hourly basis. Increases magic amplification by 10.",1,708,[0,0,0,0,0,0,0,0,10,0,0,0])
+    foodDirectory.append(PrombolStew)
+    MirageDumplings = Food("Mirage Dumplings","Dumplings made with the meat and feathres of Mirage Owls, a semi-transparent bird that often lives underground. Increases dodge by 10.",1,709,[0,0,0,0,0,0,0,0,0,10,0,0])
+    foodDirectory.append(MirageDumplings)
+    SilkwingCandy = Food("Silkwing Candy","A hard candy made from melted silkwings, extraordinarily fast insects. Increases speed by 5.",1,710,[0,0,0,0,0,0,0,0,0,0,5,0])
+    foodDirectory.append(SilkwingCandy)
+    Ulvomelon = Food("Ulvomelon","A whole Ulvomelon, a fruit which regenerates rapidly once it is taken from the vine. Increases hp regen by 4.",1,711,[0,0,0,0,0,0,0,0,0,0,0,4])
+    foodDirectory.append(Ulvomelon)
+
+    return foodDirectory
+
+    ######### CONSUMABLES #########
+
+def initConsumableDirectory():
+    consumableDirectory = []
+
+    # Honna Tear - Raises a party member with half HP and MP
+    HonnaTear = Consumable("Honna Tear","A small glass vial containing a tear from the rare Honna Falcon, said to be a messenger of Rendai. Raises a fallen party member with half HP and MP.",3,800,Target.Ally,Timing.Anytime,0)
+    consumableDirectory.append(HonnaTear)
+    # Fire Arrow - 50dmg to one target
+    FireArrow = Consumable("Fire Arrow","A small, pre-loaded dart shooter, loaded with an arrow that bursts into flames on impact. Deals 50 damage to one target.",1,801,Target.Single,Timing.InTurn,50)
+    consumableDirectory.append(FireArrow)
+    # Blast Arrow - 150dmg to one target
+    BlastArrow = Consumable("Blast Arrow","A small, pre-loaded dart shooter, loaded with an arrow that explodes on impact. Deals 150 damage to one target.",2,802,Target.Single,Timing.InTurn,150)
+    consumableDirectory.append(BlastArrow)
+    # Nova Arrow - 300dmg to one target
+    NovaArrow = Consumable("Nova Arrow","A small, pre-loaded dart shooter, loaded with an arrow that releases an explosion of magical energy on impact. Deals 300 damage to one target.",3,803,Target.Single,Timing.InTurn,300)
+    consumableDirectory.append(NovaArrow)
+    # Fire Bomb - 50dmg to all enemies
+    FireBomb = Consumable("Fire Bomb","A small leather satchel, with a fuse coming out of the top. On use, it releases a burst of flames and deals 50 damage to all enemies.",2,804,Target.All,Timing.InTurn,50)
+    consumableDirectory.append(FireBomb)
+    # Blast Bomb - 150dmg to all enemies
+    BlastBomb = Consumable("Blast Bomb","A small glass flask, with a fuse coming out of the top. On use, it explodes and deals 150 damage to all enemies.",3,805,Target.All,Timing.InTurn,150)
+    consumableDirectory.append(BlastBomb)
+    # Nova Bomb - 300dmg to all enemies
+    NovaBomb = Consumable("Nova Bomb","A small steel sphere, glowing with violet light. When activated, it releases an explosion of magical energy and deals 300 damage to all enemies.",4,806,Target.All,Timing.InTurn,300)
+    consumableDirectory.append(NovaBomb)
+    # Smoke Capsule - Instantly escape from combat
+    SmokeCapsule = Consumable("Smoke Capsule","A glass orb, filled with smoke. When shattered, it allows for automatic escape from any non-boss combat.",1,807,Target.Party,Timing.InTurn,0)
+    consumableDirectory.append(SmokeCapsule)
+    # Pyrilic Venom - Apply a poison to a weapon that increases in damage over time
+    PyrilicVenom = Consumable("Pyrilic Venom","A venom that increases in potency over time. When applied to a weapon, it increases the damage dealt by a character by 5 every round of combat.",2,808,Target.Ally,Timing.DamageDealt,5)
+    consumableDirectory.append(PyrilicVenom)
+    # Rendai's Veil - Makes a party member immune to damage for a short time
+    RendaisVeil = Consumable("Rendai's Veil","A scrap of golden cloth. When torn, it protects the user from any damage for 3 rounds of combat.",3,809,Target.Ally,Timing.DamageTaken,4)
+    consumableDirectory.append(RendaisVeil)
+    # Callaret's Grace - Makes the party immune to magic damage for a short time
+    CallaretsGrace = Consumable("Callaret's Grace","A small stone disk inscribed with the runes of Callaret, the God of Magic. When activated, it protects the party from magic damage and effects for 3 rounds of combat.",3,810,Target.Party,Timing.DamageTaken,4)
+    consumableDirectory.append(CallaretsGrace)
+    # Second Soul - Immediately raises the next fallen party member with full HP and MP
+    SecondSoul = Consumable("Second Soul","A floating golden light in a jar. Whenever the next party member falls, the soul will burst from the jar and restore them to full HP and MP.",4,811,Target.Ally,Timing.OnDeath,0)
+    consumableDirectory.append(SecondSoul)
+    # Campfire Kit - Fully restores the party's HP
+    CampfireKit = Consumable("Campfire Kit","A handy pack full of everything you need to set up camp for the night. Fully restores the party's HP.",2,812,Target.Party,Timing.Peacetime,0)
+    consumableDirectory.append(CampfireKit)
+    # Spirit Vapor - Fully restores the party's MP
+    SpiritVapor = Consumable("Spirit Vapor","A small block of ice frozen from Lake Torren. When heated over a fire, it releases a vapor that fully restores the party's MP.",2,813,Target.Party,Timing.Peacetime,0)
+    consumableDirectory.append(SpiritVapor)
+    # Callaret's Compact - Returns the party to the last haven/village visited
+    CallaretsCompact = Consumable("Callaret's Compact","A gold inlaid compact mirror that hums gently. When looked into, it teleports the party to the last haven or village that they visited.",3,814,Target.Party,Timing.Peacetime,0)
+    consumableDirectory.append(CallaretsCompact)
+    # Wommi Tuft - Cures an ally of any status effect
+    WommiTuft = Consumable("Wommi Tuft","A tuft of wool from a Wommi. When rubbed on skin, it cures the target of any negative status effects.",2,815,Target.Ally,Timing.Anytime,0)
+    consumableDirectory.append(WommiTuft)
+    # Sun Sponge - Cures an ally of Ablaze
+    SunSponge = Consumable("Sun Sponge","A soft sponge that is cool to the touch, known to draw in heat of anything touching it at an incredible rate. Cures an ally of Ablaze.",1,816,Target.Ally,Timing.Anytime,0)
+    consumableDirectory.append(SunSponge)
+    # Pulse Regulator - Cures an ally of any Shocked
+    PulseRegulator = Consumable("Pulse Regulator","A small needle that pulses with a steady rate, which can reset the nervous system of a patient when pierced with it. Cures an ally of Shocked.",1,817,Target.Ally,Timing.Anytime,0)
+    consumableDirectory.append(PulseRegulator)
+    # Shaking Stone - Cures an ally of Freezing
+    ShakingStone = Consumable("Shaking Stone","A small stone that vibrates rapidly, giving off heat. Cures an ally of Freezing.",1,818,Target.Ally,Timing.Anytime,0)
+    consumableDirectory.append(ShakingStone)
+
+    return consumableDirectory
+
+    ######### RUNES #########
+
+def initRuneDirectory():
+    runeDirectory = []
+
+    # Rune of Power - Passive Rune - Increases attack power by Level*10%
+    PowerRune = Rune("Rune of Power", "An ancient rune, capable of enchanting weapons it is etched into. Increases the attack power of etched weapon.",1,900,ActivationType.Passive,10)
+    runeDirectory.append(PowerRune)
+    # Rune of Surging - Active Rune - Has a (Luck + Level*5)% chance to double damage dealt
+    SurgingRune = Rune("Rune of Surging", "An ancient rune, capable of enchanting weapons it is etched into. Has a chance to double the damage dealt with etched weapon.",1,901,ActivationType.Active,5)
+    runeDirectory.append(SurgingRune)
+    # Rune of Piercing - Active Rune - Has a (Luck + Level*5)% chance to ignore 50% of an enemy's defense
+    PiercingRune = Rune("Rune of Piercing", "An ancient rune, capable of enchanting weapons it is etched into. Has a chance to cut the enemy's defense in half when attacking with etched weapon.",1,902,ActivationType.Active,5)
+    runeDirectory.append(PiercingRune)
+    # Rune of Flames - Active Rune - Has a (Luck + (Level-1)*5)% chance to apply the Ablaze debuff to an enemy
+    FlamesRune = Rune("Rune of Flames", "An ancient rune, capable of enchanting weapons it is etched into. Has a chance to apply the Ablaze debuff when attacking with etched weapon.",1,903,ActivationType.Active,5)
+    runeDirectory.append(FlamesRune)
+    # Rune of Sparks - Active Rune - Has a (Luck + (Level-1)*5)% chance to apply the Shocked debuff to an enemy
+    SparksRune = Rune("Rune of Sparks", "An ancient rune, capable of enchanting weapons it is etched into. Has a chance to apply the Shocked debuff when attacking with etched weapon.",1,904,ActivationType.Active,5)
+    runeDirectory.append(SparksRune)
+    # Rune of Freezing - Active Rune - Has a (Luck + (Level-1)*5)% chance to apply the Freezing debuff to an enemy
+    FreezingRune = Rune("Rune of Freezing", "An ancient rune, capable of enchanting weapons it is etched into. Has a chance to apply the Freezing debuff when attacking with etched weapon.",1,905,ActivationType.Active,5)
+    runeDirectory.append(FreezingRune)
+    # Rune of Syphoning - Passive Rune - Restores MP to the user equal to Level*10% of damage dealt
+    SiphoningRune = Rune("Rune of Siphoning", "An ancient rune, capable of enchanting weapons it is etched into. Restores a portion of the damage dealt as MP when attacking with etched weapon.",1,906,ActivationType.Passive,10)
+    runeDirectory.append(SiphoningRune)
+    # Rune of Blood - Passive Rune - Restores HP to the user equal to Level*10% of damage dealt
+    BloodRune = Rune("Rune of Blood", "An ancient rune, capable of enchanting weapons it is etched into. Restores a portion of the damage dealt as HP when attacking with etched weapon.",1,907,ActivationType.Passive,10)
+    runeDirectory.append(BloodRune)
+    # Rune of Corruption - Passive Rune - Increases attack power by Level*20%, but deals Level*10% of damage dealt back to the wielder
+    CorruptionRune = Rune("Rune of Corruption", "An ancient rune, capable of enchanting weapons it is etched into. Significantly increases power when attacking with etched weapon, but hurts the wielder in the process.",1,908,ActivationType.Passive,10)
+    runeDirectory.append(CorruptionRune)
+    # Rune of Channeling - Passive Rune - Increases attack power by Level*20%, but saps Level*10% of MP from the wielder
+    ChannelingRune = Rune("Rune of Channeling", "An ancient rune, capable of enchanting weapons it is etched into. Significantly increases power when attacking with etched weapon, but saps the wielder's MP in the process.",1,909,ActivationType.Passive,10)
+    runeDirectory.append(ChannelingRune)
+    # Rune of Expertise - Passive Rune - Increases the power of critical hits by Level*33%
+    ExpertiseRune = Rune("Rune of Expertise", "An ancient rune, capable of enchanting weapons it is etched into. Significantly increases power of critical hits when attacking with etched weapon.",1,910,ActivationType.Passive,33)
+    runeDirectory.append(ExpertiseRune)
+
+    return runeDirectory

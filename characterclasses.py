@@ -66,23 +66,23 @@ class Character():
     def getMaxMP(self):
         return self.mpMax + self.universalEffects.mp
     def getAttack(self):
-        return self.eqpWpn.attack + self.attack + self.universalEffects.attack + self.getBuff("ATK")
+        return self.eqpWpn.getAttack() + self.attack + self.universalEffects.attack + self.getBuff("ATK")
     def getDefense(self):
-        return self.eqpAmr.defense + self.defense + self.universalEffects.defense + self.getBuff("DEF")
+        return self.eqpAmr.getDefense() + self.defense + self.universalEffects.defense + self.getBuff("DEF")
     def getCritRate(self):
-        return self.eqpWpn.critrate + self.critrate + self.universalEffects.critrate + self.getBuff("CRT")
+        return self.eqpWpn.getCritrate() + self.critrate + self.universalEffects.critrate + self.getBuff("CRT")
     def getAccuracy(self):
         ablazePenalty = 0
         if self.status is Status.Ablaze:
             ablazePenalty = 33
-        if self.eqpWpn.accuracy > 0:
-            return self.eqpWpn.accuracy + self.universalEffects.accuracy + self.getBuff("ACC") - ablazePenalty
+        if self.eqpWpn.getAccuracy() > 0:
+            return self.eqpWpn.getAccuracy() + self.universalEffects.accuracy + self.getBuff("ACC") - ablazePenalty
         else:
             return self.accuracy + self.universalEffects.accuracy + self.getBuff("ACC") - ablazePenalty
     def getDodge(self):
         if self.status is Status.Shocked:
             return 0
-        return self.eqpAmr.dodge + self.dodge + self.universalEffects.dodge + self.getBuff("DDG")
+        return self.eqpAmr.getDodge() + self.dodge + self.universalEffects.dodge + self.getBuff("DDG")
     def getLuck(self):
         return self.luck + self.universalEffects.luck + self.getBuff("LCK")
     def getAmplifier(self):
@@ -146,8 +146,16 @@ class Character():
         self.hp += val
         if self.hp > self.getMaxHP():
             self.hp = self.getMaxHP()
+    def setHP(self,val):
+        self.hp = val
+        if self.hp > self.getMaxHP():
+            self.hp = self.getMaxHP()
     def gainMP(self,val):
         self.mp += val
+        if self.mp > self.getMaxMP():
+            self.mp = self.getMaxMP()
+    def setMP(self,val):
+        self.mp = val
         if self.mp > self.getMaxMP():
             self.mp = self.getMaxMP()
     def gainXP(self,val):
@@ -164,7 +172,7 @@ class Character():
         if self.level != 10:
             self.level += 1
         self.xp = 0
-        self.nextLevel += self.level*100
+        self.nextLevel += (self.level*100)/2
         growth = self.type.getGrowths()
         self.hpMax += growth[0]
         self.mpMax += growth[1]
@@ -183,23 +191,23 @@ class Character():
             self.lastLearned.append(self.type.knownTalents[self.level-1])
         return growth
     def equip(self,item,dir):
-        print(dir.getItemType(item))
-        if dir.getItemType(item) == Type.Weapon:
-            returner = self.eqpWpn.id
-            self.eqpWpn = dir.getItem(item)
-        elif dir.getItemType(item) == Type.Armor:
-            returner = self.eqpAmr.id
-            self.eqpAmr = dir.getItem(item)
-        elif dir.getItemType(item) == Type.Accessory:
-            returner = self.eqpAcc.id
-            if returner != -1:
+        itemType = dir.getItemType(item.id)
+        if itemType == Type.Weapon:
+            returner = self.eqpWpn
+            self.eqpWpn = item
+        elif itemType == Type.Armor:
+            returner = self.eqpAmr
+            self.eqpAmr = item
+        elif itemType == Type.Accessory:
+            returner = self.eqpAcc
+            if returner.id != -1:
                 print("Unequip")
-                if dir.getItem(returner).timing == Timing.Universal:
-                    self.universalEffectHandler(self.eqpAcc,"Unequip")
-            self.eqpAcc = dir.getItem(item)
+                if returner.timing == Timing.Universal:
+                    self.universalEffectHandler(self.eqpAcc,"Unequip",dir)
+            self.eqpAcc = item
             if self.eqpAcc.timing == Timing.Universal:
                 print("Equip")
-                self.universalEffectHandler(self.eqpAcc,"Equip")
+                self.universalEffectHandler(self.eqpAcc,"Equip",dir)
         return returner
     def checkProficiency(self,id,dir):
         idType = dir.getItemType(id)
@@ -271,41 +279,62 @@ class Character():
             self.mp = self.getMaxMP()
     def canPerform(self,talentID,dir):
         return dir.getManaCost(talentID) <= self.mp
-    def universalEffectHandler(self,accessory,mode):
+    def universalEffectHandler(self,effect,mode,dir):
         mod = 0
-        if mode == "Equip":
+        if mode == "Equip" or mode == "On":
             mod = 1
-        elif mode == "Unequip":
+        elif mode == "Unequip" or mode == "Off":
             mod = -1
 
-        if accessory.id == 600: # Solar Band
-            self.universalEffects.hp += accessory.data * mod
-        elif accessory.id == 601: # Lunar Band
-            self.universalEffects.mp += accessory.data * mod
-        elif accessory.id == 602: # Mercury Band
-            self.universalEffects.accuracy += accessory.data * mod
-        elif accessory.id == 603: # Venus Band
-            self.universalEffects.critrate += accessory.data * mod
-        elif accessory.id == 604: # Earth Band
-            self.universalEffects.defense += accessory.data * mod
-        elif accessory.id == 605: # Mars Band
-            self.universalEffects.attack += accessory.data * mod
-        elif accessory.id == 606: # Jupiter Band
-            self.universalEffects.luck += accessory.data * mod
-        elif accessory.id == 607: # Saturn Band
-            self.universalEffects.manaregen += accessory.data * mod
-        elif accessory.id == 608: # Uranus Band
-            self.universalEffects.amplifier += accessory.data * mod
-        elif accessory.id == 609: # Neptune Band
-            self.universalEffects.dodge += accessory.data * mod
-        elif accessory.id == 610: # Pluto Band
-            self.universalEffects.speed += accessory.data * mod
-        elif accessory.id == 613: # Marble Heart
-            self.universalEffects.hpregen += accessory.data * mod
-        elif accessory.id == 624: # Mystic Journal
-            self.universalEffects.sptMagicLevel += accessory.data * mod
-        elif accessory.id == 625: # Wicked Journal
-            self.universalEffects.atkMagicLevel += accessory.data * mod
+        print(dir.getItemType(effect))
+        if dir.getItemType(effect.id) == Type.Accessory:
+            accessory = effect
+            if accessory.id == 600: # Solar Band
+                self.universalEffects.hp += accessory.data * mod
+                if self.getHP() > self.getMaxHP():
+                    self.hp = self.getMaxHP()
+            elif accessory.id == 601: # Lunar Band
+                self.universalEffects.mp += accessory.data * mod
+                if self.getMP() > self.getMaxMP():
+                    self.mp = self.getMaxMP()
+            elif accessory.id == 602: # Mercury Band
+                self.universalEffects.accuracy += accessory.data * mod
+            elif accessory.id == 603: # Venus Band
+                self.universalEffects.critrate += accessory.data * mod
+            elif accessory.id == 604: # Earth Band
+                self.universalEffects.defense += accessory.data * mod
+            elif accessory.id == 605: # Mars Band
+                self.universalEffects.attack += accessory.data * mod
+            elif accessory.id == 606: # Jupiter Band
+                self.universalEffects.luck += accessory.data * mod
+            elif accessory.id == 607: # Saturn Band
+                self.universalEffects.manaregen += accessory.data * mod
+            elif accessory.id == 608: # Uranus Band
+                self.universalEffects.amplifier += accessory.data * mod
+            elif accessory.id == 609: # Neptune Band
+                self.universalEffects.dodge += accessory.data * mod
+            elif accessory.id == 610: # Pluto Band
+                self.universalEffects.speed += accessory.data * mod
+            elif accessory.id == 613: # Marble Heart
+                self.universalEffects.hpregen += accessory.data * mod
+            elif accessory.id == 624: # Mystic Journal
+                self.universalEffects.sptMagicLevel += accessory.data * mod
+            elif accessory.id == 625: # Wicked Journal
+                self.universalEffects.atkMagicLevel += accessory.data * mod
+        elif dir.getItemType(effect) == Type.Food:
+            self.universalEffects.hp += effect.buff[0] * mod
+            self.universalEffects.mp += effect.buff[1] * mod
+            self.universalEffects.accuracy += effect.buff[2] * mod
+            self.universalEffects.critrate += effect.buff[3] * mod
+            self.universalEffects.defense += effect.buff[4] * mod
+            self.universalEffects.attack += effect.buff[5] * mod
+            self.universalEffects.luck += effect.buff[6] * mod
+            self.universalEffects.manaregen += effect.buff[7] * mod
+            self.universalEffects.amplifier += effect.buff[8] * mod
+            self.universalEffects.dodge += effect.buff[9] * mod
+            self.universalEffects.speed += effect.buff[10] * mod
+            self.universalEffects.hpregen += effect.buff[11] * mod
+        self.universalEffects.print()
 
 
 class ClassType():
@@ -379,7 +408,9 @@ class Party():
     def __init__(self):
         self.members = []
         self.inventory = []         # List of int : Contains id of all items in inventory
-        self.equipment = []         # List of int : Contains id of all equipment in inventory
+        self.equipment = []         # List of int : Contains all equipment in inventory
+        self.activeFood = None
+        self.callaretsCompact = False
     def printContents(self):
         for member in self.members:
             print(member.name)
@@ -394,14 +425,17 @@ class Party():
     def debug_RandomInventory(self,dir):
         while len(self.inventory) < MAX_INVENTORY_SIZE:
             self.addItem(dir.getItemByRarities(Type.Potion,1,5))
-    def add(self,item,dir):
-        if dir.getItemType(item) == Type.Weapon or dir.getItemType(item) == Type.Armor or dir.getItemType(item) == Type.Accessory:
-            return self.addEquipment(item)
+    def add(self,id,dir):
+        if dir.getItemType(id) == Type.Weapon or dir.getItemType(id) == Type.Armor or dir.getItemType(id) == Type.Accessory:
+            if type(id) != int:
+                return self.addEquipment(id)
+            else:
+                return self.addEquipment(dir.getItem(id))
         else:
-            return self.addItem(item)
-    def addItem(self,item):
+            return self.addItem(id)
+    def addItem(self,id):
         if len(self.inventory) < MAX_INVENTORY_SIZE:
-            self.inventory.append(item)
+            self.inventory.append(id)
             return True
         print("Item inventory is full")
         return False
@@ -417,6 +451,41 @@ class Party():
     def usePotion(self,member,index,dir):
         self.members[member].gainHP(dir.getPotion(self.inventory[index]).hpGain)
         self.members[member].gainMP(dir.getPotion(self.inventory[index]).mpGain)
+        self.inventory.pop(index)
+    def useConsumable(self,member,index,dir,inDungeon):
+        consumable = dir.getItem(self.inventory[index])
+        print(consumable.name)
+        if consumable.name == "Campfire Kit" and not inDungeon:
+            for member in self.members:
+                member.hp = member.getMaxHP()
+        elif consumable.name == "Spirit Vapor" and not inDungeon:
+            for member in self.members:
+                member.mp = member.getMaxMP()
+        elif consumable.name == "Callaret's Compact":
+            self.callaretsCompact = True
+        elif consumable.name == "Honna Tear":
+            if member.getHP() == 0:
+                member.hp = round(member.getMaxHP())
+                member.mp = round(member.getMaxMP())
+            else:
+                return
+        elif consumable.name == "Wommi Tuft":
+            self.members[member].resetStatus()
+        elif consumable.name == "Sun Sponge":
+            if self.members[member].status == Status.Ablaze:
+                self.members[member].resetStatus()
+            else:
+                return
+        elif consumable.name == "Pulse Regulator":
+            if self.members[member].status == Status.Shocked:
+                self.members[member].resetStatus()
+            else:
+                return
+        elif consumable.name == "Shaking Stone":
+            if self.members[member].status == Status.Freezing:
+                self.members[member].resetStatus()
+            else:
+                return
         self.inventory.pop(index)
     def getPower(self):
         power = 0
@@ -450,11 +519,21 @@ class Party():
                 if self.members[i].gainXP((diff * 3) + (round(diff/2) * random.randint(2,4)) + round((diff*3)*underdogMultiplier)):
                     levelups[i] = 1
         return levelups
-    def removeAccessory(self,target):
+    def removeAccessory(self,target,dir):
         if self.members[target].eqpAcc != None and len(self.equipment) < MAX_INVENTORY_SIZE:
-            self.equipment.append(self.members[target].eqpAcc.id)
-            self.members[target].universalEffectHandler(self.members[target].eqpAcc,"Unequip")
+            self.equipment.append(self.members[target].eqpAcc)
+            self.members[target].universalEffectHandler(self.members[target].eqpAcc,"Unequip",dir)
             self.members[target].eqpAcc = Accessory()
+    def addFoodEffect(self,food,dir):
+        self.removeFoodEffect(dir)
+        for member in self.members:
+            member.universalEffectHandler(food,"On",dir)
+        self.activeFood = food
+    def removeFoodEffect(self,dir):
+        if self.activeFood is not None:
+            for member in self.members:
+                member.universalEffectHandler(self.activeFood,"Off",dir)
+            self.activeFood = None
             
 
 class Creature():
@@ -581,3 +660,6 @@ class UniversalEffects():
         self.hpregen = 0
         self.atkMagicLevel = 0
         self.sptMagicLevel = 0
+    def print(self):
+        print(f'{self.hp}, {self.mp}, {self.attack}, {self.accuracy}, {self.critrate}, {self.defense}, {self.dodge}, {self.speed}, \
+              {self.luck}, {self.amplifier}, {self.manaregen}, {self.hpregen}, {self.atkMagicLevel}, {self.sptMagicLevel}')

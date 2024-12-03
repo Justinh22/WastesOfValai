@@ -25,6 +25,7 @@ class Combat():
         self.activeEffects = []
         self.scheduledManaCosts = []
         self.actionVal = -1
+        self.ranAway = False
         self.state = "mainWindow"
         self.delay = 0
         self.ex = False
@@ -53,9 +54,48 @@ class Combat():
         self.risen = False
         self.curse = []
         self.deathWish = []
+        self.pyrilicVenom = {}
+
+    def reset(self):
+        self.combatOrder = []
+        self.currentTurn = 0
+        self.actions = []
+        self.activeEffects = []
+        self.scheduledManaCosts = []
+        self.actionVal = -1
+        self.ranAway = False
+        self.state = "mainWindow"
+        self.delay = 0
+        self.ex = False
+        self.exTurn = 0
+        self.timeStart = 0
+        self.dmg = 0
+        self.heal = 0
+        self.miss = False
+        self.crit = False
+        self.waitFlag = False
+        self.cursorPos = -1
+        self.menuTop = -1
+        self.itemID = -1
+        self.spellID = -1
+        self.talentID = -1
+        self.lowMana = False
+        self.buffs = []
+        self.duration = 0
+        self.combatDialogue = ""
+        self.defeat = False
+        self.showElementalEffectivenessColorsTo = None
+        
+        self.hitAll = False
+        self.immune = False
+        self.manaspent = False
+        self.risen = False
+        self.curse = []
+        self.deathWish = []
+        self.pyrilicVenom = {}
 
     def initialize(self,encounter):
-        self.currentTurn = 0
+        self.reset()
         for i in range(0,len(self.game.player.party.members)):
             print(f'{self.game.player.party.members[i].name}, {self.game.player.party.members[i].type.name}, {self.game.player.party.members[i].level} (ID {self.game.player.party.members[i].id}) - WPN: {self.game.player.party.members[i].eqpWpn.name}, AMR: {self.game.player.party.members[i].eqpAmr.name}, HP: {self.game.player.party.members[i].getMaxHP()}, MP: {self.game.player.party.members[i].getMaxMP()}, ATK: {self.game.player.party.members[i].attack}, CRT: {self.game.player.party.members[i].critrate}, DEF: {self.game.player.party.members[i].defense}, DDG: {self.game.player.party.members[i].dodge}, LCK: {self.game.player.party.members[i].luck}, SPD: {self.game.player.party.members[i].speed}, PRS: {self.game.player.party.members[i].personality}, SPELLS: {self.game.player.party.members[i].spells}')
         self.encounter = encounter
@@ -103,6 +143,9 @@ class Combat():
                 if member.eqpAcc.timing is not Timing.Universal:
                     print(f'Effect of {member.eqpAcc.name} in play!')
                     self.activeEffects.append(ActiveEffect(member.eqpAcc.id,("Party",i),-1,100))
+            if member.eqpWpn.rune is not None:
+                print(f'Effect of {member.eqpWpn.rune.name} in play!')
+                self.activeEffects.append(ActiveEffect(member.eqpWpn.rune.id,("Party",i),-1,100))
 
         self.inCombat = True
         self.state = "mainWindow"
@@ -138,7 +181,7 @@ class Combat():
         if self.delay > 0:
             self.delay -= 1
             return
-        if self.game.A:
+        if self.game.keys["A"]:
             if self.state == "mainWindow":
                 self.cursorPos = 0
                 self.actionVal = 0
@@ -194,6 +237,9 @@ class Combat():
                     if self.game.player.party.inventory[self.itemID] >= 200 and self.game.player.party.inventory[self.itemID] < 300:
                         self.state = "itemSummary"
                         print("ITEMSUMMARY")
+                    elif self.game.player.party.inventory[self.itemID] >= 800 and self.game.player.party.inventory[self.itemID] < 900 and self.game.directory.getItem(self.game.player.party.inventory[self.itemID]).timing != Timing.Peacetime:
+                        self.state = "itemSummary"
+                        print("ITEMSUMMARY")
             elif self.state == "talentList":
                 if self.cursorPos+self.menuTop < len(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].talents):
                     self.talentID = self.menuTop + self.cursorPos
@@ -231,6 +277,24 @@ class Combat():
                     self.cursorPos = 0
                     self.enterTargetSelect()
                     print("ITEM")
+                elif self.game.player.party.inventory[self.itemID] >= 800 and self.game.player.party.inventory[self.itemID] < 900:
+                    if self.game.directory.getItem(self.game.player.party.inventory[self.itemID]).timing != Timing.Peacetime:
+                        self.actionVal = self.game.player.party.inventory[self.itemID]
+                        if self.game.directory.getConsumableTarget(self.actionVal) == Target.Single or self.game.directory.getConsumableTarget(self.actionVal) == Target.Ally:
+                            self.state = "targetSelect"
+                            self.cursorPos = 0
+                            self.enterTargetSelect()
+                        else:
+                            self.state = "mainWindow"
+                            if self.game.player.party.members[self.combatOrder[self.currentTurn][1]].status == Status.Shocked and random.randint(0,1)==0:
+                                self.actionVal = -2
+                            elif self.game.player.party.members[self.combatOrder[self.currentTurn][1]].status == Status.Freezing and random.randint(0,1)==0:
+                                self.actionVal = -3
+                            self.writeAction(self.combatOrder[self.currentTurn],0,self.actionVal)
+                            print(f'Action writing for {self.combatOrder[self.currentTurn]}, length {len(self.actions)}')
+                            self.next()
+                            self.cursorPos = -1
+                        print("TALENT")
             elif self.state =="talentSummary":
                 if self.validManaCost(self.game.player.party.members[self.combatOrder[self.currentTurn][1]],self.game.player.party.members[self.combatOrder[self.currentTurn][1]].talents[self.talentID]):
                     self.lowMana = False
@@ -258,7 +322,7 @@ class Combat():
                     self.lowMana = True
             elif self.state == "execute":
                 self.timeStart -= 2000
-        if self.game.B:
+        if self.game.keys["B"]:
             if self.state == "mainWindow":
                 self.state = "useMenu"
                 self.cursorPos = 0
@@ -290,17 +354,19 @@ class Combat():
             elif self.state == "talentSummary":
                 self.state = "talentList"
                 print("BACK")
-        if self.game.X:
+        if self.game.keys["X"]:
             if self.state == "mainWindow":
                 self.state = "mainWindow"
                 print("CANCEL")
                 self.prev()
-        if self.game.Y:
+        if self.game.keys["Y"]:
             if self.state == "mainWindow":
                 self.state = "mainWindow"
                 print("RUN")
-                self.inCombat = False
-        if self.game.UP:
+                self.writeAction(self.combatOrder[self.currentTurn],-1,-5) # Run away
+                self.next()
+                # self.inCombat = False
+        if self.game.keys["UP"]:
             if self.state == "targetSelect" and self.cursorPos > 0:
                 tgtList = self.encounter if self.actionVal < 200 else self.game.player.party.members
                 if self.actionVal >= 500:
@@ -322,7 +388,7 @@ class Combat():
                         self.menuTop -= 2
                 else:
                     self.cursorPos -= 2
-        if self.game.DOWN:
+        if self.game.keys["DOWN"]:
             if self.state == "targetSelect":
                 tgtList = self.encounter if self.actionVal < 200 or (self.actionVal >= 300 and self.actionVal < 400) else self.game.player.party.members
                 if self.actionVal >= 500:
@@ -357,14 +423,14 @@ class Combat():
                         self.menuTop += 2
                 else:
                     self.cursorPos += 2
-        if self.game.LEFT:
+        if self.game.keys["LEFT"]:
             if self.state == "spellList" or self.state == "itemList" or self.state == "talentList":
                 if self.cursorPos == 1 or self.cursorPos == 3:
                     self.cursorPos -= 1
             elif self.state == "useMenu":
                 if self.cursorPos > 0:
                     self.cursorPos -= 1
-        if self.game.RIGHT:
+        if self.game.keys["RIGHT"]:
             if self.state == "spellList" or self.state == "itemList" or self.state == "talentList":
                 if self.cursorPos == 0 or self.cursorPos == 2:
                     self.cursorPos += 1
@@ -510,13 +576,14 @@ class Combat():
             pygame.draw.line(self.game.screen,self.game.white,(self.left,350),(self.right+9,350),2)
             write(self.game, 20, self.left+15, 325, "Do you want to use this item?")
             write(self.game, 16, self.left+15, 360, self.game.directory.getItemName(self.game.player.party.inventory[self.itemID]))
-            if self.game.directory.getItem(self.game.player.party.inventory[self.itemID]).hpGain > 0 and self.game.directory.getItem(self.game.player.party.inventory[self.itemID]).mpGain > 0:
-                writeOrientation(self.game, 16,self.right-10, 360, "Restores "+str(self.game.directory.getItem(self.game.player.party.inventory[self.itemID]).hpGain)+" HP and "+str(self.game.directory.getItem(self.game.player.party.inventory[self.itemID]).mpGain)+" MP","R")
-            elif self.game.directory.getItem(self.game.player.party.inventory[self.itemID]).hpGain > 0 and self.game.directory.getItem(self.game.player.party.inventory[self.itemID]).mpGain == 0:
-                writeOrientation(self.game, 16,self.right-10, 360, "Restores "+str(self.game.directory.getItem(self.game.player.party.inventory[self.itemID]).hpGain)+" HP","R")
-            elif self.game.directory.getItem(self.game.player.party.inventory[self.itemID]).hpGain == 0 and self.game.directory.getItem(self.game.player.party.inventory[self.itemID]).mpGain > 0:
-                writeOrientation(self.game, 16,self.right-10, 360, "Restores "+str(self.game.directory.getItem(self.game.player.party.inventory[self.itemID]).mpGain)+" MP","R")
-            write(self.game, 16, self.left+15, 380, self.game.directory.getItem(self.game.player.party.inventory[self.itemID]).description)
+            if self.game.directory.getItemType(self.game.player.party.inventory[self.itemID]) == Type.Potion:
+                if self.game.directory.getItem(self.game.player.party.inventory[self.itemID]).hpGain > 0 and self.game.directory.getItem(self.game.player.party.inventory[self.itemID]).mpGain > 0:
+                    writeOrientation(self.game, 16,self.right-10, 360, "Restores "+str(self.game.directory.getItem(self.game.player.party.inventory[self.itemID]).hpGain)+" HP and "+str(self.game.directory.getItem(self.game.player.party.inventory[self.itemID]).mpGain)+" MP","R")
+                elif self.game.directory.getItem(self.game.player.party.inventory[self.itemID]).hpGain > 0 and self.game.directory.getItem(self.game.player.party.inventory[self.itemID]).mpGain == 0:
+                    writeOrientation(self.game, 16,self.right-10, 360, "Restores "+str(self.game.directory.getItem(self.game.player.party.inventory[self.itemID]).hpGain)+" HP","R")
+                elif self.game.directory.getItem(self.game.player.party.inventory[self.itemID]).hpGain == 0 and self.game.directory.getItem(self.game.player.party.inventory[self.itemID]).mpGain > 0:
+                    writeOrientation(self.game, 16,self.right-10, 360, "Restores "+str(self.game.directory.getItem(self.game.player.party.inventory[self.itemID]).mpGain)+" MP","R")
+            wrapWrite(self.game, 16, self.game.directory.getItem(self.game.player.party.inventory[self.itemID]).description, self.right-20, self.left+15, 380)
             write(self.game, 20,150,425,"A) CONFIRM")
             write(self.game, 20,385,425,"B) BACK")
 
@@ -531,6 +598,8 @@ class Combat():
         if self.state == "execute":
             pygame.draw.line(self.game.screen,self.game.white,(self.left,350),(self.right+9,350),2)
             combatStr = ""
+            if self.actions[self.exTurn-1].action == -5: # Run Away
+                combatStr = self.game.player.party.members[self.actions[self.exTurn-1].source[1]].name + " attempted to flee!"
             if self.actions[self.exTurn-1].action == 0:
                 if self.actions[self.exTurn-1].source[0] == "Encounter":
                     if self.miss:
@@ -597,11 +666,18 @@ class Combat():
                         combatStr = self.game.player.party.members[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + " on " + self.game.player.party.members[self.actions[self.exTurn-1].target].name + ", removing status effects!"
                     else:
                         combatStr = self.game.player.party.members[self.actions[self.exTurn-1].source[1]].name + " casts " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + ", removing all status effects!"
-            elif self.actions[self.exTurn-1].action >= 500 and self.game.directory.getItem(self.actions[self.exTurn-1].action).timing==Timing.InTurn:
+            elif self.actions[self.exTurn-1].action >= 500 and self.actions[self.exTurn-1].action < 600 and self.game.directory.getItem(self.actions[self.exTurn-1].action).timing==Timing.InTurn:
                 if self.game.directory.getTalentTarget(self.actions[self.exTurn-1].action) == Target.Single or self.game.directory.getTalentTarget(self.actions[self.exTurn-1].action) == Target.Ally:
                     combatStr = self.game.player.party.members[self.actions[self.exTurn-1].source[1]].name + " performs " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + " on " + self.encounter[self.actions[self.exTurn-1].target].name + "!"
                 else:
                     combatStr = self.game.player.party.members[self.actions[self.exTurn-1].source[1]].name + " performs " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + "!"
+            elif self.actions[self.exTurn-1].action >= 800 and self.actions[self.exTurn-1].action < 900:
+                if self.game.directory.getConsumableTarget(self.actions[self.exTurn-1].action) == Target.Single:
+                    combatStr = self.game.player.party.members[self.actions[self.exTurn-1].source[1]].name + " uses " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + " on " + self.encounter[self.actions[self.exTurn-1].target].name + "!"
+                elif self.game.directory.getConsumableTarget(self.actions[self.exTurn-1].action) == Target.Ally:
+                    combatStr = self.game.player.party.members[self.actions[self.exTurn-1].source[1]].name + " uses " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + " on " + self.game.player.party.members[self.actions[self.exTurn-1].target].name + "!"
+                else:
+                    combatStr = self.game.player.party.members[self.actions[self.exTurn-1].source[1]].name + " uses " + self.game.directory.getItemName(self.actions[self.exTurn-1].action) + "!"
             write(self.game, 20, self.left+15, 325, combatStr)
 
         if self.state == "win":
@@ -611,6 +687,7 @@ class Combat():
                 difficulty = 0
                 for monster in self.encounter:
                     difficulty += monster.level
+                gold = self.game.player.awardGold(difficulty)
                 levelups = self.game.player.party.awardXP(difficulty)
                 for i in range(len(levelups)):
                     if levelups[i] == 1:
@@ -626,6 +703,13 @@ class Combat():
                 self.inCombat = False
                 self.defeat = True
                 self.game.load()
+
+        if self.state == "ranAway":
+            pygame.draw.line(self.game.screen,self.game.white,(self.left,350),(self.right+9,350),2)
+            write(self.game, 20, self.left+15, 325, "Ran away successfully!")
+            if pygame.time.get_ticks() - self.timeStart >= 3000:
+                self.combatTeardown()
+                self.inCombat = False
 
     def combatInfo(self):
         self.game.screen.fill(self.game.black)
@@ -723,8 +807,16 @@ class Combat():
         write(self.game, 11, 440, 405, "MPG "+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].getManaRegen()))
         write(self.game, 16, 360, 430, "\""+self.combatDialogue+"\"")
         iNext = 0
-        for i in range(len(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].activeBuffs)):
-            writeOrientation(self.game, 11, self.right, 330+(i*15), self.game.player.party.members[self.combatOrder[self.currentTurn][1]].activeBuffs[i][0]+" ("+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].activeBuffs[i][1])+")","R")
+        effectList = self.game.player.party.members[self.combatOrder[self.currentTurn][1]].activeBuffs[:]
+        for effect in self.activeEffects:
+            if effect.id >= 800 and effect.id < 900:
+                if self.game.directory.getItem(effect.id).target == Target.All or effect.target == self.combatOrder[self.currentTurn][1]:
+                    if effect.duration < 50:
+                        effectList.append((self.game.directory.getItemName(effect.id),effect.duration))
+                    else:
+                        effectList.append((self.game.directory.getItemName(effect.id),"Inf"))
+        for i in range(len(effectList)):
+            writeOrientation(self.game, 11, self.right, 330+(i*15), effectList[i][0]+" ("+str(effectList[i][1])+")","R")
             iNext += 1
         if self.game.player.party.members[self.combatOrder[self.currentTurn][1]].status != Status.NoStatus:
             writeOrientation(self.game, 11, self.right, 330+(iNext*15), self.game.player.party.members[self.combatOrder[self.currentTurn][1]].status.name+" ("+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].statusCount)+")","R")
@@ -736,7 +828,7 @@ class Combat():
         else:
             self.skip()
             self.gameStatus()
-            if self.state == "lose" or self.state == "win":
+            if self.state == "lose" or self.state == "win" or self.state == "ranAway":
                 return
             if self.currentTurn >= len(self.combatOrder):
                 self.startExecute()
@@ -764,6 +856,7 @@ class Combat():
 
 
     def enemyAction(self,source):
+        move = random.randint(0,len(self.encounter[self.combatOrder[self.currentTurn][1]].knownSpells))
         if not self.isAlive(source):
             self.writeAction(source,0,-1)
             print(f'Action writing for {source}, length {len(self.actions)}')
@@ -772,7 +865,7 @@ class Combat():
             self.writeAction(source,0,-2)
             print(f'Action writing for {source}, length {len(self.actions)}')
             return
-        elif self.encounter[self.combatOrder[self.currentTurn][1]].status == Status.Freezing and random.randint(0,1)==0:
+        elif self.encounter[self.combatOrder[self.currentTurn][1]].status == Status.Freezing and (random.randint(0,1)==0 or (move != 0 and self.encounter[self.combatOrder[self.currentTurn][1]].spellCooldown == 0)):
             self.writeAction(source,0,-3)
             print(f'Action writing for {source}, length {len(self.actions)}')
             return
@@ -782,7 +875,6 @@ class Combat():
         while self.game.player.party.members[target].hp <= 0 and timeout < 20:
             target = random.randint(0,len(self.game.player.party.members)-1)
             timeout += 1
-        move = random.randint(0,len(self.encounter[self.combatOrder[self.currentTurn][1]].knownSpells))
         if move == 0 or self.encounter[self.combatOrder[self.currentTurn][1]].spellCooldown > 0:
             self.writeAction(source, target, 0)
             if self.encounter[self.combatOrder[self.currentTurn][1]].spellCooldown > 0:
@@ -1043,6 +1135,8 @@ class Combat():
                         self.endExecute()
                         return
                 print(f'Action: {self.actions[self.exTurn].source} -> {self.actions[self.exTurn].target}, {self.actions[self.exTurn].action} (exTurn {self.exTurn})')
+                if self.actions[self.exTurn].action == -5: # Run Away
+                    self.ranAway = self.runAway(self.actions[self.exTurn].source)
                 self.checkEffectTiming(self.actions[self.exTurn],Timing.PreAttack)
                 if self.actions[self.exTurn].action == 0:
                     self.attack(self.actions[self.exTurn])
@@ -1052,9 +1146,11 @@ class Combat():
                     self.cast(self.actions[self.exTurn])
                 elif self.actions[self.exTurn].action >= 400 and self.actions[self.exTurn].action < 500:
                     self.cast(self.actions[self.exTurn])
-                elif self.actions[self.exTurn].action >= 500:
+                elif self.actions[self.exTurn].action >= 500 and self.actions[self.exTurn].action < 600:
                     if self.game.directory.getItem(self.actions[self.exTurn].action).timing == Timing.InTurn:
                         self.talentActionHandler(self.actions[self.exTurn])
+                elif self.actions[self.exTurn].action >= 800 and self.actions[self.exTurn].action < 900:
+                    self.consumableActionHandler(self.actions[self.exTurn])
                 self.tupleToMember(self.actions[self.exTurn].source).tickStatus()
                 self.manaspent = False
                 self.exTurn += 1
@@ -1103,8 +1199,11 @@ class Combat():
         self.currentTurn = 0
 
     def endExecute(self):
-        #for i in range(len(self.combatOrder)):
-        #    self.actions.pop(0)
+        for i in range(len(self.combatOrder)):
+            if self.isAlive(self.combatOrder[i]) == False:
+                self.tupleToMember(self.combatOrder[i]).resetStatus()
+                if self.combatOrder[i][0] == 'Party':
+                    self.onDeathEffectHandler(self.combatOrder[i])
         for i in range(len(self.combatOrder)-1,-1,-1):
             if self.isAlive(self.combatOrder[i]) == False:
                 self.combatOrder.pop(i)
@@ -1159,7 +1258,7 @@ class Combat():
                 return
 
     def gameStatus(self):
-        if self.state == "lose" or self.state == "win":
+        if self.state == "lose" or self.state == "win" or self.state == "ranAway":
             return
         encFlag = False
         ptyFlag = False
@@ -1170,6 +1269,15 @@ class Combat():
             elif member[0] == "Party":
                 if self.game.player.party.members[member[1]].hp > 0:
                     ptyFlag = True
+        if ptyFlag == False: # Provide last chance to trigger OnDeath effects before loss
+            for member in self.combatOrder:
+                if member[0] == "Encounter":
+                    if self.encounter[member[1]].hp > 0:
+                        encFlag = True
+                elif member[0] == "Party":
+                    self.onDeathEffectHandler(member)
+                    if self.game.player.party.members[member[1]].hp > 0:
+                        ptyFlag = True
         if ptyFlag == False:
             self.state = "lose"
             self.timeStart = pygame.time.get_ticks()
@@ -1181,6 +1289,13 @@ class Combat():
             self.state = "win"
             self.timeStart = pygame.time.get_ticks()
             print("Win!")
+            self.exTurn = 10
+            self.timeStart -= 1000
+            return True
+        if self.ranAway == True:
+            self.state = "ranAway"
+            self.timeStart = pygame.time.get_ticks()
+            print("Ran away successfully!")
             self.exTurn = 10
             self.timeStart -= 1000
             return True
@@ -1272,10 +1387,16 @@ class Combat():
                 return "Resistance"
         print("ERROR: Elemental Effectiveness Not Found")
         return "Neutral"
+    
+    def runAway(self,source):
+        chance = random.randint(1,100)
+        threshold = 20 + self.tupleToMember(source).getLuck()
+        return threshold >= chance
         
         
     def checkEffectTiming(self,action,timing):
         for effect in self.activeEffects:
+            print(effect.id)
             if self.game.directory.getItemType(effect.id) is Type.Talent:
                 talent = self.game.directory.getTalent(effect.id)
                 if timing == talent.timing:
@@ -1289,10 +1410,17 @@ class Combat():
                 accessory = self.game.directory.getAccessory(effect.id)
                 #print(f'Checking for usage of {accessory.name} at {timing.name}...')
                 if timing == accessory.timing:
-                    if accessory.type == AccessoryType.Passive:
+                    if accessory.type == ActivationType.Passive:
                         self.accessoryPassiveEffectHandler(effect,action)
-                    if accessory.type == AccessoryType.Active:
+                    if accessory.type == ActivationType.Active:
                         self.accessoryActiveEffectHandler(effect,action)
+            elif self.game.directory.getItemType(effect.id) is Type.Consumable:
+                consumable = self.game.directory.getConsumable(effect.id)
+                if timing == consumable.timing:
+                    self.consumableEffectHandler(effect,action)
+            elif self.game.directory.getItemType(effect.id) is Type.Rune and timing == Timing.DamageDealt and effect.source == action.source and (action.action == 0 or self.game.directory.getItemType(action.action) == Type.Talent):
+                self.runeEffectHandler(effect,action)
+
 
     def checkAccessoryEffectTiming(self,action,timing):
         for effect in self.activeEffects:
@@ -1300,10 +1428,11 @@ class Combat():
                 accessory = self.game.directory.getAccessory(effect.id)
                 #print(f'Checking for usage of {accessory.name} at {timing.name}...')
                 if timing == accessory.timing:
-                    if accessory.type == AccessoryType.Passive:
+                    if accessory.type == ActivationType.Passive:
                         self.accessoryPassiveEffectHandler(effect,action)
-                    if accessory.type == AccessoryType.Active:
+                    if accessory.type == ActivationType.Active:
                         self.accessoryActiveEffectHandler(effect,action)
+
 
     def talentOrderingEffectHandler(self,effect):
         talent = self.game.directory.getTalent(effect.id)
@@ -1627,6 +1756,93 @@ class Combat():
         elif talent.name == "Death Wish":
             self.deathWish.append(target)
 
+
+    def consumableActionHandler(self,action):
+        consumable = self.game.directory.getConsumable(action.action)
+        source = action.source
+        target = action.target
+        print(f'Consumable: {consumable.name}')
+
+        if consumable.name == "Fire Arrow" or consumable.name == "Blast Arrow" or consumable.name == "Nova Arrow":
+            target = self.checkRecalculateTarget(source[0],target,"Encounter")
+            self.encounter[target].takeDamage(consumable.data)
+
+        elif consumable.name == "Fire Bomb" or consumable.name == "Blast Bomb" or consumable.name == "Nova Bomb":
+            for enemy in self.encounter:
+                enemy.takeDamage(consumable.data)
+
+        elif consumable.name == "Smoke Capsule":
+            self.inCombat = False
+            self.timeStart = pygame.time.get_ticks()
+            self.timeStart -= 1000
+
+        elif consumable.name == "Honna Tear":
+            if self.game.player.party.members[target].getHP() <= 0:
+                self.risen = True
+                self.game.player.party.members[target].setHP(round(self.game.player.party.members[target].getMaxHP()/2))
+                if self.game.player.party.members[target].getMP() <= round(self.game.player.party.members[target].getMaxHP()/2):
+                    self.game.player.party.members[target].setMP(round(self.game.player.party.members[target].getMaxHP()/2))
+            else:
+                return
+
+        elif consumable.name == "Pyrilic Venom":
+            effect = ActiveEffect(consumable.id, source, target, 500)
+            self.activeEffects.insert(0,effect)
+
+        elif consumable.name == "Rendai's Veil":
+            effect = ActiveEffect(consumable.id, source, target, consumable.data)
+            self.activeEffects.insert(0,effect)
+
+        elif consumable.name == "Callaret's Grace":
+            effect = ActiveEffect(consumable.id, source, target, consumable.data)
+            self.activeEffects.insert(0,effect)
+
+        elif consumable.name == "Wommi Tuft":
+            self.game.player.party.members[target].resetStatus()
+
+        elif consumable.name == "Sun Sponge":
+            if self.game.player.party.members[target].status == Status.Ablaze:
+                self.game.player.party.members[target].resetStatus()
+            else:
+                return
+
+        elif consumable.name == "Pulse Regulator":
+            if self.game.player.party.members[target].status == Status.Shocked:
+                self.game.player.party.members[target].resetStatus()
+            else:
+                return
+
+        elif consumable.name == "Shaking Stone":
+            if self.game.player.party.members[target].status == Status.Freezing:
+                self.game.player.party.members[target].resetStatus()
+            else:
+                return
+
+        self.game.player.party.inventory.remove(consumable.id)
+
+
+    def consumableEffectHandler(self,effect,action):
+        consumable = self.game.directory.getConsumable(effect.id)
+        target = effect.target
+
+        if consumable.name == "Pyrilic Venom":
+            if action.source[1] == effect.target:
+                if target not in self.pyrilicVenom:
+                    self.pyrilicVenom[target] = 0
+                self.pyrilicVenom[target] += consumable.data
+                print(f'Venom damage: {self.pyrilicVenom[target]}')
+                self.dmg += self.pyrilicVenom[target]
+
+        elif consumable.name == "Rendai's Veil":
+            if action.target == effect.target:
+                self.dmg = 0
+
+        elif consumable.name == "Callaret's Grace":
+            if action.action >= 300 and action.action < 400:
+                self.immune = True
+                self.dmg = 0
+
+
     def accessoryPassiveEffectHandler(self, effect, action):
         accessory = self.game.directory.getAccessory(effect.id)
 
@@ -1809,6 +2025,71 @@ class Combat():
                     if accessory.activationRate + luck >= chance:
                         print(f'{accessory.name} triggered!')
                         self.dmg = self.game.player.party.members[effect.source[1]].getHP() - 1
+
+
+    def runeEffectHandler(self,effect,action):
+        rune = self.game.directory.getRune(effect.id)
+        chance = random.randint(1,100)
+        print(f'{rune.name} effect activated!')
+
+        if rune.name == "Rune of Power":
+            self.dmg += round((self.dmg)*float((rune.level*rune.data)/100))
+
+        elif rune.name == "Rune of Surging":
+            roll = self.game.player.party.members[effect.source[1]].getLuck() + (rune.level*rune.data)
+            if roll >= chance:
+                self.dmg *= 2
+
+        elif rune.name == "Rune of Piercing":
+            roll = self.game.player.party.members[effect.source[1]].getLuck() + (rune.level*rune.data)
+            if roll >= chance:
+                self.dmg = self.game.player.party.members[action.source[1]].getAttack() - round(self.encounter[action.target].defense/2)
+
+        elif rune.name == "Rune of Flames":
+            roll = self.game.player.party.members[effect.source[1]].getLuck() + (rune.level*rune.data)
+            if roll >= chance:
+                self.encounter[action.target].status = Status.Ablaze
+                self.encounter[action.target].statusCount = 3
+
+        elif rune.name == "Rune of Sparks":
+            roll = self.game.player.party.members[effect.source[1]].getLuck() + (rune.level*rune.data)
+            if roll >= chance:
+                self.encounter[action.target].status = Status.Shocked
+                self.encounter[action.target].statusCount = 3
+
+        elif rune.name == "Rune of Freezing":
+            roll = self.game.player.party.members[effect.source[1]].getLuck() + (rune.level*rune.data)
+            if roll >= chance:
+                self.encounter[action.target].status = Status.Freezing
+                self.encounter[action.target].statusCount = 3
+
+        elif rune.name == "Rune of Siphoning":
+            self.game.player.party.members[effect.source[1]].gainMP(round(self.dmg*(rune.level*rune.data/100)))
+
+        elif rune.name == "Rune of Blood":
+            self.game.player.party.members[effect.source[1]].gainHP(round(self.dmg*(rune.level*rune.data/100)))
+
+        elif rune.name == "Rune of Corruption":
+            self.dmg += round((self.dmg)*float(rune.level*rune.data*2/100))
+            self.game.player.party.members[effect.source[1]].gainHP(-round((self.dmg)*float(rune.level*rune.data/100)))
+
+        elif rune.name == "Rune of Channeling":
+            if self.game.player.party.members[effect.source[1]].getMP() > 0:
+                self.dmg += round((self.dmg)*float(rune.level*rune.data*2/100))
+                self.game.player.party.members[effect.source[1]].changeMana(-round((self.dmg)*float(rune.level*rune.data/100)))
+
+        elif rune.name == "Rune of Expertise":
+            if self.crit:
+                self.dmg *= 1 + round(rune.level*rune.data/100)
+
+    def onDeathEffectHandler(self, member):
+        # Second Soul
+        for item in self.game.player.party.inventory:
+            if self.game.directory.getItemName(item) == "Second Soul":
+                print("The Second Soul bursts from its jar!")
+                self.game.player.party.members[member[1]].fullRestore()
+                self.game.player.party.inventory.remove(item)
+                break
 
     def checkCursedItems(self,character):
         if character.eqpAcc.name == "Cursed Bracer":

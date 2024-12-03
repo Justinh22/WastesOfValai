@@ -1,4 +1,3 @@
-from collections import deque
 import pygame
 import time
 from combat import *
@@ -7,6 +6,7 @@ from directory import *
 from writing import *
 from dungeonmapgenerator import *
 from characterpopups import *
+from pathfinder import *
 
 class Crawler():
     def __init__(self,game,dungeon):
@@ -52,35 +52,35 @@ class Crawler():
         self.blitScreen()
 
     def getInput(self):
-        if self.game.UP:
+        if self.game.keys["UP"]:
             if self.dungeonMap.map[self.dungeonPos[0]-1][self.dungeonPos[1]] != self.dungeonMap.wallChar:
                 self.dungeonPos[0] -= 1
                 self.stepTo(self.dungeonPos[0],self.dungeonPos[1])
             self.drawScreen()
             if self.state == "lootSummary":
                 self.state == "main"
-        if self.game.RIGHT:
+        if self.game.keys["RIGHT"]:
             if self.dungeonMap.map[self.dungeonPos[0]][self.dungeonPos[1]+1] != self.dungeonMap.wallChar:
                 self.dungeonPos[1] += 1
                 self.stepTo(self.dungeonPos[0],self.dungeonPos[1])
             self.drawScreen()
             if self.state == "lootSummary":
                 self.state == "main"
-        if self.game.DOWN:
+        if self.game.keys["DOWN"]:
             if self.dungeonMap.map[self.dungeonPos[0]+1][self.dungeonPos[1]] != self.dungeonMap.wallChar:
                 self.dungeonPos[0] += 1
                 self.stepTo(self.dungeonPos[0],self.dungeonPos[1])
             self.drawScreen()
             if self.state == "lootSummary":
                 self.state == "main"
-        if self.game.LEFT:
+        if self.game.keys["LEFT"]:
             if self.dungeonMap.map[self.dungeonPos[0]][self.dungeonPos[1]-1] != self.dungeonMap.wallChar:
                 self.dungeonPos[1] -= 1
                 self.stepTo(self.dungeonPos[0],self.dungeonPos[1])
             self.drawScreen()
             if self.state == "lootSummary":
                 self.state == "main"
-        if self.game.A:
+        if self.game.keys["A"]:
             print("A")
             if self.state == "lootSummary":
                 if self.game.player.party.add(self.lootLookup().loot,self.game.directory):
@@ -103,13 +103,13 @@ class Crawler():
                 self.dungeonMap.map[self.dungeonPos[0]][self.dungeonPos[1]] = FLOOR_CHAR
                 self.messageTimer = 1000
                 self.state = "main"
-        if self.game.B:
+        if self.game.keys["B"]:
             print("B")
-        if self.game.X:
+        if self.game.keys["X"]:
             print("X")
             #self.inDungeon = False
             #self.game.inGame = False
-        if self.game.START:
+        if self.game.keys["START"]:
             self.pausemenu.pause(self.game.player.currentPos)
 
     def drawScreen(self):
@@ -117,6 +117,7 @@ class Crawler():
         self.game.screen.fill((0,0,0))
         floorInfo = "Floor " + str(self.dungeonMap.floor) + "/" + str(self.dungeonMap.maxFloors)
         write(self.game,15,self.width-80,self.height+10,"ST) Pause")
+        write(self.game,15,30,self.height+10,self.dungeon.name)
         write(self.game,15,self.width-80,self.height+30,floorInfo)
         for x in range(30, self.width, blockSize):
             for y in range(30, self.height, blockSize):
@@ -149,13 +150,13 @@ class Crawler():
         if self.state == "lootSummary":
             text = "Inside the chest is a " + self.game.directory.getItemName(self.lootLookup().loot,True)
             self.messageTimer = 0
-            write(self.game, 20, 30,self.height+10,text)
+            write(self.game, 15, 30,self.height+30,text)
         if self.state == "wandererSummary":
             text = "A wanderer lies on the ground, unconscious."
             self.messageTimer = 0
-            write(self.game, 20, 30,self.height+10,text)
+            write(self.game, 15, 30,self.height+30,text)
         if self.messageTimer > 0:
-            write(self.game, 20, 30,self.height+10,self.message)
+            write(self.game, 15, 30,self.height+30,self.message)
             self.messageTimer -= 1
 
     def nextFloor(self):
@@ -317,45 +318,6 @@ class Enemy():
         self.coords = list(self.huntPath[self.huntIndex])
         
     def pathfind(self,start,target,path):
-        pathfinder = Pathfinder(start,target,self.map)
+        pathfinder = Pathfinder(start,target,self.map.map)
+        pathfinder.setObstacle(self.map.wallChar)
         path += pathfinder.calculatePath()
-
-class Pathfinder():
-    def __init__(self,start,end,map):
-        self.startPoint = start
-        self.endPoint = end
-        self.map = map
-        self.path = []
-        self.workingPath = set()
-
-    def calculatePath(self):
-        path = self.bfs(self.startPoint)
-        return path
-    
-    def isValid(self,row,col):
-        return self.map.map[row][col] != self.map.wallChar
-
-    def bfs(self,start):
-        queue = deque([(start, [])])
-        visited = set()
-
-        while queue:
-            current, path = queue.popleft()
-            row, col = current
-
-            if current == self.endPoint:
-                return path + [current]
-            
-            if current in visited:
-                continue
-
-            visited.add(current)
-
-            for r, c in [(0,1), (1,0), (0,-1), (-1,0)]:
-                newR, newC = row + r, col + c
-                nextPos = (newR, newC)
-
-                if self.isValid(newR, newC):
-                    queue.append((nextPos, path + [current]))
-
-        return None

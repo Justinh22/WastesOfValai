@@ -15,6 +15,7 @@ class MainMenu():
         self.debug_lv = 1
         self.debug_cls = -1
         self.debug_startingItems = []
+        self.debug_startingGold = []
         self.startingZone = 1
         self.debugOps = []
         self.startPos = (self.game.width/2,self.game.height/2+30)
@@ -44,7 +45,7 @@ class MainMenu():
 
     def getInput(self):
         self.cursorHandler()
-        if self.game.A:
+        if self.game.keys["A"]:
             if self.cursorState == "Start":
                 self.game.inGame = True
                 self.displayRunning = False
@@ -52,6 +53,7 @@ class MainMenu():
                 self.game.write(20, self.startPos[0], self.startPos[1], "Loading...")
                 self.blitScreen()
                 self.wipeDungeonDir()
+                self.wipeVillageDir()
                 for op in self.debugOps:
                     self.setDebug(op)
                 self.executeDebug()
@@ -71,34 +73,38 @@ class MainMenu():
                 print("Quit!")
                 pygame.quit()
                 sys.exit()
-        if self.game.X:
+        if self.game.keys["X"]:
             if "StartClass" not in self.debugOps:
                 print("StartClass")
                 self.debugOps.append("StartClass")
-        if self.game.Y:
+        if self.game.keys["Y"]:
             if "StartLevel" not in self.debugOps:
                 print("StartLevel")
                 self.debugOps.append("StartLevel")
-        if self.game.L:
+        if self.game.keys["L"]:
             if "ManualEncounters" not in self.debugOps:
                 print("ManualEncounters")
                 self.debugOps.append("ManualEncounters")
-        if self.game.R:
+        if self.game.keys["R"]:
             if "ManualLevelUp" not in self.debugOps:
                 print("ManualLevelUp")
                 self.debugOps.append("ManualLevelUp")
-        if self.game.START:
+        if self.game.keys["START"]:
             if "StartingItems" not in self.debugOps:
                 print("StartingItems")
                 self.debugOps.append("StartingItems")
-        if self.game.SELECT:
+        if self.game.keys["SELECT"]:
             if "StartingZone" not in self.debugOps:
                 print("StartingZone")
                 self.debugOps.append("StartingZone")
+        if self.game.keys["B"]:
+            if "StartingGold" not in self.debugOps:
+                print("StartingGold")
+                self.debugOps.append("StartingGold")
 
 
     def cursorHandler(self):
-        if self.game.DOWN:
+        if self.game.keys["DOWN"]:
             if self.cursorState == "Start":
                 self.cursor.midtop = (self.loadPos[0]-100, self.loadPos[1])
                 self.cursorState = "Load"
@@ -108,7 +114,7 @@ class MainMenu():
             elif self.cursorState == "Quit":
                 self.cursor.midtop = (self.startPos[0]-100, self.startPos[1])
                 self.cursorState = "Start"
-        elif self.game.UP:
+        elif self.game.keys["UP"]:
             if self.cursorState == "Start":
                 self.cursor.midtop = (self.quitPos[0]-100, self.quitPos[1])
                 self.cursorState = "Quit"
@@ -121,6 +127,12 @@ class MainMenu():
 
     def wipeDungeonDir(self):
         folder = 'dungeons/'
+        for filename in os.listdir(folder):
+            if filename.endswith('.txt'):
+                os.remove(os.path.join(folder,filename))
+
+    def wipeVillageDir(self):
+        folder = 'villages/'
         for filename in os.listdir(folder):
             if filename.endswith('.txt'):
                 os.remove(os.path.join(folder,filename))
@@ -138,6 +150,8 @@ class MainMenu():
             self.debug_startingItems = getDebug(4)
         if typ == "StartingZone":
             self.debug_startingZone = getDebug(5)
+        if typ == "StartingGold":
+            self.debug_startingGold = getDebug(6)
     
     def executeDebug(self):
         print(self.debugOps)
@@ -156,3 +170,5 @@ class MainMenu():
                 self.game.player.party.add(item,self.game.directory)
         if "StartingZone" in self.debugOps:
             self.startingZone = self.debug_startingZone
+        if "StartingGold" in self.debugOps:
+            self.game.player.gold += self.debug_startingGold

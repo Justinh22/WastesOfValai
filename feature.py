@@ -49,6 +49,9 @@ class Feature():
         if type == Type.SptSpell:
             divVal = MAX_DIFFICULTY / MAX_SPTSPELL_RARITY
             lootRarity = math.ceil(rarity / divVal)
+        if type == Type.Consumable:
+            divVal = MAX_DIFFICULTY / MAX_CONSUMABLE_RARITY
+            lootRarity = math.ceil(rarity / divVal)
         return lootRarity
 
 
@@ -63,7 +66,7 @@ class FeatureList():
     def initFeatureList(self):
 ######################################################################## FEATURE LIST #########################################################################################
         Chest = Feature(0,"Chest","There is an unlocked, ornate-looking chest.",
-                        [Type.Weapon,Type.Armor,Type.Potion], LootOdds.Definite, LootRarity.Rare)
+                        [Type.Weapon,Type.Armor,Type.Potion,Type.Consumable], LootOdds.Definite, LootRarity.Rare)
         self.featureList.append(Chest)
 
         Spellbook = Feature(1,"Spellbook","An old, tattered spellbook, filled with runes.",
@@ -71,7 +74,7 @@ class FeatureList():
         self.featureList.append(Spellbook)
 
         Table = Feature(2,"Table","A small, wooden table.",
-                        [Type.Potion], LootOdds.Likely, LootRarity.Common)
+                        [Type.Potion,Type.Consumable], LootOdds.Likely, LootRarity.Common)
         self.featureList.append(Table)
 
         Rug = Feature(3,"Rug","An old, tattered rug on the floor.",
@@ -87,7 +90,7 @@ class FeatureList():
         self.featureList.append(Cobblestones)
 
         Dirt = Feature(6,"Dirt Floor","Soft dirt covers the floor of the room, with some mounds piled up throughout.",
-                       [Type.Potion], LootOdds.VeryLikely, LootRarity.Common)
+                       [Type.Potion,Type.Consumable], LootOdds.VeryLikely, LootRarity.Common)
         self.featureList.append(Dirt)
 
         SuitOfArmor = Feature(7,"Suit of Armor","A suit of solid armor stands vigilantly.",
@@ -107,11 +110,11 @@ class FeatureList():
         self.featureList.append(StoneWalls)
 
         BlackSlime = Feature(11,"Black Slime","A thick black slime. If you listen close enough, it seems to have a heartbeat...",
-                             [Type.Weapon,Type.Potion], LootOdds.Unlikely, LootRarity.Common)
+                             [Type.Weapon,Type.Potion,Type.Consumable], LootOdds.Unlikely, LootRarity.Common)
         self.featureList.append(BlackSlime)
 
         Lockbox = Feature(12,"Lockbox","A small metal box, with the lock seemingly smashed off...",
-                          [Type.Weapon,Type.Armor,Type.Potion], LootOdds.Definite, LootRarity.Uncommon)
+                          [Type.Weapon,Type.Armor,Type.Potion,Type.Consumable], LootOdds.Definite, LootRarity.Uncommon)
         self.featureList.append(Lockbox)
 
         AncientScroll = Feature(13,"Ancient Scroll","A tattered old scroll, detailing the casting of a powerful spell.",
@@ -139,7 +142,7 @@ class FeatureList():
         self.featureList.append(WeaponRack)
 
         MetalShelf = Feature(19,"Metal Shelf","A solid steel shelf. Some random tools and pieces of equipment lie on its surface.",
-                             [Type.Weapon,Type.Potion], LootOdds.Unlikely, LootRarity.Uncommon)
+                             [Type.Weapon,Type.Potion,Type.Consumable], LootOdds.Unlikely, LootRarity.Uncommon)
         self.featureList.append(MetalShelf)
 
         MetalTable = Feature(20,"Table","A solid metal table. Some random pieces of paper with intelligible writing cover its surface.",

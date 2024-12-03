@@ -29,7 +29,7 @@ class Map():
                 
         if startR == -1 and startC == -1:
             self.startingPos = (round(self.sizeR/2),round(self.sizeC/2))
-            while self.map[self.startingPos[0]][self.startingPos[1]] == ' ':
+            while self.map[self.startingPos[0]][self.startingPos[1]] == OCEAN_CHAR:
                 if self.startingPos[0] > round(self.sizeR/3):
                     self.startingPos = (self.startingPos[0]-1, self.startingPos[1])
                 else:
@@ -45,13 +45,13 @@ class Map():
             for j in range(0,self.sizeC):
                 randomChar = random.randint(1,4)
                 if randomChar == 1:
-                    row.append('#')
+                    row.append(FOREST_CHAR)
                 elif randomChar == 2:
-                    row.append(';')
+                    row.append(PLAINS_CHAR)
                 elif randomChar == 3:
-                    row.append('.')
+                    row.append(DESERT_CHAR)
                 else:
-                    row.append(' ')
+                    row.append(OCEAN_CHAR)
                 revealedRow.append('0')
             self.map.append(row)
             self.revealedMap.append(revealedRow)
@@ -74,7 +74,7 @@ class Map():
                     if self.difficultyMap[r][c] != startingZoneChar:
                         continue
                     for coords in [(-1,0), (0,-1), (1,0), (0,1)]:
-                        if self.map[r+coords[0]][c+coords[1]] == ' ' or self.difficultyMap[r+coords[0]][c+coords[1]] != startingZoneChar:
+                        if self.map[r+coords[0]][c+coords[1]] == OCEAN_CHAR or self.difficultyMap[r+coords[0]][c+coords[1]] != startingZoneChar:
                             continue
                     potentialStartPoints.append((r,c))
             if potentialStartPoints == []:
@@ -127,7 +127,7 @@ class Map():
         #Setting tower position...
         rEnd = random.randint(randRA,randRB)
         cEnd = random.randint(randCA,randCB)
-        while self.map[rEnd][cEnd] == ' ':
+        while self.map[rEnd][cEnd] == OCEAN_CHAR:
             rEnd = random.randint(randRA,randRB)
             cEnd = random.randint(randCA,randCB)
         self.map[rEnd][cEnd] = 'O'
@@ -136,10 +136,10 @@ class Map():
         #Setting temple position...
         rEnd = random.randint(randRA,randRB)
         cEnd = random.randint(randCA,randCB)
-        while self.map[-rEnd][-cEnd] == ' ':
+        while self.map[-rEnd][-cEnd] == OCEAN_CHAR:
             rEnd = random.randint(randRA,randRB)
             cEnd = random.randint(randCA,randCB)
-        self.map[-rEnd][-cEnd] = 'V'
+        self.map[-rEnd][-cEnd] = 'Z'
 
         print("Generating landmarks...")
         self.placeLandmarks(LANDMARK_COUNT)
@@ -248,32 +248,38 @@ class Map():
         for room in roomList:
             randomVal = random.randint(1,3)
             if randomVal == 1:
-                self.map[room[0]][room[1]] = 'A' # Abandoned Camp
+                self.map[room[0]][room[1]] = ABANDONED_VILLAGE_CHAR # Abandoned Camp
             else:
-                self.map[room[0]][room[1]] = 'S' # Shack
+                self.map[room[0]][room[1]] = SHACK_CHAR # Shack
 
         dungeonList = self.pseudoRandomPlacement(dungeons)
         for dungeon in dungeonList:
             randomVal = random.randint(1,2)
-            if self.map[dungeon[0]][dungeon[1]] == '.':
+            if self.map[dungeon[0]][dungeon[1]] == DESERT_CHAR:
                 if randomVal == 1:
-                    self.map[dungeon[0]][dungeon[1]] = 'W' # Well
+                    self.map[dungeon[0]][dungeon[1]] = WELL_CHAR # Well
                 elif randomVal == 2:
-                    self.map[dungeon[0]][dungeon[1]] = 'P' # Pyramid
-            elif self.map[dungeon[0]][dungeon[1]] == ';':
+                    self.map[dungeon[0]][dungeon[1]] = PYRAMID_CHAR # Pyramid
+            elif self.map[dungeon[0]][dungeon[1]] == PLAINS_CHAR:
                 if randomVal == 1:
-                    self.map[dungeon[0]][dungeon[1]] = 'B' # Bandit Camp
+                    self.map[dungeon[0]][dungeon[1]] = BANDITCAMP_CHAR # Bandit Camp
                 elif randomVal == 2:
-                    self.map[dungeon[0]][dungeon[1]] = 'C' # Cave
-            elif self.map[dungeon[0]][dungeon[1]] == '#':
+                    self.map[dungeon[0]][dungeon[1]] = CAVE_CHAR # Cave
+            elif self.map[dungeon[0]][dungeon[1]] == FOREST_CHAR:
                 if randomVal == 1:
-                    self.map[dungeon[0]][dungeon[1]] = 'R' # Ruins
+                    self.map[dungeon[0]][dungeon[1]] = RUINS_CHAR # Ruins
                 elif randomVal == 2:
-                    self.map[dungeon[0]][dungeon[1]] = 'T' # Treehouse
+                    self.map[dungeon[0]][dungeon[1]] = TREEHOUSE_CHAR # Treehouse
 
         havenList = self.pseudoRandomPlacement(havens)
+        villageCount = 0
+        random.shuffle(havenList)
         for haven in havenList:
-            self.map[haven[0]][haven[1]] = 'H' # Haven
+            if villageCount % VILLAGE_WEIGHT == 0:
+                self.map[haven[0]][haven[1]] = VILLAGE_CHAR # Village
+            else:
+                self.map[haven[0]][haven[1]] = HAVEN_CHAR # Haven
+            villageCount += 1
 
 
     def pseudoRandomPlacement(self,num):
@@ -296,7 +302,7 @@ class Map():
 
             targetR = random.randint(quadrantSizeR*r, upperBoundR)
             targetC = random.randint(quadrantSizeC*c, upperBoundC)
-            if self.map[targetR][targetC] == ' ' or self.map[targetR][targetC] == 'X':
+            if self.map[targetR][targetC] == OCEAN_CHAR or self.map[targetR][targetC] == 'X':
                 burnout -= 1
                 continue
             burnout = 50
@@ -341,8 +347,8 @@ class Map():
         while not good:
             rowMod = random.choice([-2,-1,1,2])
             colMod = random.choice([-2,-1,1,2])
-            if self.map[self.startingPos[0]+rowMod][self.startingPos[1]+colMod] != ' ':
-                self.map[self.startingPos[0]+rowMod][self.startingPos[1]+colMod] = 'H'
+            if self.map[self.startingPos[0]+rowMod][self.startingPos[1]+colMod] != OCEAN_CHAR:
+                self.map[self.startingPos[0]+rowMod][self.startingPos[1]+colMod] = HAVEN_CHAR
                 good = True
 
 
@@ -420,8 +426,8 @@ class Map():
             line = ""
             for c in range(len(valMap[0])):
                 letter = self.valToLetter(valMap[r][c])
-                if self.map[r][c] == ' ':
-                    letter = ' '
+                if self.map[r][c] == OCEAN_CHAR:
+                    letter = OCEAN_CHAR
                 line += letter
             self.difficultyMap.append(line)
 

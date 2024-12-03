@@ -7,6 +7,7 @@ from overworld import *
 from writing import *
 from room import *
 from dungeonmapgenerator import *
+from villagemapgenerator import *
 from playerdata import *
 
 class Game():
@@ -15,9 +16,10 @@ class Game():
         self.running = True
         self.inGame = False
 
-        self.A, self.B, self.X, self.Y, self.L, self.R = False, False, False, False, False, False
-        self.UP, self.DOWN, self.LEFT, self.RIGHT = False, False, False, False
-        self.SELECT, self.START = False, False
+        self.keys = {"A": False, "B": False, "X": False, "Y": False, "L": False, "R": False,
+                     "UP": False, "DOWN": False, "LEFT": False, "RIGHT": False, "SELECT": False, "START": False}
+        self.heldKeys = {"UP": False, "DOWN": False, "LEFT": False, "RIGHT": False}
+        self.keydownDelay = KEYDOWN_START_DELAY
         self.white, self.gray, self.darkgrey, self.black = (255,255,255), (150,150,150), (85,85,85), (0,0,0)
         self.tan, self.lightgreen, self.green, self.orange = (232, 235, 96), (181, 247, 94), (90, 176, 72), (179,114,2)
         self.brown, self.maroon, self.yellow = (173, 84, 0), (173, 0, 0), (255, 255, 0)
@@ -39,6 +41,7 @@ class Game():
         self.overworld = Overworld(self)
         self.roomDB = RoomDatabase()
         self.dungeonDB = DungeonDatabase()
+        self.villageDB = VillageDatabase()
 
         self.steps = 0
         self.stepsThreshold = 100
@@ -62,10 +65,10 @@ class Game():
         self.screen.blit(text_surface,text_rect)
 
     def buttonReset(self):
-        self.A, self.B, self.X, self.Y = False, False, False, False
-        self.L, self.R = False, False
-        self.UP, self.DOWN, self.LEFT, self.RIGHT = False, False, False, False
-        self.SELECT, self.START = False, False
+        self.keys["A"], self.keys["B"], self.keys["X"], self.keys["Y"] = False, False, False, False
+        self.keys["L"], self.keys["R"] = False, False
+        self.keys["UP"], self.keys["DOWN"], self.keys["LEFT"], self.keys["RIGHT"] = False, False, False, False
+        self.keys["SELECT"], self.keys["START"] = False, False
 
     def eventHandler(self):
         for event in pygame.event.get():
@@ -73,46 +76,93 @@ class Game():
                 self.running, self.inGame = False, False
             if event.type==pygame.KEYDOWN:
                 if event.key==pygame.K_w:
-                    self.UP = True
+                    self.setKey("UP",True)
                 if event.key==pygame.K_d:
-                    self.RIGHT = True
+                    self.setKey("RIGHT",True)
                 if event.key==pygame.K_s:
-                    self.DOWN = True
+                    self.setKey("DOWN",True)
                 if event.key==pygame.K_a:
-                    self.LEFT = True
+                    self.setKey("LEFT",True)
                 if event.key==pygame.K_j:
-                    self.A = True
+                    self.setKey("A",True)
                 if event.key==pygame.K_k:
-                    self.B = True
+                    self.setKey("B",True)
                 if event.key==pygame.K_l:
-                    self.X = True
+                    self.setKey("X",True)
                 if event.key==pygame.K_SEMICOLON:
-                    self.Y = True
+                    self.setKey("Y",True)
                 if event.key==pygame.K_q:
-                    self.L = True
+                    self.setKey("L",True)
                 if event.key==pygame.K_e:
-                    self.R = True
+                    self.setKey("R",True)
                 if event.key==pygame.K_n:
-                    self.START = True
+                    self.setKey("START",True)
                 if event.key==pygame.K_m:
-                    self.SELECT = True
+                    self.setKey("SELECT",True)
+            if event.type==pygame.KEYUP:
+                if event.key==pygame.K_w:
+                    self.setKey("UP",False)
+                if event.key==pygame.K_d:
+                    self.setKey("RIGHT",False)
+                if event.key==pygame.K_s:
+                    self.setKey("DOWN",False)
+                if event.key==pygame.K_a:
+                    self.setKey("LEFT",False)
+                if event.key==pygame.K_j:
+                    self.setKey("A",False)
+                if event.key==pygame.K_k:
+                    self.setKey("B",False)
+                if event.key==pygame.K_l:
+                    self.setKey("X",False)
+                if event.key==pygame.K_SEMICOLON:
+                    self.setKey("Y",False)
+                if event.key==pygame.K_q:
+                    self.setKey("L",False)
+                if event.key==pygame.K_e:
+                    self.setKey("R",False)
+                if event.key==pygame.K_n:
+                    self.setKey("START",False)
+                if event.key==pygame.K_m:
+                    self.setKey("SELECT",False)
+            self.heldKeyHandler()
 
-    def stir(self):
-        self.steps += 1
-        if self.steps > self.stepsThreshold:
-            if self.difficulty < MAX_DIFFICULTY:
-                self.difficulty += 1
-            self.steps = 0
+
+    def heldKeyHandler(self):
+        keyheld = False
+        trigger = False
+        for key in self.heldKeys.keys():
+            if self.heldKeys[key]:
+                keyheld = True
+        if keyheld:
+            self.keydownDelay -= 1
+            if self.keydownDelay <= 0:
+                trigger = True
+            for key in self.heldKeys.keys():
+                if self.heldKeys[key] and trigger:
+                    self.keys[key] = True
+                    self.keydownDelay = KEYDOWN_DELAY
+        else:
+            self.keydownDelay = KEYDOWN_START_DELAY
+
+
+    def setKey(self,key,val):
+        self.keys[key] = val
+        if key in self.heldKeys:
+            self.heldKeys[key] = val
+
 
     def save(self):
         roomdb = open('databases/roomDatabase.db','wb')
         dungeondb = open('databases/dungeonDatabase.db','wb')
+        villagedb = open('databases/villageDatabase.db','wb')
         playerdb = open('databases/playerDatabase.db','wb')
         pickle.dump(self.roomDB, roomdb)
         pickle.dump(self.dungeonDB, dungeondb)
+        pickle.dump(self.villageDB, villagedb)
         pickle.dump(self.player,playerdb)
         roomdb.close()
         dungeondb.close()
+        villagedb.close()
         playerdb.close()
         self.WorldMap.saveRevealed()
         self.WorldMap.saveWorld()
@@ -120,13 +170,17 @@ class Game():
     def load(self):
         roomdb = open('databases/roomDatabase.db','rb')
         dungeondb = open('databases/dungeonDatabase.db','rb')
+        villagedb = open('databases/villageDatabase.db','rb')
         playerdb = open('databases/playerDatabase.db','rb')
         self.roomDB = pickle.load(roomdb)
         self.dungeonDB = pickle.load(dungeondb)
+        self.villageDB = pickle.load(villagedb)
         self.player = pickle.load(playerdb)
         self.roomDB.printContents()
         self.dungeonDB.printContents()
+        self.villageDB.printContents()
         self.player.party.printContents()
         roomdb.close()
         dungeondb.close()
+        villagedb.close()
         playerdb.close()

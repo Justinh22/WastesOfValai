@@ -8,20 +8,29 @@ MAX_POTION_RARITY = 5
 MAX_ATKSPELL_RARITY = 5
 MAX_SPTSPELL_RARITY = 5
 MAX_ACCESSORY_RARITY = 3
+MAX_CONSUMABLE_RARITY = 4
+MAX_RUNE_RARITY = 1
 MAX_INVENTORY_SIZE = 10
 
 LANDMARK_COUNT = 300
+MAP_GROWTH_CYCLES = 20
+VILLAGE_WEIGHT = 4 # 1 in every VILLAGE_WEIGHT havens is a village
 MAP_WIDTH = 250
 MAP_HEIGHT = 250
 DUNGEON_DIM = 40
+
 DUNGEON_MAX_FLOORS = 5
-DUNGEON_ENEMY_SPEED = 120
-MAP_GROWTH_CYCLES = 20
+DUNGEON_ENEMY_SPEED = 100
+
+VILLAGE_DIM = 30
+TOWN_DIM = 40
+CITY_DIM = 50
+BUILDING_TYPES = 9
 
 FOREST_CHAR = '#'
 PLAINS_CHAR = ';'
 DESERT_CHAR = '.'
-OCEAN_CHAR = ' '
+OCEAN_CHAR = '~'
 BORDER_CHAR = 'X'
 PATH_CHAR = '%'
 WELL_CHAR = 'W'
@@ -34,6 +43,17 @@ TREEHOUSE_CHAR = 'T'
 SHACK_CHAR = 'S'
 ABANDONED_VILLAGE_CHAR = 'A'
 HAVEN_CHAR = 'H'
+VILLAGE_CHAR = 'V'
+
+ATK_REFINE_BOOST = 2
+ACC_REFINE_BOOST = 5
+CRT_REFINE_BOOST = 3
+DEF_REFINE_BOOST = 2
+DDG_REFINE_BOOST = 5
+MAX_REFINE_LEVEL = 5
+
+KEYDOWN_START_DELAY = 15
+KEYDOWN_DELAY = 12
 
 class Type(Enum):
     Empty = 0
@@ -44,8 +64,11 @@ class Type(Enum):
     SptSpell = 5
     Talent = 6
     Accessory = 7
-    Creature = 8
-    Class = 9
+    Food = 8
+    Consumable = 9
+    Rune = 10
+    Creature = 11
+    Class = 12
 
 class LootOdds(Enum):
     Impossible = 0
@@ -125,6 +148,11 @@ class DungeonType(Enum):
     Ruins = 4
     Treehouse = 5
 
+class VillageType(Enum):
+    Village = 0
+    Town = 1
+    City = 2
+
 class Personality(Enum):
     Brave = 0
     Angry = 1
@@ -133,7 +161,7 @@ class Personality(Enum):
     Headstrong = 4
     Lazy = 5
 
-class AccessoryType(Enum):
+class ActivationType(Enum):
     Passive = 0
     Active = 1
 
@@ -146,3 +174,24 @@ class Timing(Enum):
     Universal = 4
     InTurn = 5
     Ordering = 6
+    Anytime = 7
+    Peacetime = 9
+    OnDeath = 10
+
+class VillageBuildings(Enum):
+    Forge = 0
+    Weaponsmith = 1
+    Armory = 2
+    GeneralStore = 3
+    Library = 4
+    Temple = 5
+    BlackMarket = 6
+    Inn = 7
+    RuneCarver = 8
+
+class ConsumableTiming(Enum):
+    Anytime = 0
+    CombatInturn = 1
+    CombatInstant = 2
+    OnDeath = 3
+    Peacetime = 4
