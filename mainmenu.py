@@ -156,6 +156,7 @@ class MainMenu():
     def executeDebug(self):
         print(self.debugOps)
         if "StartLevel" in self.debugOps or "StartClass" in self.debugOps:
+            self.game.player.party.setLevel(self.debug_lv)
             self.game.player.party.debug_setToLevel(self.game.directory,self.debug_lv,self.debug_cls,self.game.player.getNewCharID())
             self.game.player.getNewCharID()
             self.game.player.getNewCharID()

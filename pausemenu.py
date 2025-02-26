@@ -68,8 +68,9 @@ class PauseMenu():
             write(self.game, 20, 60, 115, "Party")
             write(self.game, 20, 60, 140, "Map")
             write(self.game, 20, 60, 165, "Quit")
-            write(self.game, 20, 60, 400, "XP: " + str(self.game.player.party.xp) + " / " + str(self.game.player.party.nextLevel))
-            write(self.game, 20, 60, 430, "Gold: " + str(self.game.player.gold))
+            write(self.game, 20, 60, 355, "Level " + str(self.game.player.party.level))
+            write(self.game, 20, 60, 385, "XP: " + str(self.game.player.party.xp) + " / " + str(self.game.player.party.nextLevel))
+            write(self.game, 20, 60, 415, "Gold: " + str(self.game.player.gold))
             if self.state == "main":
                 write(self.game, 20, 30, 87 + (self.cursorPos*25), "->")
             if self.state == "partySelect":
@@ -634,7 +635,7 @@ class PauseMenu():
     def drawMinStatBlock(self,xPos,yPos,character):
         outlineRect = pygame.Rect(xPos,yPos,350,90)
         pygame.draw.rect(self.game.screen,self.game.white,outlineRect,2)
-        write(self.game, 14, xPos+10, yPos+10, character.name + ", Level " + str(character.level) + " " + character.type.name)
+        write(self.game, 14, xPos+10, yPos+10, character.name + ", the " + character.type.name)
         write(self.game, 14, xPos+10, yPos+30, "HP " + str(character.getHP()) + "/" + str(character.getMaxHP()))
         write(self.game, 14, xPos+10, yPos+50, "MP " + str(character.getMP()) + "/" + str(character.getMaxMP()))
         write(self.game, 12, xPos+120, yPos+30, "ATK Spl: " + str(character.type.attackMagicLevel[character.level-1]+character.universalEffects.atkMagicLevel))

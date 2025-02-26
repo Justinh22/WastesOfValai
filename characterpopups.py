@@ -86,7 +86,7 @@ class CharacterSwap():
     def drawMinStatBlock(self,xPos,yPos,character):
         outlineRect = pygame.Rect(xPos,yPos,350,90)
         pygame.draw.rect(self.game.screen,self.game.white,outlineRect,2)
-        write(self.game, 14, xPos+10, yPos+10, character.name + ", Level " + str(character.level) + " " + character.type.name)
+        write(self.game, 14, xPos+10, yPos+10, character.name + ", the " + character.type.name)
         write(self.game, 14, xPos+10, yPos+30, "HP " + str(character.getHP()) + "/" + str(character.getMaxHP()))
         write(self.game, 14, xPos+10, yPos+50, "MP " + str(character.getMP()) + "/" + str(character.getMaxMP()))
         write(self.game, 14, xPos+10, yPos+70, "XP " + str(character.xp) + "/" + str(character.nextLevel))
@@ -104,7 +104,7 @@ class CharacterSwap():
     def drawCharacterNameBlock(self,xPos,yPos,character):
         outlineRect = pygame.Rect(xPos,yPos,250,33)
         pygame.draw.rect(self.game.screen,self.game.white,outlineRect,2)
-        write(self.game, 14, xPos+10, yPos+10, character.name + ", Level " + str(character.level) + " " + character.type.name)
+        write(self.game, 14, xPos+10, yPos+10, character.name + ", the " + character.type.name)
 
     def intToRating(self,val):
         ret = ""
@@ -205,7 +205,7 @@ class Hostel():
     def drawMinStatBlock(self,xPos,yPos,character):
         outlineRect = pygame.Rect(xPos,yPos,350,90)
         pygame.draw.rect(self.game.screen,self.game.white,outlineRect,2)
-        write(self.game, 14, xPos+10, yPos+10, character.name + ", Level " + str(character.level) + " " + character.type.name)
+        write(self.game, 14, xPos+10, yPos+10, character.name + ", the " + character.type.name)
         write(self.game, 14, xPos+10, yPos+30, "HP " + str(character.getHP()) + "/" + str(character.getMaxHP()))
         write(self.game, 14, xPos+10, yPos+50, "MP " + str(character.getMP()) + "/" + str(character.getMaxMP()))
         write(self.game, 14, xPos+10, yPos+70, "XP " + str(character.xp) + "/" + str(character.nextLevel))
@@ -223,7 +223,7 @@ class Hostel():
     def drawCharacterNameBlock(self,xPos,yPos,character):
         outlineRect = pygame.Rect(xPos,yPos,250,33)
         pygame.draw.rect(self.game.screen,self.game.white,outlineRect,2)
-        write(self.game, 14, xPos+10, yPos+10, character.name + ", Level " + str(character.level) + " " + character.type.name)
+        write(self.game, 14, xPos+10, yPos+10, character.name + ", the " + character.type.name)
 
     def intToRating(self,val):
         ret = ""

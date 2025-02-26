@@ -698,7 +698,7 @@ class Combat():
     def statBlock(self):
         pygame.draw.line(self.game.screen,self.game.white,(self.left,350),(350,350),2)
         pygame.draw.line(self.game.screen,self.game.white,(350,320),(350,self.bottom+7),2)
-        write(self.game, 11, 360, 328, self.game.player.party.members[self.combatOrder[self.currentTurn][1]].name+", Level "+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].level)+" "+self.game.player.party.members[self.combatOrder[self.currentTurn][1]].type.name)
+        write(self.game, 11, 360, 328, self.game.player.party.members[self.combatOrder[self.currentTurn][1]].name+", the "+self.game.player.party.members[self.combatOrder[self.currentTurn][1]].type.name)
         if self.game.player.party.members[self.combatOrder[self.currentTurn][1]].getBuff("HP") > 0:
             write(self.game, 11, 360, 345, "HP "+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].hp)+"/"+str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].getMaxHP()) + " (+" + str(self.game.player.party.members[self.combatOrder[self.currentTurn][1]].getBuff("HP")) + ")")
         else:

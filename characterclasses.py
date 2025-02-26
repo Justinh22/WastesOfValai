@@ -405,6 +405,9 @@ class Party():
         for i in range(0,self.level+1):
             sumXP += i*100
         return sumXP
+    def setLevel(self,lv):
+        self.level = lv
+        self.nextLevel = self.calculateNextLevelThreshold()
     def printContents(self):
         for member in self.members:
             print(member.name)
