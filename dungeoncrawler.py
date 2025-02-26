@@ -91,10 +91,7 @@ class Crawler():
                     self.message = "Your inventory is full"
                 self.messageTimer = 1000
             if self.state == "wandererSummary":
-                lvl = difficultyToLevel(self.dungeonMap.dungeonLevel)
-                if difficultyToLevel(self.dungeonMap.dungeonLevel) > self.game.player.party.getHighestLevel():
-                    lvl = self.game.player.party.getHighestLevel()
-                newChar = self.game.directory.buildCharacter(lvl,self.game.player.party.members,self.game.player.getNewCharID())
+                newChar = self.game.directory.buildCharacter(self.game.player.party.level,self.game.player.party.members,self.game.player.getNewCharID())
                 if len(self.game.player.party.members) < 4:
                     self.game.player.party.members.append(newChar)
                     self.message = "You awaken " + newChar.name + ", the Level " + str(newChar.level) + " " + newChar.type.name
