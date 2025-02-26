@@ -34,7 +34,7 @@ class MainMenu():
             self.game.eventHandler()
             self.getInput()
             self.game.screen.fill(self.game.black)
-            self.game.write(50, self.game.width / 2, self.game.height / 2 - 50, "Wastes of Valai")
+            self.game.write(70, self.game.width / 2 - 5, self.game.height / 2 - 60, "Valai")
             self.game.write(20, self.startPos[0], self.startPos[1], "Venture Out")
             self.game.write(20, self.loadPos[0], self.loadPos[1], "Load Game")
             self.game.write(20, self.quitPos[0], self.quitPos[1], "Quit")

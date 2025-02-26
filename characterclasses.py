@@ -10,10 +10,6 @@ class Character():
         self.name = nm
         self.level = lv
         self.id = id
-        self.xp = 0
-        self.nextLevel = 0
-        for i in range(1,lv+1):
-            self.nextLevel += i*100
         self.type = tp # Class; Type is used to avoid defined 'class' name
         self.spells = []
         self.talents = []
@@ -93,9 +89,6 @@ class Character():
         return self.hpregen + self.universalEffects.hpregen
     def getSpeed(self):
         return self.speed + self.universalEffects.speed
-    def getCumulativeXP(self):
-        cumulativeXPTable = [200, 600, 1200, 2000, 3000, 4200, 5600, 7200, 9000, 11000]
-        return cumulativeXPTable[self.level-1] + self.xp
     def amplify(self,val):
         val = math.ceil(val + (val * (self.getAmplifier()/100)))
         return val
@@ -158,11 +151,6 @@ class Character():
         self.mp = val
         if self.mp > self.getMaxMP():
             self.mp = self.getMaxMP()
-    def gainXP(self,val):
-        self.xp += val
-        if self.xp > self.nextLevel and self.level < 10:
-            return True
-        return False
     def addSpell(self,spellID):
         if spellID not in self.spells:
             self.spells.append(spellID)
@@ -171,8 +159,6 @@ class Character():
     def levelUp(self):
         if self.level != 10:
             self.level += 1
-        self.xp = 0
-        self.nextLevel += (self.level*100)/2
         growth = self.type.getGrowths()
         self.hpMax += growth[0]
         self.mpMax += growth[1]
@@ -409,8 +395,16 @@ class Party():
         self.members = []
         self.inventory = []         # List of int : Contains id of all items in inventory
         self.equipment = []         # List of int : Contains all equipment in inventory
+        self.xp = 0
+        self.level = 1
+        self.nextLevel = self.calculateNextLevelThreshold()
         self.activeFood = None
         self.callaretsCompact = False
+    def calculateNextLevelThreshold(self):
+        sumXP = 0
+        for i in range(0,self.level+1):
+            sumXP += i*100
+        return sumXP
     def printContents(self):
         for member in self.members:
             print(member.name)
@@ -506,19 +500,13 @@ class Party():
         for member in self.members:
             member.fullRestore()
     def awardXP(self,diff):
-        underdogFactor = 0
-        levelups = [0,0,0,0]
-        for member in self.members:
-            if member.getCumulativeXP() > underdogFactor:
-                underdogFactor = member.getCumulativeXP()
-        underdogMultiplier = 0
-        for i in range(len(self.members)): #member in self.members:
-            if self.members[i].hp > 0:
-                # R
-                underdogMultiplier = .5 * round(( (underdogFactor - self.members[i].getCumulativeXP()) / 50)/.5)
-                if self.members[i].gainXP((diff * 3) + (round(diff/2) * random.randint(2,4)) + round((diff*3)*underdogMultiplier)):
-                    levelups[i] = 1
-        return levelups
+        self.xp += (diff * 3) + (round(diff/2) * random.randint(2,4))
+        levelup = False
+        if self.xp > self.nextLevel:
+            levelup = True
+            self.level += 1
+            self.nextLevel = self.calculateNextLevelThreshold() 
+        return levelup
     def removeAccessory(self,target,dir):
         if self.members[target].eqpAcc != None and len(self.equipment) < MAX_INVENTORY_SIZE:
             self.equipment.append(self.members[target].eqpAcc)
