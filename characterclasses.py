@@ -502,8 +502,8 @@ class Party():
     def fullRestore(self):
         for member in self.members:
             member.fullRestore()
-    def awardXP(self,diff):
-        self.xp += (diff * 3) + (round(diff/2) * random.randint(2,4))
+    def awardXP(self,xp):
+        self.xp += xp
         levelup = False
         if self.xp > self.nextLevel:
             levelup = True

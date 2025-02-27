@@ -28,6 +28,8 @@ class Directory():
         self.nameDirectory = initNameDirectory()                # 0 - 99
 
     def getItem(self,id):
+        if type(id) != int:
+            id = id.id
         item = Item()
         if id < 100:
             item = self.getWeapon(id)

@@ -84,21 +84,26 @@ class CharacterSwap():
         write(self.game, 15, xPos+50, yPos + 247 + (self.cursorPos*40), "<-")
         
     def drawMinStatBlock(self,xPos,yPos,character):
-        outlineRect = pygame.Rect(xPos,yPos,350,90)
+        outlineRect = pygame.Rect(xPos,yPos,350,70)
+        color = self.game.white
         pygame.draw.rect(self.game.screen,self.game.white,outlineRect,2)
-        write(self.game, 14, xPos+10, yPos+10, character.name + ", " + character.type.name)
+        if character.status == Status.Ablaze:
+            color = self.game.red
+        if character.status == Status.Shocked:
+            color = self.game.yellow
+        if character.status == Status.Freezing:
+            color = self.game.lightblue
+        writeColor(self.game, 14, xPos+10, yPos+10, character.name + ", " + character.type.name, color)
         write(self.game, 14, xPos+10, yPos+30, "HP " + str(character.getHP()) + "/" + str(character.getMaxHP()))
         write(self.game, 14, xPos+10, yPos+50, "MP " + str(character.getMP()) + "/" + str(character.getMaxMP()))
-        write(self.game, 12, xPos+120, yPos+30, "ATK Spl: " + str(character.type.attackMagicLevel[character.level-1]+character.universalEffects.atkMagicLevel))
-        write(self.game, 12, xPos+120, yPos+50, "SPT Spl: " + str(character.type.supportMagicLevel[character.level-1]+character.universalEffects.sptMagicLevel))
-        write(self.game, 14, xPos+218, yPos+10, "ATK " + str(character.getAttack()))
+        write(self.game, 14, xPos+100, yPos+30, "ATK Spl: " + str(character.type.attackMagicLevel[character.level-1]+character.universalEffects.atkMagicLevel))
+        write(self.game, 14, xPos+100, yPos+50, "SPT Spl: " + str(character.type.supportMagicLevel[character.level-1]+character.universalEffects.sptMagicLevel))
+        write(self.game, 14, xPos+213, yPos+10, "ATK " + str(character.getAttack()))
         write(self.game, 14, xPos+283, yPos+10, "DEF " + str(character.getDefense()))
-        write(self.game, 14, xPos+218, yPos+28, "ACC " + str(character.getAccuracy()))
-        write(self.game, 14, xPos+283, yPos+28, "DDG " + str(character.getDodge()))
-        write(self.game, 14, xPos+218, yPos+46, "CRT " + str(character.getCritRate()))
-        write(self.game, 14, xPos+283, yPos+46, "LCK " + str(character.getLuck()))
-        write(self.game, 14, xPos+218, yPos+64, "AMP " + str(character.getAmplifier()))
-        write(self.game, 14, xPos+283, yPos+64, "MPG " + str(character.getManaRegen()))
+        write(self.game, 14, xPos+213, yPos+30, "ACC " + str(character.getAccuracy()))
+        write(self.game, 14, xPos+283, yPos+30, "DDG " + str(character.getDodge()))
+        write(self.game, 14, xPos+213, yPos+50, "CRT " + str(character.getCritRate()))
+        write(self.game, 14, xPos+283, yPos+50, "LCK " + str(character.getLuck()))
 
     def drawCharacterNameBlock(self,xPos,yPos,character):
         outlineRect = pygame.Rect(xPos,yPos,250,33)
@@ -202,21 +207,26 @@ class Hostel():
         write(self.game, 15, xPos-40, yPos + ((self.cursorPos-self.listTop)*40), "->")
 
     def drawMinStatBlock(self,xPos,yPos,character):
-        outlineRect = pygame.Rect(xPos,yPos,350,90)
+        outlineRect = pygame.Rect(xPos,yPos,350,70)
+        color = self.game.white
         pygame.draw.rect(self.game.screen,self.game.white,outlineRect,2)
-        write(self.game, 14, xPos+10, yPos+10, character.name + ", " + character.type.name)
+        if character.status == Status.Ablaze:
+            color = self.game.red
+        if character.status == Status.Shocked:
+            color = self.game.yellow
+        if character.status == Status.Freezing:
+            color = self.game.lightblue
+        writeColor(self.game, 14, xPos+10, yPos+10, character.name + ", " + character.type.name, color)
         write(self.game, 14, xPos+10, yPos+30, "HP " + str(character.getHP()) + "/" + str(character.getMaxHP()))
         write(self.game, 14, xPos+10, yPos+50, "MP " + str(character.getMP()) + "/" + str(character.getMaxMP()))
-        write(self.game, 12, xPos+120, yPos+30, "ATK Spl: " + str(character.type.attackMagicLevel[character.level-1]+character.universalEffects.atkMagicLevel))
-        write(self.game, 12, xPos+120, yPos+50, "SPT Spl: " + str(character.type.supportMagicLevel[character.level]+character.universalEffects.sptMagicLevel))
-        write(self.game, 14, xPos+218, yPos+10, "ATK " + str(character.getAttack()))
+        write(self.game, 14, xPos+100, yPos+30, "ATK Spl: " + str(character.type.attackMagicLevel[character.level-1]+character.universalEffects.atkMagicLevel))
+        write(self.game, 14, xPos+100, yPos+50, "SPT Spl: " + str(character.type.supportMagicLevel[character.level-1]+character.universalEffects.sptMagicLevel))
+        write(self.game, 14, xPos+213, yPos+10, "ATK " + str(character.getAttack()))
         write(self.game, 14, xPos+283, yPos+10, "DEF " + str(character.getDefense()))
-        write(self.game, 14, xPos+218, yPos+28, "ACC " + str(character.getAccuracy()))
-        write(self.game, 14, xPos+283, yPos+28, "DDG " + str(character.getDodge()))
-        write(self.game, 14, xPos+218, yPos+46, "CRT " + str(character.getCritRate()))
-        write(self.game, 14, xPos+283, yPos+46, "LCK " + str(character.getLuck()))
-        write(self.game, 14, xPos+218, yPos+64, "AMP " + str(character.getAmplifier()))
-        write(self.game, 14, xPos+283, yPos+64, "MPG " + str(character.getManaRegen()))
+        write(self.game, 14, xPos+213, yPos+30, "ACC " + str(character.getAccuracy()))
+        write(self.game, 14, xPos+283, yPos+30, "DDG " + str(character.getDodge()))
+        write(self.game, 14, xPos+213, yPos+50, "CRT " + str(character.getCritRate()))
+        write(self.game, 14, xPos+283, yPos+50, "LCK " + str(character.getLuck()))
 
     def drawCharacterNameBlock(self,xPos,yPos,character):
         outlineRect = pygame.Rect(xPos,yPos,250,33)
@@ -301,6 +311,7 @@ class LevelUp():
             write(self.game, 20, 350, 345+(i*25), f'Learned {self.game.directory.getItemName(learned)}!')
         write(self.game, 20, 30, 140, f'{self.character.name} grew to level {self.character.level}!')
         write(self.game, 18, 30, 165, f'Press any button to continue.')
+
 
 #class ItemReplace():
 

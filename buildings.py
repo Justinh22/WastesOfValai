@@ -1308,7 +1308,7 @@ class Inn(Building):
     
     def printStatBlock(self,item,game):
         write(game, 15, self.left + 10, 315, item.name)
-        wrapWrite(game, 15, item.description, self.right - self.left - 190, self.left + 10, 370)
+        wrapWrite(game, 15, item.description, self.right - self.left - 185, self.left + 10, 370)
         writeOrientation(game, 15, self.right - self.left - 185, 315, "Rarity " + str(item.rarity) + " Food", "R")
         buffString = ""
         commaString = ""
@@ -1476,12 +1476,16 @@ class RuneCarver(Building):
             elif self.state == "runeEtching":
                 self.cursorPos = 0
                 self.state = self.substate
+                if self.state == "tooExpensive":
+                    self.state = "chooseInventory"
                 self.substate = None
             elif self.state == "confirmEtch":
                 self.state = "runeEtching"
             elif self.state == "runeEnhancement":
                 self.cursorPos = 0
                 self.state = self.substate
+                if self.state == "tooExpensive":
+                    self.state = "chooseInventory"
                 self.substate = None
             elif self.state == "confirmEnhancement":
                 self.state = "runeEnhancement"

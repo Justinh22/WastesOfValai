@@ -662,7 +662,7 @@ def initFoodDirectory():
     foodDirectory.append(SpellpaperCookie)
     PrombolStew = Food("Prombol Stew","Stew cooked with fresh vegetables and Prombol meat. Prombols are small six-legged frogs, which inexplicably teleport on an hourly basis. Increases magic amplification by 10.",1,708,[0,0,0,0,0,0,0,0,10,0,0,0])
     foodDirectory.append(PrombolStew)
-    MirageDumplings = Food("Mirage Dumplings","Dumplings made with the meat and feathres of Mirage Owls, a semi-transparent bird that often lives underground. Increases dodge by 10.",1,709,[0,0,0,0,0,0,0,0,0,10,0,0])
+    MirageDumplings = Food("Mirage Dumplings","Dumplings made with the meat and feathers of Mirage Owls, a semi-transparent bird that often lives underground. Increases dodge by 10.",1,709,[0,0,0,0,0,0,0,0,0,10,0,0])
     foodDirectory.append(MirageDumplings)
     SilkwingCandy = Food("Silkwing Candy","A hard candy made from melted silkwings, extraordinarily fast insects. Increases speed by 5.",1,710,[0,0,0,0,0,0,0,0,0,0,5,0])
     foodDirectory.append(SilkwingCandy)

@@ -59,6 +59,10 @@ class Combat():
         self.deathWish = []
         self.pyrilicVenom = {}
 
+        self.gold = 0
+        self.xp = 0
+        self.item = None
+
     def reset(self):
         self.combatOrder = []
         self.currentTurn = 0
@@ -155,6 +159,10 @@ class Combat():
         self.delay = 5
 
     def combatTeardown(self):
+        levelup = self.game.player.party.awardXP(self.xp)
+        if levelup:
+            for member in self.game.player.party.members:
+                LevelUp(self.game, member)
         for member in self.game.player.party.members:
             member.resetBuffs()
 
@@ -328,6 +336,13 @@ class Combat():
                     self.messageTimer -= 2000
                 else:
                     self.timeStart -= 2000
+            elif self.state == "win":
+                self.timeStart -= 3000
+            elif self.state == "combatRewards":
+                if self.item is not None:
+                    self.game.player.party.add(self.item.id,self.game.directory)
+                self.combatTeardown()
+                self.inCombat = False
         if self.game.keys["B"]:
             if self.state == "mainWindow":
                 self.state = "useMenu"
@@ -612,13 +627,24 @@ class Combat():
                 difficulty = 0
                 for monster in self.encounter:
                     difficulty += monster.level
-                gold = self.game.player.awardGold(difficulty)
-                levelup = self.game.player.party.awardXP(difficulty)
-                if levelup:
-                    for member in self.game.player.party.members:
-                        LevelUp(self.game, member)
-                self.combatTeardown()
-                self.inCombat = False
+                self.gold = self.game.player.awardGold(difficulty)
+                self.xp = (difficulty * 3) + (round(difficulty/2) * random.randint(2,4))
+                self.item = None
+                if random.randint(1,20) <= 3:
+                    self.item = self.game.directory.getItem(self.game.directory.rollForLoot(self.game.player.party.level,LootRarity.Common,[Type.Potion,Type.Consumable]))
+                self.state = "combatRewards"
+
+        if self.state == "combatRewards":
+            rewardWindowOutline = pygame.Rect(self.left+130,self.top+30,370,self.bottom-220)
+            rewardWindow = pygame.Rect(self.left+132,self.top+32,366,self.bottom-224)
+            pygame.draw.rect(self.game.screen,self.game.white,rewardWindowOutline,2)
+            pygame.draw.rect(self.game.screen,self.game.black,rewardWindow)
+            write(self.game, 30, self.left+250, 70, "Rewards")
+            write(self.game, 20, self.left+150, 120, str(self.gold) + " Gold")
+            write(self.game, 20, self.left+150, 145, str(self.xp) + " XP")
+            if self.item is not None:
+                write(self.game, 20, self.left+150, 170, "Got a(n) " + str(self.item.name) + "!")
+            write(self.game, 20, self.left+150, 225, "Press (A) to Continue")
 
         if self.state == "lose":
             pygame.draw.line(self.game.screen,self.game.white,(self.left,350),(self.right+9,350),2)
@@ -1127,6 +1153,7 @@ class Combat():
         self.ex = True
         self.exTurn = 0
         self.timeStart = pygame.time.get_ticks()-2001
+        self.messageTimer = -1
         self.state = "execute"
         self.currentTurn = 0
 
@@ -1217,7 +1244,7 @@ class Combat():
             self.exTurn = 10
             self.timeStart -= 1000
             return True
-        if encFlag == False:
+        if encFlag == False and (self.state != "win" and self.state != "combatRewards"):
             self.state = "win"
             self.timeStart = pygame.time.get_ticks()
             print("Win!")
