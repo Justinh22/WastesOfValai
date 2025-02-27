@@ -74,7 +74,7 @@ class PauseMenu():
             if self.state == "main":
                 write(self.game, 20, 30, 87 + (self.cursorPos*25), "->")
             if self.state == "partySelect":
-                write(self.game, 30, 210, 75 + (self.cursorPos*100), "->")
+                write(self.game, 30, 210, 68 + (self.cursorPos*100), "->")
             for i in range(0,len(self.game.player.party.members)):
                 self.drawMinStatBlock(250, 45 + (i*100), self.game.player.party.members[i])
 
@@ -86,7 +86,7 @@ class PauseMenu():
             write(self.game, 20, 60, 115, "Equipment")
             write(self.game, 20, 60, 140, "Inventory")
             write(self.game, 20, 60, 165, "Spells")
-            write(self.game, 30, 210, 75 + (self.cursorPos*100), "->")
+            write(self.game, 30, 210, 68 + (self.cursorPos*100), "->")
             for i in range(0,len(self.game.player.party.members)):
                 self.drawMinStatBlock(250, 45 + (i*100), self.game.player.party.members[i])
 
@@ -98,18 +98,21 @@ class PauseMenu():
             write(self.game, 20, 60, 115, "Equipment")
             write(self.game, 20, 60, 140, "Inventory")
             write(self.game, 20, 60, 165, "Spells")
-            self.drawMinStatBlock(250, 45, self.game.player.party.members[self.targetPartyMember])
-            weapon = self.game.player.party.members[self.targetPartyMember].eqpWpn
-            write(self.game, 12, 250, 145, "Weapon: " + weapon.name + " (" + str(weapon.getAttack()) + " ATK, " + str(weapon.getAccuracy()) + " ACC, " + str(weapon.getCritrate()) + " CRT, " + str(weapon.amplifier) + " AMP)")
-            armor = self.game.player.party.members[self.targetPartyMember].eqpAmr
-            write(self.game, 12, 250, 162, "Armor: " + armor.name + " (" + str(armor.getDefense()) + " DEF, " + str(armor.getDodge()) + " DDG, " + str(armor.manaregen) + " MPG)")
-            accessory = self.game.player.party.members[self.targetPartyMember].eqpAcc
-            if accessory.id == -1:
-                write(self.game, 12, 250, 179, "Accessory: None")
-            elif accessory.type == ActivationType.Passive:
-                write(self.game, 12, 250, 179, "Accessory: " + accessory.name)
-            elif accessory.type == ActivationType.Active:
-                write(self.game, 12, 250, 179, "Accessory: " + accessory.name + " (" + str(accessory.activationRate) + " LCK)")
+            if self.state == "partyMember":
+                self.drawFullStatBlock(250, 45, self.game.player.party.members[self.targetPartyMember])
+            else:
+                self.drawMinStatBlock(250, 45, self.game.player.party.members[self.targetPartyMember])
+                weapon = self.game.player.party.members[self.targetPartyMember].eqpWpn
+                write(self.game, 12, 250, 135, "Weapon: " + weapon.name + " (" + str(weapon.getAttack()) + " ATK, " + str(weapon.getAccuracy()) + " ACC, " + str(weapon.getCritrate()) + " CRT, " + str(weapon.amplifier) + " AMP)")
+                armor = self.game.player.party.members[self.targetPartyMember].eqpAmr
+                write(self.game, 12, 250, 152, "Armor: " + armor.name + " (" + str(armor.getDefense()) + " DEF, " + str(armor.getDodge()) + " DDG, " + str(armor.manaregen) + " MPG)")
+                accessory = self.game.player.party.members[self.targetPartyMember].eqpAcc
+                if accessory.id == -1:
+                    write(self.game, 12, 250, 169, "Accessory: None")
+                elif accessory.type == ActivationType.Passive:
+                    write(self.game, 12, 250, 169, "Accessory: " + accessory.name)
+                elif accessory.type == ActivationType.Active:
+                    write(self.game, 12, 250, 169, "Accessory: " + accessory.name + " (" + str(accessory.activationRate) + " LCK)")
 
             if self.state == "partyMember":
                 classOutline = pygame.Rect(250,200,350,240)
@@ -633,27 +636,52 @@ class PauseMenu():
                     self.mapZoomSize += 2
 
     def drawMinStatBlock(self,xPos,yPos,character):
-        outlineRect = pygame.Rect(xPos,yPos,350,90)
+        outlineRect = pygame.Rect(xPos,yPos,350,70)
+        color = self.game.white
         pygame.draw.rect(self.game.screen,self.game.white,outlineRect,2)
-        write(self.game, 14, xPos+10, yPos+10, character.name + ", the " + character.type.name)
+        if character.status == Status.Ablaze:
+            color = self.game.red
+        if character.status == Status.Shocked:
+            color = self.game.yellow
+        if character.status == Status.Freezing:
+            color = self.game.lightblue
+        writeColor(self.game, 14, xPos+10, yPos+10, character.name + ", " + character.type.name, color)
         write(self.game, 14, xPos+10, yPos+30, "HP " + str(character.getHP()) + "/" + str(character.getMaxHP()))
         write(self.game, 14, xPos+10, yPos+50, "MP " + str(character.getMP()) + "/" + str(character.getMaxMP()))
-        write(self.game, 12, xPos+120, yPos+30, "ATK Spl: " + str(character.type.attackMagicLevel[character.level-1]+character.universalEffects.atkMagicLevel))
-        write(self.game, 12, xPos+120, yPos+50, "SPT Spl: " + str(character.type.supportMagicLevel[character.level-1]+character.universalEffects.sptMagicLevel))
-        if character.status == Status.Ablaze:
-            writeColor(self.game, 12, xPos+120, yPos+70, "Ablaze", self.game.red)
-        if character.status == Status.Shocked:
-            writeColor(self.game, 12, xPos+120, yPos+70, "Shocked", self.game.yellow)
-        if character.status == Status.Freezing:
-            writeColor(self.game, 12, xPos+120, yPos+70, "Freezing", self.game.lightblue)
-        write(self.game, 14, xPos+218, yPos+10, "ATK " + str(character.getAttack()))
+        write(self.game, 14, xPos+100, yPos+30, "ATK Spl: " + str(character.type.attackMagicLevel[character.level-1]+character.universalEffects.atkMagicLevel))
+        write(self.game, 14, xPos+100, yPos+50, "SPT Spl: " + str(character.type.supportMagicLevel[character.level-1]+character.universalEffects.sptMagicLevel))
+        write(self.game, 14, xPos+213, yPos+10, "ATK " + str(character.getAttack()))
         write(self.game, 14, xPos+283, yPos+10, "DEF " + str(character.getDefense()))
-        write(self.game, 14, xPos+218, yPos+28, "ACC " + str(character.getAccuracy()))
-        write(self.game, 14, xPos+283, yPos+28, "DDG " + str(character.getDodge()))
-        write(self.game, 14, xPos+218, yPos+46, "CRT " + str(character.getCritRate()))
-        write(self.game, 14, xPos+283, yPos+46, "LCK " + str(character.getLuck()))
-        write(self.game, 14, xPos+218, yPos+64, "AMP " + str(character.getAmplifier()))
-        write(self.game, 14, xPos+283, yPos+64, "MPG " + str(character.getManaRegen()))
+        write(self.game, 14, xPos+213, yPos+30, "ACC " + str(character.getAccuracy()))
+        write(self.game, 14, xPos+283, yPos+30, "DDG " + str(character.getDodge()))
+        write(self.game, 14, xPos+213, yPos+50, "CRT " + str(character.getCritRate()))
+        write(self.game, 14, xPos+283, yPos+50, "LCK " + str(character.getLuck()))
+
+    def drawFullStatBlock(self,xPos,yPos,character):
+        outlineRect = pygame.Rect(xPos,yPos,350,115)
+        color = self.game.white
+        pygame.draw.rect(self.game.screen,self.game.white,outlineRect,2)
+        if character.status == Status.Ablaze:
+            color = self.game.red
+        if character.status == Status.Shocked:
+            color = self.game.yellow
+        if character.status == Status.Freezing:
+            color = self.game.lightblue
+        writeColor(self.game, 14, xPos+10, yPos+10, character.name + ", " + character.type.name, color)
+        write(self.game, 14, xPos+10, yPos+30, "HP " + str(character.getHP()) + "/" + str(character.getMaxHP()))
+        write(self.game, 14, xPos+10, yPos+50, "MP " + str(character.getMP()) + "/" + str(character.getMaxMP()))
+        write(self.game, 14, xPos+100, yPos+30, "ATK Spl: " + str(character.type.attackMagicLevel[character.level-1]+character.universalEffects.atkMagicLevel))
+        write(self.game, 14, xPos+100, yPos+50, "SPT Spl: " + str(character.type.supportMagicLevel[character.level-1]+character.universalEffects.sptMagicLevel))
+        write(self.game, 14, xPos+10, yPos+70, "Personality: " + character.personality.name)
+        write(self.game, 14, xPos+213, yPos+10, "ATK " + str(character.getAttack()))
+        write(self.game, 14, xPos+283, yPos+10, "DEF " + str(character.getDefense()))
+        write(self.game, 14, xPos+213, yPos+30, "ACC " + str(character.getAccuracy()))
+        write(self.game, 14, xPos+283, yPos+30, "DDG " + str(character.getDodge()))
+        write(self.game, 14, xPos+213, yPos+50, "CRT " + str(character.getCritRate()))
+        write(self.game, 14, xPos+283, yPos+50, "LCK " + str(character.getLuck()))
+        write(self.game, 14, xPos+213, yPos+70, "AMP " + str(character.getAmplifier()))
+        write(self.game, 14, xPos+283, yPos+70, "MPG " + str(character.getManaRegen()))
+        write(self.game, 14, xPos+213, yPos+90, "SPD " + str(character.getSpeed()))
 
     def panMap(self):
         if self.mapZoomSize == 40:
@@ -679,6 +707,7 @@ class PauseMenu():
         
     def printInventory(self, type):
         scroll = False
+        pygame.draw.line(self.game.screen,self.game.white,(85,205),(self.right-60,205),1)
         if type == "equipment":
             list = self.game.player.party.equipment
             if self.game.player.party.members[self.targetPartyMember].eqpAcc.id != -1:
