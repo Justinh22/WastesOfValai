@@ -342,12 +342,14 @@ class ClassType():
         self.knownTalents = tlntsLrn
         self.id = idIN
         self.description = ""
+        self.classType = None
         self.rating = []
         self.startingStats = []
-    def setAdditionalInfo(self,rating,stats,desc):
+    def setAdditionalInfo(self,rating,stats,desc,clsTyp):
         self.description = desc
         self.rating = rating # Rating Order: [Power,Sturdiness,Nimbleness,Arcana,Faith,Luck]
         self.startingStats = stats # [HP,MP,ATK,ACC,CRT,DEF,DDG,LCK,SPD,AMP,MPG]
+        self.classType = clsTyp
     def getGrowths(self):
         return [self.hpGrowth[random.randint(0,2)], self.mpGrowth[random.randint(0,2)], self.atkGrowth[random.randint(0,2)], self.crtGrowth[random.randint(0,2)], self.defGrowth[random.randint(0,2)], self.ddgGrowth[random.randint(0,2)], self.lckGrowth[random.randint(0,2)], self.spdGrowth[random.randint(0,2)]]
     def wpnProfToString(self):

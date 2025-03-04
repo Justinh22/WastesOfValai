@@ -138,3 +138,13 @@ class Rune(Item):
         for i in range(lvl):
             levelString += "I"
         return levelString
+    
+class Feat(Item):
+    def __init__(self,nm,desc,rar,i,type,timing,classReq,persReq,dataA=0,dataB=0):
+        Item.__init__(self,nm,desc,rar,i)
+        self.featType = type
+        self.timing = timing
+        self.classRequirement = classReq
+        self.personalityRequirement = persReq
+        self.dataA = dataA
+        self.dataB = dataB

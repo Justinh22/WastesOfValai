@@ -869,6 +869,8 @@ class Combat():
                     self.miss = False
                     self.checkEffectTiming(action,Timing.DamageDealt)
                     self.encounter[action.target].takeDamage(self.dmg)
+                    if self.encounter[action.target].hp <= 0:
+                        self.checkEffectTiming(action,Timing.OnKill)
                 else:
                     self.miss = True
                     self.checkCursedItems(self.game.player.party.members[action.source[1]])
@@ -886,6 +888,8 @@ class Combat():
                             if self.crit:
                                 self.dmg *= 2
                             self.encounter[target].takeDamage(self.dmg)
+                            if self.encounter[action.target].hp <= 0:
+                                self.checkEffectTiming(action,Timing.OnKill)
                             self.miss = False
                         else:
                             self.miss = True
@@ -975,6 +979,8 @@ class Combat():
                         self.game.player.party.members[action.source[1]].mp -= spell.manacost
                         self.checkEffectTiming(action,Timing.DamageDealt)
                         self.encounter[action.target].takeDamage(self.dmg)
+                        if self.encounter[action.target].hp <= 0:
+                            self.checkEffectTiming(action,Timing.OnKill)
                     elif spell.type == SpellType.Debuff:
                         self.applyStatusEffect(self.encounter,action.target,spell)
                         self.game.player.party.members[action.source[1]].mp -= spell.manacost
@@ -1004,6 +1010,8 @@ class Combat():
                                 self.dmg = math.ceil(self.dmg*1.5)
                             self.checkEffectTiming(action,Timing.DamageDealt)
                             member.takeDamage(self.dmg)
+                            if member.hp <= 0:
+                                self.checkEffectTiming(action,Timing.OnKill)
                         self.dmg = self.game.player.party.members[action.source[1]].amplify(spell.attack)
                         self.game.player.party.members[action.source[1]].mp -= spell.manacost
                     elif spell.type == SpellType.Debuff:
@@ -1198,6 +1206,7 @@ class Combat():
                 member.takeDamage(math.ceil(member.getMaxHP()*.10))
             if member.status == Status.Freezing:
                 member.changeMana(-(math.ceil(member.getMaxMP()*.10)))
+        self.checkEffectTiming(None,Timing.Upkeep)
         for member in self.encounter:
             if member.status == Status.Ablaze:
                 member.takeDamage(math.ceil(member.getMaxHP()*.10))
@@ -1529,6 +1538,8 @@ class Combat():
             if action.source[0] == "Encounter" and action.target == effect.source[1]:
                 self.actionMessages.append(f'{self.tupleToMember(effect.source)} swiftly counterattacked!')
                 self.encounter[action.source[1]].takeDamage(math.ceil(self.dmg*.75))
+                if self.encounter[action.source[1]].hp <= 0:
+                    self.checkEffectTiming(action,Timing.OnKill)
 
         elif talent.name == "Hide":
             if action.source[0] == "Encounter" and action.target == effect.source[1]:
@@ -1582,6 +1593,8 @@ class Combat():
                 self.actionMessages.append(f"{self.tupleToMember(action.source).name} attacks {self.encounter[action.target].name} for {str(self.dmg)} damage!")
             self.checkAccessoryEffectTiming(action,Timing.DamageDealt)
             self.encounter[target].takeDamage(self.dmg)
+            if self.encounter[target].hp <= 0:
+                self.checkEffectTiming(action,Timing.OnKill)
             self.miss = False
 
         elif talent.name == "Patch Up":
@@ -1611,6 +1624,8 @@ class Combat():
                 self.checkAccessoryEffectTiming(action,Timing.DamageDealt)
                 self.dmg = math.ceil(self.dmg*1.5)
                 self.encounter[target].takeDamage(self.dmg)
+                if self.encounter[target].hp <= 0:
+                    self.checkEffectTiming(action,Timing.OnKill)
                 self.miss = False
             else:
                 print("Miss!")
@@ -1638,6 +1653,8 @@ class Combat():
                     self.crit = True
                 self.checkAccessoryEffectTiming(action,Timing.DamageDealt)
                 self.encounter[target].takeDamage(self.dmg)
+                if self.encounter[target].hp <= 0:
+                    self.checkEffectTiming(action,Timing.OnKill)
                 self.miss = False
             else:
                 print("Miss!")
@@ -1664,6 +1681,8 @@ class Combat():
                     self.crit = True
                 self.checkAccessoryEffectTiming(action,Timing.DamageDealt)
                 self.encounter[target].takeDamage(self.dmg)
+                if self.encounter[target].hp <= 0:
+                    self.checkEffectTiming(action,Timing.OnKill)
                 self.miss = False
             else:
                 print("Miss!")
@@ -1690,6 +1709,8 @@ class Combat():
                     self.crit = True
                 self.checkAccessoryEffectTiming(action,Timing.DamageDealt)
                 self.encounter[target].takeDamage(self.dmg)
+                if self.encounter[target].hp <= 0:
+                    self.checkEffectTiming(action,Timing.OnKill)
                 self.miss = False
             else:
                 print("Miss!")
@@ -1716,6 +1737,8 @@ class Combat():
                             self.dmg *= 2
                         self.checkAccessoryEffectTiming(action,Timing.DamageDealt)
                         self.encounter[target].takeDamage(self.dmg)
+                        if self.encounter[target].hp <= 0:
+                            self.checkEffectTiming(action,Timing.OnKill)
                         self.miss = False
                     else:
                         self.miss = True
@@ -1735,6 +1758,8 @@ class Combat():
                     self.crit = True
                 self.checkAccessoryEffectTiming(action,Timing.DamageDealt)
                 self.encounter[target].takeDamage(self.dmg)
+                if self.encounter[target].hp <= 0:
+                    self.checkEffectTiming(action,Timing.OnKill)
                 self.game.player.party.members[source[1]].gainHP(self.dmg)
                 self.miss = False
             else:
@@ -1762,6 +1787,8 @@ class Combat():
                     self.crit = True
                 self.checkAccessoryEffectTiming(action,Timing.DamageDealt)
                 self.encounter[target].takeDamage(self.dmg)
+                if self.encounter[target].hp <= 0:
+                    self.checkEffectTiming(action,Timing.OnKill)
                 self.game.player.party.members[source[1]].gainMP(self.dmg)
                 self.miss = False
             else:
@@ -1797,6 +1824,8 @@ class Combat():
                         self.crit = True
                     self.checkAccessoryEffectTiming(action,Timing.DamageDealt)
                     self.encounter[target].takeDamage(self.dmg)
+                    if self.encounter[target].hp <= 0:
+                        self.checkEffectTiming(action,Timing.OnKill)
                     self.miss = False
                 else:
                     print("Miss!")
@@ -1834,6 +1863,8 @@ class Combat():
                     self.dmg = math.ceil(self.dmg/2)
                     self.checkAccessoryEffectTiming(action,Timing.DamageDealt)
                     self.encounter[target].takeDamage(self.dmg)
+                    if self.encounter[target].hp <= 0:
+                        self.checkEffectTiming(action,Timing.OnKill)
                     self.miss = False
                 else:
                     print("Miss!")
@@ -1862,6 +1893,8 @@ class Combat():
                 self.dmg = math.ceil(self.dmg * 1.5)
                 self.checkAccessoryEffectTiming(action,Timing.DamageDealt)
                 self.encounter[target].takeDamage(self.dmg)
+                if self.encounter[target].hp <= 0:
+                    self.checkEffectTiming(action,Timing.OnKill)
                 self.miss = False
             else:
                 print("Miss!")
@@ -1887,10 +1920,14 @@ class Combat():
         if consumable.name == "Fire Arrow" or consumable.name == "Blast Arrow" or consumable.name == "Nova Arrow":
             target = self.checkRecalculateTarget(source[0],target,"Encounter")
             self.encounter[target].takeDamage(consumable.data)
+            if self.encounter[target].hp <= 0:
+                self.checkEffectTiming(action,Timing.OnKill)
 
         elif consumable.name == "Fire Bomb" or consumable.name == "Blast Bomb" or consumable.name == "Nova Bomb":
             for enemy in self.encounter:
                 enemy.takeDamage(consumable.data)
+                if enemy.hp <= 0:
+                    self.checkEffectTiming(action,Timing.OnKill)
 
         elif consumable.name == "Smoke Capsule":
             self.inCombat = False
@@ -2162,6 +2199,8 @@ class Combat():
                     self.actionMessages.append(f"{self.tupleToMember(effect.source).name}'s Ivory Mirror reflects the damage!")
                     print(f'{accessory.name} triggered!')
                     self.encounter[action.source[1]].takeDamage(self.dmg)
+                    if self.encounter[action.source[1]].hp <= 0:
+                        self.checkEffectTiming(action,Timing.OnKill)
 
         elif accessory.name == "Miracle Bracelet":
             if action.source[0] == "Encounter" and action.target == effect.source[1]:

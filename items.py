@@ -482,7 +482,7 @@ def initSptSpellDirectory():
     sptSpellDirectory.append(Fortune_Aura_II)
     Spectrum_Aura = SupportMagic("Spectrum Aura","Increases all stats for all party members.",5,452,[10,15,15,10,15,15,0],64,SpellType.Buff,Target.All)
     sptSpellDirectory.append(Spectrum_Aura)
-    Major_Regenerate = SupportMagic("Major Regenerate","Heals for a large amount of health over time.",5,453,[0,0,0,0,0,0,50],64,SpellType.Buff,Target.Single)
+    Major_Regenerate = SupportMagic("Major Regenerate","Heals for a large amount of health over time.",5,453,[0,0,0,0,0,0,60],64,SpellType.Buff,Target.Single)
     sptSpellDirectory.append(Major_Regenerate)
     Regenerate_Aura = SupportMagic("Regenerate Aura","Heals all party members for a moderate amount of health over time.",5,454,[0,0,0,0,0,0,30],64,SpellType.Buff,Target.All)
     sptSpellDirectory.append(Regenerate_Aura)
@@ -658,7 +658,7 @@ def initFoodDirectory():
     foodDirectory.append(WommiMilk)
     StarrySalad = Food("Starry Salad","Salad made from greens in close proximity to the crash site in Bentro Forest. Plants taken from the area of the meteor impact are said to have special properties and provide good fortune. Increases luck by 10.",1,706,[0,0,0,0,0,0,10,0,0,0,0,0])
     foodDirectory.append(StarrySalad)
-    SpellpaperCookie = Food("Spellpaper Cookie","A tiny shortbread cookie with a piece of an archmage's spell tome cooked into it. Mage's tomes are said to absorb some of their magical ability over time, which eventually led to many spellcasters abandoning tomes. Increases mana regen by 2.",1,707,[0,0,0,0,0,0,0,2,0,0,0,0])
+    SpellpaperCookie = Food("Spellpaper Cookie","A tiny shortbread cookie with a piece of an archmage's spell tome cooked into it. Mage's tomes are said to absorb some of their magical ability over time, which eventually led to many spellcasters abandoning tomes. Increases mana regen by 4.",1,707,[0,0,0,0,0,0,0,4,0,0,0,0])
     foodDirectory.append(SpellpaperCookie)
     PrombolStew = Food("Prombol Stew","Stew cooked with fresh vegetables and Prombol meat. Prombols are small six-legged frogs, which inexplicably teleport on an hourly basis. Increases magic amplification by 10.",1,708,[0,0,0,0,0,0,0,0,10,0,0,0])
     foodDirectory.append(PrombolStew)
@@ -776,3 +776,154 @@ def initRuneDirectory():
     runeDirectory.append(ExpertiseRune)
 
     return runeDirectory
+
+    ######### FEATS #########
+
+def initFeatDirectory():
+    featDirectory = []
+
+    # Warm-Blooded - General Feat - Reduces damage from Ice by 25%
+    WarmBlooded = Feat("Warm-Blooded", "Reduces damage from Ice by 25%", 1, 1000, FeatType.General, Timing.DamageTaken, None, None, .25)
+    featDirectory.append(WarmBlooded)
+    # Warm-Blooded II - Mastery Feat - Reduces damage from Ice by 50%
+    WarmBloodedII = Feat("Warm-Blooded II", "Reduces damage from Ice by 50%", 1, 1001, FeatType.Mastery, Timing.DamageTaken, None, None, .50)
+    featDirectory.append(WarmBloodedII)
+    # Cold-Blooded - General Feat - Reduces damage from Fire by 25%
+    ColdBlooded = Feat("Cold-Blooded", "Reduces damage from Fire by 25%", 1, 1002, FeatType.General, Timing.DamageTaken, None, None, .25)
+    featDirectory.append(ColdBlooded)
+    # Cold-Blooded II - Mastery Feat - Reduces damage from Fire by 50%
+    ColdBloodedII = Feat("Cold-Blooded II", "Reduces damage from Fire by 50%", 1, 1003, FeatType.Mastery, Timing.DamageTaken, None, None, .50)
+    featDirectory.append(ColdBloodedII)
+    # Thick Skin - General Feat - Reduces damage from Lightning by 25%
+    ThickSkin = Feat("Thick Skin", "Reduces damage from Lightning by 25%", 1, 1004, FeatType.General, Timing.DamageTaken, None, None, .25)
+    featDirectory.append(ThickSkin)
+    # Thick Skin II - Mastery Feat - Reduces damage from Lightning by 50%
+    ThickSkinII = Feat("Thick Skin II", "Reduces damage from Lightning by 50%", 1, 1005, FeatType.Mastery, Timing.DamageTaken, None, None, .50)
+    featDirectory.append(ThickSkinII)
+    # Rendai's Blessing - General Feat - +4 HP Regen
+    RendaisBlessing = Feat("Rendai's Blessing", "+4 HP Regen", 1, 1006, FeatType.General, Timing.Universal, None, None, 4)
+    featDirectory.append(RendaisBlessing)
+    # Rendai's Blessing II - Mastery Feat - +8 HP Regen
+    RendaisBlessingII = Feat("Rendai's Blessing II", "+8 HP Regen", 1, 1007, FeatType.Mastery, Timing.Universal, None, None, 8)
+    featDirectory.append(RendaisBlessingII)
+    # Callaret's Blessing - General Feat - +2 MP Regen
+    CallaretsBlessing = Feat("Callaret's Blessing", "+2 MP Regen", 1, 1008, FeatType.General, Timing.Universal, None, None, 2)
+    featDirectory.append(CallaretsBlessing)
+    # Callaret's Blessing II - Mastery Feat - +4 MP Regen
+    CallaretsBlessingII = Feat("Callaret's Blessing II", "+4 MP Regen", 1, 1009, FeatType.Mastery, Timing.Universal, None, None, 4)
+    featDirectory.append(CallaretsBlessingII)
+    # Alert - General Feat - 25% chance to negate damage when using Guard
+    Alert = Feat("Alert", "Grants 25% chance to negate damage when using Guard", 1, 1010, FeatType.General, Timing.DamageTaken, None, None, .25)
+    featDirectory.append(Alert)
+    # Alert II - Mastery Feat - 50% chance to negate damage when using Guard
+    AlertII = Feat("Alert II", "Grants 50% chance to negate damage when using Guard", 1, 1011, FeatType.Mastery, Timing.DamageTaken, None, None, .50)
+    featDirectory.append(AlertII)
+    # Improvise - General Feat - Allows character to use weapons of types they cannot with a penalty
+    Improvise = Feat("Improvise", "Allows the use of weapons that cannot normally be used, with a 10% penalty", 1, 1012, FeatType.General, Timing.Universal, None, None, .10)
+    featDirectory.append(Improvise)
+    # Improvise II - Mastery Feat - Allows character to use weapons of types they cannot
+    ImproviseII = Feat("Improvise II", "Allows the use of weapons that cannot normally be used", 1, 1013, FeatType.Mastery, Timing.Universal, None, None)
+    featDirectory.append(ImproviseII)
+    # Serenity - General Feat - -10% dmg from magic
+    Serenity = Feat("Serenity", "Reduces damage from magic by 10%", 1, 1014, FeatType.General, Timing.DamageTaken, None, None, .10)
+    featDirectory.append(Serenity)
+    # Serenity II - Mastery Feat - -20% dmg from magic
+    SerenityII = Feat("Serenity II", "Reduces damage from magic by 20%", 1, 1015, FeatType.Mastery, Timing.DamageTaken, None, None, .20)
+    featDirectory.append(SerenityII)
+    # Keen Eye - General Feat - +10% ACC
+    KeenEye = Feat("Keen Eye", "+10% ACC", 1, 1016, FeatType.General, Timing.Universal, None, None, 10)
+    featDirectory.append(KeenEye)
+    # Keen Eye II - Mastery Feat - +20% ACC
+    KeenEyeII = Feat("Keen Eye II", "+20% ACC", 1, 1017, FeatType.Mastery, Timing.Universal, None, None, 20)
+    featDirectory.append(KeenEyeII)
+    # Killer Instinct - General Feat - +5% CRT
+    KillerInstinct = Feat("Killer Instinct", "+5% CRT", 1, 1018, FeatType.General, Timing.Universal, None, None, 5)
+    featDirectory.append(KillerInstinct)
+    # Killer Instinct II - Mastery Feat - +10% CRT
+    KillerInstinctII = Feat("Killer Instinct II", "+10% CRT", 1, 1019, FeatType.Mastery, Timing.Universal, None, None, 10)
+    featDirectory.append(KillerInstinctII)
+    # Attune - General Feat - +10% activation rate for Active Runes
+    Attune = Feat("Attune", "+10% activation rate for Active Runes", 1, 1020, FeatType.General, Timing.DamageDealt, None, None, 10)
+    featDirectory.append(Attune)
+    # Attune II - Mastery Feat - +20% activation rate for Active Runes
+    AttuneII = Feat("Attune II", "+20% activation rate for Active Runes", 1, 1021, FeatType.Mastery, Timing.DamageDealt, None, None, 20)
+    featDirectory.append(AttuneII)
+    # Talented - General Feat - Talents cost 15% less MP to perform
+    Talented = Feat("Talented", "Talents cost 15% less MP to perform", 1, 1022, FeatType.General, Timing.DamageDealt, None, None, .15)
+    featDirectory.append(Talented)
+    # Talented II - Mastery Feat - Talents cost 25% less MP to perform
+    TalentedII = Feat("Talented II", "Talents cost 25% less MP to perform", 1, 1023, FeatType.Mastery, Timing.DamageDealt, None, None, .25)
+    featDirectory.append(TalentedII)
+    # Shake It Off - General Feat - Character has a 50% chance for debuffs to tick twice in a turn
+    ShakeItOff = Feat("Shake It Off", "Grants a 50% chance for debuffs to tick twice in a turn", 1, 1024, FeatType.General, Timing.Upkeep, None, None, .5)
+    featDirectory.append(ShakeItOff)
+    # Shake It Off II - Mastery Feat - All debuffs tick twice per turn
+    ShakeItOffII = Feat("Shake It Off II", "Grants a 50% chance for debuffs to tick twice in a turn", 1, 1025, FeatType.Mastery, Timing.Upkeep, None, None, 1)
+    featDirectory.append(ShakeItOffII)
+
+    # Worldly Valor - Class Feat - Explorer - +15% dmg dealt by all sources
+    WorldlyValor = Feat("Worldly Valor", "+15% dmg dealt", 1, 1026, FeatType.Class, Timing.DamageDealt, ClassID.Explorer, None, .15)
+    featDirectory.append(WorldlyValor)
+    # Arcanism - Class Feat - Mage - Absorb 10% of MMP when hit with magic damage
+    Arcanism = Feat("Arcanism", "Absorb MP equal to 10% of MMP when hit with magic damage", 1, 1027, FeatType.Class, Timing.DamageTaken, ClassID.Mage, None, .10)
+    featDirectory.append(Arcanism)
+    # Vitalism - Class Feat - Cleric - Absorb 5% of MMP when hit with physical damage
+    Vitalism = Feat("Vitalism", "Absorb HP equal to 10% of MHP when hit with physical damage", 1, 1028, FeatType.Class, Timing.DamageTaken, ClassID.Cleric, None, .05)
+    featDirectory.append(Vitalism)
+    # Bastion - Class Feat - Knight - Learn the Bastion talent (Resist 80% of damage over the next 2 turns, skip next action)
+    Bastion = Feat("Bastion", "Learn the Bastion talent", 1, 1029, FeatType.Class, Timing.Universal, None, None)
+    featDirectory.append(Bastion)
+    # Blood Pact - Class Feat - Warlock - Killing an enemy heals the character for 25% of MHP
+    BloodPact = Feat("Blood Pact", "Heals for 25% of MHP upon defeating an enemy", 1, 1030, FeatType.Class, Timing.OnKill, ClassID.Warlock, None, .25)
+    featDirectory.append(BloodPact)
+    # Wicked Hex - Class Feat - Witch - Enemies take 10% more damage from the character per consecutive attack
+    WickedHex = Feat("Wicked Hex", "Enemies take 10% more damage per consecutive attack", 1, 1031, FeatType.Class, Timing.DamageDealt, ClassID.Witch, None, .10)
+    featDirectory.append(WickedHex)
+    # Sticky Fingers - Class Feat - Mercenary - Chance to gain extra gold from attacking enemies
+    StickyFingers = Feat("Sticky Fingers", "Chance to gain gold from attacking enemies", 1, 1032, FeatType.Class, Timing.DamageDealt, ClassID.Mercenary, None, .20)
+    featDirectory.append(StickyFingers)
+    # Last Stand - Class Feat - Warrior - When below 20% MHP, attack actions strike twice
+    LastStand = Feat("Last Stand", "When below 20% MHP, attack actions strike twice", 1, 1033, FeatType.Class, Timing.PreAttack, ClassID.Warrior, None, .20)
+    featDirectory.append(LastStand)
+    # Diamond Eyes - Class Feat - Thief - +15% CRT when below 50% MHP
+    DiamondEyes = Feat("Diamond Eyes", "+15% CRT when below 50% MHP", 1, 1034, FeatType.Class, Timing.PreAttack, ClassID.Thief, None, .15, .50)
+    featDirectory.append(DiamondEyes)
+    # Elimination - Class Feat - Assassin - Killing an enemy restores 25% of MMP
+    Elimination = Feat("Elimination", "Restores 25% of MMP upon defeating an enemy", 1, 1035, FeatType.Class, Timing.OnKill, ClassID.Assassin, None, .25)
+    featDirectory.append(Elimination)
+    # Favor of Gods - Class Feat - Paladin - Increases all healing done to character by 30%
+    FavorofGods = Feat("Favor of Gods", "Increases all healing done to character by 30%", 1, 1036, FeatType.Class, Timing.DamageTaken, ClassID.Paladin, None, .30)
+    featDirectory.append(FavorofGods)
+    # Wide Swings - Class Feat - Vanguard - Has LCK% chance to hit adjacent enemies with attacks
+    WideSwings = Feat("Wide Swings", "Grants LCK% chance to also hit adjacent enemies when attacking", 1, 1037, FeatType.Class, Timing.PreAttack, ClassID.Vanguard, None)
+    featDirectory.append(WideSwings)
+
+    # Antagonistic - Personality Feat - Angry, Headstrong - Increases chance of being targeted by attacks
+    Antagonistic = Feat("Antagonistic", "Increases chance of being targeted by attacks", 1, 1038, FeatType.Personality, Timing.Targeting, None, [Personality.Angry, Personality.Headstrong], .25)
+    featDirectory.append(Antagonistic)
+    # Wallflower - Personality Feat - Cowardly, Lazy - Decreases chance of being targeted by attacks
+    Wallflower = Feat("Wallflower", "Decreases chance of being targeted by attacks", 1, 1039, FeatType.Personality, Timing.Targeting, None, [Personality.Cowardly, Personality.Lazy], .25)
+    featDirectory.append(Wallflower)
+    # Diplomacy - Personality Feat - Brave, Friendly - Increases chance of successfully running away in combat
+    Diplomacy = Feat("Diplomacy", "Increases chance of successfully running away in combat", 1, 1040, FeatType.Personality, Timing.PreAttack, None, [Personality.Brave, Personality.Friendly], .25)
+    featDirectory.append(Diplomacy)
+    # Rage - Personality Feat - Angry - Learn the Rage talent (Build power over the next turn. For each time the user is hit this turn, their next regular attack will do double damage. Can stack.)
+    Rage = Feat("Rage", "Learn the Rage talent", 1, 1041, FeatType.Personality, Timing.Universal, None, Personality.Angry)
+    featDirectory.append(Rage)
+    # Valiant - Personality Feat - Brave - -10% pysical damage taken
+    Valiant = Feat("Valiant", "-10% physical damage taken", 1, 1042, FeatType.Personality, Timing.DamageTaken, None, Personality.Brave, .10)
+    featDirectory.append(Valiant)
+    # Desperation - Personality Feat - Cowardly - When below 20% MHP, deal +15% damage
+    Desperation = Feat("Desperation", "When below 20% MHP, deal +15% dmg", 1, 1043, FeatType.Personality, Timing.DamageDealt, None, Personality.Cowardly, .20, .15)
+    featDirectory.append(Desperation)
+    # Helping Hand - Personality Feat - Friendly - Learn the Helping Hand talent (Grant an ally +50% ACC)
+    HelpingHand = Feat("Helping Hand", "Learn the Helping Hand talent", 1, 1044, FeatType.Personality, Timing.Universal, None, Personality.Friendly)
+    featDirectory.append(HelpingHand)
+    # Lunge - Personality Feat - Headstrong - Learn the Lunge talent (Strike an enemy for 200% damage. User takes double damage for the remainder of the turn.)
+    Lunge = Feat("Lunge", "Learn the Lunge talent", 1, 1045, FeatType.Personality, Timing.Universal, None, Personality.Headstrong, 2)
+    featDirectory.append(Lunge)
+    # Biding Time - Personality Feat - Lazy - Always attack last in the order, but deal +10% damage
+    BidingTime = Feat("Biding Time", "Always attack last in the order, but deal +10% damage", 1, 1046, FeatType.Personality, Timing.Ordering, None, Personality.Lazy, .10)
+    featDirectory.append(BidingTime)
+
+    return featDirectory

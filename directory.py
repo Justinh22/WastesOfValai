@@ -23,6 +23,7 @@ class Directory():
         self.foodDirectory = initFoodDirectory()                # 700 - 799
         self.consumableDirectory = initConsumableDirectory()    # 800 - 899
         self.runeDirectory = initRuneDirectory()                # 900 - 999
+        self.featDirectory = initFeatDirectory()                # 1000 - 1099
         self.classDirectory = initClassDirectory()              # 0 - 99
         self.creatureDirectory = initCreatureDirectory()        # 0 - 99
         self.nameDirectory = initNameDirectory()                # 0 - 99
@@ -51,6 +52,8 @@ class Directory():
             item = self.getConsumable(id)
         elif id < 1000:
             item = self.getRune(id)
+        elif id < 1100:
+            item = self.getFeat(id)
         return item
 
     def getItemName(self,id,scroll=False):
@@ -81,6 +84,8 @@ class Directory():
             name = self.consumableDirectory[id-800].name
         elif id < 1000:
             name = self.runeDirectory[id-900].name
+        elif id < 1100:
+            name = self.featDirectory[id-1000].name
         return name
 
     def getItemDesc(self,id):
@@ -107,6 +112,8 @@ class Directory():
             desc = self.consumableDirectory[id-800].description
         elif id < 1000:
             desc = self.runeDirectory[id-900].description
+        elif id < 1100:
+            desc = self.featDirectory[id-1000].description
         return desc
 
     def getItemRarity(self,id):
@@ -133,6 +140,8 @@ class Directory():
             rarity = self.consumableDirectory[id-800].rarity
         elif id < 1000:
             rarity = self.runeDirectory[id-900].rarity
+        elif id < 1100:
+            rarity = self.featDirectory[id-1000].rarity
         return rarity
     
     def getItemType(self,id):
@@ -161,6 +170,8 @@ class Directory():
             itemType = Type.Consumable
         elif id < 1000:
             itemType = Type.Rune
+        elif id < 1100:
+            itemType = Type.Feat
         return itemType
 
     def getSpellTarget(self,id):
@@ -214,6 +225,9 @@ class Directory():
     
     def getRune(self,id):
         return self.copy(self.runeDirectory[id-900])
+    
+    def getFeat(self,id):
+        return self.copy(self.featDirectory[id-1000])
 
     def getItemByRarity(self,type,rarity):
         print(f'Fetching {type} of rarity {rarity}...')

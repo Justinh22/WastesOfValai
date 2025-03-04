@@ -12,11 +12,11 @@ MAX_CONSUMABLE_RARITY = 4
 MAX_RUNE_RARITY = 1
 MAX_INVENTORY_SIZE = 10
 
-LANDMARK_COUNT = 300
+LANDMARK_COUNT = 300 # 300
 MAP_GROWTH_CYCLES = 20
 VILLAGE_WEIGHT = 4 # 1 in every VILLAGE_WEIGHT havens is a village
-MAP_WIDTH = 250
-MAP_HEIGHT = 250
+MAP_WIDTH = 250 # 250
+MAP_HEIGHT = 250 # 250
 DUNGEON_DIM = 40
 
 DUNGEON_MAX_FLOORS = 5
@@ -69,6 +69,21 @@ class Type(Enum):
     Rune = 10
     Creature = 11
     Class = 12
+    Feat = 13
+
+class ClassID(Enum):
+    Explorer = 0
+    Warrior = 1
+    Thief = 2
+    Knight = 3
+    Vanguard = 4
+    Mercenary = 5
+    Mage = 6
+    Cleric = 7
+    Paladin = 8
+    Warlock = 9
+    Assassin = 10
+    Witch = 11
 
 class LootOdds(Enum):
     Impossible = 0
@@ -170,13 +185,14 @@ class Timing(Enum):
     Targeting = 1
     DamageTaken = 2
     DamageDealt = 3
-    Support = 3
     Universal = 4
     InTurn = 5
     Ordering = 6
     Anytime = 7
-    Peacetime = 9
-    OnDeath = 10
+    Peacetime = 8
+    OnDeath = 9
+    Upkeep = 10
+    OnKill = 11
 
 class VillageBuildings(Enum):
     Forge = 0
@@ -195,3 +211,9 @@ class ConsumableTiming(Enum):
     CombatInstant = 2
     OnDeath = 3
     Peacetime = 4
+
+class FeatType(Enum):
+    General = 0
+    Mastery = 1
+    Class = 2
+    Personality = 3
