@@ -843,10 +843,10 @@ def initFeatDirectory():
     KillerInstinctII = Feat("Killer Instinct II", "+10% CRT", 1, 1019, FeatType.Mastery, Timing.Universal, None, None, 10)
     featDirectory.append(KillerInstinctII)
     # Attune - General Feat - +10% activation rate for Active Runes
-    Attune = Feat("Attune", "+10% activation rate for Active Runes", 1, 1020, FeatType.General, Timing.DamageDealt, None, None, 10)
+    Attune = Feat("Attune", "+10% activation rate for Active Runes", 1, 1020, FeatType.General, Timing.Universal, None, None, 10)
     featDirectory.append(Attune)
     # Attune II - Mastery Feat - +20% activation rate for Active Runes
-    AttuneII = Feat("Attune II", "+20% activation rate for Active Runes", 1, 1021, FeatType.Mastery, Timing.DamageDealt, None, None, 20)
+    AttuneII = Feat("Attune II", "+20% activation rate for Active Runes", 1, 1021, FeatType.Mastery, Timing.Universal, None, None, 20)
     featDirectory.append(AttuneII)
     # Talented - General Feat - Talents cost 15% less MP to perform
     Talented = Feat("Talented", "Talents cost 15% less MP to perform", 1, 1022, FeatType.General, Timing.DamageDealt, None, None, .15)
@@ -858,7 +858,7 @@ def initFeatDirectory():
     ShakeItOff = Feat("Shake It Off", "Grants a 50% chance for debuffs to tick twice in a turn", 1, 1024, FeatType.General, Timing.Upkeep, None, None, .5)
     featDirectory.append(ShakeItOff)
     # Shake It Off II - Mastery Feat - All debuffs tick twice per turn
-    ShakeItOffII = Feat("Shake It Off II", "Grants a 50% chance for debuffs to tick twice in a turn", 1, 1025, FeatType.Mastery, Timing.Upkeep, None, None, 1)
+    ShakeItOffII = Feat("Shake It Off II", "All debuffs tick twice per turn", 1, 1025, FeatType.Mastery, Timing.Upkeep, None, None, 1)
     featDirectory.append(ShakeItOffII)
 
     # Worldly Valor - Class Feat - Explorer - +15% dmg dealt by all sources
@@ -868,7 +868,7 @@ def initFeatDirectory():
     Arcanism = Feat("Arcanism", "Absorb MP equal to 10% of MMP when hit with magic damage", 1, 1027, FeatType.Class, Timing.DamageTaken, ClassID.Mage, None, .10)
     featDirectory.append(Arcanism)
     # Vitalism - Class Feat - Cleric - Absorb 5% of MMP when hit with physical damage
-    Vitalism = Feat("Vitalism", "Absorb HP equal to 10% of MHP when hit with physical damage", 1, 1028, FeatType.Class, Timing.DamageTaken, ClassID.Cleric, None, .05)
+    Vitalism = Feat("Vitalism", "Absorb HP equal to 5% of MMP when hit with physical damage", 1, 1028, FeatType.Class, Timing.DamageTaken, ClassID.Cleric, None, .05)
     featDirectory.append(Vitalism)
     # Bastion - Class Feat - Knight - Learn the Bastion talent (Resist 80% of damage over the next 2 turns, skip next action)
     Bastion = Feat("Bastion", "Learn the Bastion talent", 1, 1029, FeatType.Class, Timing.Universal, None, None)
@@ -886,7 +886,7 @@ def initFeatDirectory():
     LastStand = Feat("Last Stand", "When below 20% MHP, attack actions strike twice", 1, 1033, FeatType.Class, Timing.PreAttack, ClassID.Warrior, None, .20)
     featDirectory.append(LastStand)
     # Diamond Eyes - Class Feat - Thief - +15% CRT when below 50% MHP
-    DiamondEyes = Feat("Diamond Eyes", "+15% CRT when below 50% MHP", 1, 1034, FeatType.Class, Timing.PreAttack, ClassID.Thief, None, .15, .50)
+    DiamondEyes = Feat("Diamond Eyes", "+15% CRT when below 50% MHP", 1, 1034, FeatType.Class, Timing.PreAttack, ClassID.Thief, None, 15, .50)
     featDirectory.append(DiamondEyes)
     # Elimination - Class Feat - Assassin - Killing an enemy restores 25% of MMP
     Elimination = Feat("Elimination", "Restores 25% of MMP upon defeating an enemy", 1, 1035, FeatType.Class, Timing.OnKill, ClassID.Assassin, None, .25)
@@ -905,7 +905,7 @@ def initFeatDirectory():
     Wallflower = Feat("Wallflower", "Decreases chance of being targeted by attacks", 1, 1039, FeatType.Personality, Timing.Targeting, None, [Personality.Cowardly, Personality.Lazy], .25)
     featDirectory.append(Wallflower)
     # Diplomacy - Personality Feat - Brave, Friendly - Increases chance of successfully running away in combat
-    Diplomacy = Feat("Diplomacy", "Increases chance of successfully running away in combat", 1, 1040, FeatType.Personality, Timing.PreAttack, None, [Personality.Brave, Personality.Friendly], .25)
+    Diplomacy = Feat("Diplomacy", "Increases chance of successfully running away in combat", 1, 1040, FeatType.Personality, Timing.PreAttack, None, [Personality.Brave, Personality.Friendly], 25)
     featDirectory.append(Diplomacy)
     # Rage - Personality Feat - Angry - Learn the Rage talent (Build power over the next turn. For each time the user is hit this turn, their next regular attack will do double damage. Can stack.)
     Rage = Feat("Rage", "Learn the Rage talent", 1, 1041, FeatType.Personality, Timing.Universal, None, Personality.Angry)
@@ -916,14 +916,14 @@ def initFeatDirectory():
     # Desperation - Personality Feat - Cowardly - When below 20% MHP, deal +15% damage
     Desperation = Feat("Desperation", "When below 20% MHP, deal +15% dmg", 1, 1043, FeatType.Personality, Timing.DamageDealt, None, Personality.Cowardly, .20, .15)
     featDirectory.append(Desperation)
-    # Helping Hand - Personality Feat - Friendly - Learn the Helping Hand talent (Grant an ally +50% ACC)
-    HelpingHand = Feat("Helping Hand", "Learn the Helping Hand talent", 1, 1044, FeatType.Personality, Timing.Universal, None, Personality.Friendly)
-    featDirectory.append(HelpingHand)
+    # Assist - Personality Feat - Friendly - Learn the Assist talent (Grant an ally +50% ACC)
+    Assist = Feat("Assist", "Learn the Assist talent", 1, 1044, FeatType.Personality, Timing.Universal, None, Personality.Friendly)
+    featDirectory.append(Assist)
     # Lunge - Personality Feat - Headstrong - Learn the Lunge talent (Strike an enemy for 200% damage. User takes double damage for the remainder of the turn.)
     Lunge = Feat("Lunge", "Learn the Lunge talent", 1, 1045, FeatType.Personality, Timing.Universal, None, Personality.Headstrong, 2)
     featDirectory.append(Lunge)
-    # Biding Time - Personality Feat - Lazy - Always attack last in the order, but deal +10% damage
-    BidingTime = Feat("Biding Time", "Always attack last in the order, but deal +10% damage", 1, 1046, FeatType.Personality, Timing.Ordering, None, Personality.Lazy, .10)
+    # Biding Time - Personality Feat - Lazy - Always go last in the order, but deal +10% damage
+    BidingTime = Feat("Biding Time", "Always go last in the order, but deal +10% damage", 1, 1046, FeatType.Personality, [Timing.Ordering, Timing.DamageDealt], None, Personality.Lazy, .10)
     featDirectory.append(BidingTime)
 
     return featDirectory

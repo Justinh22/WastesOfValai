@@ -13,6 +13,7 @@ class Character():
         self.type = tp # Class; Type is used to avoid defined 'class' name
         self.spells = []
         self.talents = []
+        self.feats = []
         self.talents.append(522) # Give character the Guard talent
         for i in range(self.level):
             if self.type.knownSpells[i] >= 0:

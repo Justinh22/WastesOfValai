@@ -75,7 +75,7 @@ class Potion(Item):
         self.hpGain = hpg
         self.mpGain = mpg
         self.type = "Potion"
-        self.timing = ConsumableTiming.Anytime
+        self.timing = Timing.Anytime
 
 class Consumable(Item):
     def __init__(self,nm,desc,rar,i,tgt,tmg,data):
@@ -118,7 +118,7 @@ class Talent(Item):
         self.mpcost = mpc
         self.type = tp # ATTACK, SUPPORT
         self.target = tgt # SELF, ALLY, SINGLE, ALL
-        self.timing = tmg # INSTANT, INTURN
+        self.timing = tmg
 
 class Food(Item):
     def __init__(self,nm,desc,rar,i,buff):

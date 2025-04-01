@@ -205,13 +205,6 @@ class VillageBuildings(Enum):
     Inn = 7
     RuneCarver = 8
 
-class ConsumableTiming(Enum):
-    Anytime = 0
-    CombatInturn = 1
-    CombatInstant = 2
-    OnDeath = 3
-    Peacetime = 4
-
 class FeatType(Enum):
     General = 0
     Mastery = 1

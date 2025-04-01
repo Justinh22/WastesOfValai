@@ -32,3 +32,9 @@ def armorProfArrayToList(arr):
     if arr[4] == 1:
         profList.append(ArmorType.Arcanist)
     return profList
+
+def contains(list, filter):
+    for x in list:
+        if filter(x):
+            return True
+    return False

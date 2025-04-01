@@ -6,6 +6,7 @@ from characters import Buff
 from dialogue import *
 from writing import *
 from characterpopups import *
+from utility import contains
 
 class Combat():
     def __init__(self,game):
@@ -58,6 +59,7 @@ class Combat():
         self.curse = []
         self.deathWish = []
         self.pyrilicVenom = {}
+        self.escapeBoost = 0
 
         self.gold = 0
         self.xp = 0
@@ -100,6 +102,7 @@ class Combat():
         self.curse = []
         self.deathWish = []
         self.pyrilicVenom = {}
+        self.wickedHex = {}
 
     def initialize(self,encounter):
         self.reset()
@@ -1095,9 +1098,9 @@ class Combat():
                             self.endExecute()
                             return
                     print(f'Action: {self.actions[self.exTurn].source} -> {self.actions[self.exTurn].target}, {self.actions[self.exTurn].action} (exTurn {self.exTurn})')
+                    self.checkEffectTiming(self.actions[self.exTurn],Timing.PreAttack)
                     if self.actions[self.exTurn].action == -5: # Run Away
                         self.ranAway = self.runAway(self.actions[self.exTurn].source)
-                    self.checkEffectTiming(self.actions[self.exTurn],Timing.PreAttack)
                     if self.actions[self.exTurn].action == 0:
                         self.attack(self.actions[self.exTurn])
                     elif self.actions[self.exTurn].action >= 200 and self.actions[self.exTurn].action < 300:
@@ -1452,36 +1455,44 @@ class Combat():
     
     def runAway(self,source):
         chance = random.randint(1,100)
-        threshold = 20 + self.tupleToMember(source).getLuck()
+        threshold = 20 + self.tupleToMember(source).getSpeed() + self.escapeBoost
+        self.escapeBoost = 0
         return threshold >= chance
         
         
-    def checkEffectTiming(self,action,timing):
-        for effect in self.activeEffects:
-            print(effect.id)
-            if self.game.directory.getItemType(effect.id) is Type.Talent:
-                talent = self.game.directory.getTalent(effect.id)
-                if timing == talent.timing:
-                    if talent.type == TalentType.PartyEffect:
-                        self.talentPartyTargetEffectHandler(effect,action)
-                    elif talent.type == TalentType.EncounterEffect:
-                        self.talentEncounterTargetEffectHandler(effect,action)
-                    elif talent.timing == Timing.Ordering:
-                        self.talentOrderingEffectHandler(effect)
-            elif self.game.directory.getItemType(effect.id) is Type.Accessory:
-                accessory = self.game.directory.getAccessory(effect.id)
-                #print(f'Checking for usage of {accessory.name} at {timing.name}...')
-                if timing == accessory.timing:
-                    if accessory.type == ActivationType.Passive:
-                        self.accessoryPassiveEffectHandler(effect,action)
-                    if accessory.type == ActivationType.Active:
-                        self.accessoryActiveEffectHandler(effect,action)
-            elif self.game.directory.getItemType(effect.id) is Type.Consumable:
-                consumable = self.game.directory.getConsumable(effect.id)
-                if timing == consumable.timing:
-                    self.consumableEffectHandler(effect,action)
-            elif self.game.directory.getItemType(effect.id) is Type.Rune and timing == Timing.DamageDealt and effect.source == action.source and (action.action == 0 or self.game.directory.getItemType(action.action) == Type.Talent):
-                self.runeEffectHandler(effect,action)
+    def checkEffectTiming(self,action,timingOptions):
+        if type(timingOptions) != list:
+            timingOptions = [timingOptions]
+        for timing in timingOptions:
+            for effect in self.activeEffects:
+                print(effect.id)
+                if self.game.directory.getItemType(effect.id) is Type.Talent:
+                    talent = self.game.directory.getTalent(effect.id)
+                    if timing == talent.timing:
+                        if talent.type == TalentType.PartyEffect:
+                            self.talentPartyTargetEffectHandler(effect,action)
+                        elif talent.type == TalentType.EncounterEffect:
+                            self.talentEncounterTargetEffectHandler(effect,action)
+                        elif talent.timing == Timing.Ordering:
+                            self.talentOrderingEffectHandler(effect)
+                elif self.game.directory.getItemType(effect.id) is Type.Accessory:
+                    accessory = self.game.directory.getAccessory(effect.id)
+                    #print(f'Checking for usage of {accessory.name} at {timing.name}...')
+                    if timing == accessory.timing:
+                        if accessory.type == ActivationType.Passive:
+                            self.accessoryPassiveEffectHandler(effect,action)
+                        if accessory.type == ActivationType.Active:
+                            self.accessoryActiveEffectHandler(effect,action)
+                elif self.game.directory.getItemType(effect.id) is Type.Consumable:
+                    consumable = self.game.directory.getConsumable(effect.id)
+                    if timing == consumable.timing:
+                        self.consumableEffectHandler(effect,action)
+                elif self.game.directory.getItemType(effect.id) is Type.Rune and timing == Timing.DamageDealt and effect.source == action.source and (action.action == 0 or self.game.directory.getItemType(action.action) == Type.Talent):
+                    self.runeEffectHandler(effect,action)
+                elif self.game.directory.getItemType(effect.id) is Type.Feat:
+                    feat = self.game.directory.getFeat(effect.id)
+                    if timing == feat.timing:
+                        self.featEffectHandler(effect,action,timing)
 
 
     def checkAccessoryEffectTiming(self,action,timing):
@@ -1557,6 +1568,14 @@ class Combat():
                 self.actionMessages.append(f'{self.tupleToMember(effect.source).name} defended themself, reducing damage taken!')
                 if self.game.player.party.members[action.source[1]].eqpAcc.name == "Guardian's Belt":
                     self.dmg = round(self.dmg*.2)
+                elif contains(self.game.player.party.members[action.source[1]].feats, lambda x: x.name == "Alert"):
+                    if random.randint(1,4) >= 4:
+                        self.dmg = 0
+                        self.actionMessages.append(f'{self.tupleToMember(effect.source).name} was ready for the attack, and negated the damage!')
+                elif contains(self.game.player.party.members[action.source[1]].feats, lambda x: x.name == "Alert II"):
+                    if random.randint(1,4) >= 3:
+                        self.dmg = 0
+                        self.actionMessages.append(f'{self.tupleToMember(effect.source).name} was ready for the attack, and negated the damage!')
                 else:
                     self.dmg = round(self.dmg/2)
 
@@ -2271,6 +2290,164 @@ class Combat():
             if self.crit:
                 self.dmg *= 1 + round(rune.level*rune.data/100)
 
+    def featEffectHandler(self,effect,action,timing):
+        feat = self.game.directory.getFeat(effect.id)
+
+        if feat.name == "Warm-Blooded" or feat.name == "Warm-Blooded II":
+            if action.source[0] == "Encounter" and action.target == effect.source[1] and action.action >= 300 and action.action < 400:
+                if self.game.directory.getItem[action.action].element == Element.Ice:
+                    self.dmg = round(self.dmg*(1-feat.dataA))
+
+        elif feat.name == "Cold-Blooded" or feat.name == "Cold-Blooded II":
+            if action.source[0] == "Encounter" and action.target == effect.source[1] and action.action >= 300 and action.action < 400:
+                if self.game.directory.getItem[action.action].element == Element.Fire:
+                    self.dmg = round(self.dmg*(1-feat.dataA))
+
+        elif feat.name == "Thick Skin" or feat.name == "Thick Skin II":
+            if action.source[0] == "Encounter" and action.target == effect.source[1] and action.action >= 300 and action.action < 400:
+                if self.game.directory.getItem[action.action].element == Element.Lightning:
+                    self.dmg = round(self.dmg*(1-feat.dataA))
+
+#       elif feat.name == "Rendai's Blessing" or feat.name == "Rendai's Blessing II":
+
+#       elif feat.name == "Callaret's Blessing" or feat.name == "Callaret's Blessing II":
+
+        # Alert is implemented in the Guard talent
+
+#       elif feat.name == "Improvise" or feat.name == "Improvise II":
+
+        elif feat.name == "Serenity" or feat.name == "Serenity II":
+            if action.source[0] == "Encounter" and action.target == effect.source[1] and action.action >= 300 and action.action < 400:
+                self.dmg = round(self.dmg*(1-feat.dataA))
+
+#       elif feat.name == "Keen Eye" or feat.name == "Keen Eye II":
+
+#       elif feat.name == "Killer Instinct" or feat.name == "Killer Instinct II":
+
+#       elif feat.name == "Attune" or feat.name == "Attune II":
+
+        elif feat.name == "Talented" or feat.name == "Talented II":
+            if action.source == effect.source and action.action >= 500 and action.action < 600:
+                self.game.player.party.members[effect.source[1]].gainMP(round(self.game.directory.getManaCost(action.action)*feat.dataA))
+
+        elif feat.name == "Shake It Off" or feat.name == "Shake It Off II":
+            if random.randint(1,100) <= feat.dataA*100:
+                self.tupleToMember(effect.source).tickStatus()
+
+        elif feat.name == "Worldly Valor":
+            if action.source == effect.source:
+                self.dmg *= (1+feat.dataA)
+
+        elif feat.name == "Arcanism":
+            if action.source[0] == "Encounter" and action.target == effect.source[1] and action.action >= 300 and action.action < 400:
+                self.tupleToMember(effect.source).gainMP(round(self.tupleToMember(effect.source).getMaxMP()*feat.dataA))
+
+        elif feat.name == "Vitalism":
+            if action.source[0] == "Encounter" and action.target == effect.source[1] and action.action == 0:
+                self.tupleToMember(effect.source).gainMP(round(self.tupleToMember(effect.source).getMaxMP()*feat.dataA))
+
+#       elif feat.name == "Bastion":
+
+        elif feat.name == "Blood Pact":
+            if action.source == effect.source:
+                self.tupleToMember(effect.source).gainHP(round(self.tupleToMember(effect.source).getMaxHP()*feat.dataA))
+
+        elif feat.name == "Wicked Hex":
+            if action.source == effect.source:
+                if action.target not in self.wickedHex:
+                    self.wickedHex = {}
+                    self.wickedHex[action.target] = 0
+                self.wickedHex[action.target] += feat.dataA
+                self.dmg = round(self.dmg*(1+self.wickedHex[action.target]))
+
+        elif feat.name == "Sticky Fingers":
+            if action.source == effect.source and action.action == 0:
+                if random.randint(1,100) <= (feat.dataA*100):
+                    self.game.player.gold += self.tupleToMember(self.game.player.party.level*2)
+
+        elif feat.name == "Last Stand":
+            if action.source == effect.source and action.action == 0:
+                if self.tupleToMember(effect.source).getHP() <= round(self.tupleToMember(effect.source).getMaxHP()*feat.dataA):
+                    self.attack(action)
+                    if self.miss:
+                        self.actionMessages.append(f"{self.tupleToMember(action.source).name} attacks {self.encounter[action.target].name}, but misses!")
+                    elif self.crit:
+                        self.actionMessages.append(f"{self.tupleToMember(action.source).name} attacks {self.encounter[action.target].name} for {str(self.dmg)} damage! Critical Hit!")
+                    else:
+                        self.actionMessages.append(f"{self.tupleToMember(action.source).name} attacks {self.encounter[action.target].name} for {str(self.dmg)} damage!")
+
+        elif feat.name == "Diamond Eyes":
+            if action.source == effect.source and action.action == 0:
+                if self.tupleToMember(effect.source).getHP() <= round(self.tupleToMember(effect.source).getMaxHP()*feat.dataB):
+                    newBuff = Buff("Diamond Eyes",[0,0,feat.dataA,0,0,0,0],1,action.source[1])
+                    self.buffs.append(newBuff)
+                    self.game.player.party.members[newBuff.target].addBuffs(newBuff)
+
+        elif feat.name == "Elimination":
+            if action.source == effect.source:
+                self.tupleToMember(effect.source).gainMP(round(self.tupleToMember(effect.source).getMaxMP()*feat.dataA))
+
+        elif feat.name == "Favor of Gods":
+            if action.target == effect.source[1] and action.action >= 400 and action.action < 500:
+                if self.game.directory.getItem(action.action).potency[6] > 0:
+                    if self.game.directory.getItem(action.action).type == SpellType.Buff:
+                        self.buff.potency[6] *= math.ceil(1+feat.dataA)
+                    elif self.game.directory.getItem(action.action).type == SpellType.Heal:
+                        self.heal *= math.ceil(1+feat.dataA)
+
+        elif feat.name == "Wide Swings":
+            if action.source == effect.source and action.action == 0:
+                if self.tupleToMember(effect.source).getLuck() >= random.randint(1,100):
+                    if action.target > 0:
+                        if self.isAlive(("Encounter",action.target-1)):
+                            self.attack(Action(action.source,action.target-1,action.action))
+                    if action.target < len(self.encounter)-1:
+                        if self.isAlive(("Encounter",action.target+1)):
+                            self.attack(Action(action.source,action.target+1,action.action))
+
+        elif feat.name == "Antagonistic":
+            if action.source[0] == "Encounter":
+                if random.randint(1,100) <= feat.dataA*100:
+                    self.actionMessages.append(f'{self.tupleToMember(effect.source).name} angers the enemy, provoking them!')
+                    action.target = effect.source[1]
+
+        elif feat.name == "Wallflower":
+            if action.source[0] == "Encounter" and action.target == effect.source[1]:
+                if random.randint(1,100) <= feat.dataA*100:
+                    self.actionMessages.append(f"{self.tupleToMember(effect.source).name} slips away when no one is looking!")
+                    target = random.randint(0,len(self.game.player.party.members)-1)
+                    target = self.checkRecalculateTarget(action.source[0],target,"Party")
+
+        elif feat.name == "Diplomacy":
+            if action.source == effect.source:
+                self.escapeBoost += feat.dataA
+
+#        elif feat.name == "Rage":
+
+        elif feat.name == "Valiant":
+            if action.source[0] == "Encounter" and action.target == effect.source[1] and action.action == 0:
+                self.dmg = round(self.dmg*(1-feat.dataA))
+
+        elif feat.name == "Desperation":
+            if action.source == effect.source:
+                if self.tupleToMember(effect.source).getHP() <= round(self.tupleToMember(effect.source).getMaxHP()*feat.dataA):
+                    self.dmg += round(self.dmg*(1+feat.dataB))
+
+#        elif feat.name == "Assist":
+#
+#        elif feat.name == "Lunge":
+#
+        elif feat.name == "Biding Time":
+            if timing == Timing.Ordering:
+                for index, action in enumerate(self.actions):
+                    if action.source == effect.source:
+                        temp_action = action
+                        self.actions.pop(index)
+                        self.actions.append(0,Action(temp_action.source,temp_action.target,temp_action.action))
+            elif timing == Timing.DamageDealt:
+                if action.source == effect.source:
+                    self.dmg *= (1+feat.dataA)
+            
     def onDeathEffectHandler(self, member):
         # Second Soul
         for item in self.game.player.party.inventory:
