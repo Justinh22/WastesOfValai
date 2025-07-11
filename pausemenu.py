@@ -521,6 +521,9 @@ class PauseMenu():
                 self.state = self.substate
                 self.substate = "none"
         if self.game.keys["X"]:
+            if self.state == "partyMember":
+                for feat in self.game.player.party.members[self.targetPartyMember].feats:
+                    print(feat.name)
             if self.state == "equipment":
                 if self.game.player.party.members[self.targetPartyMember].eqpAcc.id != -1:
                     self.action = "removeAcc"

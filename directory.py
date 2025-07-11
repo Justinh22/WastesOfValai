@@ -652,6 +652,59 @@ class Directory():
                     weaponName += "the"
         return weaponName
     
+    def getFeatOptions(self,currentFeats,personality,classType):
+        possibleFeats = []
+        featOptions = []
+        duplicate = False
+        for index, feat in enumerate(self.featDirectory):
+            for known in currentFeats:
+                if known.id == feat.id:
+                    duplicate = True
+            if duplicate:
+                duplicate = False
+                continue
+            if feat.featType == FeatType.Mastery:
+                for known in currentFeats:
+                    if known.id == feat.id-1:
+                        for i in range(MASTERY_FEAT_WGT):
+                            possibleFeats.append(self.featDirectory[index].id)
+                        break
+            elif feat.featType == FeatType.General:
+                for i in range(GENERAL_FEAT_WGT):
+                    possibleFeats.append(feat.id)
+            elif feat.personalityRequirement == personality:
+                for i in range(PERSONALITY_FEAT_WGT):
+                    possibleFeats.append(feat.id)
+            elif feat.classRequirement != None:
+                if feat.classRequirement.name == classType:
+                    for i in range(CLASS_FEAT_WGT):
+                        possibleFeats.append(feat.id)
+        burnout = 50
+        for entry in range(FEAT_CHOICES):
+            newPick = True
+            while newPick:
+                print("Possible---------------------------")
+                for feat in possibleFeats:
+                    print(self.getItemName(feat))
+                print("-----------------------------------")
+                choice = random.choice(possibleFeats)
+                for feat in featOptions:
+                    print(f'{feat.name} = {self.getItemName(choice)}?')
+                    if feat.name == self.getItemName(choice):
+                        duplicate = True
+                        burnout -= 1
+                        break
+                if burnout <= 0:
+                    break
+                if duplicate:
+                    duplicate = False
+                    continue
+                featOptions.append(self.getFeat(choice))
+                newPick = False
+        for feat in featOptions:
+            print(feat.name)
+        return featOptions
+    
     def buildCharacter(self,level,members,id,cls=-1):
         if cls == -1:
             cls = random.randint(0,11)

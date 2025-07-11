@@ -113,12 +113,13 @@ class SupportMagic(Item):
         return self.potency[6]
 
 class Talent(Item):
-    def __init__(self,nm,desc,rar,i,mpc,tp,tgt,tmg):
+    def __init__(self,nm,desc,rar,i,mpc,tp,tgt,tmg,turns=1):
         Item.__init__(self,nm,desc,rar,i)
         self.mpcost = mpc
         self.type = tp # ATTACK, SUPPORT
         self.target = tgt # SELF, ALLY, SINGLE, ALL
         self.timing = tmg
+        self.turns = turns
 
 class Food(Item):
     def __init__(self,nm,desc,rar,i,buff):

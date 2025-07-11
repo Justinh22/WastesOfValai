@@ -243,14 +243,20 @@ class Hostel():
 class LevelUp():
     def __init__(self,game,character):
         self.game = game
+        self.state = "levelUp"
         self.character = character
         self.growths = self.character.levelUp()
+        self.featOptions = self.getFeatOptions()
         self.lastLearned = self.character.lastLearned
+        self.cursorPos = 0
+        self.listTop = 0
+        self.listBottom = 7
         self.inMenu = True
         self.left = 10
         self.top = 10
         self.right = self.game.width - 20
         self.bottom = self.game.height - 20
+        self.pausemenu = PauseMenu(self.game)
         self.delay = 5
         self.display()
 
@@ -279,7 +285,13 @@ class LevelUp():
             return
         if self.game.keys["A"]:
             print("A")
-            self.inMenu = False
+            if self.state == "levelUp" and not self.featOptions:
+                self.inMenu = False
+            elif self.state == "levelUp":
+                self.state = "featSelect"
+            elif self.state == "featSelect":
+                self.character.addFeat(self.featOptions[self.cursorPos],self.game.directory)
+                self.inMenu = False
         if self.game.keys["B"]:
             print("B")
             self.inMenu = False
@@ -287,30 +299,84 @@ class LevelUp():
             print("X")
         if self.game.keys["Y"]:
             print("Y")
+        if self.game.keys["UP"]:
+            if len(self.featOptions) > 0:
+                self.cursorPos -= 1
+                self.cursorPos %= len(self.featOptions)
+                if self.cursorPos < self.listTop:
+                    self.listTop -= 1
+                    self.listBottom -= 1
+                if self.cursorPos >= self.listBottom:
+                    self.listBottom = self.cursorPos + 1
+                    self.listTop = self.listBottom - 7
+        if self.game.keys["DOWN"]:
+            if len(self.featOptions) > 0:
+                self.cursorPos += 1
+                self.cursorPos %= len(self.featOptions)
+                if self.cursorPos < self.listTop:
+                    self.listTop = 0
+                    self.listBottom = 7
+                if self.cursorPos >= self.listBottom:
+                    self.listBottom += 1
+                    self.listTop += 1
+        if self.game.keys["START"]:
+            self.pausemenu.pause(self.game.player.currentPos)
 
     def drawScreen(self):
         self.game.screen.fill((0,0,0))
         screenOutline = pygame.Rect(self.left,self.top,self.right,self.bottom)
         pygame.draw.rect(self.game.screen,self.game.white,screenOutline,2)
 
-        write(self.game, 40, 30, 40, "Level Up!")
-        outlineRect = pygame.Rect(30,90,280,33)
+        if self.state == "levelUp":
+            write(self.game, 40, 30, 40, "Level Up!")
+            outlineRect = pygame.Rect(30,90,280,33)
+            pygame.draw.rect(self.game.screen,self.game.white,outlineRect,2)
+            write(self.game, 14, 40, 100, self.character.name + ", Level " + str(self.character.level-1) + " -> " + str(self.character.level) + " " + self.character.type.name)
+            write(self.game, 20, 350, 70, f'HP: {self.character.getMaxHP()-self.growths[0]} -> {self.character.getMaxHP()}')
+            write(self.game, 20, 350, 95, f'MP: {self.character.getMaxMP()-self.growths[1]} -> {self.character.getMaxMP()}')
+            write(self.game, 20, 350, 120, f'ATK: {self.character.attack-self.growths[2]} -> {self.character.attack}')
+            write(self.game, 20, 350, 145, f'CRT: {self.character.critrate-self.growths[3]} -> {self.character.critrate}')
+            write(self.game, 20, 350, 170, f'DEF: {self.character.defense-self.growths[4]} -> {self.character.defense}')
+            write(self.game, 20, 350, 195, f'DDG: {self.character.dodge-self.growths[5]} -> {self.character.dodge}')
+            write(self.game, 20, 350, 220, f'LCK: {self.character.luck-self.growths[6]} -> {self.character.luck}')
+            write(self.game, 20, 350, 245, f'SPD: {self.character.speed-self.growths[7]} -> {self.character.speed}')
+            write(self.game, 20, 350, 270, f'ATK SP: Level {self.character.type.attackMagicLevel[self.character.level-2]} -> {self.character.type.attackMagicLevel[self.character.level-1]}')
+            write(self.game, 20, 350, 295, f'SPT SP: Level {self.character.type.supportMagicLevel[self.character.level-2]} -> {self.character.type.supportMagicLevel[self.character.level-1]}')
+            for i,learned in enumerate(self.lastLearned):
+                write(self.game, 20, 350, 345+(i*25), f'Learned {self.game.directory.getItemName(learned)}!')
+            write(self.game, 20, 30, 140, f'{self.character.name} grew to level {self.character.level}!')
+            write(self.game, 18, 30, 165, f'Press any button to continue.')
+
+        elif self.state == "featSelect":
+            xPos, yPos = 60, 100
+            listEnd = len(self.featOptions) if len(self.featOptions) < self.listBottom else self.listBottom
+            outlineRect = pygame.Rect(xPos,yPos+450,350,90)
+            pygame.draw.rect(self.game.screen,self.game.white,outlineRect,2)
+            write(self.game, 40, 30, 40, "Select a new Feat!")
+            for i in range(self.listTop,listEnd):
+                if i == self.cursorPos:
+                    self.drawFeatInfoBlock(xPos, yPos + ((i-self.listTop)*40), self.featOptions[i])
+                else:
+                    self.drawFeatNameBlock(xPos, yPos + ((i-self.listTop)*40 + (0 if (i-self.listTop) <= (self.cursorPos-self.listTop) else 40)), self.featOptions[i])
+            write(self.game, 15, xPos-40, yPos + ((self.cursorPos-self.listTop)*40), "->")
+
+    def getFeatOptions(self):
+        possibleFeats = []
+        if self.character.type.featLevels[self.character.level-1] == 1:
+            possibleFeats = self.game.directory.getFeatOptions(self.character.feats,self.character.personality,self.character.type.name)
+        return possibleFeats
+
+    def drawFeatInfoBlock(self,xPos,yPos,feat):
+        outlineRect = pygame.Rect(xPos,yPos,350,72)
+        color = self.game.white
         pygame.draw.rect(self.game.screen,self.game.white,outlineRect,2)
-        write(self.game, 14, 40, 100, self.character.name + ", Level " + str(self.character.level-1) + " -> " + str(self.character.level) + " " + self.character.type.name)
-        write(self.game, 20, 350, 70, f'HP: {self.character.getMaxHP()-self.growths[0]} -> {self.character.getMaxHP()}')
-        write(self.game, 20, 350, 95, f'MP: {self.character.getMaxMP()-self.growths[1]} -> {self.character.getMaxMP()}')
-        write(self.game, 20, 350, 120, f'ATK: {self.character.attack-self.growths[2]} -> {self.character.attack}')
-        write(self.game, 20, 350, 145, f'CRT: {self.character.critrate-self.growths[3]} -> {self.character.critrate}')
-        write(self.game, 20, 350, 170, f'DEF: {self.character.defense-self.growths[4]} -> {self.character.defense}')
-        write(self.game, 20, 350, 195, f'DDG: {self.character.dodge-self.growths[5]} -> {self.character.dodge}')
-        write(self.game, 20, 350, 220, f'LCK: {self.character.luck-self.growths[6]} -> {self.character.luck}')
-        write(self.game, 20, 350, 245, f'SPD: {self.character.speed-self.growths[7]} -> {self.character.speed}')
-        write(self.game, 20, 350, 270, f'ATK SP: Level {self.character.type.attackMagicLevel[self.character.level-2]} -> {self.character.type.attackMagicLevel[self.character.level-1]}')
-        write(self.game, 20, 350, 295, f'SPT SP: Level {self.character.type.supportMagicLevel[self.character.level-2]} -> {self.character.type.supportMagicLevel[self.character.level-1]}')
-        for i,learned in enumerate(self.lastLearned):
-            write(self.game, 20, 350, 345+(i*25), f'Learned {self.game.directory.getItemName(learned)}!')
-        write(self.game, 20, 30, 140, f'{self.character.name} grew to level {self.character.level}!')
-        write(self.game, 18, 30, 165, f'Press any button to continue.')
+        writeColor(self.game, 14, xPos+10, yPos+10, feat.name + " - " + feat.featType.name + " Feat", color)
+        wrapWrite(self.game, 14, feat.description, 340, xPos+10, yPos+30)
+
+    def drawFeatNameBlock(self,xPos,yPos,feat):
+        outlineRect = pygame.Rect(xPos,yPos,300,33)
+        pygame.draw.rect(self.game.screen,self.game.white,outlineRect,2)
+        write(self.game, 14, xPos+10, yPos+10, feat.name + " - " + feat.featType.name + " Feat")
 
 
 #class ItemReplace():

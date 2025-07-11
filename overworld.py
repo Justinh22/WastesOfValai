@@ -76,6 +76,10 @@ class Overworld():
                 self.stepTo(self.game.player.currentPos[0],self.game.player.currentPos[1])
             self.drawScreen()
         if self.game.keys["A"]:
+            if self.game.debug_manualLevelUp:
+                self.game.player.party.awardXP(self.game.player.party.nextLevel)
+                for member in self.game.player.party.members:
+                    LevelUp(self.game, member)
             print("A")
         if self.game.keys["B"]:
             if self.game.debug_manualEncounters:

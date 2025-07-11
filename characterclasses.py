@@ -54,20 +54,28 @@ class Character():
         self.status = Status.NoStatus
         self.statusCount = 0
         self.personality = p
+
     def getHP(self):
         return self.hp
+    
     def getMaxHP(self):
         return self.hpMax + self.universalEffects.hp
+    
     def getMP(self):
         return self.mp
+    
     def getMaxMP(self):
         return self.mpMax + self.universalEffects.mp
+    
     def getAttack(self):
         return self.eqpWpn.getAttack() + self.attack + self.universalEffects.attack + self.getBuff("ATK")
+    
     def getDefense(self):
         return self.eqpAmr.getDefense() + self.defense + self.universalEffects.defense + self.getBuff("DEF")
+    
     def getCritRate(self):
         return self.eqpWpn.getCritrate() + self.critrate + self.universalEffects.critrate + self.getBuff("CRT")
+    
     def getAccuracy(self):
         ablazePenalty = 0
         if self.status is Status.Ablaze:
@@ -76,23 +84,31 @@ class Character():
             return self.eqpWpn.getAccuracy() + self.universalEffects.accuracy + self.getBuff("ACC") - ablazePenalty
         else:
             return self.accuracy + self.universalEffects.accuracy + self.getBuff("ACC") - ablazePenalty
+        
     def getDodge(self):
         if self.status is Status.Shocked:
             return 0
         return self.eqpAmr.getDodge() + self.dodge + self.universalEffects.dodge + self.getBuff("DDG")
+    
     def getLuck(self):
         return self.luck + self.universalEffects.luck + self.getBuff("LCK")
+    
     def getAmplifier(self):
         return self.amplifier + self.universalEffects.amplifier + self.eqpWpn.amplifier
+    
     def getManaRegen(self):
         return self.manaregen + self.universalEffects.manaregen + self.eqpAmr.manaregen
+    
     def getHPRegen(self):
         return self.hpregen + self.universalEffects.hpregen
+    
     def getSpeed(self):
         return self.speed + self.universalEffects.speed
+    
     def amplify(self,val):
         val = math.ceil(val + (val * (self.getAmplifier()/100)))
         return val
+    
     def takeDamage(self,val):
         print(f'{self.name} took {val} damage!')
         if val >= self.hp:
@@ -103,6 +119,7 @@ class Character():
         else:
             self.hp -= val
         return val
+    
     def addBuffs(self,buff):
         self.activeBuffs.append((buff.name,buff.duration))
         for i in range(len(self.buffs)):
@@ -110,6 +127,7 @@ class Character():
         self.hp += self.buffs[6]
         if self.hp > self.hpMax:
             self.hp = self.hpMax
+
     def getBuff(self,type):
         if type == "ATK":
             return self.buffs[0]
@@ -125,43 +143,60 @@ class Character():
             return self.buffs[5]
         elif type == "HP":
             return self.buffs[6]
+        
     def resetBuffs(self):
         self.buffs = [0,0,0,0,0,0,0]
         self.activeBuffs.clear()
+
     def tickStatus(self):
         if self.statusCount > 0:
             self.statusCount -= 1
             if self.statusCount == 0:
                 self.status = Status.NoStatus
+
     def resetStatus(self):
         self.status = Status.NoStatus
         self.statusCount = 0
+
     def gainHP(self,val):
         self.hp += val
         if self.hp > self.getMaxHP():
             self.hp = self.getMaxHP()
+
     def setHP(self,val):
         self.hp = val
         if self.hp > self.getMaxHP():
             self.hp = self.getMaxHP()
+
     def gainMP(self,val):
         self.mp += val
         if self.mp > self.getMaxMP():
             self.mp = self.getMaxMP()
+
     def setMP(self,val):
         self.mp = val
         if self.mp > self.getMaxMP():
             self.mp = self.getMaxMP()
+
     def addSpell(self,spellID):
         if spellID not in self.spells:
             self.spells.append(spellID)
             return True 
         return False
+    
+    def addFeat(self,feat,dir):
+        if feat.timing != Timing.Universal:
+            self.feats.append(feat)
+        else:
+            self.universalEffectHandler(feat,"On",dir)
+            self.feats.append(feat)
+    
     def levelUp(self):
         if self.level != 10:
             self.level += 1
         growth = self.type.getGrowths()
         self.hpMax += growth[0]
+        self.hp = self.hpMax
         self.mpMax += growth[1]
         self.attack += growth[2]
         self.critrate += growth[3]
@@ -177,6 +212,7 @@ class Character():
             self.talents.append(self.type.knownTalents[self.level-1])
             self.lastLearned.append(self.type.knownTalents[self.level-1])
         return growth
+    
     def equip(self,item,dir):
         itemType = dir.getItemType(item.id)
         if itemType == Type.Weapon:
@@ -196,6 +232,7 @@ class Character():
                 print("Equip")
                 self.universalEffectHandler(self.eqpAcc,"Equip",dir)
         return returner
+    
     def checkProficiency(self,id,dir):
         idType = dir.getItemType(id)
         if idType == Type.Weapon:
@@ -208,6 +245,7 @@ class Character():
             return self.checkSptSpellProficiency(id,dir)
         else:
             return True
+        
     def checkWeaponProficiency(self,id,dir):
         idType = (dir.getItem(id)).type
         if idType == WeaponType.Axe:
@@ -220,6 +258,7 @@ class Character():
             return self.type.weaponProficiency[3]==1
         elif idType == WeaponType.Staff:
             return self.type.weaponProficiency[4]==1
+        
     def checkArmorProficiency(self,id,dir):
         idType = (dir.getItem(id)).type
         if idType == ArmorType.Light:
@@ -232,6 +271,7 @@ class Character():
             return self.type.armorProficiency[3]==1
         elif idType == ArmorType.Arcanist:
             return self.type.armorProficiency[4]==1
+        
     def checkSpellProficiency(self,id,dir):
         print("Checking proficiency...")
         out = False
@@ -240,39 +280,46 @@ class Character():
         else:
             out = self.checkSptSpellProficiency(id,dir)
         return out
+    
     def checkAtkSpellProficiency(self,id,dir):
         idRarity = dir.getItemRarity(id)
         print(f'Level: {self.type.attackMagicLevel[self.level-1] + self.universalEffects.atkMagicLevel} vs Spell: {idRarity}')
         return self.type.attackMagicLevel[self.level-1] + self.universalEffects.atkMagicLevel >= idRarity
+    
     def checkSptSpellProficiency(self,id,dir):
         idRarity = dir.getItemRarity(id)
         print(f'Level: {self.type.supportMagicLevel[self.level-1] + self.universalEffects.sptMagicLevel} vs Spell: {idRarity}')
         return self.type.supportMagicLevel[self.level-1] + self.universalEffects.sptMagicLevel >= idRarity
+    
     def fullRestore(self):
         self.hp = self.getMaxHP()
         self.mp = self.getMaxMP()
         self.resetStatus()
+
     def canCast(self,spellbookIndex,dir):
         return dir.getManaCost(self.spells[spellbookIndex]) <= self.mp
+    
     def expendMana(self,spellbookIndex,dir):
         self.mp -= dir.getManaCost(self.spells[spellbookIndex])
         if self.mp < 0:
             self.mp = 0
+
     def changeMana(self,amount):
         self.mp += amount
         if self.mp < 0:
             self.mp = 0
         if self.mp > self.getMaxMP():
             self.mp = self.getMaxMP()
+
     def canPerform(self,talentID,dir):
         return dir.getManaCost(talentID) <= self.mp
+    
     def universalEffectHandler(self,effect,mode,dir):
         mod = 0
         if mode == "Equip" or mode == "On":
             mod = 1
         elif mode == "Unequip" or mode == "Off":
             mod = -1
-
         print(dir.getItemType(effect))
         if dir.getItemType(effect.id) == Type.Accessory:
             accessory = effect
@@ -321,11 +368,45 @@ class Character():
             self.universalEffects.dodge += effect.buff[9] * mod
             self.universalEffects.speed += effect.buff[10] * mod
             self.universalEffects.hpregen += effect.buff[11] * mod
+        elif dir.getItemType(effect) == Type.Feat:
+            feat = effect
+            if feat.id == 1006 or feat.id == 1007: # Rendai's Blessing
+                self.universalEffects.hp += feat.dataA * mod
+            elif feat.id == 1008 or feat.id == 1009: # Callaret's Blessing
+                self.universalEffects.mp += feat.dataA * mod
+            elif feat.id == 1012 or feat.id == 1013: # Improvise
+                self.universalEffects.improvise += 1 * mod
+            elif feat.id == 1016 or feat.id == 1017: # Keen Eye
+                self.universalEffects.accuracy += feat.dataA * mod
+            elif feat.id == 1018 or feat.id == 1019: # Killer Instinct
+                self.universalEffects.critrate += feat.dataA * mod
+            elif feat.id == 1020 or feat.id == 1021: # Attune
+                self.universalEffects.runeActivation += feat.dataA * mod
+            elif feat.id == 1029: # Bastion
+                if mod == 1:
+                    self.talents.append(523)
+                elif mod == -1:
+                    self.talents.remove(523)
+            elif feat.id == 1041: # Rage
+                if mod == 1:
+                    self.talents.append(524)
+                elif mod == -1:
+                    self.talents.remove(524)
+            elif feat.id == 1044: # Assist
+                if mod == 1:
+                    self.talents.append(525)
+                elif mod == -1:
+                    self.talents.remove(525)
+            elif feat.id == 1045: # Lunge
+                if mod == 1:
+                    self.talents.append(526)
+                elif mod == -1:
+                    self.talents.remove(526)
         self.universalEffects.print()
 
 
 class ClassType():
-    def __init__(self,nm,wpnPrf,amrPrf,atkLv,sptLv,hpg,mpg,atg,ctg,dfg,dgg,lkg,sdg,splsLrn,tlntsLrn,idIN):
+    def __init__(self,nm,wpnPrf,amrPrf,atkLv,sptLv,hpg,mpg,atg,ctg,dfg,dgg,lkg,sdg,splsLrn,tlntsLrn,featLvls,idIN):
         self.name = nm
         self.weaponProficiency = wpnPrf # [AXE,SWORD,SPEAR,DAGGER,STAFF]
         self.armorProficiency = amrPrf # [LIGHT,MEDIUIM,HEAVY,ROBE,ARCANIST]
@@ -341,6 +422,7 @@ class ClassType():
         self.spdGrowth = sdg
         self.knownSpells = splsLrn
         self.knownTalents = tlntsLrn
+        self.featLevels = featLvls
         self.id = idIN
         self.description = ""
         self.classType = None
@@ -508,9 +590,10 @@ class Party():
     def awardXP(self,xp):
         self.xp += xp
         levelup = False
-        if self.xp > self.nextLevel:
+        if self.xp >= self.nextLevel:
             levelup = True
             self.level += 1
+            self.xp = 0
             self.nextLevel = self.calculateNextLevelThreshold() 
         return levelup
     def removeAccessory(self,target,dir):

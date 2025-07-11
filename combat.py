@@ -58,7 +58,9 @@ class Combat():
         self.risen = False
         self.curse = []
         self.deathWish = []
+        self.skipTurn = {}
         self.pyrilicVenom = {}
+        self.rage = {}
         self.escapeBoost = 0
 
         self.gold = 0
@@ -146,7 +148,7 @@ class Combat():
         if self.combatOrder[self.currentTurn][0] == "Party":
             self.combatDialogue = getCombatDialogue(self.game.player.party.members[self.combatOrder[self.currentTurn][1]])
 
-        # Add accessory effects to combat
+        # Add extra effects to combat
         self.activeEffects = []
         for i, member in enumerate(self.game.player.party.members):
             if member.eqpAcc is not None:
@@ -156,6 +158,11 @@ class Combat():
             if member.eqpWpn.rune is not None:
                 print(f'Effect of {member.eqpWpn.rune.name} in play!')
                 self.activeEffects.append(ActiveEffect(member.eqpWpn.rune.id,("Party",i),-1,100))
+            for feat in member.feats:
+                if feat.timing is not Timing.Universal:
+                    print(f'Effect of {feat.name} in play!')
+                    self.activeEffects.append(ActiveEffect(feat.id,("Party",i),-1,100))
+
 
         self.inCombat = True
         self.state = "mainWindow"
@@ -940,12 +947,16 @@ class Combat():
     def useTalent(self,source,target,id):
         talent = self.game.directory.getTalent(id)
         if talent.type == TalentType.PartyEffect or talent.type == TalentType.EncounterEffect:
-            effect = ActiveEffect(talent.id, source, target)
+            effect = ActiveEffect(talent.id, source, target, talent.turns)
+            if talent.turns > 1:
+                self.skipTurn[source] = talent.turns - 1
             self.scheduledManaCosts.append((source[1],talent.mpcost))
             self.activeEffects.insert(0,effect)
             self.writeAction(source,target,-1)
         elif talent.type == TalentType.Action and talent.timing == Timing.Ordering:
-            effect = ActiveEffect(talent.id, source, target)
+            effect = ActiveEffect(talent.id, source, target, talent.turns)
+            if talent.turns > 1:
+                self.skipTurn[source] = talent.turns - 1
             self.activeEffects.insert(0,effect)
             self.writeAction(source,target,-1)
         elif talent.type == TalentType.Action:
@@ -1110,7 +1121,7 @@ class Combat():
                     elif self.actions[self.exTurn].action >= 400 and self.actions[self.exTurn].action < 500:
                         self.cast(self.actions[self.exTurn])
                     elif self.actions[self.exTurn].action >= 500 and self.actions[self.exTurn].action < 600:
-                        if self.game.directory.getItem(self.actions[self.exTurn].action).timing == Timing.InTurn:
+                        if self.game.directory.getItem(self.actions[self.exTurn].action).timing == Timing.InTurn or Timing.InTurn in self.game.directory.getItem(self.actions[self.exTurn].action).timing:
                             self.talentActionHandler(self.actions[self.exTurn])
                     elif self.actions[self.exTurn].action >= 800 and self.actions[self.exTurn].action < 900:
                         self.consumableActionHandler(self.actions[self.exTurn])
@@ -1215,9 +1226,14 @@ class Combat():
                 member.takeDamage(math.ceil(member.getMaxHP()*.10))
         for target in self.deathWish:
             self.encounter[target].takeDamage(math.ceil(self.encounter[target].getMaxHP()*.10))
+        for member in self.skipTurn.keys():
+            self.skipTurn[member] -= 1
+            if self.skipTurn[member] <= 0:
+                del self.skipTurn[member]
+
 
     def skip(self):
-        while self.combatOrder[self.currentTurn][0] == "Encounter" or not self.isAlive(self.combatOrder[self.currentTurn]):
+        while self.combatOrder[self.currentTurn][0] == "Encounter" or not self.isAlive(self.combatOrder[self.currentTurn]) or self.combatOrder[self.currentTurn] in self.skipTurn.keys():
             #print(self.encounter[self.combatOrder[self.currentTurn][1]].name)
             if self.combatOrder[self.currentTurn][0] == "Encounter":
                 self.enemyAction(self.combatOrder[self.currentTurn])
@@ -1470,7 +1486,7 @@ class Combat():
                     talent = self.game.directory.getTalent(effect.id)
                     if timing == talent.timing:
                         if talent.type == TalentType.PartyEffect:
-                            self.talentPartyTargetEffectHandler(effect,action)
+                            self.talentPartyTargetEffectHandler(effect,action,timing)
                         elif talent.type == TalentType.EncounterEffect:
                             self.talentEncounterTargetEffectHandler(effect,action)
                         elif talent.timing == Timing.Ordering:
@@ -1520,7 +1536,7 @@ class Combat():
                     self.actions.pop(index)
                     self.actions.insert(0,Action(temp_action.source,temp_action.target,0))
 
-    def talentPartyTargetEffectHandler(self,effect,action):
+    def talentPartyTargetEffectHandler(self,effect,action,timing):
         talent = self.game.directory.getTalent(effect.id)
 
         if talent.name == "Fortify": #! Maybe absorb some deflected damage as MP?
@@ -1564,7 +1580,7 @@ class Combat():
             self.immune = True
 
         elif talent.name == "Guard":
-            if action.target == effect.source[1]:
+            if action.source[0] == "Encounter" and action.target == effect.source[1]:
                 self.actionMessages.append(f'{self.tupleToMember(effect.source).name} defended themself, reducing damage taken!')
                 if self.game.player.party.members[action.source[1]].eqpAcc.name == "Guardian's Belt":
                     self.dmg = round(self.dmg*.2)
@@ -1578,6 +1594,33 @@ class Combat():
                         self.actionMessages.append(f'{self.tupleToMember(effect.source).name} was ready for the attack, and negated the damage!')
                 else:
                     self.dmg = round(self.dmg/2)
+
+        elif talent.name == "Bastion":
+            if action.source[0] == "Encounter" and action.target == effect.source[1] and effect.source in self.bastion.keys():
+                self.actionMessages.append(f'{self.tupleToMember(effect.source).name} stood strong, greatly reducing damage taken!')
+                self.dmg = round(self.dmg*.2)
+
+        elif talent.name == "Rage":
+            if action.source[0] == "Encounter" and action.target == effect.source[1] and timing == Timing.DamageTaken and effect.duration == 2:
+                self.actionMessages.append(f'{self.tupleToMember(effect.source).name}s rage is building!')
+                if effect.source not in self.rage.keys():
+                    self.rage[effect.source] = 0
+                self.rage[effect.source] += 1
+            elif action.source == effect.source and action.action == 0 and timing == Timing.DamageDealt and effect.duration == 1:
+                if effect.source in self.rage.keys():
+                    self.actionMessages.append(f'{self.tupleToMember(effect.source).name} unleashes their rage!')
+                    self.dmg *= self.rage[effect.source]
+                    del self.rage[effect.source]
+
+        elif talent.name == "Assist":
+            if action.source[0] == "Party" and action.source[1] == effect.target and action.action == 0:
+                self.actionMessages.append(f'{self.tupleToMember(effect.source).name} assists!')
+                self.dmg = round(self.dmg*1.5)
+
+        elif talent.name == "Lunge":
+            if action.source[0] == "Encounter" and action.target == effect.source[1] and action.action == 0:
+                self.actionMessages.append(f'{self.tupleToMember(effect.source).name} is vulnerable to attack!')
+                self.dmg = round(self.dmg*2)
 
     def talentEncounterTargetEffectHandler(self,effect,action):
         talent = self.game.directory.getTalent(effect.id)
@@ -1761,6 +1804,7 @@ class Combat():
                         self.miss = False
                     else:
                         self.miss = True
+            self.actionMessages.append(f"{self.tupleToMember(action.source).name} cleaves at all enemies!")
 
         elif talent.name == "Heartrend":
             target = self.checkRecalculateTarget(source[0],target,"Encounter")
@@ -1785,11 +1829,11 @@ class Combat():
                 print("Miss!")
                 self.miss = True
             if self.miss:
-                self.actionMessages.append(f"{self.tupleToMember(action.source).name} attacks {self.encounter[action.target].name}, but misses!")
+                self.actionMessages.append(f"{self.tupleToMember(action.source).name} reaps {self.encounter[action.target].name}, but misses!")
             elif self.crit:
-                self.actionMessages.append(f"{self.tupleToMember(action.source).name} attacks {self.encounter[action.target].name} for {str(self.dmg)} damage, restoring that much HP! Critical Hit!")
+                self.actionMessages.append(f"{self.tupleToMember(action.source).name} reaps {self.encounter[action.target].name} for {str(self.dmg)} damage, restoring that much HP! Critical Hit!")
             else:
-                self.actionMessages.append(f"{self.tupleToMember(action.source).name} attacks {self.encounter[action.target].name} for {str(self.dmg)} damage, restoring that much HP!")
+                self.actionMessages.append(f"{self.tupleToMember(action.source).name} reaps {self.encounter[action.target].name} for {str(self.dmg)} damage, restoring that much HP!")
 
         elif talent.name == "Soulrend":
             target = self.checkRecalculateTarget(source[0],target,"Encounter")
@@ -1814,11 +1858,11 @@ class Combat():
                 print("Miss!")
                 self.miss = True
             if self.miss:
-                self.actionMessages.append(f"{self.tupleToMember(action.source).name} attacks {self.encounter[action.target].name}, but misses!")
+                self.actionMessages.append(f"{self.tupleToMember(action.source).name} reaps {self.encounter[action.target].name}, but misses!")
             elif self.crit:
-                self.actionMessages.append(f"{self.tupleToMember(action.source).name} attacks {self.encounter[action.target].name} for {str(self.dmg)} damage, restoring that much MP! Critical Hit!")
+                self.actionMessages.append(f"{self.tupleToMember(action.source).name} reaps {self.encounter[action.target].name} for {str(self.dmg)} damage, restoring that much MP! Critical Hit!")
             else:
-                self.actionMessages.append(f"{self.tupleToMember(action.source).name} attacks {self.encounter[action.target].name} for {str(self.dmg)} damage, restoring that much MP!")
+                self.actionMessages.append(f"{self.tupleToMember(action.source).name} reaps {self.encounter[action.target].name} for {str(self.dmg)} damage, restoring that much MP!")
 
         elif talent.name == "Blitz":
             target = self.checkRecalculateTarget(source[0],target,"Encounter")
@@ -1850,11 +1894,11 @@ class Combat():
                     print("Miss!")
                     self.miss = True
                 if self.miss:
-                    self.actionMessages.append(f"{self.tupleToMember(action.source).name} attacks {self.encounter[action.target].name}, but misses!")
+                    self.actionMessages.append(f"{self.tupleToMember(action.source).name} swiftly attacks {self.encounter[action.target].name}, but misses!")
                 elif self.crit:
-                    self.actionMessages.append(f"{self.tupleToMember(action.source).name} attacks {self.encounter[action.target].name} for {str(self.dmg)} damage! Critical Hit!")
+                    self.actionMessages.append(f"{self.tupleToMember(action.source).name} swiftly attacks {self.encounter[action.target].name} for {str(self.dmg)} damage! Critical Hit!")
                 else:
-                    self.actionMessages.append(f"{self.tupleToMember(action.source).name} attacks {self.encounter[action.target].name} for {str(self.dmg)} damage!")
+                    self.actionMessages.append(f"{self.tupleToMember(action.source).name} swiftly attacks {self.encounter[action.target].name} for {str(self.dmg)} damage!")
 
         elif talent.name == "Havoc":
             for i in range(5):
@@ -1889,11 +1933,11 @@ class Combat():
                     print("Miss!")
                     self.miss = True
                 if self.miss:
-                    self.actionMessages.append(f"{self.tupleToMember(action.source).name} attacks {self.encounter[action.target].name}, but misses!")
+                    self.actionMessages.append(f"{self.tupleToMember(action.source).name} hacks wildly at {self.encounter[action.target].name}, but misses!")
                 elif self.crit:
-                    self.actionMessages.append(f"{self.tupleToMember(action.source).name} attacks {self.encounter[action.target].name} for {str(self.dmg)} damage! Critical Hit!")
+                    self.actionMessages.append(f"{self.tupleToMember(action.source).name} hacks wildly at {self.encounter[action.target].name} for {str(self.dmg)} damage! Critical Hit!")
                 else:
-                    self.actionMessages.append(f"{self.tupleToMember(action.source).name} attacks {self.encounter[action.target].name} for {str(self.dmg)} damage!")
+                    self.actionMessages.append(f"{self.tupleToMember(action.source).name} hacks wildly at {self.encounter[action.target].name} for {str(self.dmg)} damage!")
 
         elif talent.name == "Smite":
             target = self.checkRecalculateTarget(source[0],target,"Encounter")
@@ -1919,15 +1963,46 @@ class Combat():
                 print("Miss!")
                 self.miss = True
             if self.miss:
-                self.actionMessages.append(f"{self.tupleToMember(action.source).name} attacks {self.encounter[action.target].name}, but misses!")
+                self.actionMessages.append(f"{self.tupleToMember(action.source).name} smites {self.encounter[action.target].name}, but misses!")
             elif self.crit:
-                self.actionMessages.append(f"{self.tupleToMember(action.source).name} attacks {self.encounter[action.target].name} for {str(self.dmg)} damage! Critical Hit!")
+                self.actionMessages.append(f"{self.tupleToMember(action.source).name} smites {self.encounter[action.target].name} for {str(self.dmg)} damage! Critical Hit!")
             else:
-                self.actionMessages.append(f"{self.tupleToMember(action.source).name} attacks {self.encounter[action.target].name} for {str(self.dmg)} damage!")
+                self.actionMessages.append(f"{self.tupleToMember(action.source).name} smites {self.encounter[action.target].name} for {str(self.dmg)} damage!")
 
         elif talent.name == "Death Wish":
             self.deathWish.append(target)
             self.actionMessages.append(f"{self.tupleToMember(action.source).name} curses {self.encounter[action.target].name}!")
+
+        elif talent.name == "Lunge":
+            target = self.checkRecalculateTarget(source[0],target,"Encounter")
+            self.checkAccessoryEffectTiming(action,Timing.Targeting)
+            if self.game.player.party.members[source[1]].getAttack() - self.encounter[target].defense < 0:
+                self.dmg = 0
+            else:
+                self.dmg = self.game.player.party.members[source[1]].getAttack() - self.encounter[target].defense
+            
+            if self.calculateHit(self.game.player.party.members[source[1]],self.encounter[target]):
+                print("Hit!")
+                if self.calculateCrit(self.game.player.party.members[source[1]]):
+                    print("Crit!") 
+                    self.dmg *= 2
+                    self.crit = True
+                self.dmg = math.ceil(self.dmg * 2)
+                self.checkAccessoryEffectTiming(action,Timing.DamageDealt)
+                self.encounter[target].takeDamage(self.dmg)
+                if self.encounter[target].hp <= 0:
+                    self.checkEffectTiming(action,Timing.OnKill)
+                self.miss = False
+            else:
+                print("Miss!")
+                self.miss = True
+            if self.miss:
+                self.actionMessages.append(f"{self.tupleToMember(action.source).name} lunges at {self.encounter[action.target].name}, but misses!")
+            elif self.crit:
+                self.actionMessages.append(f"{self.tupleToMember(action.source).name} lunges at {self.encounter[action.target].name} for {str(self.dmg)} damage! Critical Hit!")
+            else:
+                self.actionMessages.append(f"{self.tupleToMember(action.source).name} lunges at {self.encounter[action.target].name} for {str(self.dmg)} damage!")
+            
 
 
     def consumableActionHandler(self,action):
@@ -2239,33 +2314,33 @@ class Combat():
             self.dmg += round((self.dmg)*float((rune.level*rune.data)/100))
 
         elif rune.name == "Rune of Surging":
-            roll = self.game.player.party.members[effect.source[1]].getLuck() + (rune.level*rune.data)
+            roll = self.game.player.party.members[effect.source[1]].getLuck() + (rune.level*rune.data) + self.game.player.party.members[effect.source[1]].universalEffects.runeActivation
             if roll >= chance:
                 self.actionMessages.append(f"{self.tupleToMember(action.source).name}'s Rune of Surging increases damage dealt!")
                 self.dmg *= 2
 
         elif rune.name == "Rune of Piercing":
-            roll = self.game.player.party.members[effect.source[1]].getLuck() + (rune.level*rune.data)
+            roll = self.game.player.party.members[effect.source[1]].getLuck() + (rune.level*rune.data) + self.game.player.party.members[effect.source[1]].universalEffects.runeActivation
             if roll >= chance:
                 self.actionMessages.append(f"{self.tupleToMember(action.source).name}'s Rune of Piercing cuts the foe's defense!")
                 self.dmg = self.game.player.party.members[action.source[1]].getAttack() - round(self.encounter[action.target].defense/2)
 
         elif rune.name == "Rune of Flames":
-            roll = self.game.player.party.members[effect.source[1]].getLuck() + (rune.level*rune.data)
+            roll = self.game.player.party.members[effect.source[1]].getLuck() + (rune.level*rune.data) + self.game.player.party.members[effect.source[1]].universalEffects.runeActivation
             if roll >= chance:
                 self.actionMessages.append(f"{self.tupleToMember(action.source).name}'s Rune of Flames lights the enemy ablaze!")
                 self.encounter[action.target].status = Status.Ablaze
                 self.encounter[action.target].statusCount = 3
 
         elif rune.name == "Rune of Sparks":
-            roll = self.game.player.party.members[effect.source[1]].getLuck() + (rune.level*rune.data)
+            roll = self.game.player.party.members[effect.source[1]].getLuck() + (rune.level*rune.data) + self.game.player.party.members[effect.source[1]].universalEffects.runeActivation
             if roll >= chance:
                 self.actionMessages.append(f"{self.tupleToMember(action.source).name}'s Rune of Sparks electrifies the enemy!")
                 self.encounter[action.target].status = Status.Shocked
                 self.encounter[action.target].statusCount = 3
 
         elif rune.name == "Rune of Freezing":
-            roll = self.game.player.party.members[effect.source[1]].getLuck() + (rune.level*rune.data)
+            roll = self.game.player.party.members[effect.source[1]].getLuck() + (rune.level*rune.data) + self.game.player.party.members[effect.source[1]].universalEffects.runeActivation
             if roll >= chance:
                 self.actionMessages.append(f"{self.tupleToMember(action.source).name}'s Rune of Freezing chills the enemy!")
                 self.encounter[action.target].status = Status.Freezing
@@ -2308,23 +2383,11 @@ class Combat():
                 if self.game.directory.getItem[action.action].element == Element.Lightning:
                     self.dmg = round(self.dmg*(1-feat.dataA))
 
-#       elif feat.name == "Rendai's Blessing" or feat.name == "Rendai's Blessing II":
-
-#       elif feat.name == "Callaret's Blessing" or feat.name == "Callaret's Blessing II":
-
         # Alert is implemented in the Guard talent
-
-#       elif feat.name == "Improvise" or feat.name == "Improvise II":
 
         elif feat.name == "Serenity" or feat.name == "Serenity II":
             if action.source[0] == "Encounter" and action.target == effect.source[1] and action.action >= 300 and action.action < 400:
                 self.dmg = round(self.dmg*(1-feat.dataA))
-
-#       elif feat.name == "Keen Eye" or feat.name == "Keen Eye II":
-
-#       elif feat.name == "Killer Instinct" or feat.name == "Killer Instinct II":
-
-#       elif feat.name == "Attune" or feat.name == "Attune II":
 
         elif feat.name == "Talented" or feat.name == "Talented II":
             if action.source == effect.source and action.action >= 500 and action.action < 600:
@@ -2336,7 +2399,7 @@ class Combat():
 
         elif feat.name == "Worldly Valor":
             if action.source == effect.source:
-                self.dmg *= (1+feat.dataA)
+                self.dmg = round(self.dmg * (1+feat.dataA))
 
         elif feat.name == "Arcanism":
             if action.source[0] == "Encounter" and action.target == effect.source[1] and action.action >= 300 and action.action < 400:
@@ -2345,8 +2408,6 @@ class Combat():
         elif feat.name == "Vitalism":
             if action.source[0] == "Encounter" and action.target == effect.source[1] and action.action == 0:
                 self.tupleToMember(effect.source).gainMP(round(self.tupleToMember(effect.source).getMaxMP()*feat.dataA))
-
-#       elif feat.name == "Bastion":
 
         elif feat.name == "Blood Pact":
             if action.source == effect.source:
@@ -2393,11 +2454,12 @@ class Combat():
                     if self.game.directory.getItem(action.action).type == SpellType.Buff:
                         self.buff.potency[6] *= math.ceil(1+feat.dataA)
                     elif self.game.directory.getItem(action.action).type == SpellType.Heal:
-                        self.heal *= math.ceil(1+feat.dataA)
+                        self.heal = round(self.heal * (1+feat.dataA))
 
         elif feat.name == "Wide Swings":
             if action.source == effect.source and action.action == 0:
                 if self.tupleToMember(effect.source).getLuck() >= random.randint(1,100):
+                    self.actionMessages.append(f'{self.tupleToMember(effect.source).name} swings their weapon wide, hitting adjacent enemies!')
                     if action.target > 0:
                         if self.isAlive(("Encounter",action.target-1)):
                             self.attack(Action(action.source,action.target-1,action.action))
@@ -2422,8 +2484,6 @@ class Combat():
             if action.source == effect.source:
                 self.escapeBoost += feat.dataA
 
-#        elif feat.name == "Rage":
-
         elif feat.name == "Valiant":
             if action.source[0] == "Encounter" and action.target == effect.source[1] and action.action == 0:
                 self.dmg = round(self.dmg*(1-feat.dataA))
@@ -2432,12 +2492,9 @@ class Combat():
             if action.source == effect.source:
                 if self.tupleToMember(effect.source).getHP() <= round(self.tupleToMember(effect.source).getMaxHP()*feat.dataA):
                     self.dmg += round(self.dmg*(1+feat.dataB))
-
-#        elif feat.name == "Assist":
-#
-#        elif feat.name == "Lunge":
 #
         elif feat.name == "Biding Time":
+            print("Biding Time!")
             if timing == Timing.Ordering:
                 for index, action in enumerate(self.actions):
                     if action.source == effect.source:

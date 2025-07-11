@@ -338,7 +338,7 @@ def initAtkSpellDirectory():
 
     #DEBUFFS
 
-    # SHOCK: Has a 50% chance to have action cancelled. DDG is set to 0%. Moved to last in the combat order.
+    # SHOCKED: Has a 50% chance to have action cancelled. DDG is set to 0%. Moved to last in the combat order.
     # ABLAZE: Takes damage equal to 10% of max hp each turn. ACC is reduced by 33%.
     # FREEZING: Has a 50% chance to have action cancelled. Unable to cast spells. Saps 10% of max mp each turn. 
     Shock = AttackMagic("Shock","Has a chance to inflict Shocked on a target.",2,324,18,0,SpellType.Debuff,Element.Lightning,Target.Single)
@@ -536,9 +536,9 @@ def initTalentDirectory():
     talentDirectory.append(Blitz)
     Havoc = Talent("Havoc","Attack random enemies 5 times for half damage.",1,516,16,TalentType.Action,Target.All,Timing.InTurn)
     talentDirectory.append(Havoc)
-    Smite = Talent("Smite","Sheathe your weapon in holy light, and attack an enemy for 150% damage.",1,517,12,TalentType.Action,Target.Single,Timing.InTurn)
+    Smite = Talent("Smite","Sheathe the user's weapon in holy light, and attack an enemy for 150% damage.",1,517,12,TalentType.Action,Target.Single,Timing.InTurn)
     talentDirectory.append(Smite)
-    Hide = Talent("Hide","Vanish into the shadows, making you impossible to hit with physical attacks.",1,518,6,TalentType.PartyEffect,Target.Self,Timing.DamageTaken)
+    Hide = Talent("Hide","Vanish into the shadows, making the user impossible to hit with physical attacks.",1,518,6,TalentType.PartyEffect,Target.Self,Timing.DamageTaken)
     talentDirectory.append(Hide)
     Pray = Talent("Pray","Avoid status effects on your party this turn.",1,519,14,TalentType.PartyEffect,Target.Party,Timing.DamageTaken)
     talentDirectory.append(Pray)
@@ -548,6 +548,14 @@ def initTalentDirectory():
     talentDirectory.append(DeathWish)
     Guard = Talent("Guard","Take a defensive stance, halving damage taken this turn.",1,522,0,TalentType.PartyEffect,Target.Self,Timing.DamageTaken)
     talentDirectory.append(Guard)
+    Bastion = Talent("Bastion","The user buries their feet in the ground, standing as a statue. Resist 80% of damage over the next 2 turns, skip next action.",1,523,10,TalentType.PartyEffect,Target.Self,Timing.DamageTaken,2)
+    talentDirectory.append(Bastion)
+    Rage = Talent("Rage","Enter a state of unbridled fury. Gain a damage boost (2x) for each time the user is damaged this turn to unleash next turn. Can stack.",1,524,14,TalentType.PartyEffect,Target.Self,[Timing.DamageTaken,Timing.DamageDealt],2)
+    talentDirectory.append(Rage)
+    Assist = Talent("Assist","Ensure an ally strikes true. Grants chosen ally +50% physical damage dealt this turn.",1,525,4,TalentType.PartyEffect,Target.Ally,Timing.DamageDealt)
+    talentDirectory.append(Assist)
+    Lunge = Talent("Lunge","Strike an enemy for 200% damage. User takes double damage for the remainder of the turn.",1,526,8,TalentType.PartyEffect,Target.Self,[Timing.InTurn,Timing.DamageTaken])
+    talentDirectory.append(Lunge)
 
     return talentDirectory
 
@@ -804,13 +812,13 @@ def initFeatDirectory():
     RendaisBlessing = Feat("Rendai's Blessing", "+4 HP Regen", 1, 1006, FeatType.General, Timing.Universal, None, None, 4)
     featDirectory.append(RendaisBlessing)
     # Rendai's Blessing II - Mastery Feat - +8 HP Regen
-    RendaisBlessingII = Feat("Rendai's Blessing II", "+8 HP Regen", 1, 1007, FeatType.Mastery, Timing.Universal, None, None, 8)
+    RendaisBlessingII = Feat("Rendai's Blessing II", "+8 HP Regen", 1, 1007, FeatType.Mastery, Timing.Universal, None, None, 4)
     featDirectory.append(RendaisBlessingII)
     # Callaret's Blessing - General Feat - +2 MP Regen
     CallaretsBlessing = Feat("Callaret's Blessing", "+2 MP Regen", 1, 1008, FeatType.General, Timing.Universal, None, None, 2)
     featDirectory.append(CallaretsBlessing)
     # Callaret's Blessing II - Mastery Feat - +4 MP Regen
-    CallaretsBlessingII = Feat("Callaret's Blessing II", "+4 MP Regen", 1, 1009, FeatType.Mastery, Timing.Universal, None, None, 4)
+    CallaretsBlessingII = Feat("Callaret's Blessing II", "+4 MP Regen", 1, 1009, FeatType.Mastery, Timing.Universal, None, None, 2)
     featDirectory.append(CallaretsBlessingII)
     # Alert - General Feat - 25% chance to negate damage when using Guard
     Alert = Feat("Alert", "Grants 25% chance to negate damage when using Guard", 1, 1010, FeatType.General, Timing.DamageTaken, None, None, .25)
@@ -834,19 +842,19 @@ def initFeatDirectory():
     KeenEye = Feat("Keen Eye", "+10% ACC", 1, 1016, FeatType.General, Timing.Universal, None, None, 10)
     featDirectory.append(KeenEye)
     # Keen Eye II - Mastery Feat - +20% ACC
-    KeenEyeII = Feat("Keen Eye II", "+20% ACC", 1, 1017, FeatType.Mastery, Timing.Universal, None, None, 20)
+    KeenEyeII = Feat("Keen Eye II", "+20% ACC", 1, 1017, FeatType.Mastery, Timing.Universal, None, None, 10)
     featDirectory.append(KeenEyeII)
     # Killer Instinct - General Feat - +5% CRT
     KillerInstinct = Feat("Killer Instinct", "+5% CRT", 1, 1018, FeatType.General, Timing.Universal, None, None, 5)
     featDirectory.append(KillerInstinct)
     # Killer Instinct II - Mastery Feat - +10% CRT
-    KillerInstinctII = Feat("Killer Instinct II", "+10% CRT", 1, 1019, FeatType.Mastery, Timing.Universal, None, None, 10)
+    KillerInstinctII = Feat("Killer Instinct II", "+10% CRT", 1, 1019, FeatType.Mastery, Timing.Universal, None, None, 5)
     featDirectory.append(KillerInstinctII)
     # Attune - General Feat - +10% activation rate for Active Runes
     Attune = Feat("Attune", "+10% activation rate for Active Runes", 1, 1020, FeatType.General, Timing.Universal, None, None, 10)
     featDirectory.append(Attune)
     # Attune II - Mastery Feat - +20% activation rate for Active Runes
-    AttuneII = Feat("Attune II", "+20% activation rate for Active Runes", 1, 1021, FeatType.Mastery, Timing.Universal, None, None, 20)
+    AttuneII = Feat("Attune II", "+20% activation rate for Active Runes", 1, 1021, FeatType.Mastery, Timing.Universal, None, None, 10)
     featDirectory.append(AttuneII)
     # Talented - General Feat - Talents cost 15% less MP to perform
     Talented = Feat("Talented", "Talents cost 15% less MP to perform", 1, 1022, FeatType.General, Timing.DamageDealt, None, None, .15)
