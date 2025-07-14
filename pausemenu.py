@@ -30,6 +30,7 @@ class PauseMenu():
         self.bottom = self.game.height - 20
         self.font = pygame.font.Font('freesansbold.ttf',20)
         self.mapZoomSize = 20
+        self.havenList = []
 
     def blitScreen(self):
         self.game.screen.blit(self.game.screen, (0,0))
@@ -46,6 +47,7 @@ class PauseMenu():
             self.getInput()
             self.drawScreen()
             self.blitScreen()
+        self.game.player.currentPos = self.currentPos
         self.game.screen.fill(self.game.black)
         self.blitScreen()
 
@@ -290,10 +292,16 @@ class PauseMenu():
             mapFont = pygame.font.Font('freesansbold.ttf',round(blockSize/1.5))
             mapOutline = pygame.Rect(self.left+10,self.top+10,self.right-20,self.bottom-70)
             pygame.draw.rect(self.game.screen,self.game.white,mapOutline,2)
-            write(self.game, 15, 40, 435,"L) Zoom Out")
-            write(self.game, 15, 200, 435,"R) Zoom In")
-            write(self.game, 15, 360, 435,"A) Toggle View")
-            write(self.game, 15, 520, 435,"B) Back")
+            write(self.game, 15, 40, 425,"L) Zoom Out")
+            write(self.game, 15, 40, 445,"R) Zoom In")
+            if self.substate == "none":
+                write(self.game, 15, 200, 425,"A) Toggle View")
+                write(self.game, 15, 200, 445,"B) Back")
+                write(self.game, 15, 520, 425,"X) Warp")
+            else:
+                write(self.game, 15, 200, 425,"A) Warp")
+                write(self.game, 15, 200, 445,"B) Back")
+
 
             mapLeft = 40
             mapRight = self.right-20
@@ -382,6 +390,9 @@ class PauseMenu():
                     textWidth, textHeight = mapFont.size(mapChar)
                     offset = (blockSize-textWidth)/2
                     self.game.screen.blit(text,(x+offset,y+(round(blockSize/6))))
+            
+            if self.substate == "warp":
+                self.drawLocationList(self.havenList)
 
 
     def getInput(self):
@@ -411,12 +422,13 @@ class PauseMenu():
                 self.state = "partyMember"
                 self.targetPartyMember = self.cursorPos
                 self.cursorPos = 0
-            elif self.state == "map":
-                if self.state == "map":
-                    if self.mapMode == "biome":
-                        self.mapMode = "difficulty"
-                    else:
-                        self.mapMode = "biome"
+            elif self.state == "map" and self.substate == "none":
+                if self.mapMode == "biome":
+                    self.mapMode = "difficulty"
+                else:
+                    self.mapMode = "biome"
+            elif self.state == "map" and self.substate == "warp":
+                self.warp(self.havenList[self.cursorPos])
             elif self.state == "partyMember":
                 self.spellPageMod = 0
                 if self.cursorPos == 0:
@@ -429,7 +441,7 @@ class PauseMenu():
                     self.state = "inventory"
                     self.menuSelection = self.cursorPos
                     self.cursorPos = 0
-                elif self.cursorPos ==  3:
+                elif self.cursorPos == 3:
                     self.state = "spellbook"
                     self.menuSelection = self.cursorPos
                     self.cursorPos = 0
@@ -497,26 +509,31 @@ class PauseMenu():
             if self.state == "partySelect":
                 self.state = "main"
                 self.cursorPos = 1
-            if self.state == "map":
+            elif self.state == "map" and self.substate == "none":
                 if self.state == "map":
                     self.state = "main"
+                    self.substate = "none"
                 else:
                     self.paused = False
-            if self.state == "partyMember":
+            elif self.state == "map" and self.substate == "warp":
+                self.substate = "none"
+                self.cursorPos = 0
+                self.mapPos = list(self.currentPos)
+            elif self.state == "partyMember":
                 self.state = "partySelect"
                 self.cursorPos = self.targetPartyMember
-            if self.state == "equipment" or self.state == "inventory" or self.state == "spellbook":
+            elif self.state == "equipment" or self.state == "inventory" or self.state == "spellbook":
                 self.state = "partyMember"
                 self.cursorPos = self.menuSelection
-            if self.state == "itemSummary":
+            elif self.state == "itemSummary":
                 self.cursorPos = self.targetElement - (self.spellPageMod*2)
                 self.state = self.substate
                 self.substate = "none"
-            if self.state == "confirmAction":
+            elif self.state == "confirmAction":
                 self.cursorPos = self.targetElement - (self.spellPageMod*2)
                 self.state = self.substate
                 self.substate = "none"
-            if self.state == "targetSelect":
+            elif self.state == "targetSelect":
                 self.cursorPos = self.targetElement - (self.spellPageMod*2)
                 self.state = self.substate
                 self.substate = "none"
@@ -524,23 +541,35 @@ class PauseMenu():
             if self.state == "partyMember":
                 for feat in self.game.player.party.members[self.targetPartyMember].feats:
                     print(feat.name)
-            if self.state == "equipment":
+            elif self.state == "equipment":
                 if self.game.player.party.members[self.targetPartyMember].eqpAcc.id != -1:
                     self.action = "removeAcc"
                     self.state = "confirmAction"
                     self.substate = "equipment"
+            elif self.state == "map" and self.substate == "none":
+                self.substate = "warp"
+                self.cursorPos = -1
+                self.populateWarpList()
         if self.game.keys["UP"]:
             if self.state == "main":
                 self.cursorPos -= 1
                 if self.cursorPos < 0:
                     self.cursorPos = 3
-            if self.state == "partySelect" or self.state == "targetSelect":
+            elif self.state == "partySelect" or self.state == "targetSelect":
                 self.cursorPos -= 1
                 if self.cursorPos < 0:
                     self.cursorPos = len(self.game.player.party.members)-1
-            if self.state == "map":
+            elif self.state == "map" and self.substate == "none":
                 self.mapPos[0] -= self.panMap()
-            if self.state == "partyMember":
+            elif self.state == "map" and self.substate == "warp":
+                if self.cursorPos == -1:
+                    self.cursorPos = len(self.havenList)-1
+                else:
+                    self.cursorPos -= 1
+                    if self.cursorPos < 0:
+                        self.cursorPos = len(self.havenList)-1
+                self.mapPos = list(self.havenList[self.cursorPos].coords)
+            elif self.state == "partyMember":
                 self.cursorPos -= 1
                 if self.cursorPos < 0:
                     self.cursorPos = 3
@@ -564,8 +593,16 @@ class PauseMenu():
                 self.cursorPos += 1
                 if self.cursorPos > len(self.game.player.party.members)-1:
                     self.cursorPos = 0
-            elif self.state == "map":
+            elif self.state == "map" and self.substate == "none":
                 self.mapPos[0] += self.panMap()
+            elif self.state == "map" and self.substate == "warp":
+                if self.cursorPos == -1:
+                    self.cursorPos = 0
+                else:
+                    self.cursorPos += 1
+                    if self.cursorPos > len(self.havenList)-1:
+                        self.cursorPos = 0
+                self.mapPos = list(self.havenList[self.cursorPos].coords)
             elif self.state == "partyMember":
                 self.cursorPos += 1
                 if self.cursorPos > 3:
@@ -582,7 +619,7 @@ class PauseMenu():
                 else:
                     self.cursorPos += 2
         if self.game.keys["LEFT"]:
-            if self.state == "map":
+            if self.state == "map" and self.substate == "none":
                 self.mapPos[1] -= self.panMap()
             elif self.state == "partyMember":
                 self.targetPartyMember -= 1
@@ -601,7 +638,7 @@ class PauseMenu():
                 elif self.substate == "spellbook":
                     self.cursorPos = 0
         if self.game.keys["RIGHT"]:
-            if self.state == "map":
+            if self.state == "map" and self.substate == "none":
                 self.mapPos[1] += self.panMap()
             elif self.state == "partyMember":
                 self.targetPartyMember += 1
@@ -686,6 +723,19 @@ class PauseMenu():
         write(self.game, 14, xPos+283, yPos+70, "MPG " + str(character.getManaRegen()))
         write(self.game, 14, xPos+213, yPos+90, "SPD " + str(character.getSpeed()))
 
+    def drawLocationList(self,list):
+        locationWindowOutline = pygame.Rect(self.left+380,self.top+30,210,self.bottom-220)
+        locationWindow = pygame.Rect(self.left+382,self.top+32,206,self.bottom-224)
+        pygame.draw.rect(self.game.screen,self.game.white,locationWindowOutline,2)
+        pygame.draw.rect(self.game.screen,self.game.black,locationWindow)
+        write(self.game, 14, self.left+420, self.top+40, "Known Landmarks")
+        for i, landmark in enumerate(list):
+            color = self.game.white
+            if i == self.cursorPos:
+                color = self.game.yellow
+            writeColor(self.game, 14, self.left+386, self.top+60+(20*i), f'{i+1}) Haven {i+1}', color)
+
+
     def panMap(self):
         if self.mapZoomSize == 40:
             return 1
@@ -707,6 +757,15 @@ class PauseMenu():
             return 12
         elif self.mapZoomSize == 4:
             return 20
+        
+    def populateWarpList(self):
+        self.havenList = []
+        for room in self.game.roomDB.rooms.values():
+            if room.type == "haven":
+                self.havenList.append(room)
+
+    def warp(self, destination):
+        self.currentPos = list(destination.coords)
         
     def printInventory(self, type):
         scroll = False
