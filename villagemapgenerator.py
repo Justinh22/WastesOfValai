@@ -52,6 +52,7 @@ class VillageMap():
     def __init__(self,coords,level,typ,biome):
         self.map = []
         self.name = getRandomVillageName(typ)
+        self.type = "village"
         self.coords = coords        # Coords         : Duple containing (row,col) of where the village is located in the world
         self.buildings = []         # Buildings      : List of Buildings
         self.visited = []

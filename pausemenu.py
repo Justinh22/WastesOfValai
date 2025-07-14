@@ -506,7 +506,9 @@ class PauseMenu():
                     self.spellTarget = -1
                     self.cursorPos = 0
         if self.game.keys["B"]:
-            if self.state == "partySelect":
+            if self.state == "main":
+                self.paused = False
+            elif self.state == "partySelect":
                 self.state = "main"
                 self.cursorPos = 1
             elif self.state == "map" and self.substate == "none":
@@ -733,7 +735,12 @@ class PauseMenu():
             color = self.game.white
             if i == self.cursorPos:
                 color = self.game.yellow
-            writeColor(self.game, 14, self.left+386, self.top+60+(20*i), f'{i+1}) Haven {i+1}', color)
+            locationName = "None"
+            if landmark.type == "village":
+                locationName = landmark.name
+            elif landmark.type == "haven":
+                locationName = f"Haven {i+1}"
+            writeColor(self.game, 14, self.left+386, self.top+60+(20*i), f'{i+1}) {locationName}', color)
 
 
     def panMap(self):
@@ -763,6 +770,8 @@ class PauseMenu():
         for room in self.game.roomDB.rooms.values():
             if room.type == "haven":
                 self.havenList.append(room)
+        for village in self.game.villageDB.villages.values():
+            self.havenList.append(village)
 
     def warp(self, destination):
         self.currentPos = list(destination.coords)
