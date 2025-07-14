@@ -215,7 +215,7 @@ class Crawler():
                 enemy.act(self.dungeonPos)
                 if enemy.coords == self.dungeonPos:
                     encounter = []
-                    encounter = self.game.directory.buildEncounter(self.dungeonMap.dungeonLevel,Biome.Other)
+                    encounter = self.game.directory.buildEncounter(self.dungeonMap.dungeonLevel,self.dungeon.biome)
                     self.combat.initialize(encounter)
                     defeatedEnemy = i
         if defeatedEnemy != -1:

@@ -25,12 +25,12 @@ class DungeonDatabase():
     def addDungeon(self,coords,dungeon):
         self.dungeons[coords] = dungeon
 
-    def getDungeon(self,coords,type,level=0,floors=-1):
+    def getDungeon(self,coords,biome,type,level=0,floors=-1):
         if coords not in self.dungeons.keys():
             if floors == -1:
                 floors = random.randint(1,DUNGEON_MAX_FLOORS)
             print(f'{floors} floors in dungeon')
-            newDungeon = Dungeon(coords,type,level,floors)
+            newDungeon = Dungeon(coords,biome,type,level,floors)
             self.addDungeon(coords,newDungeon)
         return self.dungeons[coords]
     
@@ -43,9 +43,10 @@ class DungeonDatabase():
 
 
 class Dungeon():
-    def __init__(self,coords,type,level,floors):
+    def __init__(self,coords,biome,type,level,floors):
         self.name = getRandomDungeonName(type)
         self.coords = coords
+        self.biome = biome
         self.dungeonType = type
         self.dungeonLevel = level
         self.floors = floors

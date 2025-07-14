@@ -70,7 +70,7 @@ def initCreatureDirectory():
     creatureDirectory.append(Goblin)
     Bandit = Creature("Bandit",1,2,55,37,70,2,0,11,Element.Lightning,Biome.Desert,[])
     creatureDirectory.append(Bandit)
-    Skeleton = Creature("Skeleton",1,3,45,38,65,3,0,9,Element.Ice,Biome.Other,[])
+    Skeleton = Creature("Skeleton",1,3,45,38,65,3,0,9,Element.Ice,Biome.Wastes,[])
     creatureDirectory.append(Skeleton)
     #2
     Giant_Spider = Creature("Giant Spider",2,4,110,41,65,8,5,16,Element.Ice,Biome.Forest,[])
@@ -79,7 +79,7 @@ def initCreatureDirectory():
     creatureDirectory.append(Kobold)
     Imp = Creature("Imp",2,6,85,46,70,5,5,15,Element.Fire,Biome.Desert,[301])
     creatureDirectory.append(Imp)
-    Spectre = Creature("Spectre",2,7,120,40,65,8,10,10,Element.Ice,Biome.Other,[302])
+    Spectre = Creature("Spectre",2,7,120,40,65,8,10,10,Element.Ice,Biome.Wastes,[302])
     creatureDirectory.append(Spectre)
     #5
     Serpent = Creature("Serpent",5,8,160,58,80,15,20,20,Element.Ice,Biome.Forest,[])
@@ -88,7 +88,7 @@ def initCreatureDirectory():
     creatureDirectory.append(Wyrm)
     Cultist = Creature("Cultist",5,10,130,60,90,14,10,15,Element.Lightning,Biome.Desert,[307])
     creatureDirectory.append(Cultist)
-    Wight = Creature("Wight",5,11,200,55,85,22,5,9,Element.Ice,Biome.Other,[326])
+    Wight = Creature("Wight",5,11,200,55,85,22,5,9,Element.Ice,Biome.Wastes,[326])
     creatureDirectory.append(Wight)
     #8
     Water_Elemental = Creature("Water Elemental",8,12,300,80,85,24,25,32,Element.Ice,Biome.Forest,[314])
@@ -97,7 +97,7 @@ def initCreatureDirectory():
     creatureDirectory.append(Air_Elemental)
     Earth_Elemental = Creature("Earth Elemental",8,14,300,78,70,30,5,20,Element.Lightning,Biome.Desert,[312])
     creatureDirectory.append(Earth_Elemental)
-    Fire_Elemental = Creature("Fire Elemental",8,15,300,84,75,24,15,35,Element.Fire,Biome.Other,[313])
+    Fire_Elemental = Creature("Fire Elemental",8,15,300,84,75,24,15,35,Element.Fire,Biome.Wastes,[313])
     creatureDirectory.append(Fire_Elemental)
     #10
     Ogre = Creature("Ogre",10,16,400,91,75,28,5,24,Element.Lightning,Biome.Forest,[])
@@ -106,7 +106,7 @@ def initCreatureDirectory():
     creatureDirectory.append(Wyvern)
     Giant = Creature("Giant",10,18,400,87,70,32,0,25,Element.Fire,Biome.Desert,[])
     creatureDirectory.append(Giant)
-    Basilisk = Creature("Basilisk",10,19,400,89,85,31,0,34,Element.Ice,Biome.Other,[327])
+    Basilisk = Creature("Basilisk",10,19,400,89,85,31,0,34,Element.Ice,Biome.Wastes,[327])
     creatureDirectory.append(Basilisk)
     #12
     Chimera = Creature("Chimera",12,20,550,100,110,36,15,32,Element.Fire,Biome.Forest,[312])
@@ -115,7 +115,7 @@ def initCreatureDirectory():
     creatureDirectory.append(Demon)
     Dark_Sorcerer = Creature("Dark Sorcerer",12,22,400,114,110,26,30,46,Element.Lightning,Biome.Desert,[315,319,329])
     creatureDirectory.append(Dark_Sorcerer)
-    Vampire = Creature("Vampire",12,23,450,107,115,29,25,44,Element.Ice,Biome.Other,[])
+    Vampire = Creature("Vampire",12,23,450,107,115,29,25,44,Element.Ice,Biome.Wastes,[])
     creatureDirectory.append(Vampire)
     #15
     Gorgon = Creature("Gorgon",15,24,650,107,120,34,10,34,Element.Fire,Biome.Forest,[327])
@@ -124,7 +124,7 @@ def initCreatureDirectory():
     creatureDirectory.append(Iron_Golem)
     Behemoth = Creature("Behemoth",15,26,600,100,125,30,15,42,Element.Ice,Biome.Desert,[])
     creatureDirectory.append(Behemoth)
-    Pheonix = Creature("Pheonix",15,27,500,116,130,28,30,56,Element.Fire,Biome.Other,[322,331])
+    Pheonix = Creature("Pheonix",15,27,500,116,130,28,30,56,Element.Fire,Biome.Wastes,[322,331])
     creatureDirectory.append(Pheonix)
     #18
     Gaia_Giant = Creature("Gaia Giant",18,28,750,118,130,46,5,46,Element.Lightning,Biome.Forest,[327,316])
@@ -133,7 +133,7 @@ def initCreatureDirectory():
     creatureDirectory.append(Fallen_Angel)
     Duskwalker = Creature("Duskwalker",18,30,600,126,145,36,25,60,Element.Ice,Biome.Desert,[329])
     creatureDirectory.append(Duskwalker)
-    Valentium_Golem = Creature("Valentium Golem",18,31,850,122,120,51,0,24,Element.Fire,Biome.Other,[])
+    Valentium_Golem = Creature("Valentium Golem",18,31,850,122,120,51,0,24,Element.Fire,Biome.Wastes,[])
     creatureDirectory.append(Valentium_Golem)
     #20
     Blue_Dragon = Creature("Blue Dragon",20,32,1000,155,160,47,40,45,Element.Ice,Biome.Forest,[323,332])
@@ -142,7 +142,7 @@ def initCreatureDirectory():
     creatureDirectory.append(Green_Dragon)
     Bronze_Dragon = Creature("Bronze Dragon",20,34,1000,145,130,67,5,41,Element.Lightning,Biome.Desert,[321,330])
     creatureDirectory.append(Bronze_Dragon)
-    Red_Dragon = Creature("Red Dragon",20,35,1000,160,145,57,35,43,Element.Fire,Biome.Other,[322,331])
+    Red_Dragon = Creature("Red Dragon",20,35,1000,160,145,57,35,43,Element.Fire,Biome.Wastes,[322,331])
     creatureDirectory.append(Red_Dragon)
 
     return creatureDirectory

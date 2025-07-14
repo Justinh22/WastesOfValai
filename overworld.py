@@ -147,9 +147,11 @@ class Overworld():
                         color = self.game.lightgreen
                     elif mapChar == DESERT_CHAR: # Desert
                         color = self.game.tan
+                    elif mapChar == WASTES_CHAR: # Wastes
+                        color = self.game.lightbrown
                     elif mapChar == PATH_CHAR: # Path
                         color = self.game.orange
-                    elif mapChar == OCEAN_CHAR: # Path
+                    elif mapChar == OCEAN_CHAR: # Ocean
                         color = self.game.blue
                     elif self.game.roomDB.doesExist((r,c)) or self.game.dungeonDB.doesExist((r,c)) or self.game.villageDB.doesExist((r,c)):
                         color = self.game.gray
@@ -166,6 +168,8 @@ class Overworld():
             return Biome.Plains
         elif self.game.WorldMap.map[r][c] == DESERT_CHAR:
             return Biome.Desert
+        elif self.game.WorldMap.map[r][c] == WASTES_CHAR:
+            return Biome.Wastes
         elif self.game.WorldMap.map[r][c] == PATH_CHAR:
             return Biome.Path
         else:
@@ -187,7 +191,7 @@ class Overworld():
 
     def stepTo(self,r,c): # Simplified; any non-terrain space is treated as a Shack
         # self.game.stir()
-        if self.game.WorldMap.map[r][c] != FOREST_CHAR and self.game.WorldMap.map[r][c] != PLAINS_CHAR and self.game.WorldMap.map[r][c] != DESERT_CHAR and self.game.WorldMap.map[r][c] != PATH_CHAR:
+        if self.game.WorldMap.map[r][c] != FOREST_CHAR and self.game.WorldMap.map[r][c] != PLAINS_CHAR and self.game.WorldMap.map[r][c] != DESERT_CHAR and self.game.WorldMap.map[r][c] != WASTES_CHAR and self.game.WorldMap.map[r][c] != PATH_CHAR:
             self.steps += 1
             if self.game.WorldMap.map[r][c] == HAVEN_CHAR or self.game.WorldMap.map[r][c] == VILLAGE_CHAR:
                 if (not (self.game.roomDB.doesExist((r,c))) and self.game.WorldMap.map[r][c] == HAVEN_CHAR) or (not (self.game.villageDB.doesExist((r,c))) and self.game.WorldMap.map[r][c] == VILLAGE_CHAR):
@@ -195,7 +199,7 @@ class Overworld():
                         pathfinder = Pathfinder(self.game.player.lastCheckpoint,(r,c),self.game.WorldMap.map)
                         path = pathfinder.calculatePath()
                         for step in path:
-                            if self.game.WorldMap.map[step[0]][step[1]] == FOREST_CHAR or self.game.WorldMap.map[step[0]][step[1]] == PLAINS_CHAR or self.game.WorldMap.map[step[0]][step[1]] == DESERT_CHAR:
+                            if self.game.WorldMap.map[step[0]][step[1]] == FOREST_CHAR or self.game.WorldMap.map[step[0]][step[1]] == PLAINS_CHAR or self.game.WorldMap.map[step[0]][step[1]] == DESERT_CHAR or self.game.WorldMap.map[step[0]][step[1]] == WASTES_CHAR:
                                 tempList = list(self.game.WorldMap.map[step[0]])
                                 print(f'Writing a {type(self.game.WorldMap.map[step[0]][step[1]])} at ({step[0]},{step[1]})')
                                 tempList[step[1]] = PATH_CHAR
@@ -212,12 +216,11 @@ class Overworld():
                 newRoom = RoomHandler(self.game, self.game.roomDB.getRoom((r,c),self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]),typ))
                 newRoom.enter()
             elif self.game.WorldMap.map[r][c] == VILLAGE_CHAR:
-                print("Das a village bay-be!")
                 self.currentVillage = Explorer(self.game,self.game.villageDB.getVillage((r,c),self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c]), self.approximateBiome(r,c)))
                 self.currentVillage.inVillage = True
                 self.inVillage = True
             else:
-                self.currentDungeon = Crawler(self.game,self.game.dungeonDB.getDungeon((r,c),self.getDungeonType(r,c),self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c])))
+                self.currentDungeon = Crawler(self.game,self.game.dungeonDB.getDungeon((r,c),self.approximateBiome(r,c),self.getDungeonType(r,c),self.game.WorldMap.letterToVal(self.game.WorldMap.difficultyMap[r][c])))
                 self.currentDungeon.inDungeon = True
                 self.inDungeon = True
         elif self.game.debug_manualEncounters is False and self.game.WorldMap.map[r][c] != PATH_CHAR: # Roll for random encounter
@@ -249,7 +252,7 @@ class Overworld():
 
     def approximateBiome(self,r,c):
         checklist = [(-1,0),(0,1),(1,0),(0,-1)]
-        biomeRankings = {Biome.Forest: 0, Biome.Plains: 0, Biome.Desert: 0}
+        biomeRankings = {Biome.Forest: 0, Biome.Plains: 0, Biome.Desert: 0, Biome.Wastes: 0}
         for mod in checklist:
             biome = self.getBiome(r+mod[0],c+mod[1])
             if biome is not Biome.Other and biome is not Biome.Path:

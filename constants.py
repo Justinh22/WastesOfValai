@@ -36,6 +36,7 @@ BUILDING_TYPES = 9
 FOREST_CHAR = '#'
 PLAINS_CHAR = ';'
 DESERT_CHAR = '.'
+WASTES_CHAR = '/'
 OCEAN_CHAR = '~'
 BORDER_CHAR = 'X'
 PATH_CHAR = '%'
@@ -152,8 +153,9 @@ class Biome(Enum):
     Forest = 0
     Plains = 1
     Desert = 2
-    Other = 3
-    Path = 4
+    Wastes = 3
+    Other = 4
+    Path = 5
 
 class Status(Enum):
     Shocked = 0

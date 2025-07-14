@@ -43,13 +43,15 @@ class Map():
         revealedRow = []
         for i in range(0,self.sizeR):
             for j in range(0,self.sizeC):
-                randomChar = random.randint(1,4)
+                randomChar = random.randint(1,5)
                 if randomChar == 1:
                     row.append(FOREST_CHAR)
                 elif randomChar == 2:
                     row.append(PLAINS_CHAR)
                 elif randomChar == 3:
                     row.append(DESERT_CHAR)
+                elif randomChar == 4:
+                    row.append(WASTES_CHAR)
                 else:
                     row.append(OCEAN_CHAR)
                 revealedRow.append('0')
@@ -240,11 +242,13 @@ class Map():
 
 
     def placeLandmarks(self,num):
+        print("start")
         rooms = math.ceil(num * (.5))
         dungeons = math.ceil(num * (.2))
         havens = math.ceil(num * (.3))
         
         roomList = self.pseudoRandomPlacement(rooms)
+        print("room placement done")
         for room in roomList:
             randomVal = random.randint(1,3)
             if randomVal == 1:
@@ -253,6 +257,7 @@ class Map():
                 self.map[room[0]][room[1]] = SHACK_CHAR # Shack
 
         dungeonList = self.pseudoRandomPlacement(dungeons)
+        print("placement done")
         for dungeon in dungeonList:
             randomVal = random.randint(1,2)
             if self.map[dungeon[0]][dungeon[1]] == DESERT_CHAR:
@@ -270,6 +275,9 @@ class Map():
                     self.map[dungeon[0]][dungeon[1]] = RUINS_CHAR # Ruins
                 elif randomVal == 2:
                     self.map[dungeon[0]][dungeon[1]] = TREEHOUSE_CHAR # Treehouse
+            else:
+                self.map[dungeon[0]][dungeon[1]] = WELL_CHAR # Well
+        print("dungeons done")
 
         havenList = self.pseudoRandomPlacement(havens)
         villageCount = 0
@@ -283,6 +291,7 @@ class Map():
 
 
     def pseudoRandomPlacement(self,num):
+        print(num)
         rows = cols = math.floor(math.sqrt(num))
         quadrantSizeR = math.ceil(MAP_HEIGHT / math.ceil(math.sqrt(num)))
         quadrantSizeC = math.ceil(MAP_WIDTH / math.ceil(math.sqrt(num)))
@@ -292,7 +301,8 @@ class Map():
         coordsList = []
         randomQuadOn = False
         burnout = 50
-        while count < num or burnout <= 0:
+        while count < num and burnout > 0:
+            print(burnout)
             upperBoundR = quadrantSizeR*(r+1)
             if upperBoundR >= MAP_HEIGHT:
                 upperBoundR = MAP_HEIGHT-1
