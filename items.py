@@ -7,31 +7,31 @@ def initWeaponDirectory():
     weaponDirectory = []
 
     #1
-    Rusty_Axe = Weapon("Rusty Axe","A dull axe, coated in rust.",1,0,10,60,0,0,WeaponType.Axe)
+    Rusty_Axe = Weapon("Rusty Axe","A dull axe, coated in rust.",1,0,10,65,0,0,WeaponType.Axe)
     weaponDirectory.append(Rusty_Axe)
-    Rusty_Sword = Weapon("Rusty Sword","A dull blade, coated in rust.",1,1,9,65,0,0,WeaponType.Sword)
+    Rusty_Sword = Weapon("Rusty Sword","A dull blade, coated in rust.",1,1,9,70,0,0,WeaponType.Sword)
     weaponDirectory.append(Rusty_Sword)
-    Rusty_Spear = Weapon("Rusty Spear","A dull spear, coated in rust.",1,2,8,70,0,0,WeaponType.Spear)
+    Rusty_Spear = Weapon("Rusty Spear","A dull spear, coated in rust.",1,2,8,75,0,0,WeaponType.Spear)
     weaponDirectory.append(Rusty_Spear)
-    Rusty_Dagger = Weapon("Rusty Dagger","A dull knife, coated in rust.",1,3,7,75,5,0,WeaponType.Dagger)
+    Rusty_Dagger = Weapon("Rusty Dagger","A dull knife, coated in rust.",1,3,7,80,5,0,WeaponType.Dagger)
     weaponDirectory.append(Rusty_Dagger)
-    Rusty_Sceptre = Weapon("Rusty Sceptre","A bent metal staff, coated in rust.",1,4,5,70,0,5,WeaponType.Staff)
+    Rusty_Sceptre = Weapon("Rusty Sceptre","A bent metal staff, coated in rust.",1,4,5,75,0,5,WeaponType.Staff)
     weaponDirectory.append(Rusty_Sceptre)
 
     #2
-    Jagged_Axe = Weapon("Jagged Axe","A hastily-crafted iron axe, with a sharp and jagged edge.",2,5,12,70,5,0,WeaponType.Axe)
+    Jagged_Axe = Weapon("Jagged Axe","A hastily-crafted iron axe, with a sharp and jagged edge.",2,5,12,75,5,0,WeaponType.Axe)
     weaponDirectory.append(Jagged_Axe)
-    Crooked_Saber = Weapon("Crooked Saber","A jagged iron blade, resembling a long piece of schrapnel.",2,6,11,75,0,0,WeaponType.Sword)
+    Crooked_Saber = Weapon("Crooked Saber","A jagged iron blade, resembling a long piece of schrapnel.",2,6,11,80,0,0,WeaponType.Sword)
     weaponDirectory.append(Crooked_Saber)
-    Vicious_Pike = Weapon("Vicious Pike","A long spear, with a sharp shard of iron affixed to the end.",2,7,10,80,0,0,WeaponType.Spear)
+    Vicious_Pike = Weapon("Vicious Pike","A long spear, with a sharp shard of iron affixed to the end.",2,7,10,85,0,0,WeaponType.Spear)
     weaponDirectory.append(Vicious_Pike)
-    Crooked_Dagger = Weapon("Crooked Dagger","A sharp fragment of metal, shaped into a dagger.",2,8,9,85,10,0,WeaponType.Dagger)
+    Crooked_Dagger = Weapon("Crooked Dagger","A sharp fragment of metal, shaped into a dagger.",2,8,9,90,10,0,WeaponType.Dagger)
     weaponDirectory.append(Crooked_Dagger)
-    Gnarled_Rod = Weapon("Gnarled Rod","A tangled wooden rod, containing a green gem at its top.",2,9,7,75,0,10,WeaponType.Staff)
+    Gnarled_Rod = Weapon("Gnarled Rod","A tangled wooden rod, containing a green gem at its top.",2,9,7,80,0,10,WeaponType.Staff)
     weaponDirectory.append(Gnarled_Rod)
 
     #3
-    Iron_Axe = Weapon("Iron Axe","A sturdy iron axe.",3,10,14,70,5,0,WeaponType.Axe)
+    Iron_Axe = Weapon("Iron Axe","A sturdy iron axe.",3,10,14,75,5,0,WeaponType.Axe)
     weaponDirectory.append(Iron_Axe)
     Iron_Sword = Weapon("Iron Sword","A sturdy iron sword.",3,11,13,80,0,0,WeaponType.Sword)
     weaponDirectory.append(Iron_Sword)
@@ -43,15 +43,15 @@ def initWeaponDirectory():
     weaponDirectory.append(Iron_Sceptre)
 
     #4
-    Steel_Axe = Weapon("Steel Axe","A sharp, shining steel axe.",4,15,16,75,5,0,WeaponType.Axe)
+    Steel_Axe = Weapon("Steel Axe","A sharp, shining steel axe.",4,15,16,80,5,0,WeaponType.Axe)
     weaponDirectory.append(Steel_Axe)
-    Steel_Sword = Weapon("Steel Sword","A sharp, shining steel sword.",4,16,15,80,0,0,WeaponType.Sword)
+    Steel_Sword = Weapon("Steel Sword","A sharp, shining steel sword.",4,16,15,85,0,0,WeaponType.Sword)
     weaponDirectory.append(Steel_Sword)
-    Steel_Spear = Weapon("Steel Spear","A sharp, shining steel spear.",4,17,14,85,0,0,WeaponType.Spear)
+    Steel_Spear = Weapon("Steel Spear","A sharp, shining steel spear.",4,17,14,90,0,0,WeaponType.Spear)
     weaponDirectory.append(Steel_Spear)
-    Steel_Dagger = Weapon("Steel Dagger","A sharp, shining steel dagger.",4,18,13,90,10,0,WeaponType.Dagger)
+    Steel_Dagger = Weapon("Steel Dagger","A sharp, shining steel dagger.",4,18,13,95,10,0,WeaponType.Dagger)
     weaponDirectory.append(Steel_Dagger)
-    Steel_Wand = Weapon("Steel Wand","A long, shining steel wand.",4,19,11,80,0,20,WeaponType.Staff)
+    Steel_Wand = Weapon("Steel Wand","A long, shining steel wand.",4,19,11,85,0,20,WeaponType.Staff)
     weaponDirectory.append(Steel_Wand)
 
     #5
@@ -736,7 +736,7 @@ def initConsumableDirectory():
     SunSponge = Consumable("Sun Sponge","A soft sponge that is cool to the touch, known to draw in heat of anything touching it at an incredible rate. Cures an ally of Ablaze.",1,816,Target.Ally,Timing.Anytime,0)
     consumableDirectory.append(SunSponge)
     # Pulse Regulator - Cures an ally of any Shocked
-    PulseRegulator = Consumable("Pulse Regulator","A small needle that pulses with a steady rate, which can reset the nervous system of a patient when pierced with it. Cures an ally of Shocked.",1,817,Target.Ally,Timing.Anytime,0)
+    PulseRegulator = Consumable("Pulse Regulator","A small needle that pulses at a steady rate, which can reset the nervous system of a patient when pierced with it. Cures an ally of Shocked.",1,817,Target.Ally,Timing.Anytime,0)
     consumableDirectory.append(PulseRegulator)
     # Shaking Stone - Cures an ally of Freezing
     ShakingStone = Consumable("Shaking Stone","A small stone that vibrates rapidly, giving off heat. Cures an ally of Freezing.",1,818,Target.Ally,Timing.Anytime,0)

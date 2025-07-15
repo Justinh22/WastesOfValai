@@ -35,10 +35,8 @@ class Room():
             self.implementRoomTemplate(self.id,difficulty)
         elif self.type == "haven":
             self.implementHaven(self.id,difficulty)
-        self.wanderer = True                        # bool : Shows whether or not a wanderer is in the room
-        self.featureLen = len(self.features)        # int : Actual length of features, accounting for wanderer
+        self.featureLen = len(self.features)        # int : Actual length of features
         if self.type != "haven" or random.randint(1,3) <= 2:
-            self.wanderer = False
             self.featureLen -= 1
 
     def implementRoomTemplate(self,id,difficulty):
@@ -126,7 +124,7 @@ class RoomTemplateList():
 ############################################################################################################################################################################
 
     def initHavenTemplateList(self):
-        R0 = RoomTemplate(0,"You enter a cozy wooden shack. The roaring fire in the hearth warms your bones, and beds along the wall offer you a quiet place to rest.",[23,14,24])
+        R0 = RoomTemplate(0,"You enter a cozy wooden shack. The roaring fire in the hearth warms your bones, and beds along the wall offer you a quiet place to rest.",[23,14])
         self.havenTemplateList.append(R0)
 
 featureList = FeatureList()

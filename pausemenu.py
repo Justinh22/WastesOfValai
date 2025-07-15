@@ -162,7 +162,7 @@ class PauseMenu():
                 spelltype = "Attack" if tgt.type == SpellType.Attack or tgt.type == SpellType.Debuff else "Support"
                 writeOrientation(self.game, 15, self.right-40, 220, "Level "+str(tgt.rarity)+" "+spelltype+" Spell | "+str(tgt.manacost) + " MP", "R")
                 if tgt.type == SpellType.Attack:
-                    write(self.game, 15, 60, 245, "Deals " + str(self.game.player.party.members[self.targetPartyMember].amplify(tgt.getAttack())) + " damage.")
+                    write(self.game, 15, 60, 245, "Deals " + str(self.game.player.party.members[self.targetPartyMember].amplify(tgt.attack)) + " damage.")
                 elif tgt.type == SpellType.Buff:
                     buffText = ""
                     commaSeparator = ""
@@ -297,7 +297,8 @@ class PauseMenu():
             if self.substate == "none":
                 write(self.game, 15, 200, 425,"A) Toggle View")
                 write(self.game, 15, 200, 445,"B) Back")
-                write(self.game, 15, 520, 425,"X) Warp")
+                if self.game.WorldMap.map[self.currentPos[0]][self.currentPos[1]] == PATH_CHAR or self.game.WorldMap.map[self.currentPos[0]][self.currentPos[1]] == HAVEN_CHAR:
+                    write(self.game, 15, 520, 425,"X) Warp")
             else:
                 write(self.game, 15, 200, 425,"A) Warp")
                 write(self.game, 15, 200, 445,"B) Back")
@@ -357,7 +358,9 @@ class PauseMenu():
                                     color = self.game.lightgreen
                                 elif mapChar == DESERT_CHAR: # Desert
                                     color = self.game.tan
-                                elif mapChar == OCEAN_CHAR: # Desert
+                                elif mapChar == WASTES_CHAR: # Wastes
+                                    color = self.game.lightbrown
+                                elif mapChar == OCEAN_CHAR: # Ocean
                                     color = self.game.blue
                             elif self.mapMode == "difficulty" and mapChar != BORDER_CHAR and mapChar != PATH_CHAR:
                                 if mapChar == FOREST_CHAR or mapChar == PLAINS_CHAR or mapChar == DESERT_CHAR or mapChar == OCEAN_CHAR:
@@ -549,9 +552,10 @@ class PauseMenu():
                     self.state = "confirmAction"
                     self.substate = "equipment"
             elif self.state == "map" and self.substate == "none":
-                self.substate = "warp"
-                self.cursorPos = -1
-                self.populateWarpList()
+                if self.game.WorldMap.map[self.currentPos[0]][self.currentPos[1]] == PATH_CHAR or self.game.WorldMap.map[self.currentPos[0]][self.currentPos[1]] == HAVEN_CHAR:
+                    self.substate = "warp"
+                    self.cursorPos = -1
+                    self.populateWarpList()
         if self.game.keys["UP"]:
             if self.state == "main":
                 self.cursorPos -= 1

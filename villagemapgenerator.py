@@ -95,6 +95,8 @@ class VillageMap():
             return PLAINS_CHAR
         elif biome is Biome.Desert:
             return DESERT_CHAR
+        elif biome is Biome.Wastes:
+            return WASTES_CHAR
         return None
         
     def getPathBranches(self):

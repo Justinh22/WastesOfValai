@@ -138,7 +138,7 @@ class DungeonMap():
         self.addEntrance()
         numLoot = math.ceil(numRooms/3) + random.choice([-1,0,0,0,1,1])
         self.addLoot(numLoot)
-        if random.randint(0,2) == 2:
+        if random.randint(0,2) == 2 and self.floor >= 3:
             self.addWanderer()
         if self.floor != self.maxFloors:
             self.addDownStairs()

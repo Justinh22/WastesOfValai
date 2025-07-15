@@ -160,10 +160,6 @@ class FeatureList():
         HavenBeds = Feature(23,"Beds","A comfortable row of beds lay in a line at the side of the cabin. They look like they could provide a good night's rest.",
                             [Type.Empty], LootOdds.Impossible, LootRarity.Common)
         self.featureList.append(HavenBeds)
-
-        HavenWanderer = Feature(24,"Wanderer","A figure sits by the hearth, resting.",
-                                [Type.Empty], LootOdds.Impossible, LootRarity.Common)
-        self.featureList.append(HavenWanderer)
 ##################################################################################################################################################################################
 
 dir = Directory()

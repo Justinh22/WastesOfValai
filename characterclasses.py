@@ -737,6 +737,7 @@ class UniversalEffects():
         self.hpregen = 0
         self.atkMagicLevel = 0
         self.sptMagicLevel = 0
+        self.runeActivation = 0
     def print(self):
         print(f'{self.hp}, {self.mp}, {self.attack}, {self.accuracy}, {self.critrate}, {self.defense}, {self.dodge}, {self.speed}, \
               {self.luck}, {self.amplifier}, {self.manaregen}, {self.hpregen}, {self.atkMagicLevel}, {self.sptMagicLevel}')

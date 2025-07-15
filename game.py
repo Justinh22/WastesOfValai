@@ -20,7 +20,7 @@ class Game():
                      "UP": False, "DOWN": False, "LEFT": False, "RIGHT": False, "SELECT": False, "START": False}
         self.heldKeys = {"UP": False, "DOWN": False, "LEFT": False, "RIGHT": False}
         self.keydownDelay = KEYDOWN_START_DELAY
-        self.white, self.lightgrey, self.gray, self.darkgrey, self.black = (255,255,255), (200, 200, 200), (150,150,150), (85,85,85), (0,0,0)
+        self.white, self.lightgrey, self.gray, self.darkgrey, self.black = (255,255,255), (200, 200, 200), (150,150,150), (65,65,65), (0,0,0)
         self.tan, self.lightgreen, self.green, self.orange, self.lightbrown = (232, 235, 96), (181, 247, 94), (90, 176, 72), (179,114,2), (145, 125, 100)
         self.brown, self.maroon, self.yellow, self.darkgreen = (173, 84, 0), (173, 0, 0), (255, 255, 0), (10, 100, 40)
         self.red, self.blue, self.lightblue = (255,0,0), (0,0,255), (0,255,255)

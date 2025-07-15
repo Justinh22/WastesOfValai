@@ -101,6 +101,8 @@ class Explorer():
             color = self.game.lightgreen
         elif mapChar == DESERT_CHAR: # Desert
             color = self.game.tan
+        elif mapChar == WASTES_CHAR: # Desert
+            color = self.game.lightbrown
         elif mapChar == PATH_CHAR: # Path
             color = self.game.orange
         elif mapChar == BUILDING_WALL: # Building Wall

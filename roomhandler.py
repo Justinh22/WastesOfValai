@@ -55,7 +55,7 @@ class RoomHandler():
                 self.state = "featureCheck"
             elif self.state == "featureCheck":
                 self.delay = 5
-                if self.room.type == "room" or (self.room.type == "haven" and (self.room.features[self.cursorPos].name != "Beds" and self.room.features[self.cursorPos].name != "Wanderer")):
+                if self.room.type == "room" or (self.room.type == "haven" and self.room.features[self.cursorPos].name != "Beds"):
                     if self.room.features[self.cursorPos].lootStatus != LootStatus.Taken:
                         self.takeItem(self.cursorPos)
                 if self.room.type == "haven" and self.room.features[self.cursorPos].name == "Beds":
@@ -63,17 +63,6 @@ class RoomHandler():
                     self.game.player.party.removeFoodEffect(self.game.directory)
                     self.game.save()
                     self.slept = True
-                if self.room.type == "haven" and self.room.features[self.cursorPos].name == "Wanderer":
-                    if len(self.game.player.party.members) < 4:
-                        self.game.player.party.members.append(self.game.directory.buildCharacter(self.game.player.party.level,self.game.player.party.members,self.game.player.getNewCharID()))
-                    else:
-                        CharacterSwap(self.game,self.game.directory.buildCharacter(self.game.player.party.level,self.game.player.party.members,self.game.player.getNewCharID()))
-                    self.room.features[self.cursorPos].lootStatus = LootStatus.Taken
-                    self.room.features.pop(self.cursorPos)
-                    self.state = "lookList"
-                    self.cursorPos = 0
-                    self.room.featureLen -= 1
-                    self.room.wanderer = False
             print("A")
         if self.game.keys["B"]:
             if self.state == "main":
@@ -116,8 +105,6 @@ class RoomHandler():
         pygame.draw.line(self.game.screen,self.game.white,(self.left,300),(self.right+9,300),2)
         pygame.draw.line(self.game.screen,self.game.white,(self.right-self.left-180,300),(self.right-self.left-180,self.bottom+8),2)
         description = self.room.description
-        if self.room.wanderer:
-            description += " A figure sits by the hearth, warming by the flames."
         wrapWrite(self.game, 20,description,self.right-self.left-15)
         if self.state == "main":
             write(self.game, 25,self.right-150,self.top+340,"A) Look")
@@ -138,8 +125,6 @@ class RoomHandler():
                 self.room.features[self.cursorPos].lootStatus = LootStatus.Discovered
             if self.room.features[self.cursorPos].name == "Beds" and self.room.type == "haven" and self.slept == False:
                 write(self.game, 25,self.right-150,self.top+340,"A) Sleep")
-            if self.room.features[self.cursorPos].name == "Wanderer" and self.room.type == "haven":
-                write(self.game, 25,self.right-150,self.top+340,"A) Speak")
             write(self.game, 25,self.right-150,self.top+390,"B) Back")
             wrapWrite(self.game, 15,text,self.right-self.left-200,self.left+10,self.top+310)
 

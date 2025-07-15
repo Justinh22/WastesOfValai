@@ -940,7 +940,7 @@ class BlackMarket(Shop):
                 self.state = "shopScreen"
                 self.substate = "none"
             elif self.state == "shopScreen":
-                if self.player.gold > self.calculateCost(self.shopInventory[self.cursorPos+self.shopPageModifier]):
+                if self.player.gold >= self.calculateCost(self.shopInventory[self.cursorPos+self.shopPageModifier]):
                     if self.canAddItem(self.shopInventory[self.cursorPos+self.shopPageModifier]):
                         self.targetItem = self.shopInventory[self.cursorPos+self.shopPageModifier]
                         self.state = "confirmPurchase"
